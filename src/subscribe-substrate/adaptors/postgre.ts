@@ -1,4 +1,6 @@
 import { EventData } from '@polkadot/types/type/Event';
+import { api } from '../server';
+import { BlogId, PostId, CommentId } from 'dappforce/types';
 // import { api } from './../server';
 const { Pool } = require('pg')
 
@@ -56,10 +58,10 @@ export const DispatchForDb = (eventAction: EventAction) => {
   insertActivitiStream(eventAction);
 }
 const insertAccountFollower = async (data: EventData) => {
-  const text = 'INSERT INTO df.account_followers(follower_account, following_account) VALUES($1, $2) RETURNING *'
-  const values = [data[0].toString(), data[1].toString()];
+  const query = 'INSERT INTO df.account_followers(follower_account, following_account) VALUES($1, $2) RETURNING *'
+  const params = [data[0].toString(), data[1].toString()];
   try {
-    const res = await pool.query(text, values)
+    const res = await pool.query(query, params)
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
@@ -67,10 +69,10 @@ const insertAccountFollower = async (data: EventData) => {
 };
 
 const deleteAccountFollower = async (data: EventData) => {
-  const text = 'DELETE from df.account_followers WHERE follower_account = $1 AND following_account = $2 RETURNING *'
-  const values = [data[0].toString(), data[1].toString()];
+  const query = 'DELETE from df.account_followers WHERE follower_account = $1 AND following_account = $2 RETURNING *'
+  const params = [data[0].toString(), data[1].toString()];
   try {
-    const res = await pool.query(text, values)
+    const res = await pool.query(query, params)
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
@@ -78,13 +80,11 @@ const deleteAccountFollower = async (data: EventData) => {
 };
 
 const insertPostFollower = async (data: EventData) => {
-  const postId = data[1].toHex().split('x')[1];
-  postId.replace('0','');
-  console.log(postId);
-  const text = 'INSERT INTO df.post_followers(follower_account, following_post_id) VALUES($1, $2) RETURNING *'
-  const values = [data[0].toString(), postId];
+  const postId = encodeStructId(data[1] as PostId);
+  const query = 'INSERT INTO df.post_followers(follower_account, following_post_id) VALUES($1, $2) RETURNING *'
+  const params = [data[0].toString(), postId];
   try {
-    const res = await pool.query(text, values)
+    const res = await pool.query(query, params)
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
@@ -92,12 +92,11 @@ const insertPostFollower = async (data: EventData) => {
 };
 
 const deletePostFollower = async (data: EventData) => {
-  const postId = data[1].toHex().split('x')[1];
-  postId.replace('0','');
-  const text = 'DELETE from df.post_followers WHERE follower_account = $1 AND following_post_id = $2 RETURNING *'
-  const values = [data[0].toString(), postId];
+  const postId = encodeStructId(data[1] as PostId);
+  const query = 'DELETE from df.post_followers WHERE follower_account = $1 AND following_post_id = $2 RETURNING *'
+  const params = [data[0].toString(), postId];
   try {
-    const res = await pool.query(text, values)
+    const res = await pool.query(query, params)
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
@@ -105,13 +104,11 @@ const deletePostFollower = async (data: EventData) => {
 };
 
 const insertCommentFollower = async (data: EventData) => {
-  const commentId = data[1].toHex().split('x')[1];
-  commentId.replace('0','');
-  console.log(commentId);
-  const text = 'INSERT INTO df.comment_followers(follower_account, following_comment_id) VALUES($1, $2) RETURNING *'
-  const values = [data[0].toString(), commentId];
+  const commentId = encodeStructId(data[1] as CommentId);
+  const query = 'INSERT INTO df.comment_followers(follower_account, following_comment_id) VALUES($1, $2) RETURNING *'
+  const params = [data[0].toString(), commentId];
   try {
-    const res = await pool.query(text, values)
+    const res = await pool.query(query, params)
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
@@ -119,12 +116,11 @@ const insertCommentFollower = async (data: EventData) => {
 };
 
 const deleteCommentFollower = async (data: EventData) => {
-  const commentId = data[1].toHex().split('x')[1];
-  commentId.replace('0','');
-  const text = 'DELETE from df.comment_followers WHERE follower_account = $1 AND following_comment_id = $2 RETURNING *'
-  const values = [data[0].toString(), commentId];
+  const commentId = encodeStructId(data[1] as CommentId);
+  const query = 'DELETE from df.comment_followers WHERE follower_account = $1 AND following_comment_id = $2 RETURNING *'
+  const params = [data[0].toString(), commentId];
   try {
-    const res = await pool.query(text, values)
+    const res = await pool.query(query, params)
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
@@ -132,13 +128,11 @@ const deleteCommentFollower = async (data: EventData) => {
 };
 
 const insertBlogFollower = async (data: EventData) => {
-  const blogId = data[1].toHex().split('x')[1];
-  blogId.replace('0','');
-  console.log(blogId);
-  const text = 'INSERT INTO df.blog_followers(follower_account, following_blog_id) VALUES($1, $2) RETURNING *'
-  const values = [data[0].toString(), blogId];
+  const blogId = encodeStructId(data[1] as BlogId);
+  const query = 'INSERT INTO df.blog_followers(follower_account, following_blog_id) VALUES($1, $2) RETURNING *'
+  const params = [data[0].toString(), blogId];
   try {
-    const res = await pool.query(text, values)
+    const res = await pool.query(query, params)
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
@@ -146,12 +140,11 @@ const insertBlogFollower = async (data: EventData) => {
 };
 
 const deleteBlogFollower = async (data: EventData) => {
-  const blogId = data[1].toHex().split('x')[1];
-  blogId.replace('0','');
-  const text = 'DELETE from df.blog_followers WHERE follower_account = $1 AND following_blog_id = $2 RETURNING *'
-  const values = [data[0].toString(), blogId];
+  const blogId = encodeStructId(data[1] as BlogId);
+  const query = 'DELETE from df.blog_followers WHERE follower_account = $1 AND following_blog_id = $2 RETURNING *'
+  const params = [data[0].toString(), blogId];
   try {
-    const res = await pool.query(text, values)
+    const res = await pool.query(query, params)
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
@@ -162,6 +155,7 @@ const insertActivitiStream = async (eventAction: EventAction) => {
   const { eventName, data } = eventAction;
   // const result = await api.query.blogs.blogById(data[1]);
   // console.log(result);
+  const accountId = data[0].toString();
   let subjectId = '';
   if (eventName === 'AccountFollowed' || eventName === 'AccountUnfollowed')
   {
@@ -170,21 +164,26 @@ const insertActivitiStream = async (eventAction: EventAction) => {
     subjectId = data[1].toHex().split('x')[1];
   }
 
-  const text = 'INSERT INTO df.activities_old(account, action, subject_id) VALUES($1, $2, $3) RETURNING *'
-  const values = [data[0].toString(), eventName, subjectId];
+  const query = 'INSERT INTO df.activities_old(account, action, subject_id) VALUES($1, $2, $3) RETURNING *'
+  const params = [accountId, eventName, subjectId];
   try {
-    const res = await pool.query(text, values)
-    await fillActivityStream();
+    const res = await pool.query(query, params)
+    await fillActivityStream(accountId);
     console.log(res.rows[0])
   } catch (err) {
     console.log(err.stack)
   }
 };
 
-const fillActivityStream = async () => {
-  const text = 'SELECT df.account_followers.follower_account, df.activities_old.id FROM df.activities_old RIGHT JOIN df.account_followers ON df.activities_old.account = df.account_followers.following_account'
+function encodeStructId<Id extends BlogId | PostId | CommentId> (id: Id): string {
+  return id.toHex().split('x')[1].replace('0','');
+}
+
+const fillActivityStream = async (accountId: string) => {
+  const query = 'INSERT INTO df.activity_stream(account, activity_id) SELECT df.account_followers.follower_account, df.activities_old.id FROM df.activities_old RIGHT JOIN df.account_followers ON df.activities_old.account = df.account_followers.following_account WHERE df.account_followers.follower_account = $1'
+  const params = [accountId];
   try {
-    const res = await pool.query(text);
+    const res = await pool.query(query, params);
     console.log(res.rows)
   } catch (err) {
     console.log(err.stack);

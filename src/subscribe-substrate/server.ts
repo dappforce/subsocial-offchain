@@ -2,8 +2,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { DispatchForDb } from './adaptors/postgre'
 import { getEventSections, getEventMethods } from './lib/utils';
-import { registerBlogsTypes } from '../types/dappforce/types';
-import { registerJoystreamTypes } from '@joystream/types';
+import { registerJoystreamTypes } from '../df-types';
 import { Event, EventRecord } from '@polkadot/types';
 
 require("dotenv").config();
@@ -22,7 +21,6 @@ async function main() {
     // initialize the data service
     // internally connects to all storage sinks
     const provider = new WsProvider();
-    registerBlogsTypes();
     registerJoystreamTypes();
     // Create API with connection to the local Substrate node.
     // If your Substrate node is running elsewhere, add the config (server + port) in `.env`.
