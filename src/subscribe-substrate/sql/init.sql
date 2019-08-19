@@ -37,3 +37,19 @@ CREATE TABLE df.comment_followers
     follower_account varchar(48) NOT NULL,
     following_comment_id varchar(16) NOT NULL
 );
+
+CREATE TYPE df.action AS ENUM (
+'BlogCreated',
+'BlogUpdated',
+'BlogFollowed',
+'BlogUnfollowed',
+'AccountFollowed',
+'AccountUnfollowed',
+'PostCreated',
+'PostUpdated',
+'CommentCreated',
+'CommentUpdated',
+'PostReactionCreated',
+'PostReactionUpdated',
+'CommentReactionCreated',
+'CommentReactionUpdated')

@@ -29,7 +29,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       break;
     }
     case 'AccountUnfollowed': {
-      // TODO deleteWithActivityStream()
+      await deleteAccountActivityWithActivityStream(data[0].toString());
       await deleteAccountFollower(data);
       break;
     }
@@ -40,7 +40,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       break;
     }
     case 'BlogUnfollowed': {
-      deleteBlogFollower(data);
+      await deleteBlogActivityWithActivityStream(data[0].toString())
+      await deleteBlogFollower(data);
       break;
     }
     case 'PostCreated': {
@@ -48,12 +49,13 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const postId = data[1];
       const post = await api.query.blogs.postById(postId) as Post;
       const ids = [post.blog_id, postId ];
-      await insertActivity(eventAction, ids.map(id => encodeStructId(id)));
+      await insertActivity(eventAction, ids);
       await fillActivityStreamWithPostFollowers(encodeStructId(data[1]));
       break;
     }
     case 'PostDeleted': {
-      deletePostFollower(data);
+      await deletePostActivityWithActivityStream(data[0].toString())
+      await deletePostFollower(data);
       break;
     }
     case 'CommentCreated': {
@@ -65,12 +67,13 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = await api.query.blogs.postById(postId) as Post;
       const ids = [post.blog_id, postId, commentId ];
       console.log(post.blog_id.toHex());
-      await insertActivity(eventAction, ids.map(id => encodeStructId(id)));
+      await insertActivity(eventAction, ids);
       await fillActivityStreamWithCommentFollowers(encodeStructId(data[1]));
       break;
     }
     case 'CommentDeleted': {
-      deleteCommentFollower(data);
+      await deleteCommentActivityWithActivityStream(data[0].toString())
+      await deleteCommentFollower(data);
       break;
     }
     case 'PostReactionCreated': {
@@ -78,7 +81,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = await api.query.blogs.postById(postId) as Post;
       const ids = [post.blog_id, postId ];
       console.log(post.blog_id.toHex());
-      await insertActivity(eventAction, ids.map(id => encodeStructId(id)));
+      await insertActivity(eventAction, ids);
       await fillActivityStreamWithPostFollowers(encodeStructId(data[1]));
       break;
     }
@@ -89,7 +92,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = await api.query.blogs.postById(postId) as Post;
       const ids = [post.blog_id, postId, commentId ];
       console.log(post.blog_id.toHex());
-      await insertActivity(eventAction, ids.map(id => encodeStructId(id)));
+      await insertActivity(eventAction, ids);
       await fillActivityStreamWithCommentFollowers(encodeStructId(data[1]));
       break;
     }
@@ -189,13 +192,15 @@ const deleteBlogFollower = async (data: EventData) => {
   }
 };
 
-const insertActivity = async (eventAction: EventAction, ids?: string[]) => {
-  if (!ids) ids = eventAction.data.slice(1).map(id => encodeStructId(id));
+const insertActivity = async (eventAction: EventAction, ids?: Codec[]) => {
+  let paramsIds: string[];
+  if (!ids) paramsIds = eventAction.data.slice(1).map(id => encodeStructId(id))
+  else paramsIds = ids.map(id => encodeStructId(id));
   const { eventName, data } = eventAction;
   const accountId = data[0].toString();
 
   const query = 'INSERT INTO df.activities(account, events, blog_id, post_id, comment_id) VALUES($1, $2, $3, $4, $5) RETURNING *'
-  const params = [accountId, eventName, ...ids];
+  const params = [accountId, eventName, ...paramsIds];
   console.log(params);
   try {
     const res = await pool.query(query, params)
@@ -236,6 +241,19 @@ const fillActivityStreamWithAccountFollowers = async (accountId: string) => {
   }
 }
 
+
+const deleteAccountActivityWithActivityStream = async (accountId: string) => {
+  const query = 'DELETE FROM activity_stream WHERE EXISTS(SELECT df.account_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.account_followers ON df.activities.account = df.account_followers.following_account WHERE df.activities.account = $1)'
+  const params = [accountId];
+  try {
+    await pool.query(query, params);
+    console.log('Insert');
+  } catch (err) {
+    console.log(err.stack);
+  }
+}
+
+
 const fillActivityStreamWithBlogFollowers = async (blogId: string) => {
   const query = 'INSERT INTO df.activity_stream(account, actitvity_id) (SELECT df.blog_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.blog_followers ON df.activities.blog_id = df.account_followers.following_blog_id WHERE df.activities.blog_id = $1)'
   const params = [blogId];
@@ -246,6 +264,18 @@ const fillActivityStreamWithBlogFollowers = async (blogId: string) => {
     console.log(err.stack);
   }
 }
+
+const deleteBlogActivityWithActivityStream = async (blogId: string) => {
+  const query = 'DELETE FROM activity_stream WHERE EXISTS(SELECT df.blog_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.blog_followers ON df.activities.blog_id = df.account_followers.following_blog_id WHERE df.activities.blog_id = $1)'
+  const params = [blogId];
+  try {
+    await pool.query(query, params);
+    console.log('Insert');
+  } catch (err) {
+    console.log(err.stack);
+  }
+}
+
 const fillActivityStreamWithPostFollowers = async (postId: string) => {
   const query = 'INSERT INTO df.activity_stream(account, actitvity_id) (SELECT df.post_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.post_followers ON df.activities.post_id = df.account_followers.following_post_id WHERE df.activities.post_id = $1)'
   const params = [postId];
@@ -256,6 +286,18 @@ const fillActivityStreamWithPostFollowers = async (postId: string) => {
     console.log(err.stack);
   }
 }
+
+const deletePostActivityWithActivityStream = async (postId: string) => {
+  const query = 'DELETE FROM activity_stream WHERE EXISTS(SELECT df.post_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.post_followers ON df.activities.post_id = df.account_followers.following_post_id WHERE df.activities.post_id = $1)'
+  const params = [postId];
+  try {
+    await pool.query(query, params);
+    console.log('Insert');
+  } catch (err) {
+    console.log(err.stack);
+  }
+}
+
 const fillActivityStreamWithCommentFollowers = async (commentId: string) => {
   const query = 'INSERT INTO df.activity_stream(account, actitvity_id) (SELECT df.comment_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.comment_followers ON df.activities.comment_id = df.account_followers.following_comment_id WHERE df.activities.comment_id = $1)'
   const params = [commentId];
@@ -266,3 +308,15 @@ const fillActivityStreamWithCommentFollowers = async (commentId: string) => {
     console.log(err.stack);
   }
 }
+
+const deleteCommentActivityWithActivityStream = async (commentId: string) => {
+  const query = 'DELETE FROM activity_stream WHERE EXISTS(SELECT df.comment_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.comment_followers ON df.activities.comment_id = df.account_followers.following_comment_id WHERE df.activities.comment_id = $1)'
+  const params = [commentId];
+  try {
+    await pool.query(query, params);
+    console.log('Insert');
+  } catch (err) {
+    console.log(err.stack);
+  }
+}
+
