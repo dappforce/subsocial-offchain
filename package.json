@@ -1,7 +1,7 @@
 {
-  "name": "joystream-bench",
+  "name": "dappforce-offchain-storage",
   "version": "0.1.0",
-  "description": "A benchmarking tool for Joystream sotrage node.",
+  "description": "A offcahain storage in PostgeSQL",
   "engines": {
     "node": ">= 10.13"
   },
