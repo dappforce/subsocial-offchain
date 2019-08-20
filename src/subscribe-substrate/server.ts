@@ -1,4 +1,3 @@
-// Import the API and selected RxJs operators
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { DispatchForDb } from './adaptors/postgre'
 import { getEventSections, getEventMethods } from './lib/utils';
@@ -76,11 +75,6 @@ async function main() {
                 // remove this log if not needed
                 console.log("Event Received: " + Date.now() + ": " + JSON.stringify(eventObj));
 
-                // insert in data sink
-                // can have some error handling here
-                // should not fail or catch exceptions gracefully
-                // const log = await api.query.blogs.blogById(eventObj.data[1]);
-                // console.log(log);
                 await DispatchForDb({eventName: eventObj.method, data: eventObj.data});
             }
         });

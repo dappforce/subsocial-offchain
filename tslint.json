@@ -13,6 +13,7 @@
     "no-redundant-jsdoc": false,
     "prefer-type-cast": false,
     "no-suspicious-comment": false,
+    "prefer-array-literal": false,
     "typedef": [
       true,
       "parameter",
