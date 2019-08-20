@@ -48,7 +48,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       await insertPostFollower(data);
       const postId = data[1];
       const post = await api.query.blogs.postById(postId) as Post;
-      const ids = [post.blog_id, postId ];
+      const ids = [post.blog_id as Codec, postId ];
       await insertActivity(eventAction, ids);
       await fillActivityStreamWithPostFollowers(encodeStructId(data[1]));
       break;
@@ -193,9 +193,10 @@ const deleteBlogFollower = async (data: EventData) => {
 };
 
 const insertActivity = async (eventAction: EventAction, ids?: Codec[]) => {
-  let paramsIds: string[];
-  if (!ids) paramsIds = eventAction.data.slice(1).map(id => encodeStructId(id))
-  else paramsIds = ids.map(id => encodeStructId(id));
+  let paramsIds: string[] = new Array(3).fill(null);
+  console.log(paramsIds);
+  if (!ids) eventAction.data.slice(1).forEach((id,index) => paramsIds[index] = encodeStructId(id));
+  else ids.forEach((id,index) => paramsIds[index] = encodeStructId(id));
   const { eventName, data } = eventAction;
   const accountId = data[0].toString();
 
@@ -252,7 +253,6 @@ const deleteAccountActivityWithActivityStream = async (accountId: string) => {
     console.log(err.stack);
   }
 }
-
 
 const fillActivityStreamWithBlogFollowers = async (blogId: string) => {
   const query = 'INSERT INTO df.activity_stream(account, actitvity_id) (SELECT df.blog_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.blog_followers ON df.activities.blog_id = df.account_followers.following_blog_id WHERE df.activities.blog_id = $1)'

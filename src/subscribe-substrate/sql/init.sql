@@ -8,7 +8,8 @@ CREATE TABLE df.activities
 (
     id bigserial not null primary key,
     account varchar(48) NOT NULL,
-    action df.action NOT NULL,
+    events df.action NOT NULL,
+    object_id varchar(48) NULL,
     blog_id varchar(16) NULL,
     post_id varchar(16) NULL,
     comment_id varchar(16) NULL
