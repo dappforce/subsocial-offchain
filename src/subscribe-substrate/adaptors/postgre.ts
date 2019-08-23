@@ -72,9 +72,12 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const postId = comment.post_id;
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       const post = postOpt.unwrap();
-      const ids = [post.blog_id, postId, commentId ];
+      const ids = [post.blog_id, postId];
+      if (comment.parent_id.isSome) {
+        insertActivityComments(eventAction, ids,comment);
+      }
       await insertActivity(eventAction, ids);
-      await fillActivityStreamWithCommentFollowers(commentId);
+      await fillActivityStreamWithPostFollowers(postId);
       break;
     }
     case 'CommentDeleted': {
@@ -96,7 +99,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
       const comment = commentOpt.unwrap();
-      const ids = [comment.post_id, commentId ];
+      const ids = [comment.post_id, null as PostId, commentId ];
       await insertActivity(eventAction, ids);
       await fillActivityStreamWithCommentFollowers(commentId);
       break;
@@ -106,6 +109,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
 //Utils
 function encodeStructId (id: InsertData): string {
+  if(!id) return null;
   return id.toHex().split('x')[1].replace(/(0+)/,'');
 }
 
@@ -204,7 +208,20 @@ const deleteBlogFollower = async (data: EventData) => {
   }
 };
 
-const insertActivity = async (eventAction: EventAction, ids?:   InsertData[]) => {
+const insertActivityComments = async (eventAction: EventAction, ids: InsertData[], commentLast: Comment) => {
+  let comment = commentLast;
+  while(comment.parent_id.isSome)
+  {
+    const id = comment.parent_id.unwrap() as CommentId;
+    const param = [...ids, id];
+    insertActivity(eventAction,param);
+    fillActivityStreamWithCommentFollowers(id);
+    const commentOpt = await api.query.blogs.commentById(id) as Option<Comment>;
+    comment = commentOpt.unwrap();
+  }
+};
+
+const insertActivity = async (eventAction: EventAction, ids?: InsertData[]) => {
   let paramsIds: string[] = new Array(3).fill(null);
   console.log(paramsIds);
   if (!ids) eventAction.data.slice(1).forEach((id,index) => paramsIds[index] = encodeStructId(id as InsertData));
