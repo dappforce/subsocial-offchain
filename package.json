@@ -1,0 +1,60 @@
+{
+  "name": "dappforce-offchain-storage",
+  "version": "0.1.0",
+  "description": "A offcahain storage in PostgeSQL",
+  "engines": {
+    "node": ">= 10.13"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^4.11.5",
+    "@types/jest": "^24.0.15",
+    "@types/node": "^10.14.10",
+    "jest": "~24.8.0",
+    "prettier": "~1.18.2",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.2",
+    "tslint": "~5.18.0",
+    "tslint-config-prettier": "1.18.0",
+    "tslint-microsoft-contrib": "~6.2.0",
+    "tsutils": "~3.14.0",
+    "typescript": "3.4.5"
+  },
+  "scripts": {
+    "start": "npm run serve",
+    "serve": "node ./build/src/server.js",
+    "clean": "rimraf coverage build tmp",
+    "build": "tsc -p tsconfig.release.json",
+    "build:watch": "tsc -w -p tsconfig.release.json",
+    "lint": "tslint -t stylish --project \"tsconfig.json\"",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "author": "Joystream contributors",
+  "license": "GPL-3.0-only",
+  "dependencies": {
+    "@joystream/types": "^0.3.1",
+    "@polkadot/api": "^0.77.1",
+    "@polkadot/keyring": "^0.76.1",
+    "@polkadot/util": "^0.76.1",
+    "@polkadot/util-crypto": "^0.76.1",
+    "@types/chalk": "^2.2.0",
+    "@types/cli-progress": "^1.8.1",
+    "@types/numeral": "^0.0.25",
+    "@types/react": "^16.8.23",
+    "axios": "^0.19.0",
+    "bn.js": "^4.11.8",
+    "chalk": "^2.4.2",
+    "cli-progress": "^2.1.1",
+    "commander": "^2.20.0",
+    "dotenv": "^8.0.0",
+    "frappe-charts": "^1.2.3",
+    "ipfs-http-client": "^32.0.1",
+    "ipfs-only-hash": "^1.0.2",
+    "lodash": "^4.17.11",
+    "numeral": "^2.0.6",
+    "pg": "^7.12.1",
+    "react": "^16.8.6",
+    "recharts": "^1.6.2",
+    "tslib": "~1.10.0"
+  }
+}
