@@ -1,7 +1,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { DispatchForDb } from './adaptors/postgre'
+import { DispatchForDb } from './lib/postgre'
 import { getEventSections, getEventMethods } from './lib/utils';
-import { registerJoystreamTypes } from './df-types';
+import { registerJoystreamTypes } from './../df-types';
 import { Event, EventRecord } from '@polkadot/types';
 
 require("dotenv").config();

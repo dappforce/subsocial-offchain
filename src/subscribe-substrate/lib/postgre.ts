@@ -1,18 +1,8 @@
 import { api } from '../server';
-import { BlogId, PostId, CommentId, Post, Comment } from '../df-types/src/blogs';
+import { BlogId, PostId, CommentId, Post, Comment } from '../../df-types/src/blogs';
 import { Option } from '@polkadot/types'
 import { EventData } from '@polkadot/types/type/Event';
-const { Pool } = require('pg')
-
-require("dotenv").config();
-
-const pool = new Pool({
-  user: process.env.PGUSER,
-  host: process.env.PGHOST,
-  database: process.env.PGDATABASE,
-  password: process.env.PGPASSWORD,
-  port: process.env.PGPORT,
-});
+import { pool } from './../../adaptors/connectPostgre'
 
 type EventAction = {
   eventName: string,
