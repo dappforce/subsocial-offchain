@@ -11,7 +11,6 @@ export const getEventSections = () => {
     }
 };
 
-
 export const getEventMethods = () => {
     const methods = process.env.SUBSTRATE_EVENT_METHODS;
     if (methods) {
