@@ -1,5 +1,5 @@
 import { pool } from './../adaptors/connectPostgre'
-import { getJsonFromIpfs, addJsonToIpfs, IpfsData, removeFromIpfs } from './adaptors/ipfs'
+import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
 
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
@@ -35,7 +35,7 @@ app.get('/v1/ipfs/rm/:hash', (req: express.Request) => {
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const data = req.body;
   console.log(data);
-  const hash = await addJsonToIpfs(req.body as IpfsData);
+  const hash = await addJsonToIpfs(req.body);
   res.json(hash);
 });
 

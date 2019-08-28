@@ -1,5 +1,6 @@
 import { Option, Struct, Enum } from '@polkadot/types/codec';
 import { BlockNumber, Moment, AccountId, u16, u32, u64, Text, Vector, i32 } from '@polkadot/types';
+export declare type IpfsData = CommentData | PostData | BlogData;
 export declare class IpfsHash extends Text {
 }
 export declare class BlogId extends u64 {

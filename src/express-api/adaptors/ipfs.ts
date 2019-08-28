@@ -1,4 +1,4 @@
-import { CommentData, PostData, BlogData } from './../../df-types/src/blogs'
+import { IpfsData } from './../../df-types/src/blogs'
 import * as IPFS from 'typestub-ipfs';
 const ipfsClient = require('ipfs-http-client');
 const CID = require('cids');
@@ -16,8 +16,6 @@ const ipfs = ipfsClient('localhost', '5002', { protocol: 'http' }) as IpfsAPI;
 
 // const ipfsConfig = { host: 'localhost', port:'5002', protocol: 'http' };
 // new IPFS({ config: ipfsConfig });
-
-export type IpfsData = CommentData | PostData | BlogData;
 
 export async function addJsonToIpfs (data: IpfsData): Promise<string> {
   // const path = `subsocial/${pathDir}`;
