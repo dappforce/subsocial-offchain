@@ -14,22 +14,22 @@ type InsertData = BlogId | PostId | CommentId;
 export const DispatchForDb = async (eventAction: EventAction) => {
   const { data } = eventAction;
   switch(eventAction.eventName){
-    case 'AccountFollowed': {
+    case 'FollowAccount': {
       await insertAccountFollower(data);
       await insertActivityForAccount(eventAction);
-      await fillActivityStreamWithAccountFollowers(data[1].toString())
       break;
     }
-    case 'AccountUnfollowed': {
-      await deleteAccountActivityWithActivityStream(data[0].toString(),data[1].toString());
+    case 'UnfollowAccount': {
+      const follower = data[0].toString();
+      const following = data[1].toString();
+      await deleteAccountActivityWithActivityStream(follower, following);
       await deleteAccountFollower(data);
       break;
     }
-    case 'BlogFollowed': {
+    case 'FollowBlog': {
       await insertBlogFollower(data);
       await insertActivity(eventAction);
-      await fillActivityStreamWithBlogFollowers(data[1] as BlogId);
-      await fillActivityStreamWithAccountFollowers(data[0].toString())
+      // TODO insertNotificationForBlogOwner();
       break;
     }
     case 'BlogUnfollowed': {
@@ -47,7 +47,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       console.log(post.blog_id);
       const ids = [post.blog_id, postId ];
       await insertActivity(eventAction, ids);
-      fillActivityStreamWithPostFollowers(postId);
+      fillActivityStreamWithBlogFollowers(post.blog_id);
+      // TODO WHERE account <> data[0];
       fillActivityStreamWithAccountFollowers(data[0].toString())
       break;
     }
@@ -61,7 +62,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const ids = [post.blog_id, postId ];
       await insertActivity(eventAction, ids);
       fillActivityStreamWithPostFollowers(postId);
-      fillActivityStreamWithAccountFollowers(data[0].toString())
+      //fillActivityStreamWithAccountFollowers(data[0].toString())
       break;
     }
     case 'PostDeleted': {
@@ -96,7 +97,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId, commentId];
       await insertActivity(eventAction, ids);
-      fillActivityStreamWithPostFollowers(postId);
+      fillActivityStreamWithCommentFollowers(commentId);
       fillActivityStreamWithAccountFollowers(data[0].toString())
       break;
     }
@@ -113,7 +114,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       console.log(post.blog_id.toHex());
       await insertActivity(eventAction, ids);
       fillActivityStreamWithPostFollowers(postId);
-      fillActivityStreamWithAccountFollowers(data[0].toString())
+      //fillActivityStreamWithAccountFollowers(data[0].toString())
       break;
     }
     case 'CommentReactionCreated': {
@@ -123,7 +124,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const ids = [comment.post_id, null as PostId, commentId ];
       await insertActivity(eventAction, ids);
       fillActivityStreamWithCommentFollowers(commentId);
-      fillActivityStreamWithAccountFollowers(data[0].toString())
+      //fillActivityStreamWithAccountFollowers(data[0].toString())
       break;
     }
   }
@@ -137,7 +138,8 @@ function encodeStructId (id: InsertData): string {
 
 //Query
 const insertAccountFollower = async (data: EventData) => {
-  const query = 'INSERT INTO df.account_followers(follower_account, following_account) VALUES($1, $2) RETURNING *'
+  console.log(data);
+  const query = 'INSERT INTO df.account_followers(follower_account, following_account) VALUES($1, $2) RETURNING *';
   const params = [data[0].toString(), data[1].toString()];
   try {
     const res = await pool.query(query, params)
@@ -207,6 +209,7 @@ const deleteCommentFollower = async (data: EventData) => {
 };
 
 const insertBlogFollower = async (data: EventData) => {
+  console.log(data);
   const blogId = encodeStructId(data[1] as BlogId);
   const query = 'INSERT INTO df.blog_followers(follower_account, following_blog_id) VALUES($1, $2) RETURNING *'
   const params = [data[0].toString(), blogId];
@@ -246,12 +249,19 @@ const insertActivityComments = async (eventAction: EventAction, ids: InsertData[
 const insertActivity = async (eventAction: EventAction, ids?: InsertData[]) => {
   let paramsIds: string[] = new Array(3).fill(null);
   console.log(paramsIds);
-  if (!ids) eventAction.data.slice(1).forEach((id,index) => paramsIds[index] = encodeStructId(id as InsertData));
-  else ids.forEach((id,index) => paramsIds[index] = encodeStructId(id));
+  if (!ids) {
+    eventAction.data.slice(1).forEach((id,index) =>
+      paramsIds[index] = encodeStructId(id as InsertData)
+    );
+  } else {
+    ids.forEach((id,index) =>
+      paramsIds[index] = encodeStructId(id)
+    );
+  }
   const { eventName, data } = eventAction;
   const accountId = data[0].toString();
 
-  const query = 'INSERT INTO df.activities(account, events, blog_id, post_id, comment_id) VALUES($1, $2, $3, $4, $5) RETURNING *'
+  const query = 'INSERT INTO df.activities(account, event, blog_id, post_id, comment_id) VALUES($1, $2, $3, $4, $5) RETURNING *'
   const params = [accountId, eventName, ...paramsIds];
   console.log(params);
   try {
@@ -267,7 +277,7 @@ const insertActivityForAccount = async (eventAction: EventAction) => {
   const accountId = data[0].toString();
   const objectId = data[1].toString();
 
-  const query = 'INSERT INTO df.activities(account, events, object_id) VALUES($1, $2, $3) RETURNING *'
+  const query = 'INSERT INTO df.activities(account, event, following_account) VALUES($1, $2, $3) RETURNING *'
   const params = [accountId, eventName, objectId];
   try {
     const res = await pool.query(query, params);
@@ -279,7 +289,15 @@ const insertActivityForAccount = async (eventAction: EventAction) => {
 };
 
 const fillActivityStreamWithAccountFollowers = async (accountId: string) => {
-  const query = 'INSERT INTO df.notifications(account, activity_id) (SELECT df.account_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.account_followers ON df.activities.account = df.account_followers.following_account WHERE account = $1 and (df.account_followers.follower_account, df.activities.id) NOT IN (SELECT account,activity_id from df.notifications)) RETURNING *'
+  const query = `
+  INSERT INTO df.notifications (account, activity_id)
+    (SELECT df.account_followers.follower_account, df.activities.id
+    FROM df.activities
+    LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
+    WHERE account = $1 AND account IS NOT NULL
+      AND (df.account_followers.follower_account, df.activities.id)
+      NOT IN (SELECT account, activity_id from df.notifications))
+  RETURNING *`
   const params = [accountId];
   try {
     const res = await pool.query(query, params)
@@ -301,7 +319,7 @@ const deleteAccountActivityWithActivityStream = async (userId: string,accountId:
 }
 
 const fillActivityStreamWithBlogFollowers = async (blogId: BlogId) => {
-  const query = 'INSERT INTO df.notifications(account, activity_id) (SELECT df.blog_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.blog_followers ON df.activities.blog_id = df.blog_followers.following_blog_id WHERE blog_id = $1 and (df.blog_followers.follower_account, df.activities.id) NOT IN (SELECT account,activity_id from df.notifications)) RETURNING *';
+  const query = 'INSERT INTO df.news_feed(account, activity_id) (SELECT df.blog_followers.follower_account, df.activities.id FROM df.activities Left JOIN df.blog_followers ON df.activities.blog_id = df.blog_followers.following_blog_id WHERE blog_id = $1 and (df.blog_followers.follower_account, df.activities.id) NOT IN (SELECT account,activity_id from df.news_feed)) RETURNING *';
   const hexBlogId = encodeStructId(blogId);
   const params = [hexBlogId];
   try {
