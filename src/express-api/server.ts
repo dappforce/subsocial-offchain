@@ -28,7 +28,8 @@ app.get('/v1/ipfs/get/:hash', async (req: express.Request, res: express.Response
   res.json(data);
 });
 
-app.get('/v1/ipfs/rm/:hash', (req: express.Request) => {
+
+app.post('/v1/ipfs/remove/:hash', (req: express.Request) => {
   removeFromIpfs(req.params.hash as string);
 });
 

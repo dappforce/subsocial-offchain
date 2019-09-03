@@ -1,7 +1,13 @@
-CREATE TABLE df.activity_stream
+CREATE TABLE df.news_feed
 (
     account varchar(48) NOT NULL,
-    actitvity_id bigint NOT NULL
+    activity_id bigint NOT NULL
+);
+
+CREATE TABLE df.notifications
+(
+    account varchar(48) NOT NULL,
+    activity_id bigint NOT NULL
 );
 
 CREATE TABLE df.activities
