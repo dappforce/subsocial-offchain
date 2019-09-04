@@ -18,6 +18,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       await insertAccountFollower(data);
       const id = await insertActivityForAccount(eventAction);
       if (id === -1) return;
+
       const following = data[1].toString();
       await insertNotificationForOwner(id, following);
       break;
@@ -33,13 +34,16 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       await insertBlogFollower(data);
       const id = await insertActivity(eventAction);
       if (id === -1) return;
+
       const blogId = data[1] as BlogId;
       const blogOpt = await api.query.blogs.blogById(blogId) as Option<Blog>;
       if (blogOpt.isNone) return;
+
       const blog = blogOpt.unwrap();
       const follower = data[0].toString();
       const account = blog.created.account.toString();
       if (follower === account) return;
+
       await insertNotificationForOwner(id, account);
       break;
     }
@@ -57,12 +61,14 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       console.log(postId);
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
+
       const post = postOpt.unwrap();
       console.log(post);
       console.log(post.blog_id);
       const ids = [post.blog_id, postId ];
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
+
       await fillActivityStreamWithBlogFollowers(post.blog_id, account, activityId);
       await fillActivityStreamWithAccountFollowers(account, activityId)
       break;
@@ -73,12 +79,14 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       console.log(postId);
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
+
       const post = postOpt.unwrap();
       console.log(post);
       console.log(post.blog_id);
       const ids = [post.blog_id, postId ];
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
+
       const account = post.created.account.toString();
       insertNotificationForOwner(activityId, account);
       fillActivityStreamWithAccountFollowers(follower, activityId);
@@ -97,10 +105,12 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
       if (commentOpt.isNone) return;
+
       const comment = commentOpt.unwrap();
       const postId = comment.post_id;
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
+
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId];
       if (comment.parent_id.isSome) {
@@ -109,6 +119,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       ids.push(commentId);
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
+
       const account = comment.created.account.toString();
       fillActivityStreamWithPostFollowers(postId, account, activityId);
       fillActivityStreamWithAccountFollowers(follower, activityId);
@@ -119,14 +130,17 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
       if (commentOpt.isNone) return;
+
       const comment = commentOpt.unwrap();
       const postId = comment.post_id;
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
+
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId, commentId];
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
+
       const account = comment.created.account.toString();
       fillActivityStreamWithCommentFollowers(commentId, account, activityId);
       fillActivityStreamWithAccountFollowers(follower, activityId);
@@ -143,11 +157,13 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const postId = data[1] as PostId;
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
+
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId ];
       console.log(post.blog_id.toHex());
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
+
       const account = post.created.account.toString();
       insertNotificationForOwner(activityId, account);
       break;
@@ -156,10 +172,12 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
       if (commentOpt.isNone) return;
+
       const comment = commentOpt.unwrap();
       const ids = [comment.post_id, null as PostId, commentId ];
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
+      
       const account = comment.created.account.toString();
       insertNotificationForOwner(activityId, account);// TODO insertPostOwner
       break;
@@ -170,6 +188,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 //Utils
 function encodeStructId (id: InsertData): string {
   if(!id) return null;
+
   return id.toHex().split('x')[1].replace(/(0+)/,'');
 }
 
