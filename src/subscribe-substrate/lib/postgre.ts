@@ -19,7 +19,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const id = await insertActivityForAccount(eventAction);
       if (id === -1) return;
       const following = data[1].toString();
-      await insertNotificationForBlogOwnerOrAccount(id, following);
+      await insertNotificationForOwner(id, following);
       break;
     }
     case 'UnfollowAccount': {
@@ -40,7 +40,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const follower = data[0].toString();
       const account = blog.created.account.toString();
       if (follower === account) return;
-      await insertNotificationForBlogOwnerOrAccount(id, account);
+      await insertNotificationForOwner(id, account);
       break;
     }
     case 'BlogUnfollowed': {
@@ -80,7 +80,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
       const account = post.created.account.toString();
-      fillActivityStreamWithPostFollowers(postId, account, activityId);
+      insertNotificationForOwner(activityId, account);
       fillActivityStreamWithAccountFollowers(follower, activityId);
       break;
     }
@@ -149,7 +149,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
       const account = post.created.account.toString();
-      fillActivityStreamWithPostFollowers(postId, account, activityId);// TODO insertPostOwner
+      insertNotificationForOwner(activityId, account);
       break;
     }
     case 'CommentReactionCreated': {
@@ -161,7 +161,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
       const account = comment.created.account.toString();
-      fillActivityStreamWithCommentFollowers(commentId, account, activityId);// TODO insertPostOwner
+      insertNotificationForOwner(activityId, account);// TODO insertPostOwner
       break;
     }
   }
@@ -174,7 +174,7 @@ function encodeStructId (id: InsertData): string {
 }
 
 //Query
-const insertNotificationForBlogOwnerOrAccount = async (id: number, account: string) => {
+const insertNotificationForOwner = async (id: number, account: string) => {
   const query = `
     INSERT INTO df.notifications
       VALUES($1, $2) 
@@ -320,7 +320,7 @@ const insertActivityComments = async (eventAction: EventAction, ids: InsertData[
     const param = [...ids, id];
     const activityId = await insertActivity(eventAction,param);
     const account = comment.created.account.toString();
-    await fillActivityStreamWithCommentFollowers(id, account, activityId);
+    await insertNotificationForOwner(activityId, account);
     const commentOpt = await api.query.blogs.commentById(id) as Option<Comment>;
     comment = commentOpt.unwrap();
   }
