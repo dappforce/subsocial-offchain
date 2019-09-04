@@ -42,7 +42,14 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
 
 //Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
-  const query = 'SELECT DISTINCT * FROM df.activities WHERE id IN(SELECT activity_id from df.news_feed WHERE account = $1)';
+  const query = `
+    SELECT DISTINCT * 
+    FROM df.activities
+    WHERE id IN (
+      SELECT activity_id
+      FROM df.news_feed
+      WHERE account = $1
+    )`;
   const params = [req.params.id];
   console.log(params);
   try {
@@ -56,7 +63,14 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
 });
 
 app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
-  const query = 'SELECT DISTINCT * FROM df.activities WHERE id IN(SELECT activity_id from df.notifications WHERE account = $1)';
+  const query = `
+    SELECT DISTINCT *
+    FROM df.activities
+    WHERE id IN ( 
+      SELECT activity_id
+      FROM df.notifications
+      WHERE account = $1
+    )`;
   const params = [req.params.id];
   try {
     const data = await pool.query(query, params)

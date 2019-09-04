@@ -35,6 +35,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (id === -1) return;
       const blogId = data[1] as BlogId;
       const blogOpt = await api.query.blogs.blogById(blogId) as Option<Blog>;
+      if (blogOpt.isNone) return;
       const blog = blogOpt.unwrap();
       const follower = data[0].toString();
       const account = blog.created.account.toString();
@@ -55,6 +56,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const account = data[0].toString();
       console.log(postId);
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
+      if (postOpt.isNone) return;
       const post = postOpt.unwrap();
       console.log(post);
       console.log(post.blog_id);
@@ -70,6 +72,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const follower = data[0].toString();
       console.log(postId);
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
+      if (postOpt.isNone) return;
       const post = postOpt.unwrap();
       console.log(post);
       console.log(post.blog_id);
@@ -93,9 +96,11 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const follower = data[0].toString();
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
+      if (commentOpt.isNone) return;
       const comment = commentOpt.unwrap();
       const postId = comment.post_id;
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
+      if (postOpt.isNone) return;
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId];
       if (comment.parent_id.isSome) {
@@ -113,9 +118,11 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const follower = data[0].toString();
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
+      if (commentOpt.isNone) return;
       const comment = commentOpt.unwrap();
       const postId = comment.post_id;
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
+      if (postOpt.isNone) return;
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId, commentId];
       const activityId = await insertActivity(eventAction, ids);
@@ -133,9 +140,9 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       break;
     }
     case 'PostReactionCreated': {
-      const follower = data[0].toString();
       const postId = data[1] as PostId;
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
+      if (postOpt.isNone) return;
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId ];
       console.log(post.blog_id.toHex());
@@ -146,9 +153,9 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       break;
     }
     case 'CommentReactionCreated': {
-      const follower = data[0].toString();
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
+      if (commentOpt.isNone) return;
       const comment = commentOpt.unwrap();
       const ids = [comment.post_id, null as PostId, commentId ];
       const activityId = await insertActivity(eventAction, ids);
@@ -167,12 +174,11 @@ function encodeStructId (id: InsertData): string {
 }
 
 //Query
-
 const insertNotificationForBlogOwnerOrAccount = async (id: number, account: string) => {
   const query = `
-  INSERT INTO df.notifications
-    VALUES($1, $2) 
-  RETURNING *`;
+    INSERT INTO df.notifications
+      VALUES($1, $2) 
+    RETURNING *`;
   const params = [account, id];
   try {
     const res = await pool.query(query, params)
@@ -185,9 +191,9 @@ const insertNotificationForBlogOwnerOrAccount = async (id: number, account: stri
 const insertAccountFollower = async (data: EventData) => {
   console.log(data);
   const query = `
-  INSERT INTO df.account_followers(follower_account, following_account)
-    VALUES($1, $2)
-  RETURNING *`;
+    INSERT INTO df.account_followers(follower_account, following_account)
+      VALUES($1, $2)
+    RETURNING *`;
   const params = [data[0].toString(), data[1].toString()];
   try {
     const res = await pool.query(query, params)
@@ -199,10 +205,10 @@ const insertAccountFollower = async (data: EventData) => {
 
 const deleteAccountFollower = async (data: EventData) => {
   const query = `
-  DELETE from df.account_followers
-  WHERE follower_account = $1
-    AND following_account = $2
-  RETURNING *`
+    DELETE from df.account_followers
+    WHERE follower_account = $1
+      AND following_account = $2
+    RETURNING *`
   const params = [data[0].toString(), data[1].toString()];
   try {
     const res = await pool.query(query, params)
@@ -215,9 +221,9 @@ const deleteAccountFollower = async (data: EventData) => {
 const insertPostFollower = async (data: EventData) => {
   const postId = encodeStructId(data[1] as PostId);
   const query = `
-  INSERT INTO df.post_followers(follower_account, following_post_id)
-    VALUES($1, $2)
-  RETURNING *`
+    INSERT INTO df.post_followers(follower_account, following_post_id)
+      VALUES($1, $2)
+    RETURNING *`
   const params = [data[0].toString(), postId];
   try {
     const res = await pool.query(query, params)
@@ -230,10 +236,10 @@ const insertPostFollower = async (data: EventData) => {
 const deletePostFollower = async (data: EventData) => {
   const postId = encodeStructId(data[1] as PostId);
   const query = `
-  DELETE from df.post_followers
-  WHERE follower_account = $1
-    AND following_post_id = $2
-  RETURNING *`
+    DELETE from df.post_followers
+    WHERE follower_account = $1
+      AND following_post_id = $2
+    RETURNING *`
   const params = [data[0].toString(), postId];
   try {
     const res = await pool.query(query, params)
@@ -246,9 +252,9 @@ const deletePostFollower = async (data: EventData) => {
 const insertCommentFollower = async (data: EventData) => {
   const commentId = encodeStructId(data[1] as CommentId);
   const query = `
-  INSERT INTO df.comment_followers(follower_account, following_comment_id)
-    VALUES($1, $2)
-  RETURNING *`
+    INSERT INTO df.comment_followers(follower_account, following_comment_id)
+      VALUES($1, $2)
+    RETURNING *`
   const params = [data[0].toString(), commentId];
   try {
     const res = await pool.query(query, params)
@@ -261,10 +267,10 @@ const insertCommentFollower = async (data: EventData) => {
 const deleteCommentFollower = async (data: EventData) => {
   const commentId = encodeStructId(data[1] as CommentId);
   const query = `
-  DELETE from df.comment_followers
-  WHERE follower_account = $1
-    AND following_comment_id = $2
-  RETURNING *`
+    DELETE from df.comment_followers
+    WHERE follower_account = $1
+      AND following_comment_id = $2
+    RETURNING *`
   const params = [data[0].toString(), commentId];
   try {
     const res = await pool.query(query, params)
@@ -278,9 +284,9 @@ const insertBlogFollower = async (data: EventData) => {
   console.log(data);
   const blogId = encodeStructId(data[1] as BlogId);
   const query = `
-  INSERT INTO df.blog_followers(follower_account, following_blog_id)
-    VALUES($1, $2)
-  RETURNING *`
+    INSERT INTO df.blog_followers(follower_account, following_blog_id)
+      VALUES($1, $2)
+    RETURNING *`
   const params = [data[0].toString(), blogId];
   try {
     const res = await pool.query(query, params)
@@ -293,10 +299,10 @@ const insertBlogFollower = async (data: EventData) => {
 const deleteBlogFollower = async (data: EventData) => {
   const blogId = encodeStructId(data[1] as BlogId);
   const query = `
-  DELETE from df.blog_followers
-  WHERE follower_account = $1
-    AND following_blog_id = $2
-  RETURNING *`
+    DELETE from df.blog_followers
+    WHERE follower_account = $1
+      AND following_blog_id = $2
+    RETURNING *`
   const params = [data[0].toString(), blogId];
   try {
     const res = await pool.query(query, params)
@@ -336,9 +342,9 @@ const insertActivity = async (eventAction: EventAction, ids?: InsertData[]): Pro
   const accountId = data[0].toString();
 
   const query = `
-  INSERT INTO df.activities(account, event, blog_id, post_id, comment_id)
-    VALUES($1, $2, $3, $4, $5)
-  RETURNING *`
+    INSERT INTO df.activities(account, event, blog_id, post_id, comment_id)
+      VALUES($1, $2, $3, $4, $5)
+    RETURNING *`
   const params = [accountId, eventName, ...paramsIds];
   console.log(params);
   try {
@@ -357,9 +363,9 @@ const insertActivityForAccount = async (eventAction: EventAction): Promise<numbe
   const objectId = data[1].toString();
 
   const query = `
-  INSERT INTO df.activities(account, event, following_account)
-    VALUES($1, $2, $3)
-  RETURNING *`
+    INSERT INTO df.activities(account, event, following_account)
+      VALUES($1, $2, $3)
+    RETURNING *`
   const params = [accountId, eventName, objectId];
   try {
     const res = await pool.query(query, params)
@@ -373,14 +379,14 @@ const insertActivityForAccount = async (eventAction: EventAction): Promise<numbe
 
 const fillActivityStreamWithAccountFollowers = async (account: string, activityId: number) => {
   const query = `
-  INSERT INTO df.notifications (account, activity_id)
-    (SELECT df.account_followers.follower_account, df.activities.id
-    FROM df.activities
-    LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
-    WHERE df.account_followers.follower_account <> $1 AND id = $2
-      AND (df.account_followers.follower_account, df.activities.id)
-      NOT IN (SELECT account, activity_id from df.notifications))
-  RETURNING *`
+    INSERT INTO df.notifications (account, activity_id)
+      (SELECT df.account_followers.follower_account, df.activities.id
+      FROM df.activities
+      LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
+      WHERE df.account_followers.follower_account <> $1 AND id = $2
+        AND (df.account_followers.follower_account, df.activities.id)
+        NOT IN (SELECT account, activity_id from df.notifications))
+    RETURNING *`
   const params = [account, activityId];
   try {
     const res = await pool.query(query, params)
@@ -392,14 +398,14 @@ const fillActivityStreamWithAccountFollowers = async (account: string, activityI
 
 const deleteAccountActivityWithActivityStream = async (userId: string,accountId: string) => {
   const query = `
-  DELETE FROM df.notifications
-  WHERE account = $1
-    AND activity_id IN
-      (SELECT df.activities.id FROM df.activities
-      LEFT JOIN df.account_followers
-      ON df.activities.account = df.account_followers.following_account
-      WHERE account = $2)
-  RETURNING *`
+    DELETE FROM df.notifications
+    WHERE account = $1
+      AND activity_id IN
+        (SELECT df.activities.id FROM df.activities
+        LEFT JOIN df.account_followers
+        ON df.activities.account = df.account_followers.following_account
+        WHERE account = $2)
+    RETURNING *`
   const params = [userId, accountId];
   try {
     const res = await pool.query(query, params)
@@ -411,14 +417,14 @@ const deleteAccountActivityWithActivityStream = async (userId: string,accountId:
 
 const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, account: string, activityId: number) => {
   const query = `
-  INSERT INTO df.news_feed(account, activity_id)
-    (SELECT df.blog_followers.follower_account, df.activities.id
-    FROM df.activities
-    LEFT JOIN df.blog_followers ON df.activities.blog_id = df.blog_followers.following_blog_id
-    WHERE blog_id = $1 AND df.blog_followers.follower_account <> $2 AND id = $3
-      AND (df.blog_followers.follower_account, df.activities.id)
-      NOT IN (SELECT account,activity_id from df.news_feed))
-  RETURNING *`;
+    INSERT INTO df.news_feed(account, activity_id)
+      (SELECT df.blog_followers.follower_account, df.activities.id
+      FROM df.activities
+      LEFT JOIN df.blog_followers ON df.activities.blog_id = df.blog_followers.following_blog_id
+      WHERE blog_id = $1 AND df.blog_followers.follower_account <> $2 AND id = $3
+        AND (df.blog_followers.follower_account, df.activities.id)
+        NOT IN (SELECT account,activity_id from df.news_feed))
+    RETURNING *`;
   const hexBlogId = encodeStructId(blogId);
   const params = [hexBlogId, account, activityId];
   try {
@@ -431,14 +437,14 @@ const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, account: stri
 
 const deleteBlogActivityWithActivityStream = async (userId: string, blogId: BlogId) => {
   const query = `
-  DELETE FROM df.notifications
-  WHERE account = $1
-    AND activity_id IN
-      (SELECT df.activities.id
-      FROM df.activities
-      LEFT JOIN df.blog_followers ON df.activities.account = df.blog_followers.following_blog_id
-      WHERE blog_id = $2)
-  RETURNING *`
+    DELETE FROM df.notifications
+    WHERE account = $1
+      AND activity_id IN
+        (SELECT df.activities.id
+        FROM df.activities
+        LEFT JOIN df.blog_followers ON df.activities.account = df.blog_followers.following_blog_id
+        WHERE blog_id = $2)
+    RETURNING *`
   const hexBlogId = encodeStructId(blogId);
   const params = [userId, hexBlogId];
   try {
@@ -451,15 +457,15 @@ const deleteBlogActivityWithActivityStream = async (userId: string, blogId: Blog
 
 const fillActivityStreamWithPostFollowers = async (postId: PostId, account: string, activityId: number) => {
   const query = `
-  INSERT INTO df.news_feed(account, activity_id)
-    (SELECT df.post_followers.follower_account, df.activities.id
-    FROM df.activities
-    LEFT JOIN df.post_followers ON df.activities.post_id = df.post_followers.following_post_id
-    WHERE post_id = $1 AND id = $3
-      AND df.post_followers.follower_account <> $2
-      AND (df.post_followers.follower_account, df.activities.id)
-      NOT IN (SELECT account,activity_id from df.news_feed))
-  RETURNING *`
+    INSERT INTO df.news_feed(account, activity_id)
+      (SELECT df.post_followers.follower_account, df.activities.id
+      FROM df.activities
+      LEFT JOIN df.post_followers ON df.activities.post_id = df.post_followers.following_post_id
+      WHERE post_id = $1 AND id = $3
+        AND df.post_followers.follower_account <> $2
+        AND (df.post_followers.follower_account, df.activities.id)
+        NOT IN (SELECT account,activity_id from df.news_feed))
+    RETURNING *`
   const hexPostId = encodeStructId(postId);
   const params = [hexPostId, account, activityId];
   try {
@@ -472,13 +478,13 @@ const fillActivityStreamWithPostFollowers = async (postId: PostId, account: stri
 
 const deletePostActivityWithActivityStream = async (userId: string,postId: PostId) => {
   const query = `
-  DELETE FROM df.news_feed
-  WHERE account = $1 AND activity_id IN
-    (SELECT df.activities.id
-    FROM df.activities
-    LEFT JOIN df.post_followers ON df.activities.account = df.post_followers.following_post_id
-    WHERE post_id = $2)
-  RETURNING *`
+    DELETE FROM df.news_feed
+    WHERE account = $1 AND activity_id IN
+      (SELECT df.activities.id
+      FROM df.activities
+      LEFT JOIN df.post_followers ON df.activities.account = df.post_followers.following_post_id
+      WHERE post_id = $2)
+    RETURNING *`
   const hexPostId = encodeStructId(postId);
   const params = [userId, hexPostId];
   try {
@@ -491,14 +497,14 @@ const deletePostActivityWithActivityStream = async (userId: string,postId: PostI
 
 const fillActivityStreamWithCommentFollowers = async (commentId: CommentId,account:string, activityId: number) => {
   const query = `
-  INSERT INTO df.notifications(account, activity_id)
-    (SELECT df.comment_followers.follower_account, df.activities.id
-    FROM df.activities
-    LEFT JOIN df.comment_followers ON df.activities.comment_id = df.comment_followers.following_comment_id WHERE comment_id = $1 AND id = $3
-      AND df.comment_followers.follower_account <> $2
-      AND (df.comment_followers.follower_account, df.activities.id)
-      NOT IN (SELECT account,activity_id from df.notifications))
-  RETURNING *`
+    INSERT INTO df.notifications(account, activity_id)
+      (SELECT df.comment_followers.follower_account, df.activities.id
+      FROM df.activities
+      LEFT JOIN df.comment_followers ON df.activities.comment_id = df.comment_followers.following_comment_id WHERE comment_id = $1 AND id = $3
+        AND df.comment_followers.follower_account <> $2
+        AND (df.comment_followers.follower_account, df.activities.id)
+        NOT IN (SELECT account,activity_id from df.notifications))
+    RETURNING *`
   const hexCommentId = encodeStructId(commentId);
   const params = [hexCommentId, account, activityId];
   try {
@@ -511,13 +517,13 @@ const fillActivityStreamWithCommentFollowers = async (commentId: CommentId,accou
 
 const deleteCommentActivityWithActivityStream = async (userId: string,commentId: CommentId) => {
   const query = `
-  DELETE FROM df.notifications
-  WHERE account = $1
-    AND activity_id IN
-      (SELECT df.activities.id
-      FROM df.activities
-      LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_comment_id WHERE comment_id = $2)
-  RETURNING *`
+    DELETE FROM df.notifications
+    WHERE account = $1
+      AND activity_id IN
+        (SELECT df.activities.id
+        FROM df.activities
+        LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_comment_id WHERE comment_id = $2)
+    RETURNING *`
   const hexCommentId = encodeStructId(commentId);
   const params = [userId, hexCommentId];
   try {
