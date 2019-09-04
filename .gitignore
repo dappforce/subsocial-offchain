@@ -38,9 +38,11 @@ jspm_packages/
 
 # TypeScript v1 declaration files
 typings/
+build/
 
 # Optional npm cache directory
 .npm
+.vscode
 
 # Optional eslint cache
 .eslintcache
@@ -53,9 +55,6 @@ typings/
 
 # Yarn Integrity file
 .yarn-integrity
-
-# dotenv environment variables file
-.env
 
 # next.js build output
 .next
