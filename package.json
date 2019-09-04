@@ -23,7 +23,7 @@
     "typescript": "3.4.5"
   },
   "scripts": {
-    "start": "npm run subscribe",
+    "start": "concurrently \"npm run subscribe\" \"npm run api\"",
     "subscribe": "node ./build/src/subscribe-substrate/server.js",
     "api": "node ./build/src/express-api/server.js",
     "ipfs": "yarn jsipfs daemon",
@@ -54,6 +54,7 @@
     "cids": "^0.7.1",
     "cli-progress": "^2.1.1",
     "commander": "^2.20.0",
+    "concurrently": "^4.1.2",
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "express": "^4.16.4",

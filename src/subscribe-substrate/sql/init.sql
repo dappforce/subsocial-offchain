@@ -1,3 +1,21 @@
+CREATE SCHEMA df
+
+CREATE TYPE df.action AS ENUM (
+'BlogCreated',
+'BlogUpdated',
+'FollowBlog',
+'BlogUnfollowed',
+'FollowAccount',
+'UnfollowAccount',
+'PostCreated',
+'PostUpdated',
+'CommentCreated',
+'CommentUpdated',
+'PostReactionCreated',
+'PostReactionUpdated',
+'CommentReactionCreated',
+'CommentReactionUpdated');
+
 CREATE TABLE df.news_feed
 (
     account varchar(48) NOT NULL,
@@ -44,19 +62,3 @@ CREATE TABLE df.comment_followers
     follower_account varchar(48) NOT NULL,
     following_comment_id varchar(16) NOT NULL
 );
-
-CREATE TYPE df.action AS ENUM (
-'BlogCreated',
-'BlogUpdated',
-'BlogFollowed',
-'BlogUnfollowed',
-'AccountFollowed',
-'AccountUnfollowed',
-'PostCreated',
-'PostUpdated',
-'CommentCreated',
-'CommentUpdated',
-'PostReactionCreated',
-'PostReactionUpdated',
-'CommentReactionCreated',
-'CommentReactionUpdated')

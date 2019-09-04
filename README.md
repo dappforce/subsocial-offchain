@@ -18,7 +18,9 @@ yarn start
 
 + `clean` - remove coverage data, Jest cache and transpiled files,
 + `build` - transpile TypeScript to ES6,
-+ `start` - run server,
++ `start` - run subscribe and express-api servers,
++ `api` - run only express-api server,
++ `subscribe` - run only subscribe server
 
 ## What's included:
 
