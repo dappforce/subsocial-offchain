@@ -30,6 +30,12 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       await deleteAccountFollower(data);
       break;
     }
+    case 'BlogCreated': {
+      const account = data[0].toString();
+      const activityId = await insertActivity(eventAction);
+      await fillActivityStreamWithAccountFollowers(account, activityId);
+      break;
+    }
     case 'FollowBlog': {
       await insertBlogFollower(data);
       const id = await insertActivity(eventAction);
@@ -177,7 +183,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const ids = [comment.post_id, null as PostId, commentId ];
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
-      
+
       const account = comment.created.account.toString();
       insertNotificationForOwner(activityId, account);// TODO insertPostOwner
       break;
