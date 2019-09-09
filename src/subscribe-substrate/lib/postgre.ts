@@ -160,6 +160,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       break;
     }
     case 'PostReactionCreated': {
+      const follower = data[0].toString();
       const postId = data[1] as PostId;
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
@@ -171,10 +172,13 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (activityId === -1) return;
 
       const account = post.created.account.toString();
+      if (follower === account) return;
+
       insertNotificationForOwner(activityId, account);
       break;
     }
     case 'CommentReactionCreated': {
+      const follower = data[0].toString();
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
       if (commentOpt.isNone) return;
@@ -185,6 +189,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (activityId === -1) return;
 
       const account = comment.created.account.toString();
+      if (follower === account) return;
+
       insertNotificationForOwner(activityId, account);// TODO insertPostOwner
       break;
     }
@@ -339,15 +345,18 @@ const deleteBlogFollower = async (data: EventData) => {
 
 const insertActivityComments = async (eventAction: EventAction, ids: InsertData[], commentLast: Comment) => {
   let comment = commentLast;
+  let lastCommentAccount = commentLast.created.account.toString();
   while(comment.parent_id.isSome)
   {
     const id = comment.parent_id.unwrap() as CommentId;
     const param = [...ids, id];
     const activityId = await insertActivity(eventAction,param);
     const account = comment.created.account.toString();
-    await insertNotificationForOwner(activityId, account);
     const commentOpt = await api.query.blogs.commentById(id) as Option<Comment>;
     comment = commentOpt.unwrap();
+    if (account === lastCommentAccount) return;
+
+    await insertNotificationForOwner(activityId, account);
   }
 };
 
@@ -482,14 +491,14 @@ const deleteBlogActivityWithActivityStream = async (userId: string, blogId: Blog
 
 const fillActivityStreamWithPostFollowers = async (postId: PostId, account: string, activityId: number) => {
   const query = `
-    INSERT INTO df.news_feed(account, activity_id)
+    INSERT INTO df.notifications(account, activity_id)
       (SELECT df.post_followers.follower_account, df.activities.id
       FROM df.activities
       LEFT JOIN df.post_followers ON df.activities.post_id = df.post_followers.following_post_id
       WHERE post_id = $1 AND id = $3
         AND df.post_followers.follower_account <> $2
         AND (df.post_followers.follower_account, df.activities.id)
-        NOT IN (SELECT account,activity_id from df.news_feed))
+        NOT IN (SELECT account,activity_id from df.notifications))
     RETURNING *`
   const hexPostId = encodeStructId(postId);
   const params = [hexPostId, account, activityId];
