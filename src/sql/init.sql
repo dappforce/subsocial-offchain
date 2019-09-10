@@ -36,7 +36,9 @@ CREATE TABLE df.activities
     following_id varchar(48) NULL,
     blog_id varchar(16) NULL,
     post_id varchar(16) NULL,
-    comment_id varchar(16) NULL
+    comment_id varchar(16) NULL,
+    date TIMESTAMP NOT NULL DEFAULT NOW(),
+    heightBlock bigint NOT NULL
 );
 
 CREATE TABLE df.account_followers
@@ -61,4 +63,14 @@ CREATE TABLE df.comment_followers
 (
     follower_account varchar(48) NOT NULL,
     following_comment_id varchar(16) NOT NULL
+);
+
+CREATE TABLE df.agg_stream
+(
+    id bigserial not null primary key,
+    account varchar(48) NOT NULL,
+    event df.action NOT NULL,
+    following_id varchar(48) NULL,
+    subject_id varchar(16) NULL,
+    subject_count bigint not null default 0 
 );

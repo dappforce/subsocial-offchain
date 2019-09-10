@@ -2,11 +2,13 @@ import { api } from '../server';
 import { BlogId, PostId, CommentId, Post, Comment, Blog } from '../../df-types/src/blogs';
 import { Option } from '@polkadot/types'
 import { EventData } from '@polkadot/types/type/Event';
-import { pool } from './../../adaptors/connectPostgre'
+import { pool } from './../../adaptors/connectPostgre';
+import BN from 'bn.js';
 
 type EventAction = {
   eventName: string,
-  data: EventData
+  data: EventData,
+  heightBlock: BN
 }
 
 type InsertData = BlogId | PostId | CommentId;
@@ -372,14 +374,14 @@ const insertActivity = async (eventAction: EventAction, ids?: InsertData[]): Pro
       paramsIds[index] = encodeStructId(id)
     );
   }
-  const { eventName, data } = eventAction;
+  const { eventName, data, heightBlock } = eventAction;
   const accountId = data[0].toString();
 
   const query = `
-    INSERT INTO df.activities(account, event, blog_id, post_id, comment_id)
-      VALUES($1, $2, $3, $4, $5)
+    INSERT INTO df.activities(account, event, blog_id, post_id, comment_id, heightBlock)
+      VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
-  const params = [accountId, eventName, ...paramsIds];
+  const params = [accountId, eventName, ...paramsIds, heightBlock];
   console.log(params);
   try {
     const res = await pool.query(query, params)

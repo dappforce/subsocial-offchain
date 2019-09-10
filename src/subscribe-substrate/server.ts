@@ -2,7 +2,7 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { DispatchForDb } from './lib/postgre'
 import { getEventSections, getEventMethods } from './lib/utils';
 import { registerJoystreamTypes } from './../df-types';
-import { Event, EventRecord } from '@polkadot/types';
+import { Event, EventRecord, Header } from '@polkadot/types';
 
 require("dotenv").config();
 
@@ -36,6 +36,7 @@ export class Api {
 
         // Retrieve the chain & node information information via rpc calls
         const system = this.api.rpc.system;
+
         const [ chain, nodeName, nodeVersion ] = await Promise.all(
         [ system.chain(), system.name(), system.version() ]);
 
@@ -65,18 +66,22 @@ async function main() {
             // check section filter
             if ( (eventsFilterSections.includes(event.section.toString()) && eventsFilterMethods.includes(event.method.toString())) || eventsFilterSections.includes("all")) {
                 // create event object for data sink
-
+                const hashBlock = await api.rpc.chain.getFinalizedHead();
+                const header = await api.rpc.chain.getHeader(hashBlock) as Header;
+                console.log(header.blockNumber);
+        
                 const eventObj = {
                     section: event.section,
                     method: event.method,
                     meta: event.meta.documentation.toString(),
-                    data: event.data
+                    data: event.data,
+                    heightBlock: header.blockNumber
                 };
 
                 // remove this log if not needed
                 console.log("Event Received: " + Date.now() + ": " + JSON.stringify(eventObj));
 
-                await DispatchForDb({eventName: eventObj.method, data: eventObj.data});
+                await DispatchForDb({eventName: eventObj.method, data: eventObj.data, heightBlock: eventObj.heightBlock});
             }
         });
     });
