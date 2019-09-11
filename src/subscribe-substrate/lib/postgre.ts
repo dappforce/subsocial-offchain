@@ -16,16 +16,17 @@ type InsertData = BlogId | PostId | CommentId;
 export const DispatchForDb = async (eventAction: EventAction) => {
   const { data } = eventAction;
   switch(eventAction.eventName){
-    case 'FollowAccount': {
+    case 'AccountFollowed': {
       await insertAccountFollower(data);
       const id = await insertActivityForAccount(eventAction);
       if (id === -1) return;
 
       const following = data[1].toString();
+      insertAggStreamForFollow(eventAction);
       await insertNotificationForOwner(id, following);
       break;
     }
-    case 'UnfollowAccount': {
+    case 'AccountUnfollowed': {
       const follower = data[0].toString();
       const following = data[1].toString();
       await deleteAccountActivityWithActivityStream(follower, following);
@@ -35,10 +36,11 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     case 'BlogCreated': {
       const account = data[0].toString();
       const activityId = await insertActivity(eventAction);
-      await fillActivityStreamWithAccountFollowers(account, activityId);
+      insertAggStream(eventAction);
+      await fillNotificationsWithAccountFollowers(account, activityId);
       break;
     }
-    case 'FollowBlog': {
+    case 'BlogFollowed': {
       await insertBlogFollower(data);
       const id = await insertActivity(eventAction);
       if (id === -1) return;
@@ -52,7 +54,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const account = blog.created.account.toString();
       if (follower === account) return;
 
-      await insertNotificationForOwner(id, account);
+      insertAggStream(eventAction);
+      insertNotificationForOwner(id, account);
       break;
     }
     case 'BlogUnfollowed': {
@@ -77,8 +80,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
 
-      await fillActivityStreamWithBlogFollowers(post.blog_id, account, activityId);
-      await fillActivityStreamWithAccountFollowers(account, activityId)
+      fillActivityStreamWithBlogFollowers(post.blog_id, account, activityId);
+      fillNewsFeedWithAccountFollowers(account, activityId)
       break;
     }
     case 'PostShared': {
@@ -97,7 +100,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       const account = post.created.account.toString();
       insertNotificationForOwner(activityId, account);
-      fillActivityStreamWithAccountFollowers(follower, activityId);
+      fillNewsFeedWithAccountFollowers(follower, activityId);
       break;
     }
     case 'PostDeleted': {
@@ -109,7 +112,6 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     }
     case 'CommentCreated': {
       await insertCommentFollower(data);
-      const follower = data[0].toString();
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
       if (commentOpt.isNone) return;
@@ -128,13 +130,13 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
 
+      insertAggStream(eventAction, postId);
       const account = comment.created.account.toString();
       fillActivityStreamWithPostFollowers(postId, account, activityId);
-      fillActivityStreamWithAccountFollowers(follower, activityId);
+      fillNotificationsWithAccountFollowers(account, activityId);
       break;
     }
     case 'CommentShared': {
-      const follower = data[0].toString();
       const commentId = data[1] as CommentId;
       const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
       if (commentOpt.isNone) return;
@@ -149,9 +151,10 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
 
+      insertAggStream(eventAction, postId);
       const account = comment.created.account.toString();
       fillActivityStreamWithCommentFollowers(commentId, account, activityId);
-      fillActivityStreamWithAccountFollowers(follower, activityId);
+      fillNotificationsWithAccountFollowers(account, activityId);
       break;
     }
     case 'CommentDeleted': {
@@ -176,6 +179,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const account = post.created.account.toString();
       if (follower === account) return;
 
+      insertAggStream(eventAction, postId);
       insertNotificationForOwner(activityId, account);
       break;
     }
@@ -186,14 +190,15 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (commentOpt.isNone) return;
 
       const comment = commentOpt.unwrap();
-      const ids = [comment.post_id, null as PostId, commentId ];
+      const ids = [comment.post_id, null, commentId ];
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
 
       const account = comment.created.account.toString();
       if (follower === account) return;
 
-      insertNotificationForOwner(activityId, account);// TODO insertPostOwner
+      insertAggStream(eventAction, commentId);
+      insertNotificationForOwner(activityId, account);
       break;
     }
   }
@@ -413,7 +418,81 @@ const insertActivityForAccount = async (eventAction: EventAction): Promise<numbe
   }
 };
 
-const fillActivityStreamWithAccountFollowers = async (account: string, activityId: number) => {
+const insertAggStreamForFollow = async (eventAction: EventAction) => {
+  const { eventName, data } = eventAction;
+  const account = data[0].toString();
+  const following = data[1].toString();
+  const query = `
+    with updated as (
+      UPDATE df.agg_stream
+          SET account = $1,
+              subject_count = subject_count + 1
+    WHERE event = $2 AND following_id = $3
+    RETURNING *
+    )
+    INSERT INTO df.agg_stream (account, event, following_id, subject_count)
+    SELECT $1, $2, $3, 0
+    WHERE NOT EXISTS (SELECT * FROM df.agg_stream WHERE event = $2 AND following_id = $3)
+    RETURNING *;`
+    const params = [account, eventName, following];
+  try {
+    const res = await pool.query(query, params)
+    console.log(res.rows[0])
+  } catch (err) {
+    console.log(err.stack);
+  }
+};
+
+const insertAggStream = async (eventAction: EventAction, subjectId?: InsertData) => {
+  let subjectParam;
+  if (!subjectId) {
+    subjectParam = encodeStructId(eventAction.data[1] as InsertData);
+  } else {
+    subjectParam = encodeStructId(subjectId);
+  }
+  const { eventName, data } = eventAction;
+  const account = data[0].toString();
+
+  const query = `
+    with updated as (
+      UPDATE df.agg_stream
+          SET account = $1,
+              subject_count = subject_count + 1
+    WHERE event = $2 AND subject_id = $3
+    RETURNING *
+    )
+    INSERT INTO df.agg_stream (account, event, subject_id, subject_count)
+    SELECT $1, $2, $3, 0
+    WHERE NOT EXISTS (SELECT * FROM df.agg_stream WHERE event = $2 AND subject_id = $3)
+    RETURNING *;`
+    const params = [account, eventName, subjectParam];
+  try {
+    const res = await pool.query(query, params)
+    console.log(res.rows[0])
+  } catch (err) {
+    console.log(err.stack);
+  }
+};
+const fillNewsFeedWithAccountFollowers = async (account: string, activityId: number) => {
+  const query = `
+    INSERT INTO df.news_feed (account, activity_id)
+      (SELECT df.account_followers.follower_account, df.activities.id
+      FROM df.activities
+      LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
+      WHERE df.account_followers.follower_account <> $1 AND id = $2
+        AND (df.account_followers.follower_account, df.activities.id)
+        NOT IN (SELECT account, activity_id from df.news_feed))
+    RETURNING *`
+  const params = [account, activityId];
+  try {
+    const res = await pool.query(query, params)
+    console.log(res.rows)
+  } catch (err) {
+    console.log(err.stack);
+  }
+}
+
+const fillNotificationsWithAccountFollowers = async (account: string, activityId: number) => {
   const query = `
     INSERT INTO df.notifications (account, activity_id)
       (SELECT df.account_followers.follower_account, df.activities.id
@@ -514,7 +593,7 @@ const fillActivityStreamWithPostFollowers = async (postId: PostId, account: stri
 
 const deletePostActivityWithActivityStream = async (userId: string,postId: PostId) => {
   const query = `
-    DELETE FROM df.news_feed
+    DELETE FROM df.notifications
     WHERE account = $1 AND activity_id IN
       (SELECT df.activities.id
       FROM df.activities
