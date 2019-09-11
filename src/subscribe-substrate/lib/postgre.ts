@@ -80,8 +80,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivity(eventAction, ids);
       if (activityId === -1) return;
 
-      fillActivityStreamWithBlogFollowers(post.blog_id, account, activityId);
-      fillNewsFeedWithAccountFollowers(account, activityId)
+      await fillActivityStreamWithBlogFollowers(post.blog_id, account, activityId);
+      await fillNewsFeedWithAccountFollowers(account, activityId)
       break;
     }
     case 'PostShared': {
@@ -404,7 +404,7 @@ const insertActivityForAccount = async (eventAction: EventAction): Promise<numbe
   const objectId = data[1].toString();
 
   const query = `
-    INSERT INTO df.activities(account, event, following_account)
+    INSERT INTO df.activities(account, event, following_id)
       VALUES($1, $2, $3)
     RETURNING *`
   const params = [accountId, eventName, objectId];
