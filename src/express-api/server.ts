@@ -54,9 +54,9 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
       FROM df.news_feed
       WHERE account = $1)
     ORDER BY date DESC
-    LIMIT $2
-    OFFSET $3`;
-  const params = [req.params.id, limit, offset];
+    OFFSET $2
+    LIMIT $3`;
+  const params = [req.params.id, offset, limit];
   console.log(params);
   try {
     const data = await pool.query(query, params)
@@ -80,10 +80,10 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
       WHERE account = $1) 
       AND aggregated = true
     ORDER BY date DESC
-    LIMIT $2
-    OFFSET $3`;
+    OFFSET $2
+    LIMIT $3`;
 
-  const params = [req.params.id, limit, offset];
+  const params = [req.params.id, offset, limit];
   try {
     const data = await pool.query(query, params)
     console.log(data.rows);
