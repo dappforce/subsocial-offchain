@@ -390,7 +390,7 @@ const insertActivity = async (eventAction: EventAction, count?: number, ids?: In
   const accountId = data[0].toString();
 
   const query = `
-    INSERT INTO df.activities(account, event, blog_id, post_id, comment_id, heightBlock, agg_count)
+    INSERT INTO df.activities(account, event, blog_id, post_id, comment_id, block_height, agg_count)
       VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
   const params = [accountId, eventName, ...paramsIds, heightBlock, count];
@@ -433,7 +433,7 @@ const insertActivityForAccount = async (eventAction: EventAction, count: number)
   const objectId = data[1].toString();
 
   const query = `
-    INSERT INTO df.activities(account, event, following_id, heightBlock, agg_count)
+    INSERT INTO df.activities(account, event, following_id, block_height, agg_count)
       VALUES($1, $2, $3, $4, $5)
     RETURNING *`
   const params = [accountId, eventName, objectId, heightBlock, count];
