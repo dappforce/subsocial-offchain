@@ -364,7 +364,12 @@ const insertActivityComments = async (eventAction: EventAction, ids: InsertData[
   {
     const id = comment.parent_id.unwrap() as CommentId;
     const param = [...ids, id];
-    const activityId = await insertActivity(eventAction, 0, param); //TODO insert count
+    const newEventAction: EventAction = {
+      eventName: eventAction.eventName + 'OnComment',
+      data: eventAction.data,
+      heightBlock: eventAction.heightBlock
+    }
+    const activityId = await insertActivity(newEventAction, 0, param); //TODO insert count
     const account = comment.created.account.toString();
     const commentOpt = await api.query.blogs.commentById(id) as Option<Comment>;
     comment = commentOpt.unwrap();
@@ -403,7 +408,7 @@ const insertActivity = async (eventAction: EventAction, count?: number, ids?: In
     if (eventName !== 'PostCreated') {
       let eventEq = 'blog_id = $3 AND post_id = $4';
 
-      if (eventName === 'CommentReactionCreated') {
+      if (eventName === ('CommentReactionCreated' || 'CommentCreatedOnComment')) {
         eventEq += ' AND comment_id = $5'
       } else {
         paramsIds.pop();
@@ -412,7 +417,10 @@ const insertActivity = async (eventAction: EventAction, count?: number, ids?: In
       const queryUpdate = `
         UPDATE df.activities
           SET aggregated = false
-          WHERE id <> $1 AND event = $2 AND aggregated = true AND ${eventEq}
+          WHERE id <> $1
+            AND event = $2
+            AND aggregated = true
+            AND ${eventEq}
         RETURNING *`;
 
       const paramsUpdate = [activityId, eventName, ...paramsIds];
@@ -443,7 +451,10 @@ const insertActivityForAccount = async (eventAction: EventAction, count: number)
     const queryUpdate = `
         UPDATE df.activities
           SET aggregated = false
-          WHERE id <> $1 AND event = $2 AND aggregated = true AND following_id = $3
+          WHERE id <> $1
+            AND event = $2
+            AND aggregated = true
+            AND following_id = $3
         RETURNING *`;
 
       const paramsUpdate = [activityId, eventName, accountId];
@@ -457,69 +468,14 @@ const insertActivityForAccount = async (eventAction: EventAction, count: number)
   }
 };
 
-// const insertAggStreamForFollow = async (eventAction: EventAction) => {
-//   const { eventName, data } = eventAction;
-//   const account = data[0].toString();
-//   const following = data[1].toString();
-//   const query = `
-//     with updated as (
-//       UPDATE df.agg_stream
-//           SET account = $1,
-//               subject_count = subject_count + 1
-//     WHERE event = $2 AND following_id = $3
-//     RETURNING *
-//     )
-//     INSERT INTO df.agg_stream (account, event, following_id, subject_count)
-//     SELECT $1, $2, $3, 0
-//     WHERE NOT EXISTS (SELECT * FROM df.agg_stream WHERE event = $2 AND following_id = $3)
-//     RETURNING *;`
-//     const params = [account, eventName, following];
-//   try {
-//     const res = await pool.query(query, params)
-//     console.log(res.rows[0])
-//   } catch (err) {
-//     console.log(err.stack);
-//   }
-// };
-
-// const insertAggStream = async (eventAction: EventAction, subjectId?: InsertData) => {
-//   let subjectParam;
-//   if (!subjectId) {
-//     subjectParam = encodeStructId(eventAction.data[1] as InsertData);
-//   } else {
-//     subjectParam = encodeStructId(subjectId);
-//   }
-//   const { eventName, data } = eventAction;
-//   const account = data[0].toString();
-
-//   const query = `
-//     with updated as (
-//       UPDATE df.agg_stream
-//           SET account = $1,
-//               subject_count = subject_count + 1
-//     WHERE event = $2 AND subject_id = $3
-//     RETURNING *
-//     )
-//     INSERT INTO df.agg_stream (account, event, subject_id, subject_count)
-//     SELECT $1, $2, $3, 0
-//     WHERE NOT EXISTS (SELECT * FROM df.agg_stream WHERE event = $2 AND subject_id = $3)
-//     RETURNING *;`
-//     const params = [account, eventName, subjectParam];
-//   try {
-//     const res = await pool.query(query, params)
-//     console.log(res.rows[0])
-//   } catch (err) {
-//     console.log(err.stack);
-//   }
-// };
-
 const fillNewsFeedWithAccountFollowers = async (account: string, activityId: number) => {
   const query = `
     INSERT INTO df.news_feed (account, activity_id)
       (SELECT df.account_followers.follower_account, df.activities.id
       FROM df.activities
       LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
-      WHERE df.account_followers.follower_account <> $1 AND id = $2
+      WHERE df.account_followers.follower_account <> $1
+        AND id = $2
         AND (df.account_followers.follower_account, df.activities.id)
         NOT IN (SELECT account, activity_id from df.news_feed))
     RETURNING *`
@@ -538,7 +494,9 @@ const fillNotificationsWithAccountFollowers = async (account: string, activityId
       (SELECT df.account_followers.follower_account, df.activities.id
       FROM df.activities
       LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
-      WHERE df.account_followers.follower_account <> $1 AND id = $2 AND aggregated = true
+      WHERE df.account_followers.follower_account <> $1
+        AND id = $2
+        AND aggregated = true
         AND (df.account_followers.follower_account, df.activities.id)
         NOT IN (SELECT account, activity_id from df.notifications))
     RETURNING *`
@@ -576,7 +534,9 @@ const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, account: stri
       (SELECT df.blog_followers.follower_account, df.activities.id
       FROM df.activities
       LEFT JOIN df.blog_followers ON df.activities.blog_id = df.blog_followers.following_blog_id
-      WHERE blog_id = $1 AND df.blog_followers.follower_account <> $2 AND id = $3 AND aggregated = true
+      WHERE blog_id = $1 AND df.blog_followers.follower_account <> $2
+        AND id = $3
+        AND aggregated = true
         AND (df.blog_followers.follower_account, df.activities.id)
         NOT IN (SELECT account,activity_id from df.news_feed))
     RETURNING *`;
