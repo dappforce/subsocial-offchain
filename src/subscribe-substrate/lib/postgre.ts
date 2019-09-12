@@ -1,6 +1,6 @@
 import { api } from '../server';
 import { BlogId, PostId, CommentId, Post, Comment, Blog } from '../../df-types/src/blogs';
-import { Option } from '@polkadot/types'
+import { Option, AccountId, Vector } from '@polkadot/types'
 import { EventData } from '@polkadot/types/type/Event';
 import { pool } from './../../adaptors/connectPostgre';
 import BN from 'bn.js';
@@ -18,7 +18,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
   switch(eventAction.eventName){
     case 'AccountFollowed': {
       await insertAccountFollower(data);
-      const id = await insertActivityForAccount(eventAction);
+      const count = (await api.query.blogs.accountFollowers(data[1]) as Vector<AccountId>).length - 1;
+      const id = await insertActivityForAccount(eventAction, count);
       if (id === -1) return;
 
       const following = data[1].toString();
@@ -42,7 +43,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     }
     case 'BlogFollowed': {
       await insertBlogFollower(data);
-      const id = await insertActivity(eventAction);
+      const count = (await api.query.blogs.blogFollowers(data[1]) as Vector<AccountId>).length - 1;
+      const id = await insertActivity(eventAction, count);
       if (id === -1) return;
 
       const blogId = data[1] as BlogId;
@@ -77,14 +79,14 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       console.log(post);
       console.log(post.blog_id);
       const ids = [post.blog_id, postId ];
-      const activityId = await insertActivity(eventAction, ids);
+      const activityId = await insertActivity(eventAction,0 , ids);
       if (activityId === -1) return;
 
       await fillActivityStreamWithBlogFollowers(post.blog_id, account, activityId);
       await fillNewsFeedWithAccountFollowers(account, activityId)
       break;
     }
-    case 'PostSBlogFollowedhared': {
+    case 'PostShared': {
       const postId = data[1] as PostId;
       const follower = data[0].toString();
       console.log(postId);
@@ -95,7 +97,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       console.log(post);
       console.log(post.blog_id);
       const ids = [post.blog_id, postId ];
-      const activityId = await insertActivity(eventAction, ids);
+      const activityId = await insertActivity(eventAction, 0, ids);
       if (activityId === -1) return;
 
       const account = post.created.account.toString();
@@ -127,7 +129,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
         insertActivityComments(eventAction, ids,comment);
       }
       ids.push(commentId);
-      const activityId = await insertActivity(eventAction, ids);
+      const count = post.comments_count.toNumber() - 1;
+      const activityId = await insertActivity(eventAction, count, ids);
       if (activityId === -1) return;
 
       console.log('i in comment');
@@ -149,7 +152,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId, commentId];
-      const activityId = await insertActivity(eventAction, ids);
+      const count = post.comments_count.toNumber() - 1;
+      const activityId = await insertActivity(eventAction, count,  ids);
       if (activityId === -1) return;
 
       // insertAggStream(eventAction, postId);
@@ -174,7 +178,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId ];
       console.log(post.blog_id.toHex());
-      const activityId = await insertActivity(eventAction, ids);
+      const count = post.upvotes_count.toNumber() + post.downvotes_count.toNumber() - 1;
+      const activityId = await insertActivity(eventAction, count, ids);
       if (activityId === -1) return;
 
       const account = post.created.account.toString();
@@ -192,7 +197,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       const comment = commentOpt.unwrap();
       const ids = [comment.post_id, null, commentId ];
-      const activityId = await insertActivity(eventAction, ids);
+      const count = comment.upvotes_count.toNumber() + comment.downvotes_count.toNumber() - 1;
+      const activityId = await insertActivity(eventAction, count, ids);
       if (activityId === -1) return;
 
       const account = comment.created.account.toString();
@@ -358,7 +364,7 @@ const insertActivityComments = async (eventAction: EventAction, ids: InsertData[
   {
     const id = comment.parent_id.unwrap() as CommentId;
     const param = [...ids, id];
-    const activityId = await insertActivity(eventAction,param);
+    const activityId = await insertActivity(eventAction, 0, param); //TODO insert count
     const account = comment.created.account.toString();
     const commentOpt = await api.query.blogs.commentById(id) as Option<Comment>;
     comment = commentOpt.unwrap();
@@ -368,7 +374,7 @@ const insertActivityComments = async (eventAction: EventAction, ids: InsertData[
   }
 };
 
-const insertActivity = async (eventAction: EventAction, ids?: InsertData[]): Promise<number> => {
+const insertActivity = async (eventAction: EventAction, count?: number, ids?: InsertData[]): Promise<number> => {
   let paramsIds: string[] = new Array(3).fill(null);
   console.log(paramsIds);
   if (!ids) {
@@ -384,10 +390,10 @@ const insertActivity = async (eventAction: EventAction, ids?: InsertData[]): Pro
   const accountId = data[0].toString();
 
   const query = `
-    INSERT INTO df.activities(account, event, blog_id, post_id, comment_id, heightBlock)
-      VALUES($1, $2, $3, $4, $5, $6)
+    INSERT INTO df.activities(account, event, blog_id, post_id, comment_id, heightBlock, agg_count)
+      VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
-  const params = [accountId, eventName, ...paramsIds, heightBlock];
+  const params = [accountId, eventName, ...paramsIds, heightBlock, count];
   console.log(params);
   try {
     const res = await pool.query(query, params)
@@ -420,21 +426,31 @@ const insertActivity = async (eventAction: EventAction, ids?: InsertData[]): Pro
     return -1;
   }
 };
-const insertActivityForAccount = async (eventAction: EventAction): Promise<number> => {
+const insertActivityForAccount = async (eventAction: EventAction, count: number): Promise<number> => {
 
-  const { eventName, data } = eventAction;
+  const { eventName, data, heightBlock } = eventAction;
   const accountId = data[0].toString();
   const objectId = data[1].toString();
 
   const query = `
-    INSERT INTO df.activities(account, event, following_id)
-      VALUES($1, $2, $3)
+    INSERT INTO df.activities(account, event, following_id, heightBlock, agg_count)
+      VALUES($1, $2, $3, $4, $5)
     RETURNING *`
-  const params = [accountId, eventName, objectId];
+  const params = [accountId, eventName, objectId, heightBlock, count];
   try {
     const res = await pool.query(query, params)
+    const activityId = res.rows[0].id;
+    const queryUpdate = `
+        UPDATE df.activities
+          SET aggregated = false
+          WHERE id <> $1 AND event = $2 AND aggregated = true AND following_id = $3
+        RETURNING *`;
+
+      const paramsUpdate = [activityId, eventName, accountId];
+      const resUpdate = await pool.query(queryUpdate,paramsUpdate);
+      console.log(resUpdate.rowCount);
     console.log(res.rows[0])
-    return res.rows[0].id;
+    return activityId;
   } catch (err) {
     console.log(err.stack);
     return -1;

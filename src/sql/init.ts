@@ -76,5 +76,4 @@ CREATE TABLE df.agg_stream
     subject_count bigint not null default 0 
 );`;
 
-pool.query(createSchema);
-pool.query(init);
+pool.query(createSchema,() => pool.query(init));

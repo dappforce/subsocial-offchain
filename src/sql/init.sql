@@ -38,7 +38,9 @@ CREATE TABLE df.activities
     post_id varchar(16) NULL,
     comment_id varchar(16) NULL,
     date TIMESTAMP NOT NULL DEFAULT NOW(),
-    heightBlock bigint NOT NULL
+    heightBlock bigint NOT NULL,
+    aggregated boolean NOT NULL DEFAULT true,
+    agg_count bigint NOT NULL DEFAULT 0
 );
 
 CREATE TABLE df.account_followers
