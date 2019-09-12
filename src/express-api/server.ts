@@ -2,7 +2,7 @@ import { pool } from './../adaptors/connectPostgre'
 import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
 
 require("dotenv").config();
-const limit = process.env.PGLIMIT;
+const LIMIT = process.env.PGLIMIT;
 
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
@@ -44,7 +44,7 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
 
 //Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
-  const count = req.query.count > limit ? 20 : req.query.count;
+  const limit = req.query.count > LIMIT ? LIMIT : req.query.count;
   const offset = req.query.offset;
   const query = `
     SELECT DISTINCT * 
@@ -54,9 +54,9 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
       FROM df.news_feed
       WHERE account = $1)
     ORDER BY date DESC
-    LIMIT ${count}
-    OFFSET ${offset}`;
-  const params = [req.params.id];
+    LIMIT $2
+    OFFSET $3`;
+  const params = [req.params.id, limit, offset];
   console.log(params);
   try {
     const data = await pool.query(query, params)
@@ -69,7 +69,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
 });
 
 app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
-  const count = req.query.count > limit ? 20 : req.query.count;
+  const limit = req.query.count > LIMIT ? LIMIT : req.query.count;
   const offset = req.query.offset;
   const query = `
     SELECT DISTINCT *
@@ -80,10 +80,10 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
       WHERE account = $1) 
       AND aggregated = true
     ORDER BY date DESC
-    LIMIT ${count}
-    OFFSET ${offset}`;
+    LIMIT $2
+    OFFSET $3`;
 
-  const params = [req.params.id];
+  const params = [req.params.id, limit, offset];
   try {
     const data = await pool.query(query, params)
     console.log(data.rows);
