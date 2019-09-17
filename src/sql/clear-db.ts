@@ -1,6 +1,7 @@
 
 
 import { pool } from './../adaptors/connectPostgre';
+import { release } from 'os';
 
 const query = `
   TRUNCATE
@@ -10,10 +11,10 @@ const query = `
   df.post_followers,
   df.comment_followers,
   df.news_feed,
-  df.notifications,
-  df.agg_stream`;
+  df.notifications`;
 
 pool.query(query, (err) => {
   if (err) throw err;
   console.log('The database has been cleared')
+  release();
 });

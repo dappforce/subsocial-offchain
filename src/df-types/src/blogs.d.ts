@@ -1,6 +1,17 @@
 import { Option, Struct, Enum } from '@polkadot/types/codec';
 import { BlockNumber, Moment, AccountId, u16, u32, u64, Text, Vector, i32 } from '@polkadot/types';
-export declare type IpfsData = CommentData | PostData | BlogData;
+export declare type IpfsData = CommentData | PostData | BlogData | ProfileData;
+export declare type Activity = {
+    id: number;
+    account: string;
+    event: string;
+    following_id: string;
+    blog_id: string;
+    post_id: string;
+    comment_id: string;
+    date: Date;
+    agg_count: number;
+};
 export declare class IpfsHash extends Text {
 }
 export declare class BlogId extends u64 {
@@ -143,6 +154,7 @@ export declare type CommentType = {
     upvotes_count: u16;
     downvotes_count: u16;
     shares_count: u16;
+    direct_replies_count: u16;
     edit_history: VecCommentHistoryRecord;
     score: i32;
 };
@@ -157,6 +169,7 @@ export declare class Comment extends Struct {
     readonly upvotes_count: u16;
     readonly downvotes_count: u16;
     readonly shares_count: u16;
+    readonly direct_replies_count: u16;
     readonly edit_history: VecCommentHistoryRecord;
     readonly score: i32;
 }
@@ -194,6 +207,7 @@ export declare type SocialAccountType = {
     following_accounts_count: u16;
     following_blogs_count: u16;
     reputation: u32;
+    profile: OptionProfile;
 };
 export declare class SocialAccount extends Struct {
     constructor(value?: SocialAccountType);
@@ -201,6 +215,43 @@ export declare class SocialAccount extends Struct {
     readonly following_accounts_count: u16;
     readonly following_blogs_count: u16;
     readonly reputation: u32;
+    readonly profile: OptionProfile;
+}
+export declare type ProfileData = {
+    fullname: string;
+    avatar: string;
+    about: string;
+    facebook: string;
+    github: string;
+    linkedIn: string;
+    instagram: string;
+};
+export declare type ProfileType = {
+    created: ChangeType;
+    updated: OptionChange;
+    username: Text;
+    ipfs_hash: IpfsHash;
+    edit_history: VecProfileHistoryRecord;
+};
+export declare class Profile extends Struct {
+    constructor(value?: ProfileType);
+    readonly created: Change;
+    readonly updated: OptionChange;
+    readonly username: Text;
+    readonly ipfs_hash: string;
+    readonly edit_history: VecProfileHistoryRecord;
+}
+declare const OptionProfile_base: import("@polkadot/types/types").Constructor<Option<import("@polkadot/types/types").Codec>>;
+export declare class OptionProfile extends OptionProfile_base {
+}
+export declare type ProfileUpdateType = {
+    username: OptionText;
+    ipfs_hash: OptionIpfsHash;
+};
+export declare class ProfileUpdate extends Struct {
+    constructor(value?: ProfileUpdateType);
+    ipfs_hash: OptionIpfsHash;
+    username: OptionIpfsHash;
 }
 export declare type BlogHistoryRecordType = {
     edited: ChangeType;
@@ -237,6 +288,18 @@ export declare class CommentHistoryRecord extends Struct {
 }
 declare const VecCommentHistoryRecord_base: import("@polkadot/types/types").Constructor<Vector<CommentHistoryRecord>>;
 export declare class VecCommentHistoryRecord extends VecCommentHistoryRecord_base {
+}
+export declare type ProfileHistoryRecordType = {
+    edited: ChangeType;
+    old_data: ProfileUpdateType;
+};
+export declare class ProfileHistoryRecord extends Struct {
+    constructor(value?: ProfileHistoryRecordType);
+    readonly edited: Change;
+    readonly old_data: ProfileUpdate;
+}
+declare const VecProfileHistoryRecord_base: import("@polkadot/types/types").Constructor<Vector<ProfileHistoryRecord>>;
+export declare class VecProfileHistoryRecord extends VecProfileHistoryRecord_base {
 }
 export declare const ScoringActions: {
     [key: string]: string;
