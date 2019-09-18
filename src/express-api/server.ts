@@ -79,24 +79,9 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
       FROM df.notifications
       WHERE account = $1) 
       AND aggregated = true
-    GROUP BY id, event
     ORDER BY date DESC
     OFFSET $2
     LIMIT $3`;
-  // const query = `
-  // SELECT *
-  // FROM 
-  //   (SELECT *
-  //   ROW_NUMBER() OVER(PARTITION BY event ORDER BY date DESC) AS rn
-  //   FROM df.activities
-  //   WHERE id IN ( 
-  //     SELECT activity_id
-  //     FROM df.notifications
-  //     WHERE account = $1) 
-  //     AND aggregated = true)
-  // WHERE rn = 1
-  // OFFSET $2
-  // LIMIT $3;`
   const params = [req.params.id, offset, limit];
   try {
     const data = await pool.query(query, params)
