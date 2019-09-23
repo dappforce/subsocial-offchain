@@ -632,7 +632,6 @@ const fillNotificationsWithAccountFollowers = async (account: string, activityId
       WHERE df.account_followers.follower_account <> $1
         AND id = $2
         AND aggregated = true
-        AND parent_comment_id IS NULL
         AND (df.account_followers.follower_account, df.activities.id)
         NOT IN (SELECT account, activity_id from df.notifications))
     RETURNING *`
