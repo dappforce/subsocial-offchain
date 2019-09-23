@@ -76,7 +76,63 @@ CREATE TABLE df.agg_stream
     subject_count bigint not null default 0 
 );`;
 
+const createIndex = `
+CREATE INDEX idx_follower_account 
+ON df.account_followers(follower_account);
+
+CREATE INDEX idx_following_account 
+ON df.account_followers(following_account);
+
+CREATE INDEX idx_post_follower_account 
+ON df.post_followers(follower_account);
+
+CREATE INDEX idx_blog_follower_account 
+ON df.blog_followers(follower_account);
+
+CREATE INDEX idx_comment_follower_account 
+ON df.comment_followers(follower_account);
+
+CREATE INDEX idx_following_post_id 
+ON df.post_followers(following_post_id);
+
+CREATE INDEX idx_following_blog_id 
+ON df.blog_followers(following_blog_id);
+
+CREATE INDEX idx_following_comment_id 
+ON df.comment_followers(following_comment_id);
+
+CREATE INDEX idx_id
+ON df.activities(id);
+
+CREATE INDEX idx_account
+ON df.activities(account);
+
+CREATE INDEX idx_event
+ON df.activities(event);
+
+CREATE INDEX idx_following_id
+ON df.activities(following_id);
+
+CREATE INDEX idx_post_id
+ON df.activities(post_id);
+
+CREATE INDEX idx_blog_id
+ON df.activities(blog_id);
+
+CREATE INDEX idx_comment_id
+ON df.activities(comment_id);
+
+CREATE INDEX idx_parent_comment_id
+ON df.activities(parent_comment_id);
+
+CREATE INDEX idx_aggregated
+ON df.activities(aggregated);
+`
+
 pool.query(createSchema,(err) => {
     if (err) throw new Error(err);
-    pool.query(init)
+    pool.query(init, (err) => {
+        if (err) throw new Error(err);
+        pool.query(createIndex);
+    })
 });
