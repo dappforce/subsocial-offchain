@@ -9,18 +9,19 @@ services:
       POSTGRES_PASSWORD: 1986
     ports:
       - "5432:5432"
+    restart: always
+    volumes:
+      - ~/dappforce/postgres-data:/var/lib/postgresql/data
       
-  # subsocial-offchain:
-  #   build:
-  #     context: ..
-  #     dockerfile: ./docker/Dockerfile
-  #   depends_on:
-  #     - postgres
-  #   ports:
-  #     - "3000:3000"
-  #     - "9229:9229"
-
-
-# sudo su - postgres -c "createdb subsocial"
-# sudo -u postgres psql -c "create user dev with encrypted password '1986';"
-# sudo -u postgres psql -c "grant all privileges on database subsocial to dev;"
+  subsocial-offchain:
+    environment:
+      PGHOST: postgres
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    image: dappforce/subsocial-offchain:latest
+    depends_on:
+      - postgres
+    ports:
+      - "3001:3001"
+    command: bash -c "yarn init-offchain && yarn start"

@@ -7,14 +7,11 @@ pushd .
 PROJECT_ROOT=`git rev-parse --show-toplevel`
 cd $PROJECT_ROOT
 
-GITREPO=subsocial-offchain
-
 # Build the image
-echo "Building ${GITUSER}/${GITREPO}:latest docker image, hang on!"
-time docker-compose -f ./docker/docker-compose.yml up
+echo "Starting offchain in background, hang on!"
+time docker-compose -f ./docker/docker-compose.yml up -d
 
 # Show the list of available images for this repo
-echo "Image is ready"
-docker images | grep ${GITREPO}
+echo "Containers are ready"
 
 popd
