@@ -1,5 +1,3 @@
-CREATE SCHEMA df
-
 CREATE TYPE df.action AS ENUM (
 'BlogCreated',
 'BlogUpdated',
@@ -9,8 +7,7 @@ CREATE TYPE df.action AS ENUM (
 'UnfollowAccount',
 'PostCreated',
 'PostUpdated',
-'CommentCreated'
-'CommentCreatedOnComment',
+'CommentCreated',
 'CommentUpdated',
 'PostReactionCreated',
 'PostReactionUpdated',
@@ -67,16 +64,6 @@ CREATE TABLE df.comment_followers
 (
     follower_account varchar(48) NOT NULL,
     following_comment_id varchar(16) NOT NULL
-);
-
-CREATE TABLE df.agg_stream
-(
-    id bigserial not null primary key,
-    account varchar(48) NOT NULL,
-    event df.action NOT NULL,
-    following_id varchar(48) NULL,
-    subject_id varchar(16) NULL,
-    subject_count bigint not null default 0 
 );
 
 CREATE INDEX idx_follower_account 
