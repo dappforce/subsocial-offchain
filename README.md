@@ -33,3 +33,15 @@ yarn start
 + .editorconfig for consistent file format.
 
 The main code is located in the `src/substrate-subsrcibe`
+
+## Run with Docker
+
+### Option 1
+
+- Clone [subsocial-offchain repository](https://github.com/dappforce/dappforce-subsocial-offchain-storage.git)
+- From the root of the repo run `./docker/compose.sh`
+
+### Option 2
+
+1. Run PostgreSQL with `docker run --restart always -d -e POSTGRES_DB=subsocial -e POSTGRES_USER=dev -e POSTGRES_PASSWORD=1986 -p 5432:5432 -v /tmp/subsocial/postgres:/var/lib/postgresql/data postgres:alpine`
+2. Run offchain Node.JS app with `docker run --restart on-failure --network="host" -d dappforce/subsocial-offchain:latest`
