@@ -44,7 +44,8 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
 
 //Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
-  const limit = req.query.count > LIMIT ? LIMIT : req.query.count;
+  const limit = req.query.limit;
+  console.log(limit);
   const offset = req.query.offset;
   const query = `
     SELECT DISTINCT * 
@@ -69,7 +70,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
 });
 
 app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
-  const limit = req.query.count > LIMIT ? LIMIT : req.query.count;
+  const limit = req.query.limit > LIMIT ? LIMIT : req.query.limit;
   const offset = req.query.offset;
   const query = `
     SELECT DISTINCT *

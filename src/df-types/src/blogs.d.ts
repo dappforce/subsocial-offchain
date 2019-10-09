@@ -1,6 +1,6 @@
-import { Option, Struct, Enum } from '@polkadot/types/codec';
-import { BlockNumber, Moment, AccountId, u16, u32, u64, Text, Vector, i32 } from '@polkadot/types';
-export declare type IpfsData = CommentData | PostData | BlogData | ProfileData;
+import { Option, Struct, Enum, EnumType } from '@polkadot/types/codec';
+import { BlockNumber, Moment, AccountId, u16, u32, u64, Text, Vector, i32, Null } from '@polkadot/types';
+export declare type IpfsData = CommentData | PostData | BlogData | ProfileData | SharedPostData;
 export declare type Activity = {
     id: number;
     account: string;
@@ -12,18 +12,35 @@ export declare type Activity = {
     date: Date;
     agg_count: number;
 };
-export declare class IpfsHash extends Text {
-}
 export declare class BlogId extends u64 {
-}
-declare const OptionIpfsHash_base: import("@polkadot/types/types").Constructor<Option<import("@polkadot/types/types").Codec>>;
-export declare class OptionIpfsHash extends OptionIpfsHash_base {
 }
 export declare class PostId extends u64 {
 }
 export declare class CommentId extends u64 {
 }
 export declare class ReactionId extends u64 {
+}
+export declare class IpfsHash extends Text {
+}
+declare const OptionIpfsHash_base: import("@polkadot/types/types").Constructor<Option<import("@polkadot/types/types").Codec>>;
+export declare class OptionIpfsHash extends OptionIpfsHash_base {
+}
+export declare class RegularPost extends Null {
+}
+export declare class SharedPost extends PostId {
+}
+export declare class SharedComment extends CommentId {
+}
+export declare type PostExtensionEnum = RegularPost | SharedPost | SharedComment;
+declare type PostExtensionEnumValue = {
+    RegularPost: RegularPost;
+} | {
+    SharedPost: SharedPost;
+} | {
+    SharedComment: SharedComment;
+};
+export declare class PostExtension extends EnumType<PostExtensionEnumValue> {
+    constructor(value?: PostExtensionEnumValue, index?: number);
 }
 export declare type ChangeType = {
     account: AccountId;
@@ -34,7 +51,7 @@ export declare class Change extends Struct {
     constructor(value?: ChangeType);
     readonly account: AccountId;
     readonly block: BlockNumber;
-    readonly time: Moment;
+    readonly time: string;
 }
 declare const VecAccountId_base: import("@polkadot/types/types").Constructor<Vector<AccountId>>;
 export declare class VecAccountId extends VecAccountId_base {
@@ -96,9 +113,11 @@ export declare class BlogUpdate extends Struct {
     slug: OptionText;
     ipfs_hash: OptionIpfsHash;
 }
-export declare type PostData = {
-    title: string;
+export declare type SharedPostData = {
     body: string;
+};
+export declare type PostData = SharedPostData & {
+    title: string;
     image: string;
     tags: string[];
 };
@@ -107,7 +126,7 @@ export declare type PostType = {
     blog_id: BlogId;
     created: ChangeType;
     updated: OptionChange;
-    slug: Text;
+    extension: PostExtension;
     ipfs_hash: IpfsHash;
     comments_count: u16;
     upvotes_count: u16;
@@ -122,7 +141,7 @@ export declare class Post extends Struct {
     readonly blog_id: BlogId;
     readonly created: Change;
     readonly updated: OptionChange;
-    readonly slug: Text;
+    readonly extension: PostExtension;
     readonly ipfs_hash: string;
     readonly comments_count: u16;
     readonly upvotes_count: u16;
@@ -130,16 +149,18 @@ export declare class Post extends Struct {
     readonly shares_count: u16;
     readonly edit_history: VecPostHistoryRecord;
     readonly score: i32;
+    readonly isRegularPost: boolean;
+    readonly isSharedPost: boolean;
+    readonly isSharedComment: boolean;
 }
 export declare type PostUpdateType = {
     blog_id: OptionBlogId;
-    slug: OptionText;
     ipfs_hash: OptionIpfsHash;
 };
 export declare class PostUpdate extends Struct {
     constructor(value?: PostUpdateType);
     ipfs_hash: OptionIpfsHash;
-    slug: OptionIpfsHash;
+    slug: OptionText;
 }
 export declare type CommentData = {
     body: string;
@@ -222,8 +243,9 @@ export declare type ProfileData = {
     avatar: string;
     about: string;
     facebook: string;
-    github: string;
+    twitter: string;
     linkedIn: string;
+    github: string;
     instagram: string;
 };
 export declare type ProfileType = {

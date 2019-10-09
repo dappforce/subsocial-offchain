@@ -1,7 +1,7 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { DispatchForDb } from './lib/postgre'
 import { getEventSections, getEventMethods } from './lib/utils';
-import { registerJoystreamTypes } from './../df-types';
+import { registerDfTypes } from './../df-types';
 import { Event, EventRecord, Header } from '@polkadot/types';
 
 require("dotenv").config();
@@ -28,7 +28,7 @@ export class Api {
         const provider = new WsProvider(rpcEndpoint);
 
         // Register types before creating the API:
-        registerJoystreamTypes();
+        registerDfTypes();
 
         // Create the API and wait until ready:
         console.log(`Connecting to Substrate API: ${rpcEndpoint}`)

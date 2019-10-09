@@ -11,6 +11,7 @@ BEGIN
             'AccountUnfollowed',
             'PostCreated',
             'PostUpdated',
+            'PostShared',
             'CommentCreated',
             'CommentUpdated',
             'PostReactionCreated',

@@ -70,39 +70,43 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     case 'PostCreated': {
       insertPostFollower(data);
       const postId = data[1] as PostId;
-      const account = data[0].toString();
-      console.log(postId);
+      const follower = data[0].toString();
+
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
 
+      console.log('here');
+
       const post = postOpt.unwrap();
-      console.log(post);
-      console.log(post.blog_id);
+
       const ids = [post.blog_id, postId ];
       const activityId = await insertActivityForPost(eventAction, 0 , ids);
       if (activityId === -1) return;
 
-      await fillActivityStreamWithBlogFollowers(post.blog_id, account, activityId);
-      await fillNewsFeedWithAccountFollowers(account, activityId)
+      console.log('here');
+
+      await fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
+      await fillNewsFeedWithAccountFollowers(follower, activityId)
       break;
     }
     case 'PostShared': {
       const postId = data[1] as PostId;
       const follower = data[0].toString();
-      console.log(postId);
+
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
 
       const post = postOpt.unwrap();
-      console.log(post);
-      console.log(post.blog_id);
+
       const ids = [post.blog_id, postId ];
       const activityId = await insertActivityForPost(eventAction, 0, ids);
       if (activityId === -1) return;
 
       const account = post.created.account.toString();
       insertNotificationForOwner(activityId, account);
-      fillNewsFeedWithAccountFollowers(follower, activityId);
+      fillNotificationsWithAccountFollowers(follower, activityId);
+      fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
+      fillNewsFeedWithAccountFollowers(follower, activityId)
       break;
     }
     case 'PostDeleted': {
@@ -233,7 +237,6 @@ const insertNotificationForOwner = async (id: number, account: string) => {
 }
 
 const insertAccountFollower = async (data: EventData) => {
-  console.log(data);
   const query = `
     INSERT INTO df.account_followers(follower_account, following_account)
       VALUES($1, $2)
@@ -325,7 +328,6 @@ const deleteCommentFollower = async (data: EventData) => {
 };
 
 const insertBlogFollower = async (data: EventData) => {
-  console.log(data);
   const blogId = encodeStructId(data[1] as BlogId);
   const query = `
     INSERT INTO df.blog_followers(follower_account, following_blog_id)
@@ -392,7 +394,6 @@ const insertActivityForComment = async (eventAction: EventAction, count: number,
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
   const params = [accountId, eventName, ...paramsIds, heightBlock, count, aggregated];
-  console.log(params);
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -453,9 +454,9 @@ const insertActivityForAccount = async (eventAction: EventAction, count: number)
             AND following_id = $3
         RETURNING *`;
 
-      const paramsUpdate = [activityId, eventName, accountId];
-      const resUpdate = await pool.query(queryUpdate,paramsUpdate);
-      console.log(resUpdate.rowCount);
+    const paramsUpdate = [activityId, eventName, accountId];
+    const resUpdate = await pool.query(queryUpdate,paramsUpdate);
+    console.log(resUpdate.rowCount);
     console.log(res.rows[0])
     return activityId;
   } catch (err) {
@@ -488,8 +489,8 @@ const insertActivityForBlog = async (eventAction: EventAction, count: number, cr
             AND blog_id = $3
         RETURNING *`;
 
-      const resUpdate = await pool.query(queryUpdate,paramsUpdate);
-      console.log(resUpdate.rowCount);
+    const resUpdate = await pool.query(queryUpdate,paramsUpdate);
+    console.log(resUpdate.rowCount);
     console.log(res.rows[0])
     return activityId;
   } catch (err) {
@@ -512,7 +513,6 @@ const insertActivityForPost = async (eventAction: EventAction, count: number, id
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
   const params = [accountId, eventName, ...paramsIds, heightBlock, count];
-  console.log(params);
   try {
     const res = await pool.query(query, params)
     return res.rows[0].id;
@@ -537,7 +537,6 @@ const insertActivityForPostReaction = async (eventAction: EventAction, count: nu
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
   const params = [accountId, eventName, ...paramsIds, heightBlock, count, aggregated];
-  console.log(params);
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -552,9 +551,9 @@ const insertActivityForPostReaction = async (eventAction: EventAction, count: nu
             AND post_id = $3
         RETURNING *`;
 
-      const paramsUpdate = [activityId, eventName, postId];
-      const resUpdate = await pool.query(queryUpdate,paramsUpdate);
-      console.log(resUpdate.rowCount);
+    const paramsUpdate = [activityId, eventName, postId];
+    const resUpdate = await pool.query(queryUpdate,paramsUpdate);
+    console.log(resUpdate.rowCount);
 
     return activityId;
   } catch (err) {
@@ -577,7 +576,6 @@ const insertActivityForCommentReaction = async (eventAction: EventAction, count:
       VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
   const params = [accountId, eventName, ...paramsIds, heightBlock, count, aggregated];
-  console.log(params);
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -592,9 +590,9 @@ const insertActivityForCommentReaction = async (eventAction: EventAction, count:
             AND comment_id = $4
         RETURNING *`;
 
-      const paramsUpdate = [activityId, eventName, ...paramsIds];
-      const resUpdate = await pool.query(queryUpdate,paramsUpdate);
-      console.log(resUpdate.rowCount);
+    const paramsUpdate = [activityId, eventName, ...paramsIds];
+    const resUpdate = await pool.query(queryUpdate,paramsUpdate);
+    console.log(resUpdate.rowCount);
       
     return activityId;
   } catch (err) {
