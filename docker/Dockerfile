@@ -15,3 +15,5 @@ RUN yarn build
 COPY src/df-types/ ./build/src/df-types/
 
 EXPOSE 3001
+
+CMD bash -c "yarn init-offchain && yarn start"
