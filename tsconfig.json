@@ -19,8 +19,8 @@
     "strictNullChecks": false
   },
   "include": [
-    "src/subscribe-substrate/*",
-    "__tests__/**/*", "src/server.ts"
+    "src/**/*",
+    "__tests__/**/*"
   ],
   "exclude": [
     "src/df-types",

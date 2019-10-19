@@ -1,26 +1,22 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.registerBlogsTypes = registerBlogsTypes;
-exports.ScoringAction = exports.ScoringActions = exports.VecCommentHistoryRecord = exports.CommentHistoryRecord = exports.VecPostHistoryRecord = exports.PostHistoryRecord = exports.VecBlogHistoryRecord = exports.BlogHistoryRecord = exports.SocialAccount = exports.Reaction = exports.ReactionKind = exports.ReactionKinds = exports.OptionComment = exports.CommentUpdate = exports.Comment = exports.PostUpdate = exports.Post = exports.BlogUpdate = exports.Blog = exports.OptionVecAccountId = exports.OptionCommentId = exports.OptionBlogId = exports.OptionChange = exports.OptionText = exports.VecAccountId = exports.Change = exports.ReactionId = exports.CommentId = exports.PostId = exports.OptionIpfsHash = exports.BlogId = exports.IpfsHash = void 0;
+exports.ScoringAction = exports.ScoringActions = exports.VecProfileHistoryRecord = exports.ProfileHistoryRecord = exports.VecCommentHistoryRecord = exports.CommentHistoryRecord = exports.VecPostHistoryRecord = exports.PostHistoryRecord = exports.VecBlogHistoryRecord = exports.BlogHistoryRecord = exports.ProfileUpdate = exports.OptionProfile = exports.Profile = exports.SocialAccount = exports.Reaction = exports.ReactionKind = exports.ReactionKinds = exports.OptionComment = exports.CommentUpdate = exports.Comment = exports.PostUpdate = exports.Post = exports.BlogUpdate = exports.Blog = exports.OptionVecAccountId = exports.OptionCommentId = exports.OptionBlogId = exports.OptionChange = exports.OptionText = exports.VecAccountId = exports.Change = exports.PostExtension = exports.SharedComment = exports.SharedPost = exports.RegularPost = exports.OptionIpfsHash = exports.IpfsHash = exports.ReactionId = exports.CommentId = exports.PostId = exports.BlogId = void 0;
 
 var _codec = require("@polkadot/types/codec");
 
 var _types = require("@polkadot/types");
 
-class IpfsHash extends _types.Text {}
-
-exports.IpfsHash = IpfsHash;
+var _momentTimezone = _interopRequireDefault(require("moment-timezone"));
 
 class BlogId extends _types.u64 {}
 
 exports.BlogId = BlogId;
-
-class OptionIpfsHash extends _codec.Option.with(IpfsHash) {}
-
-exports.OptionIpfsHash = OptionIpfsHash;
 
 class PostId extends _types.u64 {}
 
@@ -33,6 +29,39 @@ exports.CommentId = CommentId;
 class ReactionId extends _types.u64 {}
 
 exports.ReactionId = ReactionId;
+
+class IpfsHash extends _types.Text {}
+
+exports.IpfsHash = IpfsHash;
+
+class OptionIpfsHash extends _codec.Option.with(IpfsHash) {}
+
+exports.OptionIpfsHash = OptionIpfsHash;
+
+class RegularPost extends _types.Null {}
+
+exports.RegularPost = RegularPost;
+
+class SharedPost extends PostId {}
+
+exports.SharedPost = SharedPost;
+
+class SharedComment extends CommentId {}
+
+exports.SharedComment = SharedComment;
+
+class PostExtension extends _codec.EnumType {
+  constructor(value, index) {
+    super({
+      RegularPost,
+      SharedPost,
+      SharedComment
+    }, value, index);
+  }
+
+}
+
+exports.PostExtension = PostExtension;
 
 class Change extends _codec.Struct {
   constructor(value) {
@@ -52,7 +81,8 @@ class Change extends _codec.Struct {
   }
 
   get time() {
-    return this.get('time');
+    const time = this.get('time');
+    return (0, _momentTimezone.default)(time).format('lll');
   }
 
 }
@@ -188,7 +218,7 @@ class Post extends _codec.Struct {
       blog_id: BlogId,
       created: Change,
       updated: OptionChange,
-      slug: _types.Text,
+      extension: PostExtension,
       ipfs_hash: IpfsHash,
       comments_count: _types.u16,
       upvotes_count: _types.u16,
@@ -215,8 +245,8 @@ class Post extends _codec.Struct {
     return this.get('updated');
   }
 
-  get slug() {
-    return this.get('slug');
+  get extension() {
+    return this.get('extension');
   }
 
   get ipfs_hash() {
@@ -248,6 +278,18 @@ class Post extends _codec.Struct {
     return this.get('score');
   }
 
+  get isRegularPost() {
+    return this.extension.value instanceof RegularPost;
+  }
+
+  get isSharedPost() {
+    return this.extension.value instanceof SharedPost;
+  }
+
+  get isSharedComment() {
+    return this.extension.value instanceof SharedComment;
+  }
+
 }
 
 exports.Post = Post;
@@ -256,17 +298,12 @@ class PostUpdate extends _codec.Struct {
   constructor(value) {
     super({
       blog_id: OptionBlogId,
-      slug: OptionText,
       ipfs_hash: OptionIpfsHash
     }, value);
   }
 
   get ipfs_hash() {
     return this.get('ipfs_hash');
-  }
-
-  get slug() {
-    return this.get('slug');
   }
 
   set ipfs_hash(value) {
@@ -293,6 +330,7 @@ class Comment extends _codec.Struct {
       upvotes_count: _types.u16,
       downvotes_count: _types.u16,
       shares_count: _types.u16,
+      direct_replies_count: _types.u16,
       edit_history: VecCommentHistoryRecord,
       score: _types.i32
     }, value);
@@ -333,6 +371,10 @@ class Comment extends _codec.Struct {
 
   get shares_count() {
     return this.get('shares_count');
+  }
+
+  get direct_replies_count() {
+    return this.get('direct_replies_count');
   }
 
   get edit_history() {
@@ -416,7 +458,8 @@ class SocialAccount extends _codec.Struct {
       followers_count: _types.u32,
       following_accounts_count: _types.u16,
       following_blogs_count: _types.u16,
-      reputation: _types.u32
+      reputation: _types.u32,
+      profile: OptionProfile
     }, value);
   }
 
@@ -436,9 +479,81 @@ class SocialAccount extends _codec.Struct {
     return this.get('reputation');
   }
 
+  get profile() {
+    return this.get('profile');
+  }
+
 }
 
 exports.SocialAccount = SocialAccount;
+
+class Profile extends _codec.Struct {
+  constructor(value) {
+    super({
+      created: Change,
+      updated: OptionChange,
+      username: _types.Text,
+      ipfs_hash: IpfsHash,
+      edit_history: VecProfileHistoryRecord
+    }, value);
+  }
+
+  get created() {
+    return this.get('created');
+  }
+
+  get updated() {
+    return this.get('updated');
+  }
+
+  get username() {
+    return this.get('username');
+  }
+
+  get ipfs_hash() {
+    const ipfsHash = this.get('ipfs_hash');
+    return ipfsHash.toString();
+  }
+
+  get edit_history() {
+    return this.get('edit_history');
+  }
+
+}
+
+exports.Profile = Profile;
+
+class OptionProfile extends _codec.Option.with(Profile) {}
+
+exports.OptionProfile = OptionProfile;
+
+class ProfileUpdate extends _codec.Struct {
+  constructor(value) {
+    super({
+      username: OptionText,
+      ipfs_hash: OptionIpfsHash
+    }, value);
+  }
+
+  get ipfs_hash() {
+    return this.get('ipfs_hash');
+  }
+
+  get username() {
+    return this.get('username');
+  }
+
+  set ipfs_hash(value) {
+    this.set('ipfs_hash', value);
+  }
+
+  set username(value) {
+    this.set('username', value);
+  }
+
+}
+
+exports.ProfileUpdate = ProfileUpdate;
 
 class BlogHistoryRecord extends _codec.Struct {
   constructor(value) {
@@ -511,6 +626,30 @@ exports.CommentHistoryRecord = CommentHistoryRecord;
 class VecCommentHistoryRecord extends _types.Vector.with(CommentHistoryRecord) {}
 
 exports.VecCommentHistoryRecord = VecCommentHistoryRecord;
+
+class ProfileHistoryRecord extends _codec.Struct {
+  constructor(value) {
+    super({
+      edited: Change,
+      old_data: ProfileUpdate
+    }, value);
+  }
+
+  get edited() {
+    return this.get('edited');
+  }
+
+  get old_data() {
+    return this.get('old_data');
+  }
+
+}
+
+exports.ProfileHistoryRecord = ProfileHistoryRecord;
+
+class VecProfileHistoryRecord extends _types.Vector.with(ProfileHistoryRecord) {}
+
+exports.VecProfileHistoryRecord = VecProfileHistoryRecord;
 const ScoringActions = {
   UpvotePost: 'UpvotePost',
   DownvotePost: 'DownvotePost',
@@ -536,24 +675,28 @@ function registerBlogsTypes() {
   try {
     const typeRegistry = (0, _types.getTypeRegistry)();
     typeRegistry.register({
-      BlogId: 'u64',
-      PostId: 'u64',
-      CommentId: 'u64',
-      ReactionId: 'u64',
+      BlogId,
+      PostId,
+      CommentId,
+      ReactionId,
       Change,
       Blog,
       BlogUpdate,
+      BlogHistoryRecord,
+      PostExtension,
       Post,
       PostUpdate,
+      PostHistoryRecord,
       Comment,
       CommentUpdate,
+      CommentHistoryRecord,
       ReactionKind,
       Reaction,
       SocialAccount,
-      BlogHistoryRecord,
-      PostHistoryRecord,
-      CommentHistoryRecord,
-      ScoringAction
+      ScoringAction,
+      Profile,
+      ProfileUpdate,
+      ProfileHistoryRecord
     });
   } catch (err) {
     console.error('Failed to register custom types of blogs module', err);

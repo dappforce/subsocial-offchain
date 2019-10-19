@@ -1,6 +1,9 @@
 import { pool } from './../adaptors/connectPostgre'
 import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
 
+require("dotenv").config();
+const LIMIT = process.env.PGLIMIT;
+
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
@@ -20,7 +23,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // // for parsing multipart/form-data
 // app.use(upload.array());
 // app.use(express.static('public'));
-
 
 //IPFS API
 app.get('/v1/ipfs/get/:hash', async (req: express.Request, res: express.Response) => {
@@ -42,15 +44,20 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
 
 //Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
+  const limit = req.query.limit;
+  console.log(limit);
+  const offset = req.query.offset;
   const query = `
     SELECT DISTINCT * 
     FROM df.activities
     WHERE id IN (
       SELECT activity_id
       FROM df.news_feed
-      WHERE account = $1
-    )`;
-  const params = [req.params.id];
+      WHERE account = $1)
+    ORDER BY date DESC
+    OFFSET $2
+    LIMIT $3`;
+  const params = [req.params.id, offset, limit];
   console.log(params);
   try {
     const data = await pool.query(query, params)
@@ -63,15 +70,20 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
 });
 
 app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
+  const limit = req.query.limit > LIMIT ? LIMIT : req.query.limit;
+  const offset = req.query.offset;
   const query = `
     SELECT DISTINCT *
     FROM df.activities
     WHERE id IN ( 
       SELECT activity_id
       FROM df.notifications
-      WHERE account = $1
-    )`;
-  const params = [req.params.id];
+      WHERE account = $1) 
+      AND aggregated = true
+    ORDER BY date DESC
+    OFFSET $2
+    LIMIT $3`;
+  const params = [req.params.id, offset, limit];
   try {
     const data = await pool.query(query, params)
     console.log(data.rows);

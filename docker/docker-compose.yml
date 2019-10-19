@@ -1,0 +1,28 @@
+# docker-compose.yml
+version: "3"
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: subsocial
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: 1986
+    network_mode: "host"
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - /tmp/subsocial/postgres-data:/var/lib/postgresql/data
+      
+  subsocial-offchain:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    image: dappforce/subsocial-offchain:latest
+    depends_on:
+      - postgres
+    network_mode: "host"
+    ports:
+      - "3001:3001"
+    restart: on-failure
+    command: bash -c "yarn init-offchain && yarn start"
