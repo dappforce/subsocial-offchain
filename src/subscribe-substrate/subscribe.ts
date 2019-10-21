@@ -1,6 +1,6 @@
 import { api } from './server';
 import { BlogId, PostId, CommentId, Post, Comment, Blog, SocialAccount, BlogData, PostData, CommentData, ProfileData, Profile } from '../df-types/src/blogs';
-import { Option } from '@polkadot/types'
+import { Option, AccountId } from '@polkadot/types'
 import { EventData } from '@polkadot/types/type/Event';
 import BN from 'bn.js';
 import { insertAccountFollower, insertActivityForAccount, insertNotificationForOwner, deleteAccountActivityWithActivityStream, deleteAccountFollower, insertActivityForBlog, fillNotificationsWithAccountFollowers, insertBlogFollower, deleteBlogActivityWithActivityStream, deleteBlogFollower, insertPostFollower, insertActivityForPost, fillActivityStreamWithBlogFollowers, fillNewsFeedWithAccountFollowers, deletePostActivityWithActivityStream, deletePostFollower, insertCommentFollower, insertActivityComments, insertActivityForComment, fillActivityStreamWithPostFollowers, fillActivityStreamWithCommentFollowers, deleteCommentActivityWithActivityStream, deleteCommentFollower, insertActivityForPostReaction, insertActivityForCommentReaction } from './lib/postgres';
@@ -44,7 +44,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (blogOpt.isNone) return;
 
       const blog = blogOpt.unwrap();
-      insertElasticSearch<BlogData>(blog.ipfs_hash);
+      insertElasticSearch<BlogData>(blog.ipfs_hash, blogId);
       break;
     }
     case 'BlogFollowed': {
@@ -92,7 +92,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       await fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
       await fillNewsFeedWithAccountFollowers(follower, activityId);
-      insertElasticSearch<PostData>(post.ipfs_hash);
+      insertElasticSearch<PostData>(post.ipfs_hash, postId);
       break;
     }
     case 'PostShared': {
@@ -150,7 +150,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
         await fillActivityStreamWithPostFollowers(postId, commentCreator, activityId);
         await fillNotificationsWithAccountFollowers(commentCreator, activityId);
       }
-      insertElasticSearch<CommentData>(comment.ipfs_hash);
+      insertElasticSearch<CommentData>(comment.ipfs_hash, commentId);
       break;
     }
     case 'CommentShared': {
@@ -219,7 +219,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       break;
     }
     case 'ProfileCreated' : {
-      const accountId = data[0].toString();
+      const accountId = data[0] as AccountId;
       const SocialAccountOpt = await api.query.blogs.socialAccountById(accountId) as Option<SocialAccount>;
       if (SocialAccountOpt.isNone) return;
       
@@ -227,7 +227,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap() as Profile;
-      insertElasticSearch<ProfileData>(profile.ipfs_hash, { username: profile.username.toString() });
+      insertElasticSearch<ProfileData>(profile.ipfs_hash, accountId, { username: profile.username.toString() });
       break;
     }
   }

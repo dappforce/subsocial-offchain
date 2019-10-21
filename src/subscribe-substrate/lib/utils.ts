@@ -1,5 +1,6 @@
 import { BlogId, PostId, CommentId, IpfsData } from '../../df-types/src/blogs';
 import { getJsonFromIpfs } from '../../express-api/adaptors/ipfs';
+import { AccountId } from '@polkadot/types';
 
 require("dotenv").config();
 
@@ -31,9 +32,9 @@ export function encodeStructId (id: InsertData): string {
     return id.toHex().split('x')[1].replace(/(0+)/,'');
 }
 
-export async function insertElasticSearch<T extends IpfsData>(ipfsHash: string, id: InsertData, extData?: object) {
+export async function insertElasticSearch<T extends IpfsData>(ipfsHash: string, id: InsertData | AccountId, extData?: object) {
    const ipfsJson = await getJsonFromIpfs<T>(ipfsHash);
    const json = extData ? { ...ipfsJson, ...extData } : ipfsJson;
    console.log('Elastic Data:');
-   console.log(json);
+   console.log({ ...json, id });
 }
