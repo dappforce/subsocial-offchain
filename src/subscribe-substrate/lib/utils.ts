@@ -1,3 +1,5 @@
+import { BlogId, PostId, CommentId } from '../../df-types/src/blogs';
+
 require("dotenv").config();
 
 // gets the event sections to filter on
@@ -19,3 +21,11 @@ export const getEventMethods = () => {
         return ["all"];
     }
 };
+
+export type InsertData = BlogId | PostId | CommentId;
+
+export function encodeStructId (id: InsertData): string {
+    if(!id) return null;
+  
+    return id.toHex().split('x')[1].replace(/(0+)/,'');
+  }

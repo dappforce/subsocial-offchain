@@ -1,5 +1,5 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { DispatchForDb } from './lib/postgre'
+import { DispatchForDb } from './subscribe'
 import { getEventSections, getEventMethods } from './lib/utils';
 import { registerDfTypes } from './../df-types';
 import { Event, EventRecord, Header } from '@polkadot/types';
