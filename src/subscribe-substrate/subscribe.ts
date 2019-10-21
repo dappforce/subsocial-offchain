@@ -44,7 +44,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (blogOpt.isNone) return;
 
       const blog = blogOpt.unwrap();
-      insertElasticSearch<BlogData>(blog.ipfs_hash, blogId);
+      insertElasticSearch<BlogData>('subsocial_blogs', blog.ipfs_hash, blogId);
       break;
     }
     case 'BlogFollowed': {
@@ -92,7 +92,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       await fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
       await fillNewsFeedWithAccountFollowers(follower, activityId);
-      insertElasticSearch<PostData>(post.ipfs_hash, postId);
+      insertElasticSearch<PostData>('subsocial_posts', post.ipfs_hash, postId);
       break;
     }
     case 'PostShared': {
@@ -150,7 +150,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
         await fillActivityStreamWithPostFollowers(postId, commentCreator, activityId);
         await fillNotificationsWithAccountFollowers(commentCreator, activityId);
       }
-      insertElasticSearch<CommentData>(comment.ipfs_hash, commentId);
+      insertElasticSearch<CommentData>('subsocial_comments', comment.ipfs_hash, commentId);
       break;
     }
     case 'CommentShared': {
@@ -227,7 +227,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap() as Profile;
-      insertElasticSearch<ProfileData>(profile.ipfs_hash, accountId, { username: profile.username.toString() });
+      insertElasticSearch<ProfileData>('subsocial_profiles', profile.ipfs_hash, accountId, { username: profile.username.toString() });
       break;
     }
   }

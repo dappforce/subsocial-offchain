@@ -27,7 +27,7 @@
     "start": "concurrently \"npm run subscribe\" \"npm run api\" \"npm run ipfs\"",
     "subscribe": "node ./build/src/subscribe-substrate/server.js",
     "api": "node ./build/src/express-api/server.js",
-    "search": "node ./build/src/search/index.js",
+    "init-search": "node ./build/src/search/index.js",
     "init-offchain": "node ./build/src/sql/init.js",
     "clear-offchain": "node ./build/src/sql/clear-db.js",
     "ipfs": "yarn jsipfs daemon",
