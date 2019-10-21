@@ -1,4 +1,5 @@
-import { BlogId, PostId, CommentId } from '../../df-types/src/blogs';
+import { BlogId, PostId, CommentId, IpfsData } from '../../df-types/src/blogs';
+import { getJsonFromIpfs } from '../../express-api/adaptors/ipfs';
 
 require("dotenv").config();
 
@@ -28,4 +29,11 @@ export function encodeStructId (id: InsertData): string {
     if(!id) return null;
   
     return id.toHex().split('x')[1].replace(/(0+)/,'');
-  }
+}
+
+export async function insertElasticSearch<T extends IpfsData>(ipfsHash: string, extData?: object) {
+   const ipfsJson = await getJsonFromIpfs<T>(ipfsHash);
+   const json = extData ? { ...ipfsJson, ...extData } : ipfsJson;
+   console.log('Elastic Data:');
+   console.log(json);
+}
