@@ -31,7 +31,7 @@ export function encodeStructId (id: InsertData): string {
     return id.toHex().split('x')[1].replace(/(0+)/,'');
 }
 
-export async function insertElasticSearch<T extends IpfsData>(ipfsHash: string, extData?: object) {
+export async function insertElasticSearch<T extends IpfsData>(ipfsHash: string, id: InsertData, extData?: object) {
    const ipfsJson = await getJsonFromIpfs<T>(ipfsHash);
    const json = extData ? { ...ipfsJson, ...extData } : ipfsJson;
    console.log('Elastic Data:');

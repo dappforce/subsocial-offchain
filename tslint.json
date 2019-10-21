@@ -14,6 +14,7 @@
     "prefer-type-cast": false,
     "no-suspicious-comment": false,
     "prefer-array-literal": false,
+    "import-name": false,
     "max-func-body-length": 150,
     "typedef": [
       true,
