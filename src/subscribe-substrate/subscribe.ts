@@ -5,6 +5,7 @@ import { EventData } from '@polkadot/types/type/Event';
 import BN from 'bn.js';
 import { insertAccountFollower, insertActivityForAccount, insertNotificationForOwner, deleteAccountActivityWithActivityStream, deleteAccountFollower, insertActivityForBlog, fillNotificationsWithAccountFollowers, insertBlogFollower, deleteBlogActivityWithActivityStream, deleteBlogFollower, insertPostFollower, insertActivityForPost, fillActivityStreamWithBlogFollowers, fillNewsFeedWithAccountFollowers, deletePostActivityWithActivityStream, deletePostFollower, insertCommentFollower, insertActivityComments, insertActivityForComment, fillActivityStreamWithPostFollowers, fillActivityStreamWithCommentFollowers, deleteCommentActivityWithActivityStream, deleteCommentFollower, insertActivityForPostReaction, insertActivityForCommentReaction } from './lib/postgres';
 import { insertElasticSearch } from './lib/utils';
+import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
 
 type EventAction = {
   eventName: string,
@@ -44,7 +45,16 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (blogOpt.isNone) return;
 
       const blog = blogOpt.unwrap();
-      insertElasticSearch<BlogData>('subsocial_blogs', blog.ipfs_hash, blogId);
+      insertElasticSearch<BlogData>(ES_INDEX_BLOGS, blog.ipfs_hash, blogId);
+      break;
+    }
+    case 'BlogUpdated': {
+      const blogId = data[1] as BlogId;
+      const blogOpt = await api.query.blogs.blogById(blogId) as Option<Blog>;
+      if (blogOpt.isNone) return;
+
+      const blog = blogOpt.unwrap();
+      insertElasticSearch<BlogData>(ES_INDEX_BLOGS, blog.ipfs_hash, blogId);
       break;
     }
     case 'BlogFollowed': {
@@ -92,7 +102,16 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       await fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
       await fillNewsFeedWithAccountFollowers(follower, activityId);
-      insertElasticSearch<PostData>('subsocial_posts', post.ipfs_hash, postId);
+      insertElasticSearch<PostData>(ES_INDEX_POSTS, post.ipfs_hash, postId);
+      break;
+    }
+    case 'PostUpdated': {
+      const postId = data[1] as PostId;
+      const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
+      if (postOpt.isNone) return;
+
+      const post = postOpt.unwrap();
+      insertElasticSearch<PostData>(ES_INDEX_POSTS, post.ipfs_hash, postId);
       break;
     }
     case 'PostShared': {
@@ -150,7 +169,16 @@ export const DispatchForDb = async (eventAction: EventAction) => {
         await fillActivityStreamWithPostFollowers(postId, commentCreator, activityId);
         await fillNotificationsWithAccountFollowers(commentCreator, activityId);
       }
-      insertElasticSearch<CommentData>('subsocial_comments', comment.ipfs_hash, commentId);
+      insertElasticSearch<CommentData>(ES_INDEX_COMMENTS, comment.ipfs_hash, commentId);
+      break;
+    }
+    case 'CommentUpdated': {
+      const commentId = data[1] as CommentId;
+      const commentOpt = await api.query.blogs.commentById(commentId) as unknown as Option<Comment>;
+      if (commentOpt.isNone) return;
+
+      const comment = commentOpt.unwrap();
+      insertElasticSearch<CommentData>(ES_INDEX_COMMENTS, comment.ipfs_hash, commentId);
       break;
     }
     case 'CommentShared': {
@@ -227,7 +255,19 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap() as Profile;
-      insertElasticSearch<ProfileData>('subsocial_profiles', profile.ipfs_hash, accountId, { username: profile.username.toString() });
+      insertElasticSearch<ProfileData>(ES_INDEX_PROFILES, profile.ipfs_hash, accountId, { username: profile.username.toString() });
+      break;
+    }
+    case 'ProfileUpdated' : {
+      const accountId = data[0] as AccountId;
+      const SocialAccountOpt = await api.query.blogs.socialAccountById(accountId) as Option<SocialAccount>;
+      if (SocialAccountOpt.isNone) return;
+      
+      const profileOpt = SocialAccountOpt.unwrap().profile;
+      if (profileOpt.isNone) return;
+
+      const profile = profileOpt.unwrap() as Profile;
+      insertElasticSearch<ProfileData>(ES_INDEX_PROFILES, profile.ipfs_hash, accountId, { username: profile.username.toString() });
       break;
     }
   }

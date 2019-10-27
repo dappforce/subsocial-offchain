@@ -2,6 +2,7 @@ import { BlogId, PostId, CommentId, IpfsData, BlogData, PostData, CommentData, P
 import { getJsonFromIpfs } from '../../express-api/adaptors/ipfs';
 import { AccountId } from '@polkadot/types';
 import searchClient from '../../adaptors/connectElasticsearch'
+import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../../search/indexes';
 
 require("dotenv").config();
 
@@ -38,26 +39,26 @@ export async function insertElasticSearch<T extends IpfsData>(index: string, ipf
     let indexData;
 
     switch (index) {
-        case process.env.BLOGS_INDEX: {
+        case ES_INDEX_BLOGS: {
             const { name, desc } = json as BlogData;
             indexData = { name, desc };
             break;
         }
 
-        case process.env.POSTS_INDEX: {
+        case ES_INDEX_POSTS: {
             const { title, body } = json as PostData;
             indexData = { title, body };
             break;
         }
 
-        case process.env.COMMENTS_INDEX: {
+        case ES_INDEX_COMMENTS: {
             const { body } = json as CommentData;
             indexData = { body };
             console.log('[*]\n' + indexData + '\n[*]');
             break;
         }
 
-        case process.env.PROFILES_INDEX: {
+        case ES_INDEX_PROFILES: {
             const { fullname, about } = json as ProfileData;
             indexData = { ...extData, fullname, about };
             break;
@@ -67,9 +68,11 @@ export async function insertElasticSearch<T extends IpfsData>(index: string, ipf
             break;
     }
 
-    await searchClient.index({
-        index,
-        id: id instanceof AccountId ? id.toString() : encodeStructId(id),
-        body: indexData
-    })
+    if (indexData) {
+        await searchClient.index({
+            index,
+            id: id instanceof AccountId ? id.toString() : encodeStructId(id),
+            body: indexData
+        })
+    }
 }
