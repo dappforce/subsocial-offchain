@@ -34,7 +34,7 @@ export function encodeStructId(id: InsertData): string {
     return id.toHex().split('x')[1].replace(/(0+)/, '');
 }
 
-export async function insertElasticSearch<T extends IpfsData>(index: string, ipfsHash: string, id: InsertData | AccountId, username?: string) {
+export async function insertElasticSearch<T extends IpfsData>(index: string, ipfsHash: string, id: InsertData | AccountId, extData?: object) {
     const json = await getJsonFromIpfs<T>(ipfsHash);
     let indexData;
 
@@ -67,9 +67,8 @@ export async function insertElasticSearch<T extends IpfsData>(index: string, ipf
 
         case ES_INDEX_PROFILES: {
             const { fullname, about } = json as ProfileData;
-            // indexData = { ...extData, fullname, about };
             indexData = {
-                profile_username: username,
+                profile_username: extData,
                 profile_fullname: fullname,
                 profile_about: about
             }
