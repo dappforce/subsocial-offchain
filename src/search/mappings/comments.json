@@ -29,7 +29,7 @@
   },
   "mappings": {
     "properties": {
-      "body": {
+      "comment_body": {
         "type": "text",
         "fields": {
           "english": {

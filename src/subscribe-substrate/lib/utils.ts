@@ -34,33 +34,45 @@ export function encodeStructId(id: InsertData): string {
     return id.toHex().split('x')[1].replace(/(0+)/, '');
 }
 
-export async function insertElasticSearch<T extends IpfsData>(index: string, ipfsHash: string, id: InsertData | AccountId, extData?: object) {
+export async function insertElasticSearch<T extends IpfsData>(index: string, ipfsHash: string, id: InsertData | AccountId, username?: string) {
     const json = await getJsonFromIpfs<T>(ipfsHash);
     let indexData;
 
     switch (index) {
         case ES_INDEX_BLOGS: {
             const { name, desc } = json as BlogData;
-            indexData = { name, desc };
+            indexData = {
+                blog_name: name,
+                blog_desc: desc
+            };
             break;
         }
 
         case ES_INDEX_POSTS: {
             const { title, body } = json as PostData;
-            indexData = { title, body };
+            indexData = {
+                blog_title: title,
+                blog_body: body
+            };
             break;
         }
 
         case ES_INDEX_COMMENTS: {
             const { body } = json as CommentData;
-            indexData = { body };
-            console.log('[*]\n' + indexData + '\n[*]');
+            indexData = {
+                comment_body: body
+            };
             break;
         }
 
         case ES_INDEX_PROFILES: {
             const { fullname, about } = json as ProfileData;
-            indexData = { ...extData, fullname, about };
+            // indexData = { ...extData, fullname, about };
+            indexData = {
+                profile_username: username,
+                profile_fullname: fullname,
+                profile_about: about
+            }
             break;
         }
 

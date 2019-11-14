@@ -29,7 +29,7 @@
   },
   "mappings": {
     "properties": {
-      "username": {
+      "profile_username": {
         "type": "text",
         "fields": {
           "suggest": {
@@ -43,7 +43,7 @@
           }
         }
       },
-      "fullname": {
+      "profile_fullname": {
         "type": "text",
         "fields": {
           "suggest": {
@@ -57,7 +57,7 @@
           }
         }
       },
-      "about": {
+      "profile_about": {
         "type": "text",
         "fields": {
           "english": {
