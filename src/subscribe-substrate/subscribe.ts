@@ -20,7 +20,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       await insertAccountFollower(data);
       const socialAccountOpt = await api.query.blogs.socialAccountById(data[1]) as Option<SocialAccount>;
       if (!socialAccountOpt && socialAccountOpt.isNone) return;
-      const id = await insertActivityForAccount(eventAction);
+      const count = socialAccountOpt.unwrap().followers_count.toNumber() - 1;
+      const id = await insertActivityForAccount(eventAction, count);
       if (id === -1) return;
 
       const following = data[1].toString();
@@ -36,7 +37,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     }
     case 'BlogCreated': {
       const account = data[0].toString();
-      const activityId = await insertActivityForBlog(eventAction);
+      const activityId = await insertActivityForBlog(eventAction, 0);
       await fillNotificationsWithAccountFollowers(account, activityId);
 
       const blogId = data[1] as BlogId;
@@ -63,8 +64,9 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (blogOpt.isNone) return;
 
       const blog = blogOpt.unwrap();
+      const count = blog.followers_count.toNumber() - 1;
       const account = blog.created.account.toString();
-      const id = await insertActivityForBlog(eventAction, account);
+      const id = await insertActivityForBlog(eventAction, count, account);
       if (id === -1) return;
 
       const follower = data[0].toString();
@@ -93,7 +95,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = postOpt.unwrap();
 
       const ids = [post.blog_id, postId ];
-      const activityId = await insertActivityForPost(eventAction, ids);
+      const activityId = await insertActivityForPost(eventAction, 0 , ids);
       if (activityId === -1) return;
 
       console.log('here');
@@ -122,7 +124,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = postOpt.unwrap();
 
       const ids = [post.blog_id, postId ];
-      const activityId = await insertActivityForPost(eventAction, ids);
+      const activityId = await insertActivityForPost(eventAction, 0, ids);
       if (activityId === -1) return;
 
       const account = post.created.account.toString();
@@ -158,8 +160,9 @@ export const DispatchForDb = async (eventAction: EventAction) => {
         console.log('PARENT ID');
         insertActivityComments(eventAction, ids,comment);
       } else {
+        const count = post.comments_count.toNumber() - 1;
 
-        const activityId = await insertActivityForComment(eventAction, ids, postCreator);
+        const activityId = await insertActivityForComment(eventAction, count, ids, postCreator);
         if (activityId === -1) return;
   
         console.log('PARENT ID NULL');
@@ -190,8 +193,9 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId, commentId];
+      const count = post.comments_count.toNumber() - 1;
       const account = comment.created.account.toString();
-      const activityId = await insertActivityForComment(eventAction, ids, account);
+      const activityId = await insertActivityForComment(eventAction, count,  ids, account);
       if (activityId === -1) return;
 
       fillActivityStreamWithCommentFollowers(commentId, account, activityId);
@@ -213,8 +217,9 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       const post = postOpt.unwrap();
       const ids = [ postId ];
+      const count = post.upvotes_count.toNumber() + post.downvotes_count.toNumber() - 1;
       const account = post.created.account.toString();
-      const activityId = await insertActivityForPostReaction(eventAction, ids, account);
+      const activityId = await insertActivityForPostReaction(eventAction, count, ids, account);
       if (activityId === -1) return;
 
       if (follower === account) return;
@@ -231,7 +236,8 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const comment = commentOpt.unwrap();
       const ids = [comment.post_id, commentId ];
       const account = comment.created.account.toString();
-      const activityId = await insertActivityForCommentReaction(eventAction, ids, account);
+      const count = (comment.upvotes_count.toNumber() + comment.downvotes_count.toNumber()) - 1;
+      const activityId = await insertActivityForCommentReaction(eventAction, count, ids, account);
       if (activityId === -1) return;
 
       if (follower === account) return;
