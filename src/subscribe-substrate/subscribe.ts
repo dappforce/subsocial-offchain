@@ -95,7 +95,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = postOpt.unwrap();
 
       const ids = [post.blog_id, postId ];
-      const activityId = await insertActivityForPost(eventAction, 0 , ids);
+      const activityId = await insertActivityForPost(eventAction, ids, 0);
       if (activityId === -1) return;
 
       console.log('here');
@@ -124,7 +124,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = postOpt.unwrap();
 
       const ids = [post.blog_id, postId ];
-      const activityId = await insertActivityForPost(eventAction, 0, ids);
+      const activityId = await insertActivityForPost(eventAction, ids);
       if (activityId === -1) return;
 
       const account = post.created.account.toString();
@@ -160,9 +160,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
         console.log('PARENT ID');
         insertActivityComments(eventAction, ids,comment);
       } else {
-        const count = post.comments_count.toNumber() - 1;
-
-        const activityId = await insertActivityForComment(eventAction, count, ids, postCreator);
+        const activityId = await insertActivityForComment(eventAction, ids, postCreator);
         if (activityId === -1) return;
   
         console.log('PARENT ID NULL');
@@ -195,7 +193,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const ids = [post.blog_id, postId, commentId];
       const count = post.comments_count.toNumber() - 1;
       const account = comment.created.account.toString();
-      const activityId = await insertActivityForComment(eventAction, count,  ids, account);
+      const activityId = await insertActivityForComment(eventAction, ids, account);
       if (activityId === -1) return;
 
       fillActivityStreamWithCommentFollowers(commentId, account, activityId);
