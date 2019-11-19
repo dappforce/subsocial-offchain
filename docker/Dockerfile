@@ -1,18 +1,25 @@
-FROM node:10
+FROM node:10 as builder
 
 RUN apt update
 
-WORKDIR /app
+COPY package.json yarn.lock* setup-ipfs.sh ./
+RUN yarn install --no-optional
 
-COPY package.json package-lock.json* setup-ipfs.sh ./
-RUN yarn add global concurrently
-RUN yarn
 RUN ./setup-ipfs.sh
 
 COPY . .
+RUN yarn add global concurrently
+RUN yarn && yarn cache clean --force
 
-RUN yarn build
+RUN NODE_ENV=production yarn build
 COPY src/df-types/ ./build/src/df-types/
+
+FROM node:10
+
+WORKDIR /app
+COPY --from=builder package.json tsconfig.json ./
+COPY --from=builder build/ ./build
+COPY --from=builder node_modules/ ./node_modules
 
 EXPOSE 3001
 

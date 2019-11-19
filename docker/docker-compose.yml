@@ -25,4 +25,3 @@ services:
     ports:
       - "3001:3001"
     restart: on-failure
-    command: bash -c "yarn init-offchain && yarn start"
