@@ -1,6 +1,29 @@
 # docker-compose.yml
 version: "3"
 services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
+    environment:
+      - cluster.name=subsocial-cluster
+      - node-name=subsocial-node
+      - node.data=true
+      - network.host=127.0.0.1
+      - http.port=9200
+      - http.cors.enabled=true
+      - http.cors.allow-credentials=true
+      - http.cors.allow-origin='*'
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,Access-Control-Allow-Headers,Accept
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    network_mode: "host"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: always
+
   postgres:
     image: postgres
     environment:
@@ -21,7 +44,12 @@ services:
     image: dappforce/subsocial-offchain:latest
     depends_on:
       - postgres
+      - elasticsearch
     network_mode: "host"
     ports:
       - "3001:3001"
     restart: on-failure
+
+volumes:
+  es_data:
+    driver: local

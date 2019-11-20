@@ -17,7 +17,7 @@ COPY src/df-types/ ./build/src/df-types/
 FROM node:10
 
 WORKDIR /app
-COPY --from=builder package.json tsconfig.json ./
+COPY --from=builder package.json tsconfig.json .env ./
 COPY --from=builder build/ ./build
 COPY --from=builder node_modules/ ./node_modules
 
