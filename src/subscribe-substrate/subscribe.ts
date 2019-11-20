@@ -191,7 +191,6 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       const post = postOpt.unwrap();
       const ids = [post.blog_id, postId, commentId];
-      const count = post.comments_count.toNumber() - 1;
       const account = comment.created.account.toString();
       const activityId = await insertActivityForComment(eventAction, ids, account);
       if (activityId === -1) return;

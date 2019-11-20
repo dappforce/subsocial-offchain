@@ -14,23 +14,20 @@ type EventAction = {
 
 type AggCountProps = {
   eventName: string,
-  post_id: string,
-  comment_id?: string
+  account: string,
+  post_id: string
 }
 
 const getAggregationCount = async (props: AggCountProps) => {
-  const { eventName, post_id, comment_id } = props;
-  const params = [eventName, post_id];
-  let commentQuery = '';
-  if ( comment_id ) {
-    params.push(comment_id);
-    commentQuery = 'AND comment_id = $3';
-  }
+  const { eventName, post_id, account } = props;
+  const params = [account, eventName, post_id];
 
   const query = `
   SELECT count(distinct account)
     FROM df.activities
-    WHERE event = $1 AND post_id = $2 ${commentQuery})`;
+    WHERE account <> $1
+      AND event = $2
+      AND post_id = $3`;
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0].count)
@@ -204,7 +201,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
     paramsIds[index] = encodeStructId(id)
   );
 
-  const [ postId, commentId ] = paramsIds;
+  const [ postId ] = paramsIds;
   const { eventName, data, heightBlock } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId === creator ? false : true;
@@ -212,7 +209,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
     INSERT INTO df.activities(account, event, post_id, comment_id, parent_comment_id, block_height, agg_count,aggregated)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
-  const count = await getAggregationCount({eventName: eventName, post_id: postId, comment_id: commentId});
+  const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
   const params = [accountId, eventName, ...paramsIds, heightBlock, count, aggregated];
   try {
     const res = await pool.query(query, params)
@@ -334,7 +331,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Inser
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
   const newCount = eventName === 'PostShared'
-  ? await getAggregationCount({eventName: eventName, post_id: postId})
+  ? await getAggregationCount({eventName: eventName, account: accountId, post_id: postId})
   : count;
 
   const params = [accountId, eventName, ...paramsIds, heightBlock, newCount];
