@@ -32,8 +32,9 @@
     "clear-offchain": "node ./build/src/sql/clear-db.js",
     "ipfs": "yarn jsipfs daemon",
     "clean": "rimraf coverage build tmp",
-    "build": "tsc -p tsconfig.release.json",
-    "build:watch": "tsc -w -p tsconfig.release.json",
+    "copy-sql": "find . -name '*.sql' | cpio -pd ./build",
+    "build": "yarn copy-sql && tsc -p tsconfig.release.json",
+    "build:watch": "yarn copy-sql && tsc -w -p tsconfig.release.json",
     "lint": "tslint -t stylish --project \"tsconfig.json\"",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
