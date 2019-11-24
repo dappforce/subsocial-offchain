@@ -24,7 +24,7 @@ export class Api {
     }
 
     private connectToApi = async () => {
-        const rpcEndpoint = 'ws://127.0.0.1:9944/';
+        const rpcEndpoint = `ws://${process.env.SUBSTRATE_HOST}:${process.env.SUBSTRATE_PORT}/`;
         const provider = new WsProvider(rpcEndpoint);
 
         // Register types before creating the API:
