@@ -1,17 +1,39 @@
 #!/usr/bin/env bash
 set -e
 
-pushd .
+pushd . > /dev/null
 
-# The following line ensure we run from the project root
+# The following line ensure we run from the docker folder
 PROJECT_ROOT=`git rev-parse --show-toplevel`
-cd $PROJECT_ROOT
+cd $PROJECT_ROOT/docker
 
-# Build the image
-echo "Starting offchain in background, hang on!"
-time docker-compose -f ./docker/docker-compose.yml up -d
+if [[ $1 = 'down' ]]
+then
+  time docker-compose down;
+  exit 0;
+fi
 
-# Show the list of available images for this repo
-echo "Containers are ready"
+POSTGRES_SERVICE=postgres
+ES_SERVICE=elasticsearch
+OFFCHAIN_SERVICE=subsocial-offchain
 
-popd
+ES_NODE_URL=$(grep ES_NODE_URL ../.env | xargs)
+ES_NODE_URL=${ES_NODE_URL#*=}
+
+time (
+  echo "Starting offchain in background, hang on!"
+
+  docker-compose up -d $POSTGRES_SERVICE
+  docker-compose up -d $ES_SERVICE
+
+  until curl -s $ES_NODE_URL > /dev/null; do
+    echo "Elasticsearch is starting..."
+    sleep 5
+  done
+
+  docker-compose up -d $OFFCHAIN_SERVICE
+)
+
+echo "Containers are ready."
+
+popd > /dev/null

@@ -34,14 +34,14 @@ yarn start
 
 The main code is located in the `src/substrate-subsrcibe`
 
-## Run with Docker
+## Building from Docker
 
-### Option 1
+### Easiest start
+To start Subsocial offchain storage separately (you should have docker-compose):
+```
+cd docker/
+./compose.sh
+```
+* It will start 3 containers: postgres, elasticsearch and offchain itself.
 
-- Clone [subsocial-offchain repository](https://github.com/dappforce/dappforce-subsocial-offchain-storage.git)
-- From the root of the repo run `./docker/compose.sh`
-
-### Option 2
-
-1. Run PostgreSQL with `docker run --restart always -d -e POSTGRES_DB=subsocial -e POSTGRES_USER=dev -e POSTGRES_PASSWORD=1986 -p 5432:5432 -v /tmp/subsocial/postgres:/var/lib/postgresql/data postgres:alpine`
-2. Run offchain Node.JS app with `docker run --restart on-failure --network="host" -d dappforce/subsocial-offchain:latest`
+### Start all parts of Subsocial at once with [Subsocial-Starter](https://github.com/dappforce/dappforce-subsocial-starter)

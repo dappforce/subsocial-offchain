@@ -24,15 +24,17 @@
     "typescript": "3.4.5"
   },
   "scripts": {
-    "start": "concurrently \"npm run subscribe\" \"npm run api\" \"npm run ipfs\"",
+    "start": "concurrently \"npm run subscribe\" \"npm run api\" \"npm run ipfs\" \"yarn init-search\"",
     "subscribe": "node ./build/src/subscribe-substrate/server.js",
     "api": "node ./build/src/express-api/server.js",
+    "init-search": "node ./build/src/search/index.js",
     "init-offchain": "node ./build/src/sql/init.js",
     "clear-offchain": "node ./build/src/sql/clear-db.js",
     "ipfs": "yarn jsipfs daemon",
     "clean": "rimraf coverage build tmp",
-    "build": "tsc -p tsconfig.release.json",
-    "build:watch": "tsc -w -p tsconfig.release.json",
+    "copy-sql": "find . -name '*.sql' | cpio -pd ./build",
+    "build": "yarn copy-sql && tsc -p tsconfig.release.json",
+    "build:watch": "yarn copy-sql && tsc -w -p tsconfig.release.json",
     "lint": "tslint -t stylish --project \"tsconfig.json\"",
     "test": "jest --coverage",
     "test:watch": "jest --watch"
@@ -40,6 +42,7 @@
   "author": "DappForce contributors",
   "license": "GPL-3.0-only",
   "dependencies": {
+    "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/api": "^0.77.1",
     "@polkadot/keyring": "^0.76.1",
     "@polkadot/util": "^0.76.1",

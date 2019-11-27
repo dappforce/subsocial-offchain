@@ -1,18 +1,24 @@
-FROM node:10
+FROM node:10 as builder
 
-RUN apt update
+RUN apt update && apt install cpio -y
 
-WORKDIR /app
-
-COPY package.json package-lock.json* setup-ipfs.sh ./
-RUN yarn add global concurrently
-RUN yarn
-RUN ./setup-ipfs.sh
+COPY package.json yarn.lock* setup-ipfs.sh ./
+RUN yarn install --no-optional
 
 COPY . .
+RUN yarn && yarn cache clean --force
 
-RUN yarn build
+RUN NODE_ENV=production yarn build
 COPY src/df-types/ ./build/src/df-types/
+
+FROM node:10
+
+WORKDIR /app
+COPY --from=builder package.json tsconfig.json .env setup-ipfs.sh ./
+COPY --from=builder build/ ./build
+COPY --from=builder node_modules/ ./node_modules
+RUN ./setup-ipfs.sh
+RUN yarn add global concurrently
 
 EXPOSE 3001
 
