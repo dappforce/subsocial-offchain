@@ -68,7 +68,7 @@ export async function insertElasticSearch<T extends IpfsData>(index: string, ipf
         case ES_INDEX_PROFILES: {
             const { fullname, about } = json as ProfileData;
             indexData = {
-                profile_username: extData,
+                profile_username: extData.toString(),
                 profile_fullname: fullname,
                 profile_about: about
             }
