@@ -19,9 +19,8 @@ COPY --from=builder node_modules/ ./node_modules
 
 RUN ./setup-ipfs.sh
 RUN yarn add global concurrently
-RUN ln -s /root/.jsipfs /data
 
+VOLUME /root/.jsipfs
 EXPOSE 3001
-VOLUME [ "/data" ]
 
 CMD bash -c "yarn init-offchain && yarn start"
