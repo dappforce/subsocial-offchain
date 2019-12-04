@@ -26,9 +26,9 @@ time (
   docker-compose up -d $POSTGRES_SERVICE
   docker-compose up -d $ES_SERVICE
 
+  echo "Elasticsearch is starting..."
   until curl -s $ES_NODE_URL > /dev/null; do
-    echo "Elasticsearch is starting..."
-    sleep 5
+    sleep 2
   done
 
   docker-compose up -d $OFFCHAIN_SERVICE
