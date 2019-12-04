@@ -38,7 +38,7 @@ services:
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      
+
   subsocial-offchain:
     build:
       context: ..
@@ -54,6 +54,8 @@ services:
     ports:
       - "3001:3001"
     restart: on-failure
+    volumes:
+      - ~/ipfs:/data
 
 volumes:
   es_data:

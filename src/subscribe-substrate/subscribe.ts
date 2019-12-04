@@ -90,15 +90,11 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const postOpt = await api.query.blogs.postById(postId) as Option<Post>;
       if (postOpt.isNone) return;
 
-      console.log('here');
-
       const post = postOpt.unwrap();
 
       const ids = [post.blog_id, postId ];
       const activityId = await insertActivityForPost(eventAction, ids, 0);
       if (activityId === -1) return;
-
-      console.log('here');
 
       await fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
       await fillNewsFeedWithAccountFollowers(follower, activityId);
