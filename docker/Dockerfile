@@ -13,7 +13,7 @@ COPY src/df-types/ ./build/src/df-types/
 FROM node:10
 
 WORKDIR /app
-COPY --from=builder package.json tsconfig.json .env setup-ipfs.sh ./
+COPY --from=builder package.json tsconfig.json .env setup-ipfs.sh yarn.lock ./
 COPY --from=builder build/ ./build
 COPY --from=builder node_modules/ ./node_modules
 
