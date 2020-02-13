@@ -51,8 +51,8 @@ export async function insertElasticSearch<T extends IpfsData>(index: string, ipf
         case ES_INDEX_POSTS: {
             const { title, body } = json as PostData;
             indexData = {
-                blog_title: title,
-                blog_body: body
+                post_title: title,
+                post_body: body
             };
             break;
         }
