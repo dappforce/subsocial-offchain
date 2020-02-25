@@ -1,12 +1,12 @@
 import { pool } from './../adaptors/connectPostgre'
 import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
 
-require("dotenv").config();
-const LIMIT = process.env.PGLIMIT;
-
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
+
+require('dotenv').config();
+const LIMIT = process.env.PGLIMIT;
 // import * as multer from 'multer';
 // const upload = multer();
 const app = express();
@@ -18,18 +18,17 @@ app.use(bodyParser.json());
 
 // for parsing application/xwww-
 app.use(bodyParser.urlencoded({ extended: true }));
-//form-urlencoded
+// form-urlencoded
 
 // // for parsing multipart/form-data
 // app.use(upload.array());
 // app.use(express.static('public'));
 
-//IPFS API
+// IPFS API
 app.get('/v1/ipfs/get/:hash', async (req: express.Request, res: express.Response) => {
   const data = await getJsonFromIpfs(req.params.hash as string);
   res.json(data);
 });
-
 
 app.post('/v1/ipfs/remove/:hash', (req: express.Request) => {
   removeFromIpfs(req.params.hash as string);
@@ -42,7 +41,7 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
   res.json(hash);
 });
 
-//Subscribe API
+// Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
   const limit = req.query.limit;
   console.log(limit);
@@ -63,7 +62,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
     const data = await pool.query(query, params)
     console.log(data.rows);
     res.json(data.rows);
-    //res.send(JSON.stringify(data));
+    // res.send(JSON.stringify(data));
   } catch (err) {
     console.log(err.stack);
   }

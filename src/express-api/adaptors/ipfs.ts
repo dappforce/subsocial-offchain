@@ -1,7 +1,7 @@
 import { IpfsData } from './../../df-types/src/blogs'
 import * as IPFS from 'typestub-ipfs';
-const ipfsClient = require('ipfs-http-client');
-const CID = require('cids');
+import ipfsClient from 'ipfs-http-client';
+import CID from 'cids';
 
 type IpfsAPI = IPFS.FilesAPI & {
   pin: {
