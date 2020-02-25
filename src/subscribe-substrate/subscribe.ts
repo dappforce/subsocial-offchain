@@ -15,7 +15,7 @@ type EventAction = {
 
 export const DispatchForDb = async (eventAction: EventAction) => {
   const { data } = eventAction;
-  switch(eventAction.eventName){
+  switch (eventAction.eventName) {
     case 'AccountFollowed': {
       await insertAccountFollower(data);
       const socialAccountOpt = await api.query.blogs.socialAccountById(data[1]) as Option<SocialAccount>;
@@ -92,7 +92,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       const post = postOpt.unwrap();
 
-      const ids = [post.blog_id, postId ];
+      const ids = [ post.blog_id, postId ];
       const activityId = await insertActivityForPost(eventAction, ids, 0);
       if (activityId === -1) return;
 
@@ -119,7 +119,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       const post = postOpt.unwrap();
 
-      const ids = [post.blog_id, postId ];
+      const ids = [ post.blog_id, postId ];
       const activityId = await insertActivityForPost(eventAction, ids);
       if (activityId === -1) return;
 
@@ -151,14 +151,14 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = postOpt.unwrap();
       const postCreator = post.created.account.toString();
       const commentCreator = comment.created.account.toString();
-      const ids = [postId, commentId];
+      const ids = [ postId, commentId ];
       if (comment.parent_id.isSome) {
         console.log('PARENT ID');
-        insertActivityComments(eventAction, ids,comment);
+        insertActivityComments(eventAction, ids, comment);
       } else {
         const activityId = await insertActivityForComment(eventAction, ids, postCreator);
         if (activityId === -1) return;
-  
+
         console.log('PARENT ID NULL');
         await fillActivityStreamWithPostFollowers(postId, commentCreator, activityId);
         await fillNotificationsWithAccountFollowers(commentCreator, activityId);
@@ -186,7 +186,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (postOpt.isNone) return;
 
       const post = postOpt.unwrap();
-      const ids = [post.blog_id, postId, commentId];
+      const ids = [ post.blog_id, postId, commentId ];
       const account = comment.created.account.toString();
       const activityId = await insertActivityForComment(eventAction, ids, account);
       if (activityId === -1) return;
@@ -227,7 +227,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (commentOpt.isNone) return;
 
       const comment = commentOpt.unwrap();
-      const ids = [comment.post_id, commentId ];
+      const ids = [ comment.post_id, commentId ];
       const account = comment.created.account.toString();
       const count = (comment.upvotes_count.toNumber() + comment.downvotes_count.toNumber()) - 1;
       const activityId = await insertActivityForCommentReaction(eventAction, count, ids, account);
@@ -243,7 +243,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const accountId = data[0] as AccountId;
       const SocialAccountOpt = await api.query.blogs.socialAccountById(accountId) as Option<SocialAccount>;
       if (SocialAccountOpt.isNone) return;
-      
+
       const profileOpt = SocialAccountOpt.unwrap().profile;
       if (profileOpt.isNone) return;
 
@@ -255,7 +255,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const accountId = data[0] as AccountId;
       const SocialAccountOpt = await api.query.blogs.socialAccountById(accountId) as Option<SocialAccount>;
       if (SocialAccountOpt.isNone) return;
-      
+
       const profileOpt = SocialAccountOpt.unwrap().profile;
       if (profileOpt.isNone) return;
 

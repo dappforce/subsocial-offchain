@@ -1,4 +1,4 @@
-require("dotenv").config();
+require('dotenv').config();
 
 export const ES_INDEX_BLOGS = process.env.ES_INDEX_BLOGS
 export const ES_INDEX_URL = process.env.ES_INDEX_URL

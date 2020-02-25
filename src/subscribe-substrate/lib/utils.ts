@@ -4,37 +4,37 @@ import { AccountId } from '@polkadot/types';
 import searchClient from '../../adaptors/connectElasticsearch'
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../../search/indexes';
 
-require("dotenv").config();
+require('dotenv').config();
 
 // gets the event sections to filter on
 // if not set in the .env file then all events are processed
 export const getEventSections = () => {
     const sections = process.env.SUBSTRATE_EVENT_SECTIONS;
     if (sections) {
-        return sections.split(",");
+        return sections.split(',');
     } else {
-        return ["all"];
+        return ['all'];
     }
 };
 
 export const getEventMethods = () => {
     const methods = process.env.SUBSTRATE_EVENT_METHODS;
     if (methods) {
-        return methods.split(",");
+        return methods.split(',');
     } else {
-        return ["all"];
+        return ['all'];
     }
 };
 
 export type InsertData = BlogId | PostId | CommentId;
 
-export function encodeStructId(id: InsertData): string {
+export function encodeStructId (id: InsertData): string {
     if (!id) return null;
 
     return id.toHex().split('x')[1].replace(/(0+)/, '');
 }
 
-export async function insertElasticSearch<T extends IpfsData>(index: string, ipfsHash: string, id: InsertData | AccountId, extData?: object) {
+export async function insertElasticSearch<T extends IpfsData> (index: string, ipfsHash: string, id: InsertData | AccountId, extData?: object) {
     const json = await getJsonFromIpfs<T>(ipfsHash);
     let indexData;
 

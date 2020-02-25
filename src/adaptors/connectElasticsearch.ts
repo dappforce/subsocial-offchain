@@ -1,6 +1,6 @@
 import { Client } from '@elastic/elasticsearch'
 
-require("dotenv").config();
+require('dotenv').config();
 
 let greeted = false
 if (!greeted) {

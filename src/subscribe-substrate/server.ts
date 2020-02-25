@@ -4,7 +4,7 @@ import { getEventSections, getEventMethods } from './lib/utils';
 import { registerDfTypes } from './../df-types';
 import { Event, EventRecord, Header } from '@polkadot/types';
 
-require("dotenv").config();
+require('dotenv').config();
 
 export class Api {
 
@@ -50,7 +50,7 @@ export { api };
 // Register types before creating the API: registerCustomTypes();
 // Create the API and wait until ready:
 // code from https://polkadot.js.org/api/examples/rx/08_system_events/
-async function main() {
+async function main () {
     // get event filters from config
     const eventsFilterSections = getEventSections();
     const eventsFilterMethods = getEventMethods();
@@ -64,12 +64,12 @@ async function main() {
             // extract the event object
             const { event } = record;
             // check section filter
-            if ( (eventsFilterSections.includes(event.section.toString()) && eventsFilterMethods.includes(event.method.toString())) || eventsFilterSections.includes("all")) {
+            if ((eventsFilterSections.includes(event.section.toString()) && eventsFilterMethods.includes(event.method.toString())) || eventsFilterSections.includes('all')) {
                 // create event object for data sink
                 const hashBlock = await api.rpc.chain.getFinalizedHead();
                 const header = await api.rpc.chain.getHeader(hashBlock) as Header;
                 console.log(header.blockNumber);
-        
+
                 const eventObj = {
                     section: event.section,
                     method: event.method,
@@ -79,13 +79,13 @@ async function main() {
                 };
 
                 // remove this log if not needed
-                console.log("Event Received: " + Date.now() + ": " + JSON.stringify(eventObj));
+                console.log('Event Received: ' + Date.now() + ': ' + JSON.stringify(eventObj));
 
-                await DispatchForDb({eventName: eventObj.method, data: eventObj.data, heightBlock: eventObj.heightBlock});
+                await DispatchForDb({ eventName: eventObj.method, data: eventObj.data, heightBlock: eventObj.heightBlock });
             }
         });
     });
-};
+}
 
 main().catch((error) => {
     console.error(error);

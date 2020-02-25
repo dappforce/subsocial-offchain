@@ -1,5 +1,4 @@
 
-
 import { pool } from './../adaptors/connectPostgre';
 import { release } from 'os';
 
