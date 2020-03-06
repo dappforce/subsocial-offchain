@@ -1,4 +1,8 @@
-# Offchain storage in PostgreSQL
+# Subsocial Off-chain Storage by [DappForce](https://github.com/dappforce)
+
+This app builds user feeds and notifications by subscribing to Substrate events.
+
+To learn more about Subsocial, please visit [Subsocial Network](http://subsocial.network).
 
 ## Setup
 
