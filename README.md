@@ -13,11 +13,11 @@ yarn
 # Compile TypeScript
 yarn build
 
-# Run
+# Run app
 yarn start
 ```
 
-## Available scripts
+## Available Scripts
 
 + `clean` - remove coverage data, Jest cache and transpiled files,
 + `build` - transpile TypeScript to ES6,
@@ -27,7 +27,7 @@ yarn start
 
 ## Building from Docker
 
-### Easiest start
+### Easiest Start
 
 To start Subsocial offchain storage separately (you should have docker-compose):
 
@@ -38,4 +38,9 @@ cd docker/
 
 It will start 3 containers: postgres, elasticsearch and offchain itself.
 
-### Start all parts of Subsocial at once with [Subsocial-Starter](https://github.com/dappforce/dappforce-subsocial-starter)
+### Start all parts of Subsocial at once with [Subsocial Starter](https://github.com/dappforce/dappforce-subsocial-starter).
+
+## License
+
+Subsocial is [GPL 3.0](./LICENSE) licensed.
+
