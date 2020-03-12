@@ -37,13 +37,15 @@
     "build:watch": "yarn copy-sql && tsc -w -p tsconfig.release.json",
     "lint": "tsc --noEmit && eslint '*/**/*.{ts,tsx}' --quiet --fix",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "setup": "yarn init-offchain && yarn build"
   },
   "author": "DappForce contributors",
   "license": "GPL-3.0-only",
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/api": "^0.77.1",
+    "@polkadot/dev-react": "^0.30.0-beta.1",
     "@polkadot/keyring": "^0.76.1",
     "@polkadot/util": "^0.76.1",
     "@polkadot/util-crypto": "^0.76.1",
@@ -64,9 +66,8 @@
     "eslint": "^6.8.0",
     "express": "^4.16.4",
     "frappe-charts": "^1.2.3",
-    "@polkadot/dev-react": "^0.30.0-beta.1",
     "ipfs": "0.36.4",
-    "ipfs-http-client": "^33.1.0",
+    "ipfs-http-client": "^42.0.0",
     "ipfs-only-hash": "^1.0.2",
     "lodash": "^4.17.11",
     "multer": "^1.4.2",
