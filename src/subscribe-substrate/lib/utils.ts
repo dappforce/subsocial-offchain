@@ -35,8 +35,6 @@ export function encodeStructId (id: InsertData): string {
 }
 
 export async function insertElasticSearch<T extends IpfsData> (index: string, ipfsHash: string, id: InsertData | AccountId, extData?: object) {
-  if (process.env.IPFS_STATUS === 'off') return;
-
   const json = await getJsonFromIpfs<T>(ipfsHash);
   let indexData;
 
