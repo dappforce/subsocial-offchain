@@ -20,7 +20,7 @@ type AggCountProps = {
 
 const getAggregationCount = async (props: AggCountProps) => {
   const { eventName, post_id, account } = props;
-  const params = [ account, eventName, post_id ];
+  const params = [account, eventName, post_id];
 
   const query = `
   SELECT count(distinct account)
@@ -43,12 +43,12 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
     INSERT INTO df.notifications
       VALUES($1, $2) 
     RETURNING *`;
-  const params = [ account, id ];
+  const params = [account, id];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
 
-    updateUnreadNotifications(account)
+    updateUnreadNotifications(account, id)
   } catch (err) {
     console.log(err.stack)
   }
@@ -59,7 +59,7 @@ export const insertAccountFollower = async (data: EventData) => {
     INSERT INTO df.account_followers(follower_account, following_account)
       VALUES($1, $2)
     RETURNING *`;
-  const params = [ data[0].toString(), data[1].toString() ];
+  const params = [data[0].toString(), data[1].toString()];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
@@ -74,7 +74,7 @@ export const deleteAccountFollower = async (data: EventData) => {
     WHERE follower_account = $1
       AND following_account = $2
     RETURNING *`
-  const params = [ data[0].toString(), data[1].toString() ];
+  const params = [data[0].toString(), data[1].toString()];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
@@ -89,7 +89,7 @@ export const insertPostFollower = async (data: EventData) => {
     INSERT INTO df.post_followers(follower_account, following_post_id)
       VALUES($1, $2)
     RETURNING *`
-  const params = [ data[0].toString(), postId ];
+  const params = [data[0].toString(), postId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
@@ -105,7 +105,7 @@ export const deletePostFollower = async (data: EventData) => {
     WHERE follower_account = $1
       AND following_post_id = $2
     RETURNING *`
-  const params = [ data[0].toString(), postId ];
+  const params = [data[0].toString(), postId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
@@ -120,7 +120,7 @@ export const insertCommentFollower = async (data: EventData) => {
     INSERT INTO df.comment_followers(follower_account, following_comment_id)
       VALUES($1, $2)
     RETURNING *`
-  const params = [ data[0].toString(), commentId ];
+  const params = [data[0].toString(), commentId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
@@ -136,7 +136,7 @@ export const deleteCommentFollower = async (data: EventData) => {
     WHERE follower_account = $1
       AND following_comment_id = $2
     RETURNING *`
-  const params = [ data[0].toString(), commentId ];
+  const params = [data[0].toString(), commentId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
@@ -151,7 +151,7 @@ export const insertBlogFollower = async (data: EventData) => {
     INSERT INTO df.blog_followers(follower_account, following_blog_id)
       VALUES($1, $2)
     RETURNING *`
-  const params = [ data[0].toString(), blogId ];
+  const params = [data[0].toString(), blogId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
@@ -167,7 +167,7 @@ export const deleteBlogFollower = async (data: EventData) => {
     WHERE follower_account = $1
       AND following_blog_id = $2
     RETURNING *`
-  const params = [ data[0].toString(), blogId ];
+  const params = [data[0].toString(), blogId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
@@ -181,7 +181,7 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Inse
   const lastCommentAccount = commentLast.created.account.toString();
   while (comment.parent_id.isSome) {
     const id = comment.parent_id.unwrap() as CommentId;
-    const param = [ ...ids, id ];
+    const param = [...ids, id];
     const commentOpt = await api.query.blogs.commentById(id) as Option<Comment>;
 
     comment = commentOpt.unwrap();
@@ -202,7 +202,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
     paramsIds[index] = encodeStructId(id)
   );
 
-  const [ postId ] = paramsIds;
+  const [postId] = paramsIds;
   const { eventName, data, heightBlock } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
@@ -211,14 +211,14 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
-  const params = [ accountId, eventName, ...paramsIds, heightBlock, count, aggregated ];
+  const params = [accountId, eventName, ...paramsIds, heightBlock, count, aggregated];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
     console.log(res.rows[0]);
-    const [ postId, , parentId ] = paramsIds;
+    const [postId, , parentId] = paramsIds;
     let parentEq = '';
-    const paramsIdsUpd = [ postId ];
+    const paramsIdsUpd = [postId];
     if (!parentId) {
       parentEq += 'AND parent_comment_id IS NULL'
     } else {
@@ -234,11 +234,11 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
           ${parentEq}
           AND aggregated = true
       RETURNING *`;
-    console.log([ ...paramsIdsUpd ]);
-    console.log([ paramsIds ]);
+    console.log([...paramsIdsUpd]);
+    console.log([paramsIds]);
     console.log(parentId);
     console.log(parentEq);
-    const paramsUpdate = [ activityId, eventName, ...paramsIdsUpd ];
+    const paramsUpdate = [activityId, eventName, ...paramsIdsUpd];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
     console.log(resUpdate.rowCount);
 
@@ -259,7 +259,7 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
     INSERT INTO df.activities(account, event, following_id, block_height, agg_count)
       VALUES($1, $2, $3, $4, $5)
     RETURNING *`
-  const params = [ accountId, eventName, objectId, heightBlock, count ];
+  const params = [accountId, eventName, objectId, heightBlock, count];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -272,7 +272,7 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
             AND following_id = $3
         RETURNING *`;
 
-    const paramsUpdate = [ activityId, eventName, accountId ];
+    const paramsUpdate = [activityId, eventName, accountId];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
     console.log(resUpdate.rowCount);
     console.log(res.rows[0])
@@ -293,11 +293,11 @@ export const insertActivityForBlog = async (eventAction: EventAction, count: num
     INSERT INTO df.activities(account, event, blog_id, block_height, agg_count, aggregated)
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
-  const params = [ accountId, eventName, blogId, heightBlock, count, aggregated ];
+  const params = [accountId, eventName, blogId, heightBlock, count, aggregated];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
-    const paramsUpdate = [ activityId, eventName, blogId ];
+    const paramsUpdate = [activityId, eventName, blogId];
     const queryUpdate = `
         UPDATE df.activities
           SET aggregated = false
@@ -324,7 +324,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Inser
     paramsIds[index] = encodeStructId(id)
   );
 
-  const [ , postId ] = paramsIds;
+  const [, postId] = paramsIds;
   const { eventName, data, heightBlock } = eventAction;
   const accountId = data[0].toString();
   const query = `
@@ -335,7 +335,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Inser
     ? await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId })
     : count;
 
-  const params = [ accountId, eventName, ...paramsIds, heightBlock, newCount ];
+  const params = [accountId, eventName, ...paramsIds, heightBlock, newCount];
   try {
     const res = await pool.query(query, params)
     return res.rows[0].id;
@@ -359,7 +359,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
     INSERT INTO df.activities(account, event, post_id, block_height, agg_count,aggregated)
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
-  const params = [ accountId, eventName, ...paramsIds, heightBlock, count, aggregated ];
+  const params = [accountId, eventName, ...paramsIds, heightBlock, count, aggregated];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -374,7 +374,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
             AND post_id = $3
         RETURNING *`;
 
-    const paramsUpdate = [ activityId, eventName, postId ];
+    const paramsUpdate = [activityId, eventName, postId];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
     console.log(resUpdate.rowCount);
 
@@ -398,7 +398,7 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
     INSERT INTO df.activities(account, event, post_id, comment_id, block_height, agg_count,aggregated)
       VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
-  const params = [ accountId, eventName, ...paramsIds, heightBlock, count, aggregated ];
+  const params = [accountId, eventName, ...paramsIds, heightBlock, count, aggregated];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -413,7 +413,7 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
             AND comment_id = $4
         RETURNING *`;
 
-    const paramsUpdate = [ activityId, eventName, ...paramsIds ];
+    const paramsUpdate = [activityId, eventName, ...paramsIds];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
     console.log(resUpdate.rowCount);
 
@@ -435,7 +435,7 @@ export const fillNewsFeedWithAccountFollowers = async (account: string, activity
         AND (df.account_followers.follower_account, df.activities.id)
         NOT IN (SELECT account, activity_id from df.news_feed))
     RETURNING *`
-  const params = [ account, activityId ];
+  const params = [account, activityId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
@@ -456,12 +456,12 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
         AND (df.account_followers.follower_account, df.activities.id)
         NOT IN (SELECT account, activity_id from df.notifications))
     RETURNING *`
-  const params = [ account, activityId ];
+  const params = [account, activityId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
 
-    updateUnreadNotifications(account)
+    updateUnreadNotifications(account, activityId)
   } catch (err) {
     console.log(err.stack);
   }
@@ -477,7 +477,7 @@ export const deleteAccountActivityWithActivityStream = async (userId: string, ac
         ON df.activities.account = df.account_followers.following_account
         WHERE account = $2)
     RETURNING *`
-  const params = [ userId, accountId ];
+  const params = [userId, accountId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
@@ -499,7 +499,7 @@ export const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, accoun
         NOT IN (SELECT account,activity_id from df.news_feed))
     RETURNING *`;
   const hexBlogId = encodeStructId(blogId);
-  const params = [ hexBlogId, account, activityId ];
+  const params = [hexBlogId, account, activityId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
@@ -519,7 +519,7 @@ export const deleteBlogActivityWithActivityStream = async (userId: string, blogI
         WHERE blog_id = $2)
     RETURNING *`
   const hexBlogId = encodeStructId(blogId);
-  const params = [ userId, hexBlogId ];
+  const params = [userId, hexBlogId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
@@ -540,12 +540,12 @@ export const fillActivityStreamWithPostFollowers = async (postId: PostId, accoun
         NOT IN (SELECT account,activity_id from df.notifications))
     RETURNING *`
   const hexPostId = encodeStructId(postId);
-  const params = [ hexPostId, account, activityId ];
+  const params = [hexPostId, account, activityId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
 
-    updateUnreadNotifications(account)
+    updateUnreadNotifications(account, activityId)
   } catch (err) {
     console.log(err.stack);
   }
@@ -561,7 +561,7 @@ export const deletePostActivityWithActivityStream = async (userId: string, postI
       WHERE post_id = $2)
     RETURNING *`
   const hexPostId = encodeStructId(postId);
-  const params = [ userId, hexPostId ];
+  const params = [userId, hexPostId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
@@ -581,12 +581,12 @@ export const fillActivityStreamWithCommentFollowers = async (commentId: CommentI
         NOT IN (SELECT account,activity_id from df.notifications))
     RETURNING *`
   const hexCommentId = encodeStructId(commentId);
-  const params = [ hexCommentId, account, activityId ];
+  const params = [hexCommentId, account, activityId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
 
-    updateUnreadNotifications(account)
+    updateUnreadNotifications(account, activityId)
   } catch (err) {
     console.log(err.stack);
   }
@@ -602,7 +602,7 @@ export const deleteCommentActivityWithActivityStream = async (userId: string, co
         LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_comment_id WHERE comment_id = $2)
     RETURNING *`
   const hexCommentId = encodeStructId(commentId);
-  const params = [ userId, hexCommentId ];
+  const params = [userId, hexCommentId];
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
@@ -611,35 +611,37 @@ export const deleteCommentActivityWithActivityStream = async (userId: string, co
   }
 }
 
-export const updateUnreadNotifications = async (account: string) => {
+export const updateUnreadNotifications = async (account: string, activityId: number) => {
+  const defaultUnreadCount = 1;
   const query = `
-    UPDATE notifications_counter 
-    SET unread_count = 
-      (SELECT COUNT(*) FROM 
-        (SELECT DISTINCT activity_id FROM df.notifications
-          WHERE account == $1 
-          AND  activity_id > 
+    INSERT INTO df.notifications_counter (account, last_read_activity_id, unread_count)
+    VALUES ($1, $2, $3)
+    ON CONFLICT (account) DO UPDATE
+      SET unread_count =
+        (SELECT DISTINCT COUNT (*) FROM df.notifications
+          WHERE account = '5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL'
+          AND  activity_id >=
             (SELECT last_read_activity_id FROM df.notifications_counter
-              WHERE account == $1
-            )
+              WHERE account = $1
+            ) 
         )
-      )
   `
+  const params = [ account, activityId, defaultUnreadCount ]
   try {
-    const res = await pool.query(query, account)
-    console.log(res.rows)
+    const res = await pool.query(query, params)
+    console.log('Done from updateUnreadNotifications:', res.rows)
   } catch (err) {
-    console.log(err.stack);
+    console.log('Error from updateUnreadNotifications:', err.stack);
   }
 }
 
 export const getUnreadNotifications = async (account: string) => {
   const query = `
     SELECT unread_count FROM df.notifications_counter
-    WHERE account == $1;
+    WHERE account = $1;
   `
   try {
-    const res = await pool.query(query, account)
+    const res = await pool.query(query, [ account ])
     console.log(res.rows[0].unread_count)
     return res.rows[0].unread_count as number;
   } catch (err) {

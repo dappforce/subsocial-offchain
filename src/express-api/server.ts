@@ -1,6 +1,6 @@
 import { pool } from './../adaptors/connectPostgre'
 import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
-import WebSocket from 'ws';
+import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
