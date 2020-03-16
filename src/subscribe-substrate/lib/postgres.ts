@@ -619,7 +619,7 @@ export const updateUnreadNotifications = async (account: string, activityId: num
     ON CONFLICT (account) DO UPDATE
       SET unread_count =
         (SELECT DISTINCT COUNT (*) FROM df.notifications
-          WHERE account = '5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL'
+          WHERE account = $1
           AND  activity_id >=
             (SELECT last_read_activity_id FROM df.notifications_counter
               WHERE account = $1
