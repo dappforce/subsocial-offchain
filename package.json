@@ -53,6 +53,7 @@
     "@types/chalk": "^2.2.0",
     "@types/cli-progress": "^1.8.1",
     "@types/numeral": "^0.0.25",
+    "@types/ws": "^7.2.2",
     "axios": "^0.19.0",
     "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
@@ -75,6 +76,7 @@
     "pg": "^7.12.1",
     "recharts": "^1.6.2",
     "tslib": "~1.10.0",
-    "typestub-ipfs": "^0.23.14"
+    "typestub-ipfs": "^0.23.14",
+    "ws": "^7.2.3"
   }
 }

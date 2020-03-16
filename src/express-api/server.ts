@@ -1,6 +1,6 @@
 import { pool } from './../adaptors/connectPostgre'
 import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
-
+import WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
@@ -56,7 +56,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
     ORDER BY date DESC
     OFFSET $2
     LIMIT $3`;
-  const params = [req.params.id, offset, limit];
+  const params = [ req.params.id, offset, limit ];
   console.log(params);
   try {
     const data = await pool.query(query, params)
@@ -82,7 +82,7 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
     ORDER BY date DESC
     OFFSET $2
     LIMIT $3`;
-  const params = [req.params.id, offset, limit];
+  const params = [ req.params.id, offset, limit ];
   try {
     const data = await pool.query(query, params)
     console.log(data.rows);
@@ -92,6 +92,24 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   }
 });
 
+// Create and hold Web Socket connection
+// Push unread counter updates per current account
+// const notifCounterObservers = Rx.Observable.create()
+// new WS (() =>
+/// update counter of this account
+// )
+
+const wss = new WebSocket.Server({ port: 3010 });
+
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    console.log('QWE received: %s', message);
+  });
+
+  ws.send('something');
+});
+
+//
 const port = 3001;
 app.listen(port, () => {
   console.log(`server started on port ${port}`)

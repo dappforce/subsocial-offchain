@@ -47,6 +47,8 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
+
+    updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack)
   }
@@ -458,6 +460,8 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
+
+    updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -540,6 +544,8 @@ export const fillActivityStreamWithPostFollowers = async (postId: PostId, accoun
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
+
+    updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -579,6 +585,8 @@ export const fillActivityStreamWithCommentFollowers = async (commentId: CommentI
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
+
+    updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -600,5 +608,42 @@ export const deleteCommentActivityWithActivityStream = async (userId: string, co
     console.log(res.rows)
   } catch (err) {
     console.log(err.stack);
+  }
+}
+
+export const updateUnreadNotifications = async (account: string) => {
+  const query = `
+    UPDATE notifications_counter 
+    SET unread_count = 
+      (SELECT COUNT(*) FROM 
+        (SELECT DISTINCT activity_id FROM df.notifications
+          WHERE account == $1 
+          AND  activity_id > 
+            (SELECT last_read_activity_id FROM df.notifications_counter
+              WHERE account == $1
+            )
+        )
+      )
+  `
+  try {
+    const res = await pool.query(query, account)
+    console.log(res.rows)
+  } catch (err) {
+    console.log(err.stack);
+  }
+}
+
+export const getUnreadNotifications = async (account: string) => {
+  const query = `
+    SELECT unread_count FROM df.notifications_counter
+    WHERE account == $1;
+  `
+  try {
+    const res = await pool.query(query, account)
+    console.log(res.rows[0].unread_count)
+    return res.rows[0].unread_count as number;
+  } catch (err) {
+    console.log(err.stack);
+    return 0
   }
 }
