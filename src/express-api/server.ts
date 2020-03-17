@@ -4,7 +4,7 @@ import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import * as events from 'events'
+import { eventEmitter, getUnreadNotifications } from '../subscribe-substrate/lib/postgres';
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT;
@@ -94,16 +94,29 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
 });
 
 const wss = new WebSocket.Server({ port: 3011 });
-export const eventEmitter = new events.EventEmitter();
 
-// let clients = []
+const clients = []
 
 wss.on('connection', (ws) => {
-  ws.on('message', (message) => {
-    console.log('Received from client: %s', message);
+
+  ws.on('message', async (account: string) => {
+    console.log('Received from client: %s', account);
+    const currentUnreadCount = await getUnreadNotifications(account)
+    ws.id = account
+    clients[account] = ws;
+    clients[account].send(`${currentUnreadCount}`)
   });
-  // setInterval(() => ws.send('something from server'), 10000);
-  eventEmitter.on('notificationUpdate', () => ws.send('something from server event'));
+
+  eventEmitter.on('notificationUpdate', (account: string, currentUnreadCount: number) => {
+    if (!clients[account] || clients[account].readyState !== WebSocket.OPEN) return
+
+    clients[account].send(`${currentUnreadCount}`)
+  })
+});
+
+wss.on('close', (ws) => {
+  delete clients[ws.id];
+  console.log(`disconnected ws: ${ws.id}`);
 });
 
 const port = 3001;

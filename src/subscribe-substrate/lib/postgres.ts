@@ -5,7 +5,8 @@ import { EventData } from '@polkadot/types/type/Event';
 import { pool } from '../../adaptors/connectPostgre';
 import { encodeStructId, InsertData } from './utils';
 import BN from 'bn.js';
-import { eventEmitter } from '../../express-api/server';
+import * as events from 'events'
+export const eventEmitter = new events.EventEmitter();
 
 type EventAction = {
   eventName: string,
@@ -502,6 +503,7 @@ export const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, accoun
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
+    await updateUnreadNotifications(account, activityId)
   } catch (err) {
     console.log(err.stack);
   }
@@ -614,21 +616,23 @@ export const updateUnreadNotifications = async (account: string, activityId: num
     INSERT INTO df.notifications_counter (account, last_read_activity_id, unread_count)
     VALUES ($1, $2, $3)
     ON CONFLICT (account) DO UPDATE
-      SET unread_count =
-        (SELECT DISTINCT COUNT (*) FROM df.notifications
-          WHERE account = $1
-          AND  activity_id >=
-            (SELECT last_read_activity_id FROM df.notifications_counter
-              WHERE account = $1
-            ) 
-        )
+    SET unread_count =
+      (SELECT DISTINCT COUNT(*)
+        FROM df.activities
+        WHERE id IN ( 
+          SELECT activity_id
+          FROM df.notifications
+          WHERE account = $1) 
+          AND aggregated = true
+      )
   `
-  eventEmitter.emit('notificationUpdate');
 
+  const currentUnreadCount = await getUnreadNotifications(account) || 0
   const params = [ account, activityId, defaultUnreadCount ]
   try {
     const res = await pool.query(query, params)
     console.log('Done from updateUnreadNotifications:', res.rows)
+    eventEmitter.emit('notificationUpdate', account, currentUnreadCount);
   } catch (err) {
     console.log('Error from updateUnreadNotifications:', err.stack);
   }
