@@ -1,9 +1,10 @@
 import { pool } from './../adaptors/connectPostgre'
 import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
-
+import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
+import * as events from 'events'
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT;
@@ -90,6 +91,19 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   } catch (err) {
     console.log(err.stack);
   }
+});
+
+const wss = new WebSocket.Server({ port: 3011 });
+export const eventEmitter = new events.EventEmitter();
+
+// let clients = []
+
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    console.log('Received from client: %s', message);
+  });
+  // setInterval(() => ws.send('something from server'), 10000);
+  eventEmitter.on('notificationUpdate', () => ws.send('something from server event'));
 });
 
 const port = 3001;
