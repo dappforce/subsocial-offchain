@@ -93,6 +93,23 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   }
 });
 
+app.get('/v1/offchain/clearnotifications/:id', async (req: express.Request, res: express.Response) => {
+  const currentUnreadCount = 0
+  const query = `
+    UPDATE df.notifications_counter
+    SET unread_count = $2
+    WHERE account = $1`;
+  const params = [ req.params.id, currentUnreadCount ];
+  try {
+    const data = await pool.query(query, params)
+    eventEmitter.emit('notificationUpdate', req.params.id, currentUnreadCount);
+    console.log(data.rows);
+    res.json(data.rows);
+  } catch (err) {
+    console.log(err.stack);
+  }
+});
+
 const wss = new WebSocket.Server({ port: 3011 });
 
 const clients = []

@@ -617,14 +617,20 @@ export const updateUnreadNotifications = async (account: string, activityId: num
     VALUES ($1, $2, $3)
     ON CONFLICT (account) DO UPDATE
     SET unread_count =
-      (SELECT DISTINCT COUNT(*)
-        FROM df.activities
-        WHERE id IN ( 
-          SELECT activity_id
-          FROM df.notifications
-          WHERE account = $1) 
-          AND aggregated = true
-      )
+        (SELECT DISTINCT COUNT(*)
+          FROM df.activities
+          WHERE id IN ( 
+            SELECT activity_id
+            FROM df.notifications
+            WHERE account = $1
+            AND  activity_id >=
+              (SELECT last_read_activity_id FROM df.notifications_counter
+                WHERE account = $1
+              )
+            ) 
+            AND aggregated = true
+        )
+        last_read_activity_id = $2
   `
 
   const currentUnreadCount = await getUnreadNotifications(account) || 0
