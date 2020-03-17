@@ -25,13 +25,13 @@ END$$;
 CREATE TABLE IF NOT EXISTS df.news_feed
 (
     account varchar(48) NOT NULL,
-    activity_id bigint NOT NULL
+    activity_id bigint NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications
 (
     account varchar(48) NOT NULL,
-    activity_id bigint NOT NULL
+    activity_id bigint NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications_counter
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS df.notifications_counter
 
 CREATE TABLE IF NOT EXISTS df.activities
 (
-    id bigserial not null primary key,
+    id bigserial not null primary key UNIQUE,
     account varchar(48) NOT NULL,
     event df.action NOT NULL,
     following_id varchar(48) NULL,
