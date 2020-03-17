@@ -101,12 +101,13 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
 
 const wss = new WebSocket.Server({ port: 3010 });
 
+let clients = []
+
 wss.on('connection', (ws) => {
   ws.on('message', (message) => {
-    console.log('QWE received: %s', message);
+    console.log('Received from client: %s', message);
   });
-
-  ws.send('something');
+  // setInterval(() => ws.send('something from server'), 10000);
 });
 
 //
