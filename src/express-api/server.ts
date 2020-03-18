@@ -115,26 +115,30 @@ const wss = new WebSocket.Server({ port: process.env.OFFCHAIN_WS_PORT });
 
 const clients = {}
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws: WebSocket) => {
 
   ws.on('message', async (account: string) => {
     console.log('Received from client: %s', account);
     const currentUnreadCount = await getUnreadNotifications(account)
-    ws.id = account
+
     clients[account] = ws;
     clients[account].send(`${currentUnreadCount}`)
   });
 
   eventEmitter.on(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, currentUnreadCount: number) => {
-    if (!clients[account] || clients[account].readyState !== WebSocket.OPEN) return
+    if (!clients[account]) return
+    if (clients[account].readyState !== WebSocket.OPEN) delete clients[account]
 
     clients[account].send(`${currentUnreadCount}`)
   })
+
+  ws.on('close', (ws: WebSocket) => {
+    console.log(`Disconnected Notifications Counter Web Socket by id: ${ws}`);
+  });
 });
 
-wss.on('close', (ws) => {
-  delete clients[ws.id];
-  console.log(`Disconnected Notifications Counter Web Socket by id: ${ws.id}`);
+wss.on('close', () => {
+  console.log(`Disconnected Notifications Counter Web Socket Server`);
 });
 
 const port = process.env.OFFCHAIN_SERVER_PORT
