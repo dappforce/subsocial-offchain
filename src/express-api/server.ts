@@ -1,12 +1,18 @@
 import { pool } from './../adaptors/connectPostgre'
-import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
+import { SubsocialIpfsApi } from '@subsocial/api/ipfs'
+import { getFirstOrUndefinded } from '@subsocial/api/utils'
 
-import * as express from 'express'
+import * as express from 'express';
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
+import { IpfsCid } from '@subsocial/types/offchain';
+
+const ipfsUrl = process.env.IPFS_URL || 'http://localhost:5002';
+// connect to ipfs daemon API server
+export const ipfs = new SubsocialIpfsApi(ipfsUrl);
 
 require('dotenv').config();
-const LIMIT = process.env.PGLIMIT;
+const LIMIT = process.env.PGLIMIT || '20';
 // import * as multer from 'multer';
 // const upload = multer();
 const app = express();
@@ -26,18 +32,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // IPFS API
 app.get('/v1/ipfs/get/:hash', async (req: express.Request, res: express.Response) => {
-  const data = await getJsonFromIpfs(req.params.hash as string);
-  res.json(data);
+  console.log('Hash', req.params.hash);
+  const data = await ipfs.getContentArray([ req.params.hash as IpfsCid ]);
+  const firstElement = getFirstOrUndefinded(data);
+  res.json(firstElement);
 });
 
-app.post('/v1/ipfs/remove/:hash', (req: express.Request) => {
-  removeFromIpfs(req.params.hash as string);
+app.get('/v1/ipfs/remove/:hash', (req: express.Request) => {
+  ipfs.removeContent(req.params.hash);
 });
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const data = req.body;
   console.log(data);
-  const hash = await addJsonToIpfs(req.body);
+  const hash = await ipfs.saveContent(req.body).catch(console.log);
   res.json(hash);
 });
 
@@ -56,7 +64,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
     ORDER BY date DESC
     OFFSET $2
     LIMIT $3`;
-  const params = [req.params.id, offset, limit];
+  const params = [ req.params.id, offset, limit ];
   console.log(params);
   try {
     const data = await pool.query(query, params)
@@ -82,7 +90,7 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
     ORDER BY date DESC
     OFFSET $2
     LIMIT $3`;
-  const params = [req.params.id, offset, limit];
+  const params = [ req.params.id, offset, limit ];
   try {
     const data = await pool.query(query, params)
     console.log(data.rows);

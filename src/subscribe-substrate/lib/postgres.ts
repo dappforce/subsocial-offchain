@@ -1,10 +1,9 @@
-import { api } from '../server';
-import { BlogId, PostId, CommentId, Comment } from '../../df-types/src/blogs';
-import { Option } from '@polkadot/types'
-import { EventData } from '@polkadot/types/type/Event';
+import { EventData } from '@polkadot/types/generic/Event';
 import { pool } from '../../adaptors/connectPostgre';
 import { encodeStructId, InsertData } from './utils';
 import BN from 'bn.js';
+import { PostId, CommentId, BlogId, Comment } from '@subsocial/types/substrate/interfaces/subsocial';
+import { substrate } from './substrate';
 
 type EventAction = {
   eventName: string,
@@ -180,9 +179,11 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Inse
   while (comment.parent_id.isSome) {
     const id = comment.parent_id.unwrap() as CommentId;
     const param = [ ...ids, id ];
-    const commentOpt = await api.query.blogs.commentById(id) as Option<Comment>;
+    const parentComment = await substrate.findComment(id);
 
-    comment = commentOpt.unwrap();
+    if (parentComment) {
+      comment = parentComment;
+    }
 
     const account = comment.created.account.toString();
     const activityId = await insertActivityForComment(eventAction, param, account);

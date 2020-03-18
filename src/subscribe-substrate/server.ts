@@ -1,51 +1,12 @@
-import { ApiPromise, WsProvider } from '@polkadot/api';
 import { DispatchForDb } from './subscribe'
 import { getEventSections, getEventMethods } from './lib/utils';
-import { registerDfTypes } from './../df-types';
-import { Event, EventRecord, Header } from '@polkadot/types';
+import { Api } from '@subsocial/api/substrateConnect';
+import { Header } from '@polkadot/types/interfaces';
+import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
+
+export let substrate: SubsocialSubstrateApi;
 
 require('dotenv').config();
-
-export class Api {
-
-  protected api: ApiPromise
-
-  public setup = async () => {
-    await this.connectToApi();
-    return this.api;
-  }
-
-  public destroy = () => {
-    const { api } = this;
-    if (api && api.isReady) {
-      api.disconnect();
-      console.log(`Disconnect from Substrate API.`);
-    }
-  }
-
-  private connectToApi = async () => {
-    const rpcEndpoint = process.env.SUBSTRATE_URL || `ws://127.0.0.1:9944/`;
-    const provider = new WsProvider(rpcEndpoint);
-
-    // Register types before creating the API:
-    registerDfTypes();
-
-    // Create the API and wait until ready:
-    console.log(`Connecting to Substrate API: ${rpcEndpoint}`)
-    this.api = await ApiPromise.create(provider);
-
-    // Retrieve the chain & node information information via rpc calls
-    const system = this.api.rpc.system;
-
-    const [ chain, nodeName, nodeVersion ] = await Promise.all(
-      [ system.chain(), system.name(), system.version() ]);
-
-    console.log(`Connected to chain '${chain}' (${nodeName} v${nodeVersion})`)
-  }
-}
-let api: ApiPromise;
-
-export { api };
 
 // Register types before creating the API: registerCustomTypes();
 // Create the API and wait until ready:
@@ -57,25 +18,25 @@ async function main () {
   console.log(eventsFilterMethods);
   // initialize the data service
   // internally connects to all storage sinks
-  api = await new Api().setup();
+  substrate = new SubsocialSubstrateApi(await Api.connect(process.env.SUBSTRATE_URL));
 
-  api.query.system.events(async (events: Event) => {
-    events.forEach(async (record: EventRecord) => {
+  substrate.api.query.system.events((events) => {
+    events.forEach(async (record) => {
       // extract the event object
       const { event } = record;
       // check section filter
       if ((eventsFilterSections.includes(event.section.toString()) && eventsFilterMethods.includes(event.method.toString())) || eventsFilterSections.includes('all')) {
         // create event object for data sink
-        const hashBlock = await api.rpc.chain.getFinalizedHead();
-        const header = await api.rpc.chain.getHeader(hashBlock) as Header;
-        console.log(header.blockNumber);
+        const hashBlock = await substrate.api.rpc.chain.getFinalizedHead();
+        const header = await substrate.api.rpc.chain.getHeader(hashBlock) as Header;
+        console.log(header);
 
         const eventObj = {
           section: event.section,
           method: event.method,
           meta: event.meta.documentation.toString(),
           data: event.data,
-          heightBlock: header.blockNumber
+          heightBlock: header.number.toBn()
         };
 
         // remove this log if not needed
