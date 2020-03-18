@@ -7,6 +7,7 @@ import { encodeStructId, InsertData } from './utils';
 import BN from 'bn.js';
 import * as events from 'events'
 export const eventEmitter = new events.EventEmitter();
+export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
 type EventAction = {
   eventName: string,
@@ -633,14 +634,14 @@ export const updateUnreadNotifications = async (account: string, activityId: num
         last_read_activity_id = $2
   `
 
-  const currentUnreadCount = await getUnreadNotifications(account) || 0
   const params = [ account, activityId, defaultUnreadCount ]
   try {
     const res = await pool.query(query, params)
-    console.log('Done from updateUnreadNotifications:', res.rows)
-    eventEmitter.emit('notificationUpdate', account, currentUnreadCount);
+    console.log('Done in updateUnreadNotifications:', res.rows)
+    const currentUnreadCount = await getUnreadNotifications(account) || 0
+    eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, currentUnreadCount);
   } catch (err) {
-    console.log('Error from updateUnreadNotifications:', err.stack);
+    console.log('Error in updateUnreadNotifications:', err.stack);
   }
 }
 

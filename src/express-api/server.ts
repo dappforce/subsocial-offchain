@@ -4,7 +4,7 @@ import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import { eventEmitter, getUnreadNotifications } from '../subscribe-substrate/lib/postgres';
+import { eventEmitter, getUnreadNotifications, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../subscribe-substrate/lib/postgres';
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT;
@@ -57,7 +57,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
     ORDER BY date DESC
     OFFSET $2
     LIMIT $3`;
-  const params = [req.params.id, offset, limit];
+  const params = [ req.params.id, offset, limit ];
   console.log(params);
   try {
     const data = await pool.query(query, params)
@@ -83,7 +83,7 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
     ORDER BY date DESC
     OFFSET $2
     LIMIT $3`;
-  const params = [req.params.id, offset, limit];
+  const params = [ req.params.id, offset, limit ];
   try {
     const data = await pool.query(query, params)
     console.log(data.rows);
@@ -93,16 +93,17 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   }
 });
 
-app.get('/v1/offchain/clearnotifications/:id', async (req: express.Request, res: express.Response) => {
+app.get('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const currentUnreadCount = 0
+  const { account } = req.params;
   const query = `
     UPDATE df.notifications_counter
     SET unread_count = $2
     WHERE account = $1`;
-  const params = [ req.params.id, currentUnreadCount ];
+  const params = [ account, currentUnreadCount ];
   try {
     const data = await pool.query(query, params)
-    eventEmitter.emit('notificationUpdate', req.params.id, currentUnreadCount);
+    eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, currentUnreadCount);
     console.log(data.rows);
     res.json(data.rows);
   } catch (err) {
@@ -110,9 +111,9 @@ app.get('/v1/offchain/clearnotifications/:id', async (req: express.Request, res:
   }
 });
 
-const wss = new WebSocket.Server({ port: 3011 });
+const wss = new WebSocket.Server({ port: process.env.OFFCHAIN_WS_PORT });
 
-const clients = []
+const clients = {}
 
 wss.on('connection', (ws) => {
 
@@ -124,7 +125,7 @@ wss.on('connection', (ws) => {
     clients[account].send(`${currentUnreadCount}`)
   });
 
-  eventEmitter.on('notificationUpdate', (account: string, currentUnreadCount: number) => {
+  eventEmitter.on(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, currentUnreadCount: number) => {
     if (!clients[account] || clients[account].readyState !== WebSocket.OPEN) return
 
     clients[account].send(`${currentUnreadCount}`)
@@ -133,10 +134,10 @@ wss.on('connection', (ws) => {
 
 wss.on('close', (ws) => {
   delete clients[ws.id];
-  console.log(`disconnected ws: ${ws.id}`);
+  console.log(`Disconnected Notifications Counter Web Socket by id: ${ws.id}`);
 });
 
-const port = 3001;
+const port = process.env.OFFCHAIN_SERVER_PORT
 app.listen(port, () => {
   console.log(`server started on port ${port}`)
 })
