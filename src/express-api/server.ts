@@ -127,7 +127,10 @@ wss.on('connection', (ws: WebSocket) => {
 
   eventEmitter.on(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, currentUnreadCount: number) => {
     if (!clients[account]) return
-    if (clients[account].readyState !== WebSocket.OPEN) delete clients[account]
+    if (clients[account].readyState !== WebSocket.OPEN) {
+      delete clients[account]
+      return
+    }
 
     clients[account].send(`${currentUnreadCount}`)
   })
