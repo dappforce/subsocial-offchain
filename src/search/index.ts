@@ -5,19 +5,19 @@ import * as CommentsMapping from './mappings/comments.json'
 import * as ProfilesMapping from './mappings/profiles.json'
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from './indexes'
 
-async function run() {
+async function run () {
   await insertSearchIndexIfNotExist(ES_INDEX_BLOGS, BlogsMapping)
   await insertSearchIndexIfNotExist(ES_INDEX_POSTS, PostsMapping)
   await insertSearchIndexIfNotExist(ES_INDEX_COMMENTS, CommentsMapping)
   await insertSearchIndexIfNotExist(ES_INDEX_PROFILES, ProfilesMapping)
 }
 
-async function insertSearchIndexIfNotExist(name: string, body: any) {
+async function insertSearchIndexIfNotExist (name: string, body: any) {
   const result = await searchClient.indices.exists({
     index: name
-  }, { ignore: [404] })
+  }, { ignore: [ 404 ] })
 
-  if (result.statusCode == 404) {
+  if (result.statusCode === 404) {
     await searchClient.indices.create({
       index: name,
       body: body

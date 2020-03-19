@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import { IpfsData } from './../../df-types/src/blogs'
 import * as IPFS from 'typestub-ipfs';
-const ipfsClient = require('ipfs-http-client');
+const ipfsClient = require('ipfs-http-client')
 const CID = require('cids');
 
 type IpfsAPI = IPFS.FilesAPI & {
@@ -11,8 +12,9 @@ type IpfsAPI = IPFS.FilesAPI & {
   repo: IPFS.RepoAPI
 };
 
+const ipfsUrl = process.env.IPFS_URL || 'localhost';
 // connect to ipfs daemon API server
-const ipfs = ipfsClient('localhost', '5002', { protocol: 'http' }) as IpfsAPI;
+const ipfs = ipfsClient({ host: ipfsUrl, port: '5002', protocol: 'http' }) as IpfsAPI;
 
 // const ipfsConfig = { host: 'localhost', port:'5002', protocol: 'http' };
 // new IPFS({ config: ipfsConfig });
