@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS df.news_feed
 CREATE TABLE IF NOT EXISTS df.notifications
 (
     account varchar(48) NOT NULL,
-    activity_id bigint NOT NULL UNIQUE
+    activity_id bigint NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications_counter
