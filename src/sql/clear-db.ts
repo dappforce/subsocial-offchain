@@ -10,7 +10,8 @@ const query = `
   df.post_followers,
   df.comment_followers,
   df.news_feed,
-  df.notifications`;
+  df.notifications,
+  df.notifications_counter`;
 
 pool.query(query, (err) => {
   if (err) throw err;
