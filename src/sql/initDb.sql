@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS df.notifications
 CREATE TABLE IF NOT EXISTS df.notifications_counter
 (
     account varchar(48) NOT NULL UNIQUE,
-    last_read_activity_id bigint,
+    last_read_activity_id bigint DEFAULT NULL,
     unread_count bigint NOT NULL DEFAULT 0
 );
 
