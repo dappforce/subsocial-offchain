@@ -93,17 +93,22 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   }
 });
 
-app.get('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
-  const currentUnreadCount = 0
-  const { account } = req.params;
+app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
+  const account = req.params.id;
+  console.log(`Deleting unread_count for ${account}`)
   const query = `
     UPDATE df.notifications_counter
-    SET unread_count = $2
+    SET 
+      unread_count = 0,
+      last_read_activity_id = (
+        SELECT MAX(activity_id) FROM df.notifications
+        WHERE account = $1
+      )
     WHERE account = $1`;
-  const params = [ account, currentUnreadCount ];
+  const params = [ account ];
   try {
     const data = await pool.query(query, params)
-    eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, currentUnreadCount);
+    eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, 0);
     console.log(data.rows);
     res.json(data.rows);
   } catch (err) {
@@ -131,7 +136,7 @@ wss.on('connection', (ws: WebSocket) => {
       delete clients[account]
       return
     }
-
+    console.log(`Message sent to ${account}`)
     clients[account].send(`${currentUnreadCount}`)
   })
 

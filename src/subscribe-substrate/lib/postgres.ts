@@ -50,7 +50,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
-    await updateUnreadNotifications(account, id)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack)
   }
@@ -462,7 +462,7 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
-    await updateUnreadNotifications(account, activityId)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -504,7 +504,7 @@ export const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, accoun
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
-    await updateUnreadNotifications(account, activityId)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -546,7 +546,7 @@ export const fillActivityStreamWithPostFollowers = async (postId: PostId, accoun
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
-    await updateUnreadNotifications(account, activityId)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -586,7 +586,7 @@ export const fillActivityStreamWithCommentFollowers = async (commentId: CommentI
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
-    await updateUnreadNotifications(account, activityId)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -611,30 +611,28 @@ export const deleteCommentActivityWithActivityStream = async (userId: string, co
   }
 }
 
-export const updateUnreadNotifications = async (account: string, activityId: number) => {
-  const defaultUnreadCount = 1;
+export const updateUnreadNotifications = async (account: string) => {
   const query = `
-    INSERT INTO df.notifications_counter (account, last_read_activity_id, unread_count)
-    VALUES ($1, $2, $3)
+    INSERT INTO df.notifications_counter 
+      (account, last_read_activity_id, unread_count)
+    VALUES ($1, 0, 1)
     ON CONFLICT (account) DO UPDATE
-    SET unread_count =
-        (SELECT DISTINCT COUNT(*)
-          FROM df.activities
-          WHERE id IN ( 
-            SELECT activity_id
-            FROM df.notifications
-            WHERE account = $1
-            AND  activity_id >=
-              (SELECT last_read_activity_id FROM df.notifications_counter
-                WHERE account = $1
-              )
-            ) 
-            AND aggregated = true
+    SET unread_count = (
+      SELECT DISTINCT COUNT(*)
+      FROM df.activities
+      WHERE aggregated = true AND id IN ( 
+        SELECT activity_id
+        FROM df.notifications
+        WHERE account = $1 AND activity_id > (
+          SELECT last_read_activity_id
+          FROM df.notifications_counter
+          WHERE account = $1
         )
-        last_read_activity_id = $2
+      )
+    )
   `
 
-  const params = [ account, activityId, defaultUnreadCount ]
+  const params = [ account ]
   try {
     const res = await pool.query(query, params)
     console.log('Done in updateUnreadNotifications:', res.rows)
