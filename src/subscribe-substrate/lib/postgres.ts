@@ -177,7 +177,7 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Inse
   let comment = commentLast;
   const lastCommentAccount = commentLast.created.account.toString();
   while (comment.parent_id.isSome) {
-    const id = comment.parent_id.unwrap() as CommentId;
+    const id = comment.parent_id.unwrap();
     const param = [ ...ids, id ];
     const parentComment = await substrate.findComment(id);
 
@@ -197,9 +197,9 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Inse
 export const insertActivityForComment = async (eventAction: EventAction, ids: InsertData[], creator: string): Promise<number> => {
   const paramsIds: string[] = new Array(3).fill(null);
 
-  ids.forEach((id, index) =>
+  ids.forEach((id, index) => {
     paramsIds[index] = encodeStructId(id)
-  );
+  });
 
   const [ postId ] = paramsIds;
   const { eventName, data, heightBlock } = eventAction;
@@ -319,9 +319,9 @@ export const insertActivityForBlog = async (eventAction: EventAction, count: num
 export const insertActivityForPost = async (eventAction: EventAction, ids: InsertData[], count?: number): Promise<number> => {
   const paramsIds: string[] = new Array(2);
 
-  ids.forEach((id, index) =>
+  ids.forEach((id, index) => {
     paramsIds[index] = encodeStructId(id)
-  );
+  });
 
   const [ , postId ] = paramsIds;
   const { eventName, data, heightBlock } = eventAction;
@@ -347,9 +347,9 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Inser
 export const insertActivityForPostReaction = async (eventAction: EventAction, count: number, ids: InsertData[], creator: string): Promise<number> => {
   const paramsIds: string[] = new Array(1);
 
-  ids.forEach((id, index) =>
+  ids.forEach((id, index) => {
     paramsIds[index] = encodeStructId(id)
-  );
+  });
 
   const { eventName, data, heightBlock } = eventAction;
   const accountId = data[0].toString();
@@ -387,9 +387,10 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
 export const insertActivityForCommentReaction = async (eventAction: EventAction, count: number, ids: InsertData[], creator: string): Promise<number> => {
   const paramsIds: string[] = new Array(2);
 
-  ids.forEach((id, index) =>
+  ids.forEach((id, index) => {
     paramsIds[index] = encodeStructId(id)
-  );
+  });
+
   const { eventName, data, heightBlock } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;

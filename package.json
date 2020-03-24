@@ -46,6 +46,7 @@
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/dev": "^0.50.0",
     "@subsocial/api": "^0.1.16",
+    "@subsocial/config": "^0.1.2",
     "@subsocial/types": "^0.1.15",
     "@types/axios": "^0.14.0",
     "@types/chalk": "^2.2.0",
