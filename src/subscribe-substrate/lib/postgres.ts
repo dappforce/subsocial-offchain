@@ -3,10 +3,10 @@ import { pool } from '../../adaptors/connectPostgre';
 import { encodeStructId, InsertData } from './utils';
 import BN from 'bn.js';
 import * as events from 'events'
-export const eventEmitter = new events.EventEmitter();
-export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 import { PostId, CommentId, BlogId, Comment } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../server';
+export const eventEmitter = new events.EventEmitter();
+export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
 type EventAction = {
   eventName: string,

@@ -150,7 +150,7 @@ wss.on('connection', (ws: WebSocket) => {
 });
 
 wss.on('close', () => {
-  console.log(`Disconnected Notifications Counter Web Socket Server`);
+  console.log('Disconnected Notifications Counter Web Socket Server');
 });
 
 const port = process.env.OFFCHAIN_SERVER_PORT
