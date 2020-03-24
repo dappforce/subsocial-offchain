@@ -2,6 +2,9 @@ import { EventData } from '@polkadot/types/generic/Event';
 import { pool } from '../../adaptors/connectPostgre';
 import { encodeStructId, InsertData } from './utils';
 import BN from 'bn.js';
+import * as events from 'events'
+export const eventEmitter = new events.EventEmitter();
+export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 import { PostId, CommentId, BlogId, Comment } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../server';
 
@@ -46,6 +49,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
   try {
     const res = await pool.query(query, params)
     console.log(res.rows[0])
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack)
   }
@@ -460,6 +464,7 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -501,6 +506,7 @@ export const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, accoun
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -542,6 +548,7 @@ export const fillActivityStreamWithPostFollowers = async (postId: PostId, accoun
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -581,6 +588,7 @@ export const fillActivityStreamWithCommentFollowers = async (commentId: CommentI
   try {
     const res = await pool.query(query, params)
     console.log(res.rows)
+    await updateUnreadNotifications(account)
   } catch (err) {
     console.log(err.stack);
   }
@@ -602,5 +610,52 @@ export const deleteCommentActivityWithActivityStream = async (userId: string, co
     console.log(res.rows)
   } catch (err) {
     console.log(err.stack);
+  }
+}
+
+export const updateUnreadNotifications = async (account: string) => {
+  const query = `
+    INSERT INTO df.notifications_counter 
+      (account, last_read_activity_id, unread_count)
+    VALUES ($1, 0, 1)
+    ON CONFLICT (account) DO UPDATE
+    SET unread_count = (
+      SELECT DISTINCT COUNT(*)
+      FROM df.activities
+      WHERE aggregated = true AND id IN ( 
+        SELECT activity_id
+        FROM df.notifications
+        WHERE account = $1 AND activity_id > (
+          SELECT last_read_activity_id
+          FROM df.notifications_counter
+          WHERE account = $1
+        )
+      )
+    )
+  `
+
+  const params = [ account ]
+  try {
+    const res = await pool.query(query, params)
+    console.log('Done in updateUnreadNotifications:', res.rows)
+    const currentUnreadCount = await getUnreadNotifications(account) || 0
+    eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, currentUnreadCount);
+  } catch (err) {
+    console.log('Error in updateUnreadNotifications:', err.stack);
+  }
+}
+
+export const getUnreadNotifications = async (account: string) => {
+  const query = `
+    SELECT unread_count FROM df.notifications_counter
+    WHERE account = $1;
+  `
+  try {
+    const res = await pool.query(query, [ account ])
+    console.log(res.rows[0].unread_count)
+    return res.rows[0].unread_count as number;
+  } catch (err) {
+    console.log(err.stack);
+    return 0
   }
 }

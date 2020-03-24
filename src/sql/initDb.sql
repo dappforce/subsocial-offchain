@@ -34,9 +34,16 @@ CREATE TABLE IF NOT EXISTS df.notifications
     activity_id bigint NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS df.notifications_counter
+(
+    account varchar(48) NOT NULL UNIQUE,
+    last_read_activity_id bigint DEFAULT NULL,
+    unread_count bigint NOT NULL DEFAULT 0
+);
+
 CREATE TABLE IF NOT EXISTS df.activities
 (
-    id bigserial not null primary key,
+    id bigserial not null primary key UNIQUE,
     account varchar(48) NOT NULL,
     event df.action NOT NULL,
     following_id varchar(48) NULL,
