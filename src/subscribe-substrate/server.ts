@@ -3,7 +3,6 @@ import { getEventSections, getEventMethods } from './lib/utils';
 import { Api } from '@subsocial/api/substrateConnect';
 import { Header } from '@polkadot/types/interfaces';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-
 export let substrate: SubsocialSubstrateApi;
 
 require('dotenv').config();
@@ -18,7 +17,8 @@ async function main () {
   console.log(eventsFilterMethods);
   // initialize the data service
   // internally connects to all storage sinks
-  substrate = new SubsocialSubstrateApi(await Api.connect(process.env.SUBSTRATE_URL));
+  const api = await Api.connect(process.env.SUBSTRATE_URL)
+  substrate = new SubsocialSubstrateApi(api);
 
   substrate.api.query.system.events((events) => {
     events.forEach(async (record) => {

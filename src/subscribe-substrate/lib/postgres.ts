@@ -3,7 +3,7 @@ import { pool } from '../../adaptors/connectPostgre';
 import { encodeStructId, InsertData } from './utils';
 import BN from 'bn.js';
 import { PostId, CommentId, BlogId, Comment } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from './substrate';
+import { substrate } from '../server';
 
 type EventAction = {
   eventName: string,

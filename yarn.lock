@@ -2684,10 +2684,10 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@^0.1.14":
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.1.14.tgz#876a8a8626061d649003b7bc6f85fdf0ec1a2afe"
-  integrity sha512-p6foBIqYdnsXhZPcqZNJWdKrq7z+wENshy98nGmEQTQUnI84KZVldPy+kmq85YTYN0lEYI6R+aW5eR2I47zt+g==
+"@subsocial/api@^0.1.16":
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.1.16.tgz#52e46bc00e0f5c79515fcc48591a07f5ebb16892"
+  integrity sha512-9o6jfLjrV5FTSiAR9vWo+lW9Li2SrFqptio5FOSqs1Yd10quF1i7O4fRHV2jeV0Ql0jXb4EWkshJAirzsv91Nw==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@polkadot/api" "^1.4.0-beta.46"
@@ -2703,10 +2703,10 @@
   dependencies:
     "@babel/runtime" "^7.8.4"
 
-"@subsocial/types@^0.1.12":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.1.12.tgz#48f191b2afdb8ffeb3d03b7c44463ed3e512217e"
-  integrity sha512-vgW9jVggc4cdp3VsJf6X6M9PnI4nyaGMGVWMlxHqeTNvu8cSWC08/UEz1zbmMWgpEZdKnrUFwC/uJk/jxgW43A==
+"@subsocial/types@^0.1.15":
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.1.15.tgz#0645017f9869a14646ea313bc422f0a0c8d41b88"
+  integrity sha512-0QW6ieIeHePqqdiZ7D29zT5gaLBmvHHa2rNHL/VBnLoORcoVoJz5b3dY/lo1l+ZzW7tz6Ae/Mafn4v9n1cl5eA==
   dependencies:
     "@babel/runtime" "^7.8.4"
 
@@ -12220,7 +12220,7 @@ libp2p-websockets@^0.13.3:
     multiaddr-to-uri "^5.0.0"
     p-timeout "^3.2.0"
 
-libp2p@^0.27.2:
+libp2p@^0.27.2, libp2p@^0.27.3:
   version "0.27.3"
   resolved "https://registry.yarnpkg.com/libp2p/-/libp2p-0.27.3.tgz#8bd62cdb8998dc55035ad872cb2658d94ee7c4fa"
   integrity sha512-JMZ9AuMkjiOWMSg202rIhmGRseq6cgQPZksmrVZXr4HlCYzTL5q8suCGOWUf/Phe5qmQTcyEs907h6Jz9QJHNw==

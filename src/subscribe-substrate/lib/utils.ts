@@ -1,6 +1,6 @@
 import { } from '@subsocial/types/substrate'
 import { CommentContent, BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
-import { ipfs } from '../../express-api/server';
+import { ipfs } from '../../adaptors/connectIpfs';
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
 import searchClient from '../../adaptors/connectElasticsearch'

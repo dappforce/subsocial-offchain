@@ -45,8 +45,8 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/dev": "^0.50.0",
-    "@subsocial/api": "^0.1.14",
-    "@subsocial/types": "^0.1.12",
+    "@subsocial/api": "^0.1.16",
+    "@subsocial/types": "^0.1.15",
     "@types/axios": "^0.14.0",
     "@types/chalk": "^2.2.0",
     "@types/cli-progress": "^1.8.1",
@@ -66,6 +66,7 @@
     "express": "^4.17.1",
     "frappe-charts": "^1.2.3",
     "ipfs": "^0.41.2",
+    "libp2p": "^0.27.3",
     "lodash": "^4.17.11",
     "multer": "^1.4.2",
     "numeral": "^2.0.6",

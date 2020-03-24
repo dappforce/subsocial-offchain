@@ -1,15 +1,12 @@
 import { pool } from './../adaptors/connectPostgre'
-import { SubsocialIpfsApi } from '@subsocial/api/ipfs'
+
 import { getFirstOrUndefinded } from '@subsocial/api/utils'
 
 import * as express from 'express';
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
 import { IpfsCid } from '@subsocial/types/offchain';
-
-const ipfsUrl = process.env.IPFS_URL || 'http://localhost:5002';
-// connect to ipfs daemon API server
-export const ipfs = new SubsocialIpfsApi(ipfsUrl);
+import ipfs from '../adaptors/connectIpfs';
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT || '20';
@@ -100,7 +97,7 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   }
 });
 
-const port = 3001;
+const port = 3004;
 app.listen(port, () => {
   console.log(`server started on port ${port}`)
 })
