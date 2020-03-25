@@ -5,14 +5,9 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
 import { eventEmitter, getUnreadNotifications, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../subscribe-substrate/lib/postgres';
-
-const parse = async (url: string) => {
-  const res = await siteParser([ url ])
-  console.log('parser result:', res)
-  return res
-}
-
-parse('https://www.youtube.com/watch?v=_38UUmioFCY')
+import siteParser from '../parser/parse-site'
+import videoParser from '../parser/parse-video'
+import { isVideo } from '../parser/utils'
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT;
@@ -78,8 +73,21 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
 });
 
 app.post('/v1/offchain/parser/', async (req: express.Request, res: express.Response) => {
-  console.dir('req.body', req.body);
-  res.send('test');
+  const parse = async (url: string) => {
+    if (isVideo(url)) {
+      const temp = await videoParser([ url ])
+      const res = { video: temp }
+      return res
+    } else {
+      const temp = await siteParser([ url ])
+      const res = { site: temp }
+      return res
+    }
+  }
+
+  const data = await parse(req.body.url)
+
+  res.send(data);
 });
 
 app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
