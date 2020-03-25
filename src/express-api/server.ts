@@ -8,14 +8,6 @@ import { logSuccess, logError } from '../postgres/postges-logger';
 import { getUnreadNotifications, eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../postgres/notifications';
 import { newLogger } from '@subsocial/utils';
 
-const parse = async (url: string) => {
-  const res = await siteParser([ url ])
-  console.log('parser result:', res)
-  return res
-}
-
-parse('https://www.youtube.com/watch?v=_38UUmioFCY')
-
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT;
 // import * as multer from 'multer';
@@ -88,8 +80,21 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
 });
 
 app.post('/v1/offchain/parser/', async (req: express.Request, res: express.Response) => {
-  console.dir('req.body', req.body);
-  res.send('test');
+  const parse = async (url: string) => {
+    if (isVideo(url)) {
+      const temp = await videoParser([ url ])
+      const res = { video: temp }
+      return res
+    } else {
+      const temp = await siteParser([ url ])
+      const res = { site: temp }
+      return res
+    }
+  }
+
+  const data = await parse(req.body.url)
+
+  res.send(data);
 });
 
 app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
