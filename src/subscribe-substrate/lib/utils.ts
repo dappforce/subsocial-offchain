@@ -37,13 +37,17 @@ export function encodeStructId (id: InsertData): string {
   return id.toHex().split('x')[1].replace(/(0+)/, '');
 }
 
-export async function insertElasticSearch<T extends CommonContent> (index: string, ipfsHash: string, id: InsertData | AccountId, extData?: object) {
-  const json = await ipfs.getContentArray<T>([ ipfsHash ]);
+function getJson<T extends CommonContent> (ipfsHash: string) {
+  return ipfs.getContent<T>(ipfsHash);
+}
+
+export async function insertElasticSearch (index: string, ipfsHash: string, id: InsertData | AccountId, extData?: object) {
+
   let indexData;
 
   switch (index) {
     case ES_INDEX_BLOGS: {
-      const { name, desc } = json as unknown as BlogContent;
+      const { name, desc } = await getJson<BlogContent>(ipfsHash)
       indexData = {
         blog_name: name,
         blog_desc: desc
@@ -52,7 +56,7 @@ export async function insertElasticSearch<T extends CommonContent> (index: strin
     }
 
     case ES_INDEX_POSTS: {
-      const { title, body } = json as unknown as PostContent;
+      const { title, body } = await getJson<PostContent>(ipfsHash)
       indexData = {
         post_title: title,
         post_body: body
@@ -61,7 +65,7 @@ export async function insertElasticSearch<T extends CommonContent> (index: strin
     }
 
     case ES_INDEX_COMMENTS: {
-      const { body } = json as unknown as CommentContent;
+      const { body } = await getJson<CommentContent>(ipfsHash)
       indexData = {
         comment_body: body
       };
@@ -69,7 +73,7 @@ export async function insertElasticSearch<T extends CommonContent> (index: strin
     }
 
     case ES_INDEX_PROFILES: {
-      const { fullname, about } = json as unknown as ProfileContent;
+      const { fullname, about } = await getJson<ProfileContent>(ipfsHash)
       indexData = {
         profile_username: extData && extData.toString(),
         profile_fullname: fullname,

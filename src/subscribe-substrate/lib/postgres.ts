@@ -11,7 +11,7 @@ export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCount
 type EventAction = {
   eventName: string,
   data: EventData,
-  heightBlock: BN
+  blockHeight: BN
 }
 
 type AggCountProps = {
@@ -206,7 +206,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
   });
 
   const [ postId ] = paramsIds;
-  const { eventName, data, heightBlock } = eventAction;
+  const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
@@ -214,7 +214,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
-  const params = [ accountId, eventName, ...paramsIds, heightBlock, count, aggregated ];
+  const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -254,7 +254,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
 
 export const insertActivityForAccount = async (eventAction: EventAction, count: number): Promise<number> => {
 
-  const { eventName, data, heightBlock } = eventAction;
+  const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const objectId = data[1].toString();
 
@@ -262,7 +262,7 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
     INSERT INTO df.activities(account, event, following_id, block_height, agg_count)
       VALUES($1, $2, $3, $4, $5)
     RETURNING *`
-  const params = [ accountId, eventName, objectId, heightBlock, count ];
+  const params = [ accountId, eventName, objectId, blockHeight, count ];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -288,7 +288,7 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
 
 export const insertActivityForBlog = async (eventAction: EventAction, count: number, creator?: string): Promise<number> => {
 
-  const { eventName, data, heightBlock } = eventAction;
+  const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const blogId = data[1].toString();
   const aggregated = accountId !== creator;
@@ -296,7 +296,7 @@ export const insertActivityForBlog = async (eventAction: EventAction, count: num
     INSERT INTO df.activities(account, event, blog_id, block_height, agg_count, aggregated)
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
-  const params = [ accountId, eventName, blogId, heightBlock, count, aggregated ];
+  const params = [ accountId, eventName, blogId, blockHeight, count, aggregated ];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -328,7 +328,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Inser
   });
 
   const [ , postId ] = paramsIds;
-  const { eventName, data, heightBlock } = eventAction;
+  const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const query = `
     INSERT INTO df.activities(account, event, blog_id, post_id, block_height, agg_count)
@@ -338,7 +338,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Inser
     ? await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId })
     : count;
 
-  const params = [ accountId, eventName, ...paramsIds, heightBlock, newCount ];
+  const params = [ accountId, eventName, ...paramsIds, blockHeight, newCount ];
   try {
     const res = await pool.query(query, params)
     return res.rows[0].id;
@@ -355,14 +355,14 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
     paramsIds[index] = encodeStructId(id)
   });
 
-  const { eventName, data, heightBlock } = eventAction;
+  const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
     INSERT INTO df.activities(account, event, post_id, block_height, agg_count,aggregated)
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
-  const params = [ accountId, eventName, ...paramsIds, heightBlock, count, aggregated ];
+  const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
@@ -395,14 +395,14 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
     paramsIds[index] = encodeStructId(id)
   });
 
-  const { eventName, data, heightBlock } = eventAction;
+  const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
     INSERT INTO df.activities(account, event, post_id, comment_id, block_height, agg_count,aggregated)
       VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
-  const params = [ accountId, eventName, ...paramsIds, heightBlock, count, aggregated ];
+  const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;

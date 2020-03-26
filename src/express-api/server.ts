@@ -1,7 +1,6 @@
 import { pool } from './../adaptors/connectPostgre'
 import * as WebSocket from 'ws';
 import * as express from 'express'
-import { getFirstOrUndefinded } from '@subsocial/api/utils'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
 import { eventEmitter, getUnreadNotifications, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../subscribe-substrate/lib/postgres';
@@ -30,10 +29,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // IPFS API
 app.get('/v1/ipfs/get/:hash', async (req: express.Request, res: express.Response) => {
   console.log('IPFS hash:', req.params.hash);
-
-  const data = await ipfs.getContentArray([ req.params.hash as IpfsCid ]);
-  const firstElement = getFirstOrUndefinded(data);
-  res.json(firstElement);
+  const data = await ipfs.getContent(req.params.hash as IpfsCid);
+  res.json(data);
 });
 
 app.get('/v1/ipfs/remove/:hash', (req: express.Request) => {

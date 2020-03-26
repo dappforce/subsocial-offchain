@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import { DispatchForDb } from './subscribe'
 import { getEventSections, getEventMethods } from './lib/utils';
 import { Api } from '@subsocial/api/substrateConnect';
-import { Header } from '@polkadot/types/interfaces';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 export let substrate: SubsocialSubstrateApi;
 
@@ -19,7 +19,6 @@ async function main () {
   // internally connects to all storage sinks
   const api = await Api.connect(process.env.SUBSTRATE_URL)
   substrate = new SubsocialSubstrateApi(api);
-
   substrate.api.query.system.events((events) => {
     events.forEach(async (record) => {
       // extract the event object
@@ -36,13 +35,13 @@ async function main () {
           method: event.method,
           meta: event.meta.documentation.toString(),
           data: event.data,
-          heightBlock: header.number.toBn()
+          blockHeight: header.number.toBn()
         };
 
         // remove this log if not needed
         console.log('Event Received: ' + Date.now() + ': ' + JSON.stringify(eventObj));
 
-        await DispatchForDb({ eventName: eventObj.method, data: eventObj.data, heightBlock: eventObj.heightBlock });
+        await DispatchForDb({ eventName: eventObj.method, data: eventObj.data, blockHeight: eventObj.blockHeight });
       }
     });
   });

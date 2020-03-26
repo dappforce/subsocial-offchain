@@ -5,14 +5,13 @@ import { insertAccountFollower, insertActivityForAccount, insertNotificationForO
 import { insertElasticSearch } from './lib/utils';
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
 import { SocialAccount, BlogId, PostId, CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { BlogContent, PostContent, CommentContent, ProfileContent } from '@subsocial/types/offchain';
 import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
 import { substrate } from './server';
 
 type EventAction = {
   eventName: string,
   data: EventData,
-  heightBlock: BN
+  blockHeight: BN
 }
 
 export const DispatchForDb = async (eventAction: EventAction) => {
@@ -46,7 +45,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const blog = await substrate.findBlog(blogId);
       if (!blog) return;
 
-      insertElasticSearch<BlogContent>(ES_INDEX_BLOGS, blog.ipfs_hash.toString(), blogId);
+      insertElasticSearch(ES_INDEX_BLOGS, blog.ipfs_hash.toString(), blogId);
       break;
     }
     case 'BlogUpdated': {
@@ -54,7 +53,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const blog = await substrate.findBlog(blogId);
       if (!blog) return;
 
-      insertElasticSearch<BlogContent>(ES_INDEX_BLOGS, blog.ipfs_hash.toString(), blogId);
+      insertElasticSearch(ES_INDEX_BLOGS, blog.ipfs_hash.toString(), blogId);
       break;
     }
     case 'BlogFollowed': {
@@ -95,7 +94,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       await fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
       await fillNewsFeedWithAccountFollowers(follower, activityId);
-      insertElasticSearch<PostContent>(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
+      insertElasticSearch(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
       break;
     }
     case 'PostUpdated': {
@@ -103,7 +102,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = await substrate.findPost(postId);
       if (!post) return;
 
-      insertElasticSearch<PostContent>(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
+      insertElasticSearch(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
       break;
     }
     case 'PostShared': {
@@ -155,7 +154,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
         await fillActivityStreamWithPostFollowers(postId, commentCreator, activityId);
         await fillNotificationsWithAccountFollowers(commentCreator, activityId);
       }
-      insertElasticSearch<CommentContent>(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
+      insertElasticSearch(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
       break;
     }
     case 'CommentUpdated': {
@@ -163,7 +162,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const comment = await substrate.findComment(commentId);
       if (!comment) return;
 
-      insertElasticSearch<CommentContent>(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
+      insertElasticSearch(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
       break;
     }
     case 'CommentShared': {
@@ -235,7 +234,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap();
-      insertElasticSearch<ProfileContent>(ES_INDEX_PROFILES, profile.ipfs_hash.toString(), accountId, { username: profile.username.toString() });
+      insertElasticSearch(ES_INDEX_PROFILES, profile.ipfs_hash.toString(), accountId, { username: profile.username.toString() });
       break;
     }
     case 'ProfileUpdated' : {
@@ -247,7 +246,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap();
-      insertElasticSearch<ProfileContent>(ES_INDEX_PROFILES, profile.ipfs_hash.toString(), accountId, { username: profile.username.toString() });
+      insertElasticSearch(ES_INDEX_PROFILES, profile.ipfs_hash.toString(), accountId, { username: profile.username.toString() });
       break;
     }
   }
