@@ -29,7 +29,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // IPFS API
 app.get('/v1/ipfs/get/:hash', async (req: express.Request, res: express.Response) => {
-  console.log('Hash', req.params.hash);
+  console.log('IPFS hash:', req.params.hash);
+
   const data = await ipfs.getContentArray([ req.params.hash as IpfsCid ]);
   const firstElement = getFirstOrUndefinded(data);
   res.json(firstElement);
@@ -42,7 +43,8 @@ app.get('/v1/ipfs/remove/:hash', (req: express.Request) => {
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const data = req.body;
   console.log(data);
-  const hash = await ipfs.saveContent(req.body).catch(console.log);
+  const hash = await ipfs.saveContent(req.body).catch(console.error);
+
   res.json(hash);
 });
 
