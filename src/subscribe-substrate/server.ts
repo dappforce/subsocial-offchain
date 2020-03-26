@@ -27,7 +27,7 @@ async function main () {
       if ((eventsFilterSections.includes(event.section.toString()) && eventsFilterMethods.includes(event.method.toString())) || eventsFilterSections.includes('all')) {
         // create event object for data sink
         const blockHash = await substrate.api.rpc.chain.getFinalizedHead();
-        const header = await substrate.api.rpc.chain.getHeader(blockHash) as Header;
+        const header = await substrate.api.rpc.chain.getHeader(blockHash);
         console.log(header);
 
         const eventObj = {
