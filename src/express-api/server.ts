@@ -1,9 +1,9 @@
-import { pool } from './../adaptors/connectPostgre'
+import { pool } from '../adaptors/connect-postgre'
 import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER, getUnreadNotifications } from '../subscribe-substrate/lib/postgres/notifications';
+import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER, getUnreadNotifications } from '../postgres/notifications';
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT || '20';

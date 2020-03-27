@@ -1,6 +1,6 @@
 import { EventData } from '@polkadot/types/generic/Event';
-import { pool } from '../../../adaptors/connectPostgre';
-import { encodeStructId } from '../utils';
+import { pool } from '../adaptors/connect-postgre';
+import { encodeStructId } from '../substrate/utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 export const eventEmitter = new events.EventEmitter();

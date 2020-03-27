@@ -1,10 +1,10 @@
 import { } from '@subsocial/types/substrate'
 import { CommentContent, BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
-import { ipfs } from '../../adaptors/connectIpfs';
+import { ipfs } from '../adaptors/connect-ipfs';
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
-import searchClient from '../../adaptors/connectElasticsearch'
-import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../../search/indexes';
+import searchClient from '../adaptors/connect-elasticsearch'
+import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
 import { CommentId, BlogId, PostId } from '@subsocial/types/substrate/interfaces/subsocial';
 
 require('dotenv').config();

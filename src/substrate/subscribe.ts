@@ -1,17 +1,17 @@
 import { Option } from '@polkadot/types'
 import { EventData } from '@polkadot/types/generic/Event';
 import BN from 'bn.js';
-import { insertElasticSearch } from './lib/utils';
+import { insertElasticSearch } from './utils';
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
 import { SocialAccount, BlogId, PostId, CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
 import { substrate } from './server';
-import { insertAccountFollower, insertBlogFollower, insertPostFollower, insertCommentFollower } from './lib/postgres/insert-follower';
-import { insertActivityForAccount, insertActivityForBlog, insertActivityForPost, insertActivityComments, insertActivityForComment, insertActivityForPostReaction, insertActivityForCommentReaction } from './lib/postgres/insert-activity';
-import { deleteNotificationsAboutAccount, deleteNotificationsAboutBlog, deleteNotificationsAboutPost, deleteNotificationsAboutComment } from './lib/postgres/delete-activity';
-import { deleteAccountFollower, deleteBlogFollower, deletePostFollower, deleteCommentFollower } from './lib/postgres/delete-follower';
-import { fillNotificationsWithAccountFollowers, fillActivityStreamWithBlogFollowers, fillNewsFeedWithAccountFollowers, fillActivityStreamWithPostFollowers, fillActivityStreamWithCommentFollowers } from './lib/postgres/fill-activity';
-import { insertNotificationForOwner } from './lib/postgres/notifications';
+import { insertAccountFollower, insertBlogFollower, insertPostFollower, insertCommentFollower } from '../postgres/insert-follower';
+import { insertActivityForAccount, insertActivityForBlog, insertActivityForPost, insertActivityComments, insertActivityForComment, insertActivityForPostReaction, insertActivityForCommentReaction } from '../postgres/insert-activity';
+import { deleteNotificationsAboutAccount, deleteNotificationsAboutBlog, deleteNotificationsAboutPost, deleteNotificationsAboutComment } from '../postgres/delete-activity';
+import { deleteAccountFollower, deleteBlogFollower, deletePostFollower, deleteCommentFollower } from '../postgres/delete-follower';
+import { fillNotificationsWithAccountFollowers, fillActivityStreamWithBlogFollowers, fillNewsFeedWithAccountFollowers, fillActivityStreamWithPostFollowers, fillActivityStreamWithCommentFollowers } from '../postgres/fill-activity';
+import { insertNotificationForOwner } from '../postgres/notifications';
 
 type EventAction = {
   eventName: string,

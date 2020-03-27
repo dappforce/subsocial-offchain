@@ -1,4 +1,4 @@
-import { pool } from '../../../adaptors/connectPostgre';
+import { pool } from '../adaptors/connect-postgre';
 import * as events from 'events'
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'

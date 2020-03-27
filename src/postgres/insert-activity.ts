@@ -1,11 +1,11 @@
 import { EventData } from '@polkadot/types/generic/Event';
-import { pool } from '../../../adaptors/connectPostgre';
-import { encodeStructId, InsertData } from '../utils';
+import { pool } from '../adaptors/connect-postgre';
+import { encodeStructId, InsertData } from '../substrate/utils';
 import BN from 'bn.js';
 import * as events from 'events'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../server';
-import { getAggregationCount, insertNotificationForOwner } from './notifications';
+import { substrate } from '../substrate/server';
+import { updateUnreadNotifications, getAggregationCount } from './notifications';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -13,6 +13,21 @@ type EventAction = {
   eventName: string,
   data: EventData,
   blockHeight: BN
+}
+
+export const insertNotificationForOwner = async (id: number, account: string) => {
+  const query = `
+      INSERT INTO df.notifications
+        VALUES($1, $2) 
+      RETURNING *`;
+  const params = [ account, id ];
+  try {
+    const res = await pool.query(query, params)
+    console.log(res.rows[0])
+    await updateUnreadNotifications(account)
+  } catch (err) {
+    console.log(err.stack)
+  }
 }
 
 export const insertActivityComments = async (eventAction: EventAction, ids: InsertData[], commentLast: Comment) => {
