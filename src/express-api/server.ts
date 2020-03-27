@@ -1,5 +1,4 @@
 import { pool } from './../adaptors/connectPostgre'
-import { getJsonFromIpfs, addJsonToIpfs, removeFromIpfs } from './adaptors/ipfs'
 import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
@@ -7,7 +6,7 @@ import * as cors from 'cors';
 import { eventEmitter, getUnreadNotifications, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../subscribe-substrate/lib/postgres';
 
 require('dotenv').config();
-const LIMIT = process.env.PGLIMIT;
+const LIMIT = process.env.PGLIMIT || '20';
 // import * as multer from 'multer';
 // const upload = multer();
 const app = express();
@@ -24,23 +23,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // // for parsing multipart/form-data
 // app.use(upload.array());
 // app.use(express.static('public'));
-
-// IPFS API
-app.get('/v1/ipfs/get/:hash', async (req: express.Request, res: express.Response) => {
-  const data = await getJsonFromIpfs(req.params.hash as string);
-  res.json(data);
-});
-
-app.post('/v1/ipfs/remove/:hash', (req: express.Request) => {
-  removeFromIpfs(req.params.hash as string);
-});
-
-app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
-  const data = req.body;
-  console.log(data);
-  const hash = await addJsonToIpfs(req.body);
-  res.json(hash);
-});
 
 // Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
@@ -146,7 +128,7 @@ wss.on('connection', (ws: WebSocket) => {
 });
 
 wss.on('close', () => {
-  console.log(`Disconnected Notifications Counter Web Socket Server`);
+  console.log('Disconnected Notifications Counter Web Socket Server');
 });
 
 const port = process.env.OFFCHAIN_SERVER_PORT
