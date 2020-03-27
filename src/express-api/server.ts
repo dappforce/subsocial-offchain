@@ -72,6 +72,22 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
   }
 });
 
+const parse = async (url: string) => {
+  if (isVideo(url)) {
+    const temp = await videoParser([ url ])
+    const res = { video: temp }
+    return res
+  } else {
+    const temp = await siteParser([ url ])
+    const res = { site: temp }
+    return res
+  }
+}
+const url = 'https://www.facebook.com/vladimirmezhonov?__tn__=%2CdC-R-R&eid=ARAKWTH2t6xL4YNn2xloBRrmgnS8JLFtIWSPnMG3eybmBwJ2zqJ9pEOFhSh2poc6JOcUn91mtEwLDO7v&hc_ref=ARRh3aNWFONc4e6piFRtSvgKtdohKo5z0PeEVo8hJaNeXD69B9zoBXaDvGV9DivIr30&fref=nf'
+parse(url).then((res) => {
+  console.log('===== parsed:', res)
+})
+
 app.post('/v1/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const parse = async (url: string) => {
     if (isVideo(url)) {

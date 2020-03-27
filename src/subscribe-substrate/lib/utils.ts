@@ -49,10 +49,10 @@ export async function insertElasticSearch<T extends IpfsData> (index: string, ip
     }
 
     case ES_INDEX_POSTS: {
-      const { title, body } = json as PostData;
+      const { title, blocks } = json as PostData;
       indexData = {
         post_title: title,
-        post_body: body
+        post_body: blocks
       };
       break;
     }

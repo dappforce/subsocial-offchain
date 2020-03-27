@@ -1,6 +1,6 @@
 import { Option, Struct, Enum, EnumType } from '@polkadot/types/codec';
 import { BlockNumber, Moment, AccountId, u16, u32, u64, Text, Vector, i32, Null } from '@polkadot/types';
-export declare type IpfsData = CommentData | PostData | BlogData | ProfileData | SharedPostData;
+export declare type IpfsData = CommentData | PostData | BlogData | ProfileData | SharedPostData | PostBlock | BlockValue;
 export declare type Activity = {
     id: number;
     account: string;
@@ -113,8 +113,26 @@ export declare class BlogUpdate extends Struct {
     slug: OptionText;
     ipfs_hash: OptionIpfsHash;
 }
+// ------------------------------------------
+// Post blocks
+export type BlockValue = {
+  kind: PostBlockKind
+  hidden?: boolean
+  data: string
+}
+
+type PostBlockKind = 'text' | 'code' | 'link' | 'video' | 'image' | 'twitter'
+
+export interface PostBlock {
+  kind: PostBlockKind
+  hidden?: boolean
+
+  /** CID aka IPFS hash */
+  cid: string
+}
+
 export declare type SharedPostData = {
-    body: string;
+    blocks: PostBlock[];
 };
 export declare type PostData = SharedPostData & {
     title: string;

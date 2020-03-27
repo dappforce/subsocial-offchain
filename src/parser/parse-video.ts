@@ -3,6 +3,8 @@ import * as request from 'request'
 
 // Works with googleapis '^19.0.0'
 import { google } from 'googleapis'
+// import { youtube_v3 } from 'googleapis/build/src/apis/youtube/v3'
+// import { GaxiosResponse } from 'gaxios';
 
 import moment from 'moment'
 
@@ -33,7 +35,16 @@ function isVimeoVideoUrl (url: string) {
   return extractVimeoVideoId(url) !== null;
 }
 
-function findVimeoVideoByUrl (videoUrl: string) {
+type VideoObj = {
+  url: string,
+  video: Video
+}
+
+type ErrorObj = {
+  err: string
+}
+
+function findVimeoVideoByUrl (videoUrl: string): Promise<VideoObj | ErrorObj> {
 
   const videoId = extractVimeoVideoId(videoUrl);
   // let url = `https://api.vimeo.com/videos/${videoId}`; // This API endpoint requires OAuth.
@@ -63,23 +74,23 @@ function findVimeoVideoByUrl (videoUrl: string) {
               const ratio = v.width / v.height;
               const largeThumbHeight = parseInt((640 / ratio).toString());
 
-              const video = {
+              const video: Video = {
                 generated: true,
                 isVimeo: true,
-                id: v.id,
-                url: v.url,
-                title: v.title,
-                desc: v.description,
+                id: v.id as string,
+                url: v.url as string,
+                title: v.title as string,
+                desc: v.description as string,
                 date: moment(v.upload_date).format(),
                 image: {
-                  url: v.thumbnail_large,
+                  url: v.thumbnail_large as string,
                   width: 640,
                   height: largeThumbHeight
                 },
                 author: {
-                  id: v.user_id,
-                  url: v.user_url,
-                  name: v.user_name
+                  id: v.user_id as string,
+                  url: v.user_url as string,
+                  name: v.user_name as string
                 }
               };
               resolve({ url: video.url, video });
@@ -113,7 +124,7 @@ function findVimeoVideoByUrl (videoUrl: string) {
 // -----------------------------------------------------------
 // YouTube
 
-function findYouTubeVideoByUrl (url: string, onVideoFoundFn: (a: any, b: any) => void) {
+function findYouTubeVideoByUrl (url: string, onVideoFoundFn: (a: string | null, b: Video) => void) {
   const id = extractYouTubeVideoId(url);
   console.log(`findYouTubeVideoById id (${id}) url (${url})`);
   return findYouTubeVideoById(id, onVideoFoundFn);
@@ -134,8 +145,49 @@ function isYouTubeUrl (url: string) {
   return extractYouTubeVideoId(url) !== null;
 }
 
-function findYouTubeVideoById (id: string | undefined, onVideoFoundFn: (a: any, b?: any) => void) {
-  youtube.videos.list({ id, part: 'snippet' }, function (err: any, res: any) {
+type Video = {
+  generated: boolean,
+  isYouTube?: boolean,
+  isVimeo?: boolean,
+  id: string,
+  url: string,
+  title: string,
+  desc: string,
+  date: string,
+  snippet?: {
+    title: string,
+    description: string,
+    publishedAt: string,
+    thumbnails: {
+      standard: Image
+    },
+    channelId: string,
+    channelTitle: string
+  },
+  image: Image,
+  author: {
+    id: string,
+    url: string,
+    name: string
+  }
+}
+
+type Image = {
+  url: string,
+  width: number,
+  height: number
+}
+
+/*
+interface VideoRes extends youtube_v3.Schema$VideoListResponse {
+  items: Video[]
+}
+
+// res: GaxiosResponse<VideoRes>
+*/
+
+function findYouTubeVideoById (id: string | undefined, onVideoFoundFn: (a: string | Error, b?: Video) => void) {
+  youtube.videos.list({ id, part: 'snippet' }, function (err: Error, res: any) {
     if (err || res.items.length === 0) {
       onVideoFoundFn(err);
       return;
@@ -165,7 +217,7 @@ function findYouTubeVideoById (id: string | undefined, onVideoFoundFn: (a: any, 
   });
 }
 
-function findYouTubeVideoPromise (url: string) {
+function findYouTubeVideoPromise (url: string): Promise<ErrorObj | VideoObj> {
   return new Promise((resolve) => {
     findYouTubeVideoByUrl(url, (err, video) => {
       if (err) resolve({ err });
@@ -178,16 +230,16 @@ function findYouTubeVideoPromise (url: string) {
 
 export default function parse (videoUrls: string[]) {
 
-  const findVidPromises: any = []
+  const findVidPromises: Array<VideoObj | ErrorObj> = []
   videoUrls = videoUrls.map(x => nonEmptyStr(x) ? x.trim() : x)
-  videoUrls.forEach(vidUrlOrVideo => {
+  videoUrls.forEach(async vidUrlOrVideo => {
     console.log(`videos.forEach(vidUrlOrVideo => `, vidUrlOrVideo);
 
     if (nonEmptyStr(vidUrlOrVideo)) {
       if (isYouTubeUrl(vidUrlOrVideo)) {
-        findVidPromises.push(findYouTubeVideoPromise(vidUrlOrVideo));
+        findVidPromises.push(await findYouTubeVideoPromise(vidUrlOrVideo));
       } else if (isVimeoVideoUrl(vidUrlOrVideo)) {
-        findVidPromises.push(findVimeoVideoByUrl(vidUrlOrVideo));
+        findVidPromises.push(await findVimeoVideoByUrl(vidUrlOrVideo));
       }
     }
   });
@@ -197,8 +249,8 @@ export default function parse (videoUrls: string[]) {
       console.log(`Video parser: Promise results`, results);
 
       const urlToVideoMap = new Map();
-      results.forEach((res: any) => {
-        const { url, video } = res;
+      results.forEach((res) => {
+        const { url, video } = res as VideoObj;
         if (video) {
           urlToVideoMap.set(url, video);
         }
