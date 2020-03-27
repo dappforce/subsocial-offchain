@@ -8,7 +8,7 @@ import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
 import { substrate } from './server';
 import { insertAccountFollower, insertBlogFollower, insertPostFollower, insertCommentFollower } from '../postgres/insert-follower';
 import { insertActivityForAccount, insertActivityForBlog, insertActivityForPost, insertActivityComments, insertActivityForComment, insertActivityForPostReaction, insertActivityForCommentReaction } from '../postgres/insert-activity';
-import { deleteAccountActivityWithActivityStream, deleteBlogActivityWithActivityStream, deletePostActivityWithActivityStream, deleteCommentActivityWithActivityStream } from '../postgres/delete-activity';
+import { deleteNotificationsAboutAccount, deleteNotificationsAboutBlog, deleteNotificationsAboutPost, deleteNotificationsAboutComment } from '../postgres/delete-activity';
 import { deleteAccountFollower, deleteBlogFollower, deletePostFollower, deleteCommentFollower } from '../postgres/delete-follower';
 import { fillNotificationsWithAccountFollowers, fillActivityStreamWithBlogFollowers, fillNewsFeedWithAccountFollowers, fillActivityStreamWithPostFollowers, fillActivityStreamWithCommentFollowers } from '../postgres/fill-activity';
 import { insertNotificationForOwner } from '../postgres/notifications';
@@ -37,7 +37,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     case 'AccountUnfollowed': {
       const follower = data[0].toString();
       const following = data[1].toString();
-      await deleteAccountActivityWithActivityStream(follower, following);
+      await deleteNotificationsAboutAccount(follower, following);
       await deleteAccountFollower(data);
       break;
     }
@@ -81,7 +81,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     case 'BlogUnfollowed': {
       const follower = data[0].toString();
       const following = data[1] as BlogId;
-      await deleteBlogActivityWithActivityStream(follower, following)
+      await deleteNotificationsAboutBlog(follower, following)
       await deleteBlogFollower(data);
       break;
     }
@@ -131,7 +131,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     case 'PostDeleted': {
       const follower = data[0].toString();
       const following = data[1] as PostId;
-      await deletePostActivityWithActivityStream(follower, following);
+      await deleteNotificationsAboutPost(follower, following);
       await deletePostFollower(data);
       break;
     }
@@ -191,7 +191,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     case 'CommentDeleted': {
       const follower = data[0].toString();
       const following = data[1] as CommentId;
-      await deleteCommentActivityWithActivityStream(follower, following);
+      await deleteNotificationsAboutComment(follower, following);
       await deleteCommentFollower(data);
       break;
     }
