@@ -3,7 +3,7 @@ import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import { eventEmitter, getUnreadNotifications, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../subscribe-substrate/lib/postgres';
+import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER, getUnreadNotifications } from '../subscribe-substrate/lib/postgres/notifications';
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT || '20';
