@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { DispatchForDb } from './subscribe'
-import { getEventSections, getEventMethods } from './lib/utils';
+import { getEventSections, getEventMethods } from './utils';
 import { Api } from '@subsocial/api/substrateConnect';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 export let substrate: SubsocialSubstrateApi;

@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { pool } from './../adaptors/connectPostgre';
+import { pool } from '../adaptors/connect-postgre';
 
 const ENV = process.env.NODE_ENV || 'development';
 const buildPath = ENV === 'production' ? 'build/' : '';

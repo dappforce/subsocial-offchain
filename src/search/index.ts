@@ -1,4 +1,4 @@
-import searchClient from '../adaptors/connectElasticsearch'
+import searchClient from '../adaptors/connect-elasticsearch'
 import * as BlogsMapping from './mappings/blogs.json'
 import * as PostsMapping from './mappings/posts.json'
 import * as CommentsMapping from './mappings/comments.json'

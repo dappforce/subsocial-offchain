@@ -1,5 +1,5 @@
 
-import { pool } from './../adaptors/connectPostgre';
+import { pool } from '../adaptors/connect-postgre';
 import { release } from 'os';
 
 const query = `
