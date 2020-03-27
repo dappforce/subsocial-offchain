@@ -9,6 +9,21 @@ type AggCountProps = {
   post_id: string
 }
 
+export const insertNotificationForOwner = async (id: number, account: string) => {
+  const query = `
+      INSERT INTO df.notifications
+        VALUES($1, $2) 
+      RETURNING *`;
+  const params = [ account, id ];
+  try {
+    const res = await pool.query(query, params)
+    console.log(res.rows[0])
+    await updateUnreadNotifications(account)
+  } catch (err) {
+    console.log(err.stack)
+  }
+}
+
 export const getAggregationCount = async (props: AggCountProps) => {
   const { eventName, post_id, account } = props;
   const params = [ account, eventName, post_id ];

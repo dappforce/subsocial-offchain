@@ -3,24 +3,8 @@ import { pool } from '../../../adaptors/connectPostgre';
 import { encodeStructId } from '../utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { updateUnreadNotifications } from './notifications';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
-
-export const insertNotificationForOwner = async (id: number, account: string) => {
-  const query = `
-      INSERT INTO df.notifications
-        VALUES($1, $2) 
-      RETURNING *`;
-  const params = [ account, id ];
-  try {
-    const res = await pool.query(query, params)
-    console.log(res.rows[0])
-    await updateUnreadNotifications(account)
-  } catch (err) {
-    console.log(err.stack)
-  }
-}
 
 export const insertAccountFollower = async (data: EventData) => {
   const query = `
