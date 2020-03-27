@@ -11,7 +11,14 @@ function $loadHtml (html: string) {
   return cheerio.load(html, { decodeEntities: true });
 }
 
-function parseSiteWithRequest (url: string) {
+type ParsedSite = {
+  ok: boolean,
+  url?: string,
+  siteMeta?: Meta,
+  error?: string
+}
+
+function parseSiteWithRequest (url: string): Promise<ParsedSite> {
   return new Promise((resolve) => {
     console.log(`\nRequest site at URL: ${url}`);
     request(
@@ -63,15 +70,41 @@ function parseSiteWithRequest (url: string) {
   });
 }
 
+type Meta = {
+  title?: string,
+  description?: string,
+  author?: string,
+  fb?: Fb,
+  og: Og,
+  twitter?: Twitter,
+  keywords?: string[]
+}
+
+type Fb = {
+  appId?: string
+}
+
+type Og = {
+  title?: string,
+  description?: string,
+  image?: string,
+  url?: string,
+  type?: string,
+  updated_time?: string
+}
+
+type Twitter = {
+  title?: string,
+  description?: string,
+  image?: string,
+  creator?: string
+}
+
 function parseSiteHtml (url: string, html: string) {
   console.log(url)
   const $ = $loadHtml(html);
-  const meta: {
-    fb: any,
-    og: any,
-    twitter: any,
-    keywords?: any
-  } = {
+
+  const meta: Meta = {
     fb: {},
     og: {},
     twitter: {}
@@ -105,7 +138,7 @@ function parseSiteHtml (url: string, html: string) {
   return meta;
 }
 
-function deleteEmptyKeys (obj: any) {
+function deleteEmptyKeys (obj: Meta) {
   Object.keys(obj).forEach(k => {
     const v = obj[k];
     if (typeof v === 'object' && Object.keys(v).length === 0) {
@@ -132,20 +165,30 @@ function getPrettyString (getStringFn: () => string | undefined) {
   return prettyVal;
 }
 
-function setPrettyString (obj: any, propName: string, getValueFn: () => string | undefined) {
+function setPrettyString (obj: Og | Fb | Twitter, propName: string, getValueFn: () => string | undefined) {
   const value = getPrettyString(getValueFn);
   if (typeof value !== 'undefined') {
     obj[propName] = value;
   }
 }
 
+type PressMeta = {
+  generated: boolean,
+  url: string,
+  title: string,
+  desc: string,
+  image: string,
+  date: string,
+  author: string
+}
+
 export default function parse (siteUrls: string[]) {
 
-  const parseSitePromises: any[] = []
+  const parseSitePromises: ParsedSite[] = []
   siteUrls = siteUrls.map(x => nonEmptyStr(x) ? x.trim() : x)
-  siteUrls.forEach((pressUrl: string) => {
+  siteUrls.forEach(async (pressUrl: string) => {
     if (nonEmptyStr(pressUrl)) {
-      parseSitePromises.push(parseSiteWithRequest(pressUrl));
+      parseSitePromises.push(await parseSiteWithRequest(pressUrl));
     }
   });
 
@@ -158,7 +201,7 @@ export default function parse (siteUrls: string[]) {
         urlToMetaMap.set(url, siteMeta);
       });
 
-      const parsedPress: any[] = [];
+      const parsedPress: PressMeta[] = [];
       siteUrls.forEach(pressUrl => {
         if (typeof pressUrl === 'object') {
           parsedPress.push(pressUrl);
