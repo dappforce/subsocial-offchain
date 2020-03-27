@@ -2598,16 +2598,16 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@^0.1.17", "@subsocial/api@^0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.1.19.tgz#3c5efd161ce2139536f1330e39f2e534d53b003b"
-  integrity sha512-7yrj3j36GFjk3Qnf5l3CYJKoFpYcmDxNcweO50q6RCNpFgykWc9oO1eK3ggzfYtrdZ6UaA6mJWXCTHIZtADRjw==
+"@subsocial/api@^0.1.20", "@subsocial/api@^0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.1.21.tgz#ef2817c200f91c00e89007bdceea3f5eea035314"
+  integrity sha512-d/lXDTar/RvY0YS9Osp8x7ZrMelpMyzZ8SXxHmP1dHuxIfjkhoY13nHGaUuoA8L+HhRMyt+w5R5i6eo4MO6jcg==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@polkadot/api" "^1.4.0-beta.46"
-    "@subsocial/api" "^0.1.17"
+    "@subsocial/api" "^0.1.20"
     "@subsocial/types" "^0.1.15"
-    "@subsocial/utils" "^0.1.9"
+    "@subsocial/utils" "^0.1.10"
     "@types/it-all" "^1.0.0"
     ipfs-http-client "^42.0.0"
     it-all "^1.0.1"
@@ -2619,20 +2619,19 @@
   dependencies:
     "@babel/runtime" "^7.8.4"
 
-"@subsocial/types@^0.1.15", "@subsocial/types@^0.1.3":
+"@subsocial/types@^0.1.15":
   version "0.1.15"
   resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.1.15.tgz#0645017f9869a14646ea313bc422f0a0c8d41b88"
   integrity sha512-0QW6ieIeHePqqdiZ7D29zT5gaLBmvHHa2rNHL/VBnLoORcoVoJz5b3dY/lo1l+ZzW7tz6Ae/Mafn4v9n1cl5eA==
   dependencies:
     "@babel/runtime" "^7.8.4"
 
-"@subsocial/utils@^0.1.9":
-  version "0.1.9"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.1.9.tgz#977628d0065ccfea29bf4de3c55f9cd885c48760"
-  integrity sha512-T2WE+4FtjNvw/mOKp3kELhUWR+VUgB5Vzkpvqb1jdPs6lC9G74H4iq5h1oB9lSxDhiVlGou4ae+eGZ1YIbSY5w==
+"@subsocial/utils@^0.1.10":
+  version "0.1.13"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.1.13.tgz#85e3dd19535420a33cb7633be1a8bf1eacb7edd4"
+  integrity sha512-LSeeML394/Bi2y50LROkKeO0QSYZYc2euiAEwPpjdEi3aKO7majx18vBXR3aTFUnPMcJGsin1iSMUaAYWRFU9w==
   dependencies:
     "@babel/runtime" "^7.8.4"
-    "@subsocial/types" "^0.1.3"
     "@types/lodash.truncate" "^4.4.6"
     "@types/winston" "^2.4.4"
     bn.js "^5.1.1"
@@ -2640,6 +2639,7 @@
     lodash.truncate "^4.4.2"
     markdown-to-txt "^1.0.1"
     winston "^3.2.0"
+    winston-transport-browserconsole "^1.0.5"
 
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
@@ -18830,6 +18830,14 @@ windows-release@^3.1.0:
   dependencies:
     execa "^1.0.0"
 
+winston-transport-browserconsole@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/winston-transport-browserconsole/-/winston-transport-browserconsole-1.0.5.tgz#8ef1bc32da5fb0a66604f2b8b6f127ed725108c9"
+  integrity sha512-BFZDvknATAmsqaRY3WatB2S0eEb0ziwqBYIv+H0Fnu9oe7GnPUVQzEJC1frmLdNsfEkfnyR1PCNDBAFtZE3SuQ==
+  dependencies:
+    winston "^3.2.1"
+    winston-transport "^4.3.0"
+
 winston-transport@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/winston-transport/-/winston-transport-4.3.0.tgz#df68c0c202482c448d9b47313c07304c2d7c2c66"
@@ -18838,7 +18846,7 @@ winston-transport@^4.3.0:
     readable-stream "^2.3.6"
     triple-beam "^1.2.0"
 
-winston@*, winston@^3.2.0:
+winston@*, winston@^3.2.0, winston@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/winston/-/winston-3.2.1.tgz#63061377976c73584028be2490a1846055f77f07"
   integrity sha512-zU6vgnS9dAWCEKg/QYigd6cgMVVNwyTzKs81XZtTFuRwJOcDdBg7AU0mXVyNbs7O5RH2zdv+BdNZUlx7mXPuOw==
