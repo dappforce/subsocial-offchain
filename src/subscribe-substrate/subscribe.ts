@@ -7,10 +7,11 @@ import { SocialAccount, BlogId, PostId, CommentId } from '@subsocial/types/subst
 import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
 import { substrate } from './server';
 import { insertAccountFollower, insertBlogFollower, insertPostFollower, insertCommentFollower } from './lib/postgres/insert-follower';
-import { insertActivityForAccount, insertNotificationForOwner, insertActivityForBlog, insertActivityForPost, insertActivityComments, insertActivityForComment, insertActivityForPostReaction, insertActivityForCommentReaction } from './lib/postgres/insert-activity';
+import { insertActivityForAccount, insertActivityForBlog, insertActivityForPost, insertActivityComments, insertActivityForComment, insertActivityForPostReaction, insertActivityForCommentReaction } from './lib/postgres/insert-activity';
 import { deleteNotificationsAboutAccount, deleteNotificationsAboutBlog, deleteNotificationsAboutPost, deleteNotificationsAboutComment } from './lib/postgres/delete-activity';
 import { deleteAccountFollower, deleteBlogFollower, deletePostFollower, deleteCommentFollower } from './lib/postgres/delete-follower';
 import { fillNotificationsWithAccountFollowers, fillActivityStreamWithBlogFollowers, fillNewsFeedWithAccountFollowers, fillActivityStreamWithPostFollowers, fillActivityStreamWithCommentFollowers } from './lib/postgres/fill-activity';
+import { insertNotificationForOwner } from './lib/postgres/notifications';
 
 type EventAction = {
   eventName: string,
