@@ -31,8 +31,8 @@ export const getEventMethods = () => {
 
 export type InsertData = BlogId | PostId | CommentId;
 
-export function encodeStructId (id: InsertData): string {
-  if (!id) return '';
+export function encodeStructId (id: InsertData): string | undefined {
+  if (!id) return undefined;
 
   return id.toHex().split('x')[1].replace(/(0+)/, '');
 }

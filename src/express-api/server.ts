@@ -4,8 +4,6 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
 import { eventEmitter, getUnreadNotifications, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../subscribe-substrate/lib/postgres';
-import { IpfsCid } from '@subsocial/types/offchain';
-import ipfs from '../adaptors/connectIpfs';
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT || '20';
@@ -25,25 +23,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // // for parsing multipart/form-data
 // app.use(upload.array());
 // app.use(express.static('public'));
-
-// IPFS API
-app.get('/v1/ipfs/get/:hash', async (req: express.Request, res: express.Response) => {
-  console.log('IPFS hash:', req.params.hash);
-  const data = await ipfs.getContent(req.params.hash as IpfsCid);
-  res.json(data);
-});
-
-app.get('/v1/ipfs/remove/:hash', (req: express.Request) => {
-  ipfs.removeContent(req.params.hash);
-});
-
-app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
-  const data = req.body;
-  console.log(data);
-  const hash = await ipfs.saveContent(req.body).catch(console.error);
-
-  res.json(hash);
-});
 
 // Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
