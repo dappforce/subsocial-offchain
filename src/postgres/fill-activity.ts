@@ -3,6 +3,7 @@ import { encodeStructId } from '../substrate/utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateUnreadNotifications } from './notifications';
+import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedErrorLog, fillNotificationsErrorLog } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -19,10 +20,10 @@ export const fillNewsFeedWithAccountFollowers = async (account: string, activity
       RETURNING *`
   const params = [ account, activityId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    fillNewsFeedLog('account')
   } catch (err) {
-    console.log(err.stack);
+    fillNewsFeedErrorLog('account', err.stack);
   }
 }
 
@@ -40,15 +41,15 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
       RETURNING *`
   const params = [ account, activityId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    fillNotificationsLog('account')
     await updateUnreadNotifications(account)
   } catch (err) {
-    console.log(err.stack);
+    fillNotificationsErrorLog('account', err.stack);
   }
 }
 
-export const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, account: string, activityId: number) => {
+export const fillNewsFeedWithBlogFollowers = async (blogId: BlogId, account: string, activityId: number) => {
   const query = `
       INSERT INTO df.news_feed(account, activity_id)
         (SELECT df.blog_followers.follower_account, df.activities.id
@@ -63,15 +64,15 @@ export const fillActivityStreamWithBlogFollowers = async (blogId: BlogId, accoun
   const hexBlogId = encodeStructId(blogId);
   const params = [ hexBlogId, account, activityId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    fillNewsFeedLog('blog')
     await updateUnreadNotifications(account)
   } catch (err) {
-    console.log(err.stack);
+    fillNewsFeedErrorLog('blog', err.stack);
   }
 }
 
-export const fillActivityStreamWithPostFollowers = async (postId: PostId, account: string, activityId: number) => {
+export const fillNotificationsWithPostFollowers = async (postId: PostId, account: string, activityId: number) => {
   const query = `
       INSERT INTO df.notifications(account, activity_id)
         (SELECT df.post_followers.follower_account, df.activities.id
@@ -85,15 +86,15 @@ export const fillActivityStreamWithPostFollowers = async (postId: PostId, accoun
   const hexPostId = encodeStructId(postId);
   const params = [ hexPostId, account, activityId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    fillNotificationsLog('post')
     await updateUnreadNotifications(account)
   } catch (err) {
-    console.log(err.stack);
+    fillNotificationsErrorLog('post', err.stack);
   }
 }
 
-export const fillActivityStreamWithCommentFollowers = async (commentId: CommentId, account: string, activityId: number) => {
+export const fillNotificationsWithCommentFollowers = async (commentId: CommentId, account: string, activityId: number) => {
   const query = `
       INSERT INTO df.notifications(account, activity_id)
         (SELECT df.comment_followers.follower_account, df.activities.id
@@ -106,10 +107,10 @@ export const fillActivityStreamWithCommentFollowers = async (commentId: CommentI
   const hexCommentId = encodeStructId(commentId);
   const params = [ hexCommentId, account, activityId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    fillNotificationsLog('comment')
     await updateUnreadNotifications(account)
   } catch (err) {
-    console.log(err.stack);
+    fillNotificationsErrorLog('comment', err.stack);
   }
 }

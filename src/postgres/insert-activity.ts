@@ -6,6 +6,7 @@ import * as events from 'events'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../substrate/server';
 import { updateUnreadNotifications, getAggregationCount } from './notifications';
+import { insertActivityLog, insertActivityErrorLog, log, updateCountLog } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -22,11 +23,11 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
       RETURNING *`;
   const params = [ account, id ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows[0])
+    await pool.query(query, params)
+    insertActivityLog('owner')
     await updateUnreadNotifications(account)
   } catch (err) {
-    console.log(err.stack)
+    insertActivityErrorLog('owner', err.stack)
   }
 }
 
@@ -34,11 +35,12 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Inse
   let comment = commentLast;
   const lastCommentAccount = commentLast.created.account.toString();
   while (comment.parent_id.isSome) {
+    log.debug('parent_id is defined')
     const id = comment.parent_id.unwrap();
     const param = [ ...ids, id ];
-    const parentComment = await substrate.findComment(id);
+    const parentComment = await substrate.findComment(id); // TODO test on working
 
-    if (parentComment) {
+    if (parentComment) { // TODO maybe use isEmpty with lodash
       comment = parentComment;
     }
 
@@ -46,7 +48,6 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Inse
     const activityId = await insertActivityForComment(eventAction, param, account);
 
     if (account === lastCommentAccount) return;
-    console.log('Parent id')
     await insertNotificationForOwner(activityId, account);
   }
 };
@@ -71,7 +72,9 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
-    console.log(res.rows[0]);
+
+    insertActivityLog('comment')
+
     const [ postId, , parentId ] = paramsIds;
     let parentEq = '';
     const paramsIdsUpd = [ postId ];
@@ -90,17 +93,14 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
             ${parentEq}
             AND aggregated = true
         RETURNING *`;
-    console.log([ ...paramsIdsUpd ]);
-    console.log([ paramsIds ]);
-    console.log(parentId);
-    console.log(parentEq);
+    log.debug('Params update:', [ ...paramsIdsUpd ]);
+    log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
     const paramsUpdate = [ activityId, eventName, ...paramsIdsUpd ];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
-    console.log(resUpdate.rowCount);
-
+    updateCountLog(resUpdate.rowCount)
     return activityId;
   } catch (err) {
-    console.log(err.stack);
+    insertActivityErrorLog('comment', err.stack);
     return -1;
   }
 };
@@ -130,11 +130,11 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
 
     const paramsUpdate = [ activityId, eventName, accountId ];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
-    console.log(resUpdate.rowCount);
-    console.log(res.rows[0])
+    updateCountLog(resUpdate.rowCount)
+    insertActivityLog('account')
     return activityId;
   } catch (err) {
-    console.log(err.stack);
+    insertActivityErrorLog('account', err.stack);
     return -1;
   }
 };
@@ -164,11 +164,11 @@ export const insertActivityForBlog = async (eventAction: EventAction, count: num
           RETURNING *`;
 
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
-    console.log(resUpdate.rowCount);
-    console.log(res.rows[0])
+    updateCountLog(resUpdate.rowCount)
+    insertActivityLog('blog')
     return activityId;
   } catch (err) {
-    console.log(err.stack);
+    insertActivityErrorLog('blog', err.stack);
     return -1;
   }
 };
@@ -194,9 +194,10 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Inser
   const params = [ accountId, eventName, ...paramsIds, blockHeight, newCount ];
   try {
     const res = await pool.query(query, params)
+    insertActivityLog('post')
     return res.rows[0].id;
   } catch (err) {
-    console.log(err.stack);
+    insertActivityErrorLog('post', err.stack);
     return -1;
   }
 };
@@ -219,7 +220,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
-    console.log(res.rows[0]);
+    insertActivityLog('post reaction')
     const postId = paramsIds.pop();
     const queryUpdate = `
           UPDATE df.activities
@@ -232,11 +233,11 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
 
     const paramsUpdate = [ activityId, eventName, postId ];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
-    console.log(resUpdate.rowCount);
+    updateCountLog(resUpdate.rowCount)
 
     return activityId;
   } catch (err) {
-    console.log(err.stack);
+    insertActivityErrorLog('post reaction', err.stack);
     return -1;
   }
 };
@@ -259,7 +260,7 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
   try {
     const res = await pool.query(query, params)
     const activityId = res.rows[0].id;
-    console.log(res.rows[0]);
+    insertActivityLog('comment reaction')
     const queryUpdate = `
           UPDATE df.activities
             SET aggregated = false
@@ -272,11 +273,11 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
 
     const paramsUpdate = [ activityId, eventName, ...paramsIds ];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);
-    console.log(resUpdate.rowCount);
+    updateCountLog(resUpdate.rowCount)
 
     return activityId;
   } catch (err) {
-    console.log(err.stack);
+    insertActivityErrorLog('comment reaction', err.stack);
     return -1;
   }
 };
