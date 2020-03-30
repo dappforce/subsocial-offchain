@@ -1,11 +1,12 @@
-import { newLogger } from '@subsocial/utils';
 
-export const log = newLogger('postgres');
+import { postgesLog as log } from '../adaptors/loggers';
+
+export { log };
 
 type StructLiteral = 'post' | 'blog' | 'comment' | 'account' | 'owner' | 'post reaction' | 'comment reaction';
 
-const successfulLog = (operation: string, structName: StructLiteral) => log.debug(`Successful ${operation} ${structName}`)
-export const errorLog = (operation: string, structName: StructLiteral, error: any) => log.error(`Error ${operation} ${structName}: ${error}`)
+export const successfulLog = (operation: string, structName: string) => log.debug(`Successful ${operation} ${structName}`)
+export const errorLog = (operation: string, structName: string, error: any) => log.error(`Error ${operation} ${structName}: ${error}`)
 
 // delete notifications
 

@@ -40,7 +40,7 @@ export const getAggregationCount = async (props: AggCountProps) => {
     log.info(`Get ${res.rows[0].count} distinct activities by post with id: ${post_id}`)
     return res.rows[0].count as number;
   } catch (err) {
-    console.log(err.stack)
+    log.error(`Error in getAggregationCount: ${err.stack}`)
     return 0;
   }
 }
@@ -87,7 +87,7 @@ export const getUnreadNotifications = async (account: string) => {
     log.info(`Get ${res.rows[0].unread_count} unread count by account: ${account}`)
     return res.rows[0].unread_count as number;
   } catch (err) {
-    console.log(err.stack);
+    log.error('Error in updateUnreadNotifications:', err.stack);
     return 0
   }
 }
