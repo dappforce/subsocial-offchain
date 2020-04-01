@@ -21,11 +21,17 @@ const ipfs = ipfsClient({ host: ipfsUrl, port: '5002', protocol: 'http' }) as Ip
 
 export async function addJsonToIpfs (data: IpfsData): Promise<string> {
   // const path = `subsocial/${pathDir}`;
-  // console.log(path);
   // const json = { path: path, content: Buffer.from(JSON.stringify(data)) };
-  const json = Buffer.from(JSON.stringify(data));
-  const results = await ipfs.add(json);
-  return results[results.length - 1].hash;
+  try {
+    const json = Buffer.from(JSON.stringify(data));
+    const results = await ipfs.add(json);
+    return results[results.length - 1].hash;
+
+  } catch (err) {
+    console.log('addJsonToIpfs error', err)
+    return 'hash is undefined'
+  }
+
 }
 
 export async function removeFromIpfs (hash: string) {

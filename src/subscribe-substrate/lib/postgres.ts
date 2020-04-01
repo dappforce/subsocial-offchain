@@ -4,22 +4,7 @@ import { Option } from '@polkadot/types'
 import { EventData } from '@polkadot/types/type/Event';
 import { pool } from '../../adaptors/connectPostgre';
 import { encodeStructId, InsertData } from './utils';
-import BN from 'bn.js';
-import * as events from 'events'
-export const eventEmitter = new events.EventEmitter();
-export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
-
-type EventAction = {
-  eventName: string,
-  data: EventData,
-  heightBlock: BN
-}
-
-type AggCountProps = {
-  eventName: string,
-  account: string,
-  post_id: string
-}
+import { AggCountProps, EventAction, EVENT_UPDATE_NOTIFICATIONS_COUNTER, eventEmitter } from '../../adaptors/events'
 
 const getAggregationCount = async (props: AggCountProps) => {
   const { eventName, post_id, account } = props;

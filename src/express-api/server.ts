@@ -4,7 +4,7 @@ import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import { eventEmitter, getUnreadNotifications, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../subscribe-substrate/lib/postgres';
+import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../adaptors/events';
 import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
 
 require('dotenv').config();
@@ -128,6 +128,21 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
 const wss = new WebSocket.Server({ port: process.env.OFFCHAIN_WS_PORT });
 
 const clients = {}
+
+const getUnreadNotifications = async (account: string) => {
+  const query = `
+    SELECT unread_count FROM df.notifications_counter
+    WHERE account = $1;
+  `
+  try {
+    const res = await pool.query(query, [ account ])
+    console.log(res.rows[0].unread_count)
+    return res.rows[0].unread_count as number;
+  } catch (err) {
+    console.log(err.stack);
+    return 0
+  }
+}
 
 wss.on('connection', (ws: WebSocket) => {
 

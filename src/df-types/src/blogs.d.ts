@@ -118,6 +118,7 @@ export declare class BlogUpdate extends Struct {
 export type BlockValue = {
   id: number
   kind: PostBlockKind
+  lang?: string
   hidden?: boolean
   data: string
 }
