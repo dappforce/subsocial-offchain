@@ -2,7 +2,7 @@
 import * as request from 'request'
 
 // Works with googleapis '^19.0.0'
-import { google } from 'googleapis'
+import * as google from 'googleapis'
 // import { youtube_v3 } from 'googleapis/build/src/apis/youtube/v3'
 // import { GaxiosResponse } from 'gaxios';
 

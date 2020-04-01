@@ -116,6 +116,7 @@ export declare class BlogUpdate extends Struct {
 // ------------------------------------------
 // Post blocks
 export type BlockValue = {
+  id: number
   kind: PostBlockKind
   hidden?: boolean
   data: string
