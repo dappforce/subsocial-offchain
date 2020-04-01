@@ -1,6 +1,6 @@
 import { pool } from '../adaptors/connect-postgre';
 import * as events from 'events'
-import { log, insertActivityLog, insertActivitylogError } from './postges-logger';
+import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -21,7 +21,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
     insertActivityLog('owner')
     await updateUnreadNotifications(account)
   } catch (err) {
-    insertActivitylogError('owner', err.stack)
+    insertActivityLogError('owner', err.stack)
   }
 }
 

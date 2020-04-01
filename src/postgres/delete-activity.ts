@@ -2,7 +2,7 @@ import { pool } from '../adaptors/connect-postgre';
 import { encodeStructId } from '../substrate/utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { deleteNotificationsLog, deleteNotificationslogError } from './postges-logger';
+import { deleteNotificationsLog, deleteNotificationsLogError } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -21,7 +21,7 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
     await pool.query(query, params)
     deleteNotificationsLog('comment')
   } catch (err) {
-    deleteNotificationslogError('comment', err.stack)
+    deleteNotificationsLogError('comment', err.stack)
   }
 }
 
@@ -40,7 +40,7 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
     await pool.query(query, params)
     deleteNotificationsLog('account')
   } catch (err) {
-    deleteNotificationslogError('account', err.stack)
+    deleteNotificationsLogError('account', err.stack)
   }
 }
 
@@ -59,7 +59,7 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
     await pool.query(query, params)
     deleteNotificationsLog('post')
   } catch (err) {
-    deleteNotificationslogError('post', err.stack)
+    deleteNotificationsLogError('post', err.stack)
   }
 }
 
@@ -79,6 +79,6 @@ export const deleteNotificationsAboutBlog = async (userId: string, blogId: BlogI
     await pool.query(query, params)
     deleteNotificationsLog('blog')
   } catch (err) {
-    deleteNotificationslogError('blog', err.stack)
+    deleteNotificationsLogError('blog', err.stack)
   }
 }

@@ -6,7 +6,7 @@ import * as events from 'events'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../substrate/server';
 import { updateUnreadNotifications, getAggregationCount } from './notifications';
-import { insertActivityLog, insertActivitylogError, log, updateCountLog } from './postges-logger';
+import { insertActivityLog, insertActivityLogError, log, updateCountLog } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -27,7 +27,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
     insertActivityLog('owner')
     await updateUnreadNotifications(account)
   } catch (err) {
-    insertActivitylogError('owner', err.stack)
+    insertActivityLogError('owner', err.stack)
   }
 }
 
@@ -100,7 +100,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
     updateCountLog(resUpdate.rowCount)
     return activityId;
   } catch (err) {
-    insertActivitylogError('comment', err.stack);
+    insertActivityLogError('comment', err.stack);
     return -1;
   }
 };
@@ -134,7 +134,7 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
     insertActivityLog('account')
     return activityId;
   } catch (err) {
-    insertActivitylogError('account', err.stack);
+    insertActivityLogError('account', err.stack);
     return -1;
   }
 };
@@ -168,7 +168,7 @@ export const insertActivityForBlog = async (eventAction: EventAction, count: num
     insertActivityLog('blog')
     return activityId;
   } catch (err) {
-    insertActivitylogError('blog', err.stack);
+    insertActivityLogError('blog', err.stack);
     return -1;
   }
 };
@@ -197,7 +197,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Inser
     insertActivityLog('post')
     return res.rows[0].id;
   } catch (err) {
-    insertActivitylogError('post', err.stack);
+    insertActivityLogError('post', err.stack);
     return -1;
   }
 };
@@ -237,7 +237,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
 
     return activityId;
   } catch (err) {
-    insertActivitylogError('post reaction', err.stack);
+    insertActivityLogError('post reaction', err.stack);
     return -1;
   }
 };
@@ -277,7 +277,7 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
 
     return activityId;
   } catch (err) {
-    insertActivitylogError('comment reaction', err.stack);
+    insertActivityLogError('comment reaction', err.stack);
     return -1;
   }
 };

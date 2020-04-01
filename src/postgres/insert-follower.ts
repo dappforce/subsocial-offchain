@@ -3,7 +3,7 @@ import { pool } from '../adaptors/connect-postgre';
 import { encodeStructId } from '../substrate/utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { insertFollowersLog, insertFollowerslogError } from './postges-logger';
+import { insertFollowersLog, insertFollowersLogError } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -17,7 +17,7 @@ export const insertAccountFollower = async (data: EventData) => {
     await pool.query(query, params)
     insertFollowersLog('account')
   } catch (err) {
-    insertFollowerslogError('account', err.stack)
+    insertFollowersLogError('account', err.stack)
   }
 };
 
@@ -32,7 +32,7 @@ export const insertPostFollower = async (data: EventData) => {
     await pool.query(query, params)
     insertFollowersLog('post')
   } catch (err) {
-    insertFollowerslogError('post', err.stack)
+    insertFollowersLogError('post', err.stack)
   }
 };
 
@@ -47,7 +47,7 @@ export const insertCommentFollower = async (data: EventData) => {
     await pool.query(query, params)
     insertFollowersLog('comment')
   } catch (err) {
-    insertFollowerslogError('comment', err.stack)
+    insertFollowersLogError('comment', err.stack)
   }
 };
 
@@ -62,6 +62,6 @@ export const insertBlogFollower = async (data: EventData) => {
     await pool.query(query, params)
     insertFollowersLog('blog')
   } catch (err) {
-    insertFollowerslogError('blog', err.stack)
+    insertFollowersLogError('blog', err.stack)
   }
 };

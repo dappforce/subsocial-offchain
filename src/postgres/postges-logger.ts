@@ -16,7 +16,7 @@ export const deleteNotificationsLog = (structName: StructLiteral) => {
   logSuccess(deleteNotifications, structName)
 }
 
-export const deleteNotificationslogError = (structName: StructLiteral, error: any) => {
+export const deleteNotificationsLogError = (structName: StructLiteral, error: any) => {
   logError(deleteNotifications, structName, error)
 }
 
@@ -28,7 +28,7 @@ export const deleteFollowersLog = (structName: StructLiteral) => {
   logSuccess(deleteFollowers, structName)
 }
 
-export const deleteFollowerslogError = (structName: StructLiteral, error: any) => {
+export const deleteFollowersLogError = (structName: StructLiteral, error: any) => {
   logError(deleteFollowers, structName, error)
 }
 
@@ -40,7 +40,7 @@ export const fillNotificationsLog = (structName: StructLiteral) => {
   logSuccess(fillNotifications, structName)
 }
 
-export const fillNotificationslogError = (structName: StructLiteral, error: any) => {
+export const fillNotificationsLogError = (structName: StructLiteral, error: any) => {
   logError(fillNotifications, structName, error)
 }
 
@@ -50,7 +50,7 @@ export const fillNewsFeedLog = (structName: StructLiteral) => {
   logSuccess(fillNewsFeed, structName)
 }
 
-export const fillNewsFeedlogError = (structName: StructLiteral, error: any) => {
+export const fillNewsFeedLogError = (structName: StructLiteral, error: any) => {
   logError(fillNewsFeed, structName, error)
 }
 
@@ -62,7 +62,7 @@ export const insertFollowersLog = (structName: StructLiteral) => {
   logSuccess(insertFollowers, structName)
 }
 
-export const insertFollowerslogError = (structName: StructLiteral, error: any) => {
+export const insertFollowersLogError = (structName: StructLiteral, error: any) => {
   logError(insertFollowers, structName, error)
 }
 
@@ -73,7 +73,7 @@ export const insertActivityLog = (structName: StructLiteral) => {
   logSuccess(insertActivity, structName)
 }
 
-export const insertActivitylogError = (structName: StructLiteral, error: any) => {
+export const insertActivityLogError = (structName: StructLiteral, error: any) => {
   logError(insertActivity, structName, error)
 }
 
