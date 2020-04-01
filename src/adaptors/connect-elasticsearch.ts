@@ -1,10 +1,11 @@
 import { Client } from '@elastic/elasticsearch'
+import { searchLog as log } from './loggers'
 
 require('dotenv').config();
 
 let greeted = false
 if (!greeted) {
   greeted = true;
-  console.log(`Connecting to Elasticsearch at ${process.env.ES_NODE_URL}`);
+  log.info(`Connecting to Elasticsearch at ${process.env.ES_NODE_URL}`);
 }
 export default new Client({ node: process.env.ES_NODE_URL })

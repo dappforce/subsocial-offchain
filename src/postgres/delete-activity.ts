@@ -2,6 +2,7 @@ import { pool } from '../adaptors/connect-postgre';
 import { encodeStructId } from '../substrate/utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { deleteNotificationsLog, deleteNotificationsLogError } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -17,10 +18,10 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
   const hexCommentId = encodeStructId(commentId);
   const params = [ userId, hexCommentId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    deleteNotificationsLog('comment')
   } catch (err) {
-    console.log(err.stack);
+    deleteNotificationsLogError('comment', err.stack)
   }
 }
 
@@ -36,10 +37,10 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
       RETURNING *`
   const params = [ userId, accountId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    deleteNotificationsLog('account')
   } catch (err) {
-    console.log(err.stack);
+    deleteNotificationsLogError('account', err.stack)
   }
 }
 
@@ -55,10 +56,10 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
   const hexPostId = encodeStructId(postId);
   const params = [ userId, hexPostId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    deleteNotificationsLog('post')
   } catch (err) {
-    console.log(err.stack);
+    deleteNotificationsLogError('post', err.stack)
   }
 }
 
@@ -75,9 +76,9 @@ export const deleteNotificationsAboutBlog = async (userId: string, blogId: BlogI
   const hexBlogId = encodeStructId(blogId);
   const params = [ userId, hexBlogId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows)
+    await pool.query(query, params)
+    deleteNotificationsLog('blog')
   } catch (err) {
-    console.log(err.stack);
+    deleteNotificationsLogError('blog', err.stack)
   }
 }

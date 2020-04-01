@@ -29,7 +29,7 @@
     "@types/numeral": "^0.0.25"
   },
   "scripts": {
-    "start": "concurrently \"yarn subscribe\" \"yarn api\" \"yarn ipfs\" \"yarn init-search\"",
+    "start": "concurrently \"yarn subscribe\" \"yarn api\" \"yarn init-search\"",
     "subscribe": "node ./build/src/subscribe-substrate/server.js",
     "api": "node ./build/src/express-api/server.js",
     "init-search": "node ./build/src/search/index.js",

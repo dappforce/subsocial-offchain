@@ -3,6 +3,7 @@ import { pool } from '../adaptors/connect-postgre';
 import { encodeStructId } from '../substrate/utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { deleteFollowersLog, deleteFollowersLogError } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -15,10 +16,10 @@ export const deletePostFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), postId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows[0])
+    await pool.query(query, params)
+    deleteFollowersLog('post')
   } catch (err) {
-    console.log(err.stack)
+    deleteFollowersLogError('post', err.stack)
   }
 };
 
@@ -31,10 +32,11 @@ export const deleteCommentFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), commentId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows[0])
+    await pool.query(query, params)
+    deleteFollowersLog('comment')
   } catch (err) {
-    console.log(err.stack)
+    deleteFollowersLogError('comment', err.stack)
+
   }
 };
 
@@ -47,10 +49,11 @@ export const deleteBlogFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), blogId ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows[0])
+    await pool.query(query, params)
+    deleteFollowersLog('blog')
   } catch (err) {
-    console.log(err.stack)
+    deleteFollowersLogError('blog', err.stack)
+
   }
 };
 
@@ -62,9 +65,10 @@ export const deleteAccountFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), data[1].toString() ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows[0])
+    await pool.query(query, params)
+    deleteFollowersLog('account')
   } catch (err) {
-    console.log(err.stack)
+    deleteFollowersLogError('account', err.stack)
+
   }
 };

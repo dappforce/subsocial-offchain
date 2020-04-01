@@ -1,5 +1,6 @@
 import { pool } from '../adaptors/connect-postgre';
 import * as events from 'events'
+import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -16,11 +17,11 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
       RETURNING *`;
   const params = [ account, id ];
   try {
-    const res = await pool.query(query, params)
-    console.log(res.rows[0])
+    await pool.query(query, params)
+    insertActivityLog('owner')
     await updateUnreadNotifications(account)
   } catch (err) {
-    console.log(err.stack)
+    insertActivityLogError('owner', err.stack)
   }
 }
 
@@ -36,10 +37,10 @@ export const getAggregationCount = async (props: AggCountProps) => {
       AND post_id = $3`;
   try {
     const res = await pool.query(query, params)
-    console.log(res.rows[0].count)
+    log.info(`Get ${res.rows[0].count} distinct activities by post id: ${post_id}`)
     return res.rows[0].count as number;
   } catch (err) {
-    console.log(err.stack)
+    log.error(`Error in getAggregationCount: ${err.stack}`)
     return 0;
   }
 }
@@ -68,11 +69,11 @@ export const updateUnreadNotifications = async (account: string) => {
   const params = [ account ]
   try {
     const res = await pool.query(query, params)
-    console.log('Done in updateUnreadNotifications:', res.rows)
+    log.debug(`Successfully updated unread notifications by account ${account}. Query result: ${res.rows}`)
     const currentUnreadCount = await getUnreadNotifications(account) || 0
     eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, currentUnreadCount);
   } catch (err) {
-    console.log('Error in updateUnreadNotifications:', err.stack);
+    log.error(`Failed to update unread notifications by account ${account}. Error:`, err.stack);
   }
 }
 
@@ -83,10 +84,10 @@ export const getUnreadNotifications = async (account: string) => {
   `
   try {
     const res = await pool.query(query, [ account ])
-    console.log(res.rows[0].unread_count)
+    log.info(`Found ${res.rows[0].unread_count} unread notifications by account ${account}`)
     return res.rows[0].unread_count as number;
   } catch (err) {
-    console.log(err.stack);
+    log.error(`Failed to calculate unread notifications by account ${account}. Error:`, err.stack);
     return 0
   }
 }

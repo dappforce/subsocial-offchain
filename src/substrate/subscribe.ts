@@ -10,9 +10,9 @@ import { insertAccountFollower, insertBlogFollower, insertPostFollower, insertCo
 import { insertActivityForAccount, insertActivityForBlog, insertActivityForPost, insertActivityComments, insertActivityForComment, insertActivityForPostReaction, insertActivityForCommentReaction } from '../postgres/insert-activity';
 import { deleteNotificationsAboutAccount, deleteNotificationsAboutBlog, deleteNotificationsAboutPost, deleteNotificationsAboutComment } from '../postgres/delete-activity';
 import { deleteAccountFollower, deleteBlogFollower, deletePostFollower, deleteCommentFollower } from '../postgres/delete-follower';
-import { fillNotificationsWithAccountFollowers, fillActivityStreamWithBlogFollowers, fillNewsFeedWithAccountFollowers, fillActivityStreamWithPostFollowers, fillActivityStreamWithCommentFollowers } from '../postgres/fill-activity';
+import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers, fillNotificationsWithCommentFollowers, fillNotificationsWithPostFollowers } from '../postgres/fill-activity';
 import { insertNotificationForOwner } from '../postgres/notifications';
-
+import { substrateLog as log } from '../adaptors/loggers';
 type EventAction = {
   eventName: string,
   data: EventData,
@@ -97,7 +97,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivityForPost(eventAction, ids, 0);
       if (activityId === -1) return;
 
-      await fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
+      await fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
       await fillNewsFeedWithAccountFollowers(follower, activityId);
       insertElasticSearch(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
       break;
@@ -124,7 +124,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const account = post.created.account.toString();
       insertNotificationForOwner(activityId, account);
       fillNotificationsWithAccountFollowers(follower, activityId);
-      fillActivityStreamWithBlogFollowers(post.blog_id, follower, activityId);
+      fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
       fillNewsFeedWithAccountFollowers(follower, activityId)
       break;
     }
@@ -149,14 +149,14 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const commentCreator = comment.created.account.toString();
       const ids = [ postId, commentId ];
       if (comment.parent_id.isSome) {
-        console.log('PARENT ID');
+        log.debug('Comment has a parent id');
         insertActivityComments(eventAction, ids, comment);
       } else {
         const activityId = await insertActivityForComment(eventAction, ids, postCreator);
         if (activityId === -1) return;
 
-        console.log('PARENT ID NULL');
-        await fillActivityStreamWithPostFollowers(postId, commentCreator, activityId);
+        log.debug('Comment does not have a parent id');
+        await fillNotificationsWithPostFollowers(postId, commentCreator, activityId);
         await fillNotificationsWithAccountFollowers(commentCreator, activityId);
       }
       insertElasticSearch(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
@@ -184,7 +184,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const activityId = await insertActivityForComment(eventAction, ids, account);
       if (activityId === -1) return;
 
-      fillActivityStreamWithCommentFollowers(commentId, account, activityId);
+      fillNotificationsWithCommentFollowers(commentId, account, activityId);
       fillNotificationsWithAccountFollowers(account, activityId);
       break;
     }

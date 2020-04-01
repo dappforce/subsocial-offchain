@@ -1,4 +1,5 @@
 import { Pool } from 'pg'
+import { postgesLog as log } from './loggers';
 
 require('dotenv').config();
 
@@ -13,7 +14,7 @@ const pgConf = {
 let greeted = false
 if (!greeted) {
   greeted = true;
-  console.log(`Connecting to Postgres at ${pgConf.host}:${pgConf.port} as user '${pgConf.user}'`);
+  log.info(`Connecting to Postgres at ${pgConf.host}:${pgConf.port} as user '${pgConf.user}'`);
 }
 
 export const pool = new Pool(pgConf);

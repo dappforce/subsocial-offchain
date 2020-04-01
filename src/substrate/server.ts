@@ -3,6 +3,8 @@ import { DispatchForDb } from './subscribe'
 import { getEventSections, getEventMethods } from './utils';
 import { Api } from '@subsocial/api/substrateConnect';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
+import { substrateLog as log } from '../adaptors/loggers';
+
 export let substrate: SubsocialSubstrateApi;
 
 require('dotenv').config();
@@ -14,7 +16,7 @@ async function main () {
   // get event filters from config
   const eventsFilterSections = getEventSections();
   const eventsFilterMethods = getEventMethods();
-  console.log(eventsFilterMethods);
+  log.debug(`Subscribe to events: ${eventsFilterMethods}`);
   // initialize the data service
   // internally connects to all storage sinks
   const api = await Api.connect(process.env.SUBSTRATE_URL)
@@ -28,7 +30,6 @@ async function main () {
         // create event object for data sink
         const blockHash = await substrate.api.rpc.chain.getFinalizedHead();
         const header = await substrate.api.rpc.chain.getHeader(blockHash);
-        console.log(header);
 
         const eventObj = {
           section: event.section,
@@ -38,8 +39,7 @@ async function main () {
           blockHeight: header.number.toBn()
         };
 
-        // remove this log if not needed
-        console.log('Event Received: ' + Date.now() + ': ' + JSON.stringify(eventObj));
+        log.debug('Event received:', JSON.stringify(eventObj))
 
         await DispatchForDb({ eventName: eventObj.method, data: eventObj.data, blockHeight: eventObj.blockHeight });
       }
@@ -48,6 +48,6 @@ async function main () {
 }
 
 main().catch((error) => {
-  console.error(error);
+  log.error('Failed to subscribe to events', error);
   process.exit(-1);
 });
