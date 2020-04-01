@@ -2,6 +2,8 @@ import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
+import { eventEmitter, getUnreadNotifications, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../subscribe-substrate/lib/postgres';
+import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
 import ipfs from '../adaptors/connect-ipfs';
 import { pool } from '../adaptors/connect-postgre';
 import { logSuccess, logError } from '../postgres/postges-logger';
@@ -79,36 +81,10 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
   }
 });
 
-const parse = async (url: string) => {
-  if (isVideo(url)) {
-    const temp = await videoParser([ url ])
-    const res = { video: temp }
-    return res
-  } else {
-    const temp = await siteParser([ url ])
-    const res = { site: temp }
-    return res
-  }
-}
-const url = 'https://www.facebook.com/vladimirmezhonov?__tn__=%2CdC-R-R&eid=ARAKWTH2t6xL4YNn2xloBRrmgnS8JLFtIWSPnMG3eybmBwJ2zqJ9pEOFhSh2poc6JOcUn91mtEwLDO7v&hc_ref=ARRh3aNWFONc4e6piFRtSvgKtdohKo5z0PeEVo8hJaNeXD69B9zoBXaDvGV9DivIr30&fref=nf'
-parse(url).then((res) => {
-  console.log('===== parsed:', res)
-})
-
 app.post('/v1/offchain/parser/', async (req: express.Request, res: express.Response) => {
-  const parse = async (url: string) => {
-    if (isVideo(url)) {
-      const temp = await videoParser([ url ])
-      const res = { video: temp }
-      return res
-    } else {
-      const temp = await siteParser([ url ])
-      const res = { site: temp }
-      return res
-    }
-  }
+  const data = await siteParser(req.body.url)
 
-  const data = await parse(req.body.url)
+  console.log('===== parsed data:', data)
 
   res.send(data);
 });
