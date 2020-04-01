@@ -10,7 +10,10 @@ const initDb = readFileSync(buildPath + 'src/sql/initDb.sql', 'utf8');
 pool.query(initSchema, (err: string | undefined) => {
   if (err) throw new Error(err);
   pool.query(initDb, (err: string | undefined) => {
-    if (err) throw new Error(err);
+    if (err) {
+      log.error('Failed to initialize a database', err)
+      throw new Error(err)
+    }
     log.info('Database inited');
   })
 });

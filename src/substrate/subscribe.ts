@@ -149,13 +149,13 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const commentCreator = comment.created.account.toString();
       const ids = [ postId, commentId ];
       if (comment.parent_id.isSome) {
-        log.debug('Parent id exists');
+        log.debug('Comment has a parent id');
         insertActivityComments(eventAction, ids, comment);
       } else {
         const activityId = await insertActivityForComment(eventAction, ids, postCreator);
         if (activityId === -1) return;
 
-        log.debug('Parent id is null');
+        log.debug('Comment does not have a parent id');
         await fillNotificationsWithPostFollowers(postId, commentCreator, activityId);
         await fillNotificationsWithAccountFollowers(commentCreator, activityId);
       }
