@@ -23,8 +23,8 @@ async function insertSearchIndexIfNotExist (name: string, body: any) {
       index: name,
       body: body
     })
-    log.info('\'' + name + '\' index created')
-  } else log.info('\'' + name + '\' index already exists')
+    log.info(`'${name}' index created`)
+  } else log.warn(`${name} index already exists`)
 }
 
 run().catch(err => log.error(err))

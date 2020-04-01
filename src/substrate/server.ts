@@ -16,7 +16,7 @@ async function main () {
   // get event filters from config
   const eventsFilterSections = getEventSections();
   const eventsFilterMethods = getEventMethods();
-  log.debug(`Listen events: ${eventsFilterMethods}`);
+  log.debug(`Subscribe to events: ${eventsFilterMethods}`);
   // initialize the data service
   // internally connects to all storage sinks
   const api = await Api.connect(process.env.SUBSTRATE_URL)
@@ -39,8 +39,7 @@ async function main () {
           blockHeight: header.number.toBn()
         };
 
-        // remove this log if not needed
-        log.debug('Event Received: ' + Date.now() + ': ' + JSON.stringify(eventObj));
+        log.debug('Event received:', JSON.stringify(eventObj))
 
         await DispatchForDb({ eventName: eventObj.method, data: eventObj.data, blockHeight: eventObj.blockHeight });
       }
@@ -49,6 +48,6 @@ async function main () {
 }
 
 main().catch((error) => {
-  log.error('Error subscribe' + error);
+  log.error('Failed to subscribe to events', error);
   process.exit(-1);
 });
