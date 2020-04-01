@@ -38,9 +38,9 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Inse
     log.debug('parent_id is defined')
     const id = comment.parent_id.unwrap();
     const param = [ ...ids, id ];
-    const parentComment = await substrate.findComment(id); // TODO test on working
+    const parentComment = await substrate.findComment(id); // TODO test if working
 
-    if (parentComment) { // TODO maybe use isEmpty with lodash
+    if (parentComment) { // TODO maybe use isEmpty from lodash
       comment = parentComment;
     }
 
@@ -93,7 +93,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: In
             ${parentEq}
             AND aggregated = true
         RETURNING *`;
-    log.debug('Params update:', [ ...paramsIdsUpd ]);
+    log.debug('Params of update query:', [ ...paramsIdsUpd ]);
     log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
     const paramsUpdate = [ activityId, eventName, ...paramsIdsUpd ];
     const resUpdate = await pool.query(queryUpdate, paramsUpdate);

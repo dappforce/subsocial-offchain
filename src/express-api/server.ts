@@ -24,7 +24,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // // for parsing multipart/form-data
 // app.use(upload.array());
 // app.use(express.static('public'));
-const limitLog = (limit: number) => log.debug(`Limit for result from db: ${limit} posts`);
+const limitLog = (limit: number) => log.debug(`Limit a db results to ${limit} items`);
+
 // Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
   const limit = req.query.limit;
@@ -42,14 +43,17 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
     OFFSET $2
     LIMIT $3`;
   const params = [ account, offset, limit ];
-  log.debug(`Params for query to db: ${params}`);
+  log.debug(`SQL params: ${params}`);
+
   try {
     const data = await pool.query(query, params)
-    logSuccess('get feeds from db', `by account: ${account}`)
+    logSuccess('get feed', `by account: ${account}`)
+
     res.json(data.rows);
     // res.send(JSON.stringify(data));
   } catch (err) {
-    logError('Error get feeds from db:', `by account: ${account}`, err.stack);
+    logError('get feed', `by account: ${account}`, err.stack);
+
   }
 });
 
@@ -72,16 +76,19 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   const params = [ account, offset, limit ];
   try {
     const data = await pool.query(query, params)
-    logSuccess('get notifications from db', `by account: ${account}`)
+    logSuccess('get notifications', `by account: ${account}`)
+
     res.json(data.rows);
   } catch (err) {
-    logError('Error get notificatios from db:', `by account: ${account}`, err.stack);
+    logError('get notificatios', `by account: ${account}`, err.stack);
+
   }
 });
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;
-  log.info(`Deleting unread_count for ${account}`)
+  log.info(`Mark all notifications as read by account: ${account}`)
+
   const query = `
     UPDATE df.notifications_counter
     SET 
@@ -95,10 +102,12 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
   try {
     const data = await pool.query(query, params)
     eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, 0);
-    logSuccess('read all notifications from db', `by account: ${account}`)
+    logSuccess('mark all notifications as read', `by account: ${account}`)
+
     res.json(data.rows);
   } catch (err) {
-    logError('Error read all notifications from db:', `by account: ${account}`, err.stack);
+    logError('mark all notifications as read', `by account: ${account}`, err.stack);
+
   }
 });
 
@@ -109,7 +118,8 @@ const clients = {}
 wss.on('connection', (ws: WebSocket) => {
 
   ws.on('message', async (account: string) => {
-    log.info('Received from client: %s', account);
+    log.debug('Notifications web socket: Received a message from account:', account);
+
     const currentUnreadCount = await getUnreadNotifications(account)
 
     clients[account] = ws;
@@ -122,7 +132,8 @@ wss.on('connection', (ws: WebSocket) => {
       delete clients[account]
       return
     }
-    log.info(`Message sent to ${account}`)
+    log.debug(`Notifications web socket: Message sent to account: ${account}`)
+
     clients[account].send(`${currentUnreadCount}`)
   })
 
@@ -137,5 +148,6 @@ wss.on('close', () => {
 
 const port = process.env.OFFCHAIN_SERVER_PORT
 app.listen(port, () => {
-  log.info(`server started on port ${port}`)
+  log.info(`HTTP server started on port ${port}`)
+
 })

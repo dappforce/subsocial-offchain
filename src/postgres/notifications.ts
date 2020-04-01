@@ -37,7 +37,7 @@ export const getAggregationCount = async (props: AggCountProps) => {
       AND post_id = $3`;
   try {
     const res = await pool.query(query, params)
-    log.info(`Get ${res.rows[0].count} distinct activities by post with id: ${post_id}`)
+    log.info(`Get ${res.rows[0].count} distinct activities by post id: ${post_id}`)
     return res.rows[0].count as number;
   } catch (err) {
     log.error(`Error in getAggregationCount: ${err.stack}`)
@@ -69,11 +69,11 @@ export const updateUnreadNotifications = async (account: string) => {
   const params = [ account ]
   try {
     const res = await pool.query(query, params)
-    log.info('Done in updateUnreadNotifications:', res.rows)
+    log.debug(`Successfully updated unread notifications by account ${account}. Query result: ${res.rows}`)
     const currentUnreadCount = await getUnreadNotifications(account) || 0
     eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, currentUnreadCount);
   } catch (err) {
-    log.error('Error in updateUnreadNotifications:', err.stack);
+    log.error(`Failed to update unread notifications by account ${account}. Error:`, err.stack);
   }
 }
 
@@ -84,10 +84,10 @@ export const getUnreadNotifications = async (account: string) => {
   `
   try {
     const res = await pool.query(query, [ account ])
-    log.info(`Get ${res.rows[0].unread_count} unread count by account: ${account}`)
+    log.info(`Found ${res.rows[0].unread_count} unread notifications by account ${account}`)
     return res.rows[0].unread_count as number;
   } catch (err) {
-    log.error('Error in updateUnreadNotifications:', err.stack);
+    log.error(`Failed to calculate unread notifications by account ${account}. Error:`, err.stack);
     return 0
   }
 }

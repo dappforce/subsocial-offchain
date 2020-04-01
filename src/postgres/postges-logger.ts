@@ -5,12 +5,12 @@ export { log };
 
 type StructLiteral = 'post' | 'blog' | 'comment' | 'account' | 'owner' | 'post reaction' | 'comment reaction';
 
-export const logSuccess = (operation: string, structName: string) => log.debug(`Successful ${operation} ${structName}`)
-export const logError = (operation: string, structName: string, error: any) => log.error(`Error ${operation} ${structName}: ${error}`)
+export const logSuccess = (operation: string, structName: string) => log.debug(`Succeeded to ${operation} ${structName}`)
+export const logError = (operation: string, structName: string, error: any) => log.error(`Failed to ${operation} ${structName}. Error:`, error)
 
 // delete notifications
 
-const deleteNotifications = 'deletion of';
+const deleteNotifications = 'delete notifications of';
 
 export const deleteNotificationsLog = (structName: StructLiteral) => {
   logSuccess(deleteNotifications, structName)
@@ -22,7 +22,7 @@ export const deleteNotificationsLogError = (structName: StructLiteral, error: an
 
 // delete followers
 
-const deleteFollowers = 'deletion followers of'
+const deleteFollowers = 'delete followers of'
 
 export const deleteFollowersLog = (structName: StructLiteral) => {
   logSuccess(deleteFollowers, structName)
