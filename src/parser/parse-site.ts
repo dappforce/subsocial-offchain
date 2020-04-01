@@ -18,7 +18,7 @@ type ParsedSite = {
   error?: string
 }
 
-function parseSiteWithRequest (url: string): Promise<ParsedSite> {
+export function parseSiteWithRequest (url: string): Promise<ParsedSite> {
   return new Promise((resolve) => {
     console.log(`\nRequest site at URL: ${url}`);
     request(
