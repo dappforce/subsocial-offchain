@@ -3,7 +3,7 @@ import { pool } from '../adaptors/connect-postgre';
 import { encodeStructId } from '../substrate/utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { deleteFollowersLog, deleteFollowersErrorLog } from './postges-logger';
+import { deleteFollowersLog, deleteFollowerslogError } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -19,7 +19,7 @@ export const deletePostFollower = async (data: EventData) => {
     await pool.query(query, params)
     deleteFollowersLog('post')
   } catch (err) {
-    deleteFollowersErrorLog('post', err.stack)
+    deleteFollowerslogError('post', err.stack)
   }
 };
 
@@ -35,7 +35,7 @@ export const deleteCommentFollower = async (data: EventData) => {
     await pool.query(query, params)
     deleteFollowersLog('comment')
   } catch (err) {
-    deleteFollowersErrorLog('comment', err.stack)
+    deleteFollowerslogError('comment', err.stack)
 
   }
 };
@@ -52,7 +52,7 @@ export const deleteBlogFollower = async (data: EventData) => {
     await pool.query(query, params)
     deleteFollowersLog('blog')
   } catch (err) {
-    deleteFollowersErrorLog('blog', err.stack)
+    deleteFollowerslogError('blog', err.stack)
 
   }
 };
@@ -68,7 +68,7 @@ export const deleteAccountFollower = async (data: EventData) => {
     await pool.query(query, params)
     deleteFollowersLog('account')
   } catch (err) {
-    deleteFollowersErrorLog('account', err.stack)
+    deleteFollowerslogError('account', err.stack)
 
   }
 };

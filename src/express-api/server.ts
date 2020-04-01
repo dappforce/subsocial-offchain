@@ -4,7 +4,7 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
 import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER, getUnreadNotifications } from '../postgres/notifications';
-import { successfulLog, errorLog, log } from '../postgres/postges-logger';
+import { logSuccess, logError, log } from '../postgres/postges-logger';
 
 require('dotenv').config();
 const LIMIT = process.env.PGLIMIT || '20';
@@ -45,11 +45,11 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
   log.debug(`Params for query to db: ${params}`);
   try {
     const data = await pool.query(query, params)
-    successfulLog('get feeds from db', `by account: ${account}`)
+    logSuccess('get feeds from db', `by account: ${account}`)
     res.json(data.rows);
     // res.send(JSON.stringify(data));
   } catch (err) {
-    errorLog('Error get feeds from db:', `by account: ${account}`, err.stack);
+    logError('Error get feeds from db:', `by account: ${account}`, err.stack);
   }
 });
 
@@ -72,10 +72,10 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   const params = [ account, offset, limit ];
   try {
     const data = await pool.query(query, params)
-    successfulLog('get notifications from db', `by account: ${account}`)
+    logSuccess('get notifications from db', `by account: ${account}`)
     res.json(data.rows);
   } catch (err) {
-    errorLog('Error get notificatios from db:', `by account: ${account}`, err.stack);
+    logError('Error get notificatios from db:', `by account: ${account}`, err.stack);
   }
 });
 
@@ -95,10 +95,10 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
   try {
     const data = await pool.query(query, params)
     eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, 0);
-    successfulLog('read all notifications from db', `by account: ${account}`)
+    logSuccess('read all notifications from db', `by account: ${account}`)
     res.json(data.rows);
   } catch (err) {
-    errorLog('Error read all notifications from db:', `by account: ${account}`, err.stack);
+    logError('Error read all notifications from db:', `by account: ${account}`, err.stack);
   }
 });
 

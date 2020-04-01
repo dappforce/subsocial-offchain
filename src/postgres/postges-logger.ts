@@ -5,19 +5,19 @@ export { log };
 
 type StructLiteral = 'post' | 'blog' | 'comment' | 'account' | 'owner' | 'post reaction' | 'comment reaction';
 
-export const successfulLog = (operation: string, structName: string) => log.debug(`Successful ${operation} ${structName}`)
-export const errorLog = (operation: string, structName: string, error: any) => log.error(`Error ${operation} ${structName}: ${error}`)
+export const logSuccess = (operation: string, structName: string) => log.debug(`Successful ${operation} ${structName}`)
+export const logError = (operation: string, structName: string, error: any) => log.error(`Error ${operation} ${structName}: ${error}`)
 
 // delete notifications
 
 const deleteNotifications = 'deletion of';
 
 export const deleteNotificationsLog = (structName: StructLiteral) => {
-  successfulLog(deleteNotifications, structName)
+  logSuccess(deleteNotifications, structName)
 }
 
-export const deleteNotificationsErrorLog = (structName: StructLiteral, error: any) => {
-  errorLog(deleteNotifications, structName, error)
+export const deleteNotificationslogError = (structName: StructLiteral, error: any) => {
+  logError(deleteNotifications, structName, error)
 }
 
 // delete followers
@@ -25,11 +25,11 @@ export const deleteNotificationsErrorLog = (structName: StructLiteral, error: an
 const deleteFollowers = 'deletion followers of'
 
 export const deleteFollowersLog = (structName: StructLiteral) => {
-  successfulLog(deleteFollowers, structName)
+  logSuccess(deleteFollowers, structName)
 }
 
-export const deleteFollowersErrorLog = (structName: StructLiteral, error: any) => {
-  errorLog(deleteFollowers, structName, error)
+export const deleteFollowerslogError = (structName: StructLiteral, error: any) => {
+  logError(deleteFollowers, structName, error)
 }
 
 // fill activity stream
@@ -37,21 +37,21 @@ export const deleteFollowersErrorLog = (structName: StructLiteral, error: any) =
 const fillNotifications = 'fill notificatons followers of'
 
 export const fillNotificationsLog = (structName: StructLiteral) => {
-  successfulLog(fillNotifications, structName)
+  logSuccess(fillNotifications, structName)
 }
 
-export const fillNotificationsErrorLog = (structName: StructLiteral, error: any) => {
-  errorLog(fillNotifications, structName, error)
+export const fillNotificationslogError = (structName: StructLiteral, error: any) => {
+  logError(fillNotifications, structName, error)
 }
 
 const fillNewsFeed = 'fill news feed followers of'
 
 export const fillNewsFeedLog = (structName: StructLiteral) => {
-  successfulLog(fillNewsFeed, structName)
+  logSuccess(fillNewsFeed, structName)
 }
 
-export const fillNewsFeedErrorLog = (structName: StructLiteral, error: any) => {
-  errorLog(fillNewsFeed, structName, error)
+export const fillNewsFeedlogError = (structName: StructLiteral, error: any) => {
+  logError(fillNewsFeed, structName, error)
 }
 
 // insert followers
@@ -59,22 +59,22 @@ export const fillNewsFeedErrorLog = (structName: StructLiteral, error: any) => {
 const insertFollowers = 'insert followers of'
 
 export const insertFollowersLog = (structName: StructLiteral) => {
-  successfulLog(insertFollowers, structName)
+  logSuccess(insertFollowers, structName)
 }
 
-export const insertFollowersErrorLog = (structName: StructLiteral, error: any) => {
-  errorLog(insertFollowers, structName, error)
+export const insertFollowerslogError = (structName: StructLiteral, error: any) => {
+  logError(insertFollowers, structName, error)
 }
 
 // insert activity
 const insertActivity = 'insert for';
 
 export const insertActivityLog = (structName: StructLiteral) => {
-  successfulLog(insertActivity, structName)
+  logSuccess(insertActivity, structName)
 }
 
-export const insertActivityErrorLog = (structName: StructLiteral, error: any) => {
-  errorLog(insertActivity, structName, error)
+export const insertActivitylogError = (structName: StructLiteral, error: any) => {
+  logError(insertActivity, structName, error)
 }
 
 export const updateCountLog = (count: number) => log.debug(`Update ${count} count`)

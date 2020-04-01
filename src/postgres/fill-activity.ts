@@ -3,7 +3,7 @@ import { encodeStructId } from '../substrate/utils';
 import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateUnreadNotifications } from './notifications';
-import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedErrorLog, fillNotificationsErrorLog } from './postges-logger';
+import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedlogError, fillNotificationslogError } from './postges-logger';
 export const eventEmitter = new events.EventEmitter();
 export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
@@ -23,7 +23,7 @@ export const fillNewsFeedWithAccountFollowers = async (account: string, activity
     await pool.query(query, params)
     fillNewsFeedLog('account')
   } catch (err) {
-    fillNewsFeedErrorLog('account', err.stack);
+    fillNewsFeedlogError('account', err.stack);
   }
 }
 
@@ -45,7 +45,7 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
     fillNotificationsLog('account')
     await updateUnreadNotifications(account)
   } catch (err) {
-    fillNotificationsErrorLog('account', err.stack);
+    fillNotificationslogError('account', err.stack);
   }
 }
 
@@ -68,7 +68,7 @@ export const fillNewsFeedWithBlogFollowers = async (blogId: BlogId, account: str
     fillNewsFeedLog('blog')
     await updateUnreadNotifications(account)
   } catch (err) {
-    fillNewsFeedErrorLog('blog', err.stack);
+    fillNewsFeedlogError('blog', err.stack);
   }
 }
 
@@ -90,7 +90,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
     fillNotificationsLog('post')
     await updateUnreadNotifications(account)
   } catch (err) {
-    fillNotificationsErrorLog('post', err.stack);
+    fillNotificationslogError('post', err.stack);
   }
 }
 
@@ -111,6 +111,6 @@ export const fillNotificationsWithCommentFollowers = async (commentId: CommentId
     fillNotificationsLog('comment')
     await updateUnreadNotifications(account)
   } catch (err) {
-    fillNotificationsErrorLog('comment', err.stack);
+    fillNotificationslogError('comment', err.stack);
   }
 }
