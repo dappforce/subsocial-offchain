@@ -4758,7 +4758,7 @@ columnify@^1.5.4:
     strip-ansi "^3.0.0"
     wcwidth "^1.0.0"
 
-combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
+combined-stream@^1.0.6, combined-stream@~1.0.6:
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.8.tgz#c3d45a8b34fd730631a110a8a2520682b31d5a7f"
   integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
@@ -7108,15 +7108,6 @@ forever-agent@~0.6.1:
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
   integrity sha1-+8cfDEGt6zf5bFd60e1C2P2sypE=
 
-form-data@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/form-data/-/form-data-3.0.0.tgz#31b7e39c85f1355b7139ee0c647cf0de7f83c682"
-  integrity sha512-CKMFDglpbMi6PyN+brwB9Q/GOw0eAnsrEZDgcsH5Krhz5Od/haKHAX0NmQfha2zPPz0JpWzA7GJHGSnvCRLWsg==
-  dependencies:
-    asynckit "^0.4.0"
-    combined-stream "^1.0.8"
-    mime-types "^2.1.12"
-
 form-data@~2.3.2:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.3.3.tgz#dcce52c05f644f298c6a7ab936bd724ceffbf3a6"
@@ -8334,36 +8325,56 @@ ipfs-http-client@^33.1.0:
     tar-stream "^2.0.1"
     through2 "^3.0.1"
 
-ipfs-http-client@^42.0.0:
-  version "42.0.0"
-  resolved "https://registry.yarnpkg.com/ipfs-http-client/-/ipfs-http-client-42.0.0.tgz#d113cb8181af3986247dc698b3c5820775a423e5"
-  integrity sha512-ysA1splRSil7DDJuw5qK7YVwf0SygpQDRf9vrMRApcvaL8bWwqa9rJVCkMx/S8D9LAZ5VDSaJP2fmIdpvAIK9g==
+ipfs-http-client@^33.1.0:
+  version "33.1.1"
+  resolved "https://registry.yarnpkg.com/ipfs-http-client/-/ipfs-http-client-33.1.1.tgz#6ddc13e86f8db768093290b19537d2388c74dd45"
+  integrity sha512-iwtLL3lOIzxXJFwLnOEtFUv1cYTuWJ0NauD7rpMEd/y4C7z6fuN6TSF4h547lxMh7sJWv+6Z0PmOA5N8FzUHJw==
   dependencies:
-    abort-controller "^3.0.0"
+    async "^2.6.1"
     bignumber.js "^9.0.0"
+    bl "^3.0.0"
     bs58 "^4.0.1"
-    buffer "^5.4.2"
+    buffer "^5.2.1"
     cids "~0.7.1"
+    concat-stream "github:hugomrdias/concat-stream#feat/smaller"
     debug "^4.1.0"
-    form-data "^3.0.0"
+    detect-node "^2.0.4"
+    end-of-stream "^1.4.1"
+    err-code "^1.1.2"
+    flatmap "0.0.3"
+    glob "^7.1.3"
     ipfs-block "~0.8.1"
-    ipfs-utils "^0.7.1"
-    ipld-dag-cbor "^0.15.1"
-    ipld-dag-pb "^0.18.2"
-    ipld-raw "^4.0.1"
-    it-tar "^1.1.1"
-    it-to-stream "^0.1.1"
-    iterable-ndjson "^1.1.0"
-    ky "^0.15.0"
-    ky-universal "^0.3.0"
-    merge-options "^2.0.0"
-    multiaddr "^7.2.1"
-    multiaddr-to-uri "^5.1.0"
+    ipfs-utils "~0.0.3"
+    ipld-dag-cbor "~0.15.0"
+    ipld-dag-pb "~0.17.3"
+    ipld-raw "^4.0.0"
+    is-ipfs "~0.6.1"
+    is-pull-stream "0.0.0"
+    is-stream "^2.0.0"
+    iso-stream-http "~0.1.2"
+    iso-url "~0.4.6"
+    just-kebab-case "^1.1.0"
+    just-map-keys "^1.1.0"
+    kind-of "^6.0.2"
+    lru-cache "^5.1.1"
+    multiaddr "^6.0.6"
     multibase "~0.6.0"
-    multicodec "^1.0.0"
+    multicodec "~0.5.1"
     multihashes "~0.4.14"
-    parse-duration "^0.1.1"
-    stream-to-it "^0.2.0"
+    ndjson "github:hugomrdias/ndjson#feat/readable-stream3"
+    once "^1.4.0"
+    peer-id "~0.12.2"
+    peer-info "~0.15.1"
+    promisify-es6 "^1.0.3"
+    pull-defer "~0.2.3"
+    pull-stream "^3.6.9"
+    pull-to-stream "~0.1.1"
+    pump "^3.0.0"
+    qs "^6.5.2"
+    readable-stream "^3.1.1"
+    stream-to-pull-stream "^1.7.2"
+    tar-stream "^2.0.1"
+    through2 "^3.0.1"
 
 ipfs-utils@^0.7.1:
   version "0.7.2"
@@ -13401,16 +13412,6 @@ protons@^1.0.1, protons@^1.0.2:
     signed-varint "^2.0.1"
     varint "^5.0.0"
 
-protons@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/protons/-/protons-1.1.0.tgz#08f00cb6ea2b9a40d11da2e2d580c3662056a994"
-  integrity sha512-rxf3et88VGRJkXIcDK1nemQM9OpnKsRVuZW+vkJLRmytA6530hQ+k/r2DpclNJCYF+xUl2MXsvRsK+MJgcbfEg==
-  dependencies:
-    protocol-buffers-schema "^3.3.1"
-    safe-buffer "^5.1.1"
-    signed-varint "^2.0.1"
-    varint "^5.0.0"
-
 proxy-addr@~2.0.5:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/proxy-addr/-/proxy-addr-2.0.6.tgz#fdc2336505447d3f2f2c638ed272caf614bbb2bf"
@@ -15033,7 +15034,7 @@ string.prototype.trimstart@^1.0.0:
     define-properties "^1.1.3"
     es-abstract "^1.17.5"
 
-string_decoder@^1.0.0, string_decoder@^1.1.1, string_decoder@^1.2.0:
+string_decoder@^1.0.0, string_decoder@^1.1.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/string_decoder/-/string_decoder-1.3.0.tgz#42f114594a46cf1a8e30b0a84f56c78c3edac21e"
   integrity sha512-hkRX8U1WjJFd8LsDJ2yQ/wWWxaopEsABU1XfkM8A+j0+85JAGppt16cr1Whg6KIbb4okU6Mql6BOj+uup/wKeA==
