@@ -8,7 +8,7 @@ import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } 
 import { bnToHex } from '@polkadot/util'
 import { newLogger } from '@subsocial/utils';
 
-const log = newLogger('utils')
+const log = newLogger('Substrate utils')
 
 require('dotenv').config();
 
