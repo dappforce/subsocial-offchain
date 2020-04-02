@@ -40,7 +40,7 @@ export const getAggregationCount = async (props: AggCountProps) => {
     log.info(`Get ${res.rows[0].count} distinct activities by post id: ${post_id}`)
     return res.rows[0].count as number;
   } catch (err) {
-    log.error(`Failed to getAggregationCount: ${err.stack}`)
+    log.error('Failed to getAggregationCount:', err.stack)
     return 0;
   }
 }
