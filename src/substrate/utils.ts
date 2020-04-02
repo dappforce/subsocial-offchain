@@ -36,7 +36,7 @@ export function encodeStructIds (ids: SubstrateId[]) {
   try {
     return ids.map(id => encodeStructId(id))
   } catch (err) {
-    log.error(`Error in encode struct ids: ${err}`)
+    log.error(`Failed to encode struct ids: ${err}`)
     return []
   }
 

@@ -2364,6 +2364,20 @@
     markdown-to-txt "^1.0.1"
     winston "^3.2.0"
 
+"@subsocial/utils@^0.1.16":
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.1.16.tgz#245a2814cd703a1308788e2bf6ef955f85ec83c7"
+  integrity sha512-ymfi756a/ApfJfIOeSYSqySPYk4D0ZFldlgp4/tmJXfxoglTX2JTsJx4Ga/wANiAvrXjH0RutlHPjYZnu2LgQA==
+  dependencies:
+    "@babel/runtime" "^7.8.4"
+    "@types/lodash.truncate" "^4.4.6"
+    "@types/winston" "^2.4.4"
+    bn.js "^5.1.1"
+    chalk "^3.0.0"
+    lodash.truncate "^4.4.2"
+    markdown-to-txt "^1.0.1"
+    winston "^3.2.0"
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"

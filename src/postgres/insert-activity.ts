@@ -3,6 +3,7 @@ import { pool } from '../adaptors/connect-postgre';
 import { encodeStructIds } from '../substrate/utils';
 import BN from 'bn.js';
 import * as events from 'events'
+import { isEmptyArray } from '@subsocial/utils/array'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../substrate/server';
 import { updateUnreadNotifications, getAggregationCount } from './notifications';
@@ -56,7 +57,7 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Subs
 export const insertActivityForComment = async (eventAction: EventAction, ids: SubstrateId[], creator: string): Promise<number> => {
   const paramsIds = encodeStructIds(ids)
 
-  if (!paramsIds) {
+  if (isEmptyArray(paramsIds)) {
     emptyParamsLogError('comment')
     return -1
   }
@@ -179,7 +180,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Subst
 
   const paramsIds = encodeStructIds(ids)
 
-  if (!paramsIds) {
+  if (isEmptyArray(paramsIds)) {
     emptyParamsLogError('post')
     return -1
   }
@@ -209,7 +210,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Subst
 export const insertActivityForPostReaction = async (eventAction: EventAction, count: number, ids: SubstrateId[], creator: string): Promise<number> => {
   const paramsIds = encodeStructIds(ids)
 
-  if (!paramsIds) {
+  if (isEmptyArray(paramsIds)) {
     emptyParamsLogError('post reaction')
     return -1
   }
@@ -250,7 +251,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
 export const insertActivityForCommentReaction = async (eventAction: EventAction, count: number, ids: SubstrateId[], creator: string): Promise<number> => {
   const paramsIds = encodeStructIds(ids)
 
-  if (!paramsIds) {
+  if (isEmptyArray(paramsIds)) {
     emptyParamsLogError('comment reaction')
     return -1
   }
