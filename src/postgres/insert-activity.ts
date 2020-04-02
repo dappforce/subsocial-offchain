@@ -58,6 +58,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: Su
 
   if (!paramsIds) {
     emptyParamsLogError('comment')
+    return -1
   }
 
   const [ postId ] = paramsIds;
@@ -180,6 +181,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Subst
 
   if (!paramsIds) {
     emptyParamsLogError('post')
+    return -1
   }
 
   const [ , postId ] = paramsIds;
@@ -209,6 +211,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
 
   if (!paramsIds) {
     emptyParamsLogError('post reaction')
+    return -1
   }
 
   const { eventName, data, blockHeight } = eventAction;
@@ -249,6 +252,7 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
 
   if (!paramsIds) {
     emptyParamsLogError('comment reaction')
+    return -1
   }
 
   const { eventName, data, blockHeight } = eventAction;
