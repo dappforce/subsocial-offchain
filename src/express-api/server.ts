@@ -10,9 +10,9 @@ require('dotenv').config();
 const LIMIT = process.env.PGLIMIT || '20';
 // import * as multer from 'multer';
 // const upload = multer();
-const app = express();
+const app = express.default();
 
-app.use(cors());
+app.use(cors.default());
 
 // for parsing application/json
 app.use(bodyParser.json());
@@ -102,9 +102,10 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
   }
 });
 
-const wss = new WebSocket.Server({ port: process.env.OFFCHAIN_WS_PORT });
+const wsPort = parseInt(process.env.OFFCHAIN_WS_PORT || '3011')
+const wss = new WebSocket.Server({ port: wsPort });
 
-const clients = {}
+const clients: any = {}
 
 wss.on('connection', (ws: WebSocket) => {
 

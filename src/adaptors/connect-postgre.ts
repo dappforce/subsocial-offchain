@@ -3,7 +3,7 @@ import { postgesLog as log } from './loggers';
 
 require('dotenv').config();
 
-const pgConf = {
+const pgConf: any = {
   user: process.env.PGUSER,
   host: process.env.PGHOST,
   database: process.env.PGDATABASE,
