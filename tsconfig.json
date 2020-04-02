@@ -1,30 +1,29 @@
 {
+  "extends": "./node_modules/@polkadot/dev/config/tsconfig",
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
-    "importHelpers": true,
-    "jsx": "react",
-    "alwaysStrict": true,
-    "sourceMap": true,
     "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
-    "strictNullChecks": false
+    "noEmit": true,
+    "module": "esnext",
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
-  "include": [
-    "src/**/*",
-    "__tests__/**/*"
+  "typeRoots": [
+    "./node_modules/@polkadot/ts",
+    "./node_modules/@types"
   ],
   "exclude": [
-    "src/df-types",
-    "df-types"
-]
+    "node_modules"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+  ]
 }

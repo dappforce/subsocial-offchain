@@ -77,4 +77,7 @@ export const insertActivityLogError = (structName: StructLiteral, error: any) =>
   logError(insertActivity, structName, error)
 }
 
+export const emptyParamsLogError = (structName: StructLiteral) => {
+  logError(insertActivity, structName, 'Empty struct params ids')
+}
 export const updateCountLog = (count: number) => log.debug(`Update ${count} count`)

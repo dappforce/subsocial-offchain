@@ -7,12 +7,12 @@ const buildPath = ENV === 'production' ? 'build/' : '';
 const initSchema = readFileSync(buildPath + 'src/sql/initSchema.sql', 'utf8');
 const initDb = readFileSync(buildPath + 'src/sql/initDb.sql', 'utf8');
 
-pool.query(initSchema, (err: string | undefined) => {
-  if (err) throw new Error(err);
-  pool.query(initDb, (err: string | undefined) => {
+pool.query(initSchema, (err: Error) => {
+  if (err) throw err;
+  pool.query(initDb, (err: Error) => {
     if (err) {
       log.error('Failed to initialize a database', err)
-      throw new Error(err)
+      throw err
     }
     log.info('Database inited');
   })
