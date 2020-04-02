@@ -1,11 +1,14 @@
-import { } from '@subsocial/types/substrate'
+import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { CommentContent, BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { ipfs } from '../adaptors/connect-ipfs';
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
 import searchClient from '../adaptors/connect-elasticsearch'
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
-import { CommentId, BlogId, PostId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { bnToHex } from '@polkadot/util'
+import { newLogger } from '@subsocial/utils';
+
+const log = newLogger('Substrate utils')
 
 require('dotenv').config();
 
@@ -29,25 +32,33 @@ export const getEventMethods = () => {
   }
 };
 
-export type InsertData = BlogId | PostId | CommentId;
+export function encodeStructIds (ids: SubstrateId[]) {
+  try {
+    return ids.map(id => encodeStructId(id))
+  } catch (err) {
+    log.error('Failed to encode struct ids:', err)
+    return []
+  }
 
-export function encodeStructId (id: InsertData): string | undefined {
-  if (!id) return undefined;
+}
 
-  return id.toHex().split('x')[1].replace(/(0+)/, '');
+export function encodeStructId (id: SubstrateId): string {
+  return bnToHex(id).split('x')[1].replace(/(0+)/, '');
 }
 
 function getJson<T extends CommonContent> (ipfsHash: string) {
   return ipfs.getContent<T>(ipfsHash);
 }
 
-export async function insertElasticSearch (index: string, ipfsHash: string, id: InsertData | AccountId, extData?: object) {
+export async function insertElasticSearch (index: string, ipfsHash: string, id: SubstrateId | AccountId, extData?: object) {
 
   let indexData;
-
   switch (index) {
     case ES_INDEX_BLOGS: {
-      const { name, desc } = await getJson<BlogContent>(ipfsHash)
+      const content = await getJson<BlogContent>(ipfsHash)
+      if (!content) return;
+
+      const { name, desc } = content
       indexData = {
         blog_name: name,
         blog_desc: desc
@@ -56,7 +67,10 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
     }
 
     case ES_INDEX_POSTS: {
-      const { title, body } = await getJson<PostContent>(ipfsHash)
+      const content = await getJson<PostContent>(ipfsHash)
+      if (!content) return;
+
+      const { title, body } = content
       indexData = {
         post_title: title,
         post_body: body
@@ -65,7 +79,10 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
     }
 
     case ES_INDEX_COMMENTS: {
-      const { body } = await getJson<CommentContent>(ipfsHash)
+      const content = await getJson<CommentContent>(ipfsHash)
+      if (!content) return;
+
+      const { body } = content
       indexData = {
         comment_body: body
       };
@@ -73,7 +90,10 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
     }
 
     case ES_INDEX_PROFILES: {
-      const { fullname, about } = await getJson<ProfileContent>(ipfsHash)
+      const content = await getJson<ProfileContent>(ipfsHash)
+      if (!content) return;
+
+      const { fullname, about } = content
       indexData = {
         profile_username: extData && extData.toString(),
         profile_fullname: fullname,
