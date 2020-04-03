@@ -1,6 +1,6 @@
 import { Option, Struct, Enum, EnumType } from '@polkadot/types/codec';
 import { BlockNumber, Moment, AccountId, u16, u32, u64, Text, Vector, i32, Null } from '@polkadot/types';
-export declare type IpfsData = CommentData | PostData | BlogData | ProfileData | SharedPostData | PostBlock | BlockValue;
+export declare type IpfsData = CommentData | PostData | BlogData | ProfileData | SharedPostData | PostBlock | BlockValue | CodeBlockValue;
 export declare type Activity = {
     id: number;
     account: string;
@@ -115,15 +115,18 @@ export declare class BlogUpdate extends Struct {
 }
 // ------------------------------------------
 // Post blocks
-export type BlockValue = {
+export interface BlockValue {
   id: number
   kind: PostBlockKind
-  lang?: string
   hidden?: boolean
   data: string
 }
 
-type PostBlockKind = 'text' | 'code' | 'link' | 'video' | 'image' | 'twitter'
+export interface CodeBlockValue extends BlockValue {
+  lang: string
+}
+
+type PostBlockKind = 'text' | 'code' | 'link' | 'image'
 
 export interface PostBlock {
   kind: PostBlockKind
