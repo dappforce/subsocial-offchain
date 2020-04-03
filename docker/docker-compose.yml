@@ -3,7 +3,7 @@ version: "3"
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
-    container_name: subsocial_es_cluster
+    container_name: subsocial-elasticsearch
     environment:
       - cluster.name=subsocial-cluster
       - node.name=subsocial-node
@@ -21,38 +21,42 @@ services:
     network_mode: "host"
     volumes:
       - es_data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
     restart: always
 
   postgres:
     image: postgres
-    container_name: subsocial_postgres_db
+    container_name: subsocial-postgres
     environment:
       POSTGRES_DB: subsocial
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: 1986
     network_mode: "host"
-    ports:
-      - "5432:5432"
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  ipfs:
+    image: ipfs/go-ipfs:master-latest
+    container_name: subsocial-ipfs
+    network_mode: "host"
+    restart: always
+    volumes:
+      - ipfs_staging:/export
+      - ipfs_data:/data/ipfs
 
   subsocial-offchain:
     build:
       context: ..
       dockerfile: ./docker/Dockerfile
     image: dappforce/subsocial-offchain:latest
-    container_name: subsocial_offchain_node
+    container_name: subsocial-offchain
     depends_on:
       - postgres
       - elasticsearch
+      - ipfs
     environment:
       - NODE_ENV=production
     network_mode: "host"
-    ports:
-      - "3001:3001"
     restart: on-failure
     volumes:
       - ~/ipfs:/data
@@ -61,4 +65,8 @@ volumes:
   es_data:
     driver: local
   postgres_data:
+    driver: local
+  ipfs_staging:
+    driver: local
+  ipfs_data:
     driver: local
