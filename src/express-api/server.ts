@@ -10,9 +10,9 @@ require('dotenv').config();
 const LIMIT = process.env.PGLIMIT || '20';
 // import * as multer from 'multer';
 // const upload = multer();
-const app = express.default();
+const app = express();
 
-app.use(cors.default());
+app.use(cors);
 
 // for parsing application/json
 app.use(bodyParser.json());
