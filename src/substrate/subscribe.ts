@@ -1,9 +1,8 @@
-import { Option } from '@polkadot/types'
 import { EventData } from '@polkadot/types/generic/Event';
 import BN from 'bn.js';
 import { insertElasticSearch } from './utils';
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
-import { SocialAccount, BlogId, PostId, CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { BlogId, PostId, CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
 import { substrate } from './server';
 import { insertAccountFollower, insertBlogFollower, insertPostFollower, insertCommentFollower } from '../postgres/insert-follower';
@@ -24,9 +23,11 @@ export const DispatchForDb = async (eventAction: EventAction) => {
   switch (eventAction.eventName) {
     case 'AccountFollowed': {
       await insertAccountFollower(data);
-      const socialAccountOpt = await substrate.socialQuery().socialAccountById(data[1]) as Option<SocialAccount>;
-      if (!socialAccountOpt || socialAccountOpt.isNone) return;
-      const count = socialAccountOpt.unwrap().followers_count.toNumber() - 1;
+      const account = data[1].toString()
+      const socialAccount = await substrate.findSocialAccount(account)
+      if (!socialAccount) return;
+
+      const count = socialAccount.followers_count.toNumber() - 1;
       const id = await insertActivityForAccount(eventAction, count);
       if (id === -1) return;
 
@@ -232,10 +233,10 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     }
     case 'ProfileCreated' : {
       const accountId = data[0] as AccountId;
-      const SocialAccountOpt = await substrate.socialQuery().socialAccountById(accountId) as Option<SocialAccount>;
-      if (SocialAccountOpt.isNone) return;
+      const socialAccount = await substrate.findSocialAccount(accountId)
+      if (!socialAccount) return;
 
-      const profileOpt = SocialAccountOpt.unwrap().profile;
+      const profileOpt = socialAccount.profile;
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap();
@@ -244,10 +245,10 @@ export const DispatchForDb = async (eventAction: EventAction) => {
     }
     case 'ProfileUpdated' : {
       const accountId = data[0] as AccountId;
-      const SocialAccountOpt = await substrate.socialQuery().socialAccountById(accountId) as Option<SocialAccount>;
-      if (SocialAccountOpt.isNone) return;
+      const socialAccount = await substrate.findSocialAccount(accountId)
+      if (!socialAccount) return;
 
-      const profileOpt = SocialAccountOpt.unwrap().profile;
+      const profileOpt = socialAccount.profile;
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap();

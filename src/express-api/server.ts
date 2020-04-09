@@ -1,32 +1,49 @@
-import { pool } from '../adaptors/connect-postgre'
 import * as WebSocket from 'ws';
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER, getUnreadNotifications } from '../postgres/notifications';
-import { logSuccess, logError, log } from '../postgres/postges-logger';
+import ipfs from '../adaptors/connect-ipfs';
+import { pool } from '../adaptors/connect-postgre';
+import { logSuccess, logError } from '../postgres/postges-logger';
+import { getUnreadNotifications, eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../postgres/notifications';
+import { newLogger } from '@subsocial/utils';
 
-require('dotenv').config();
-const LIMIT = process.env.PGLIMIT || '20';
 // import * as multer from 'multer';
 // const upload = multer();
+
+require("dotenv").config();
+const LIMIT = process.env.PGLIMIT;
+
+const log = newLogger('ExpressOffchainApi')
 const app = express();
 
-app.use(cors);
+app.use(cors());
+
+const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE_BYTES
 
 // for parsing application/json
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: fileSizeLimit }));
 
 // for parsing application/xwww-
-app.use(bodyParser.urlencoded({ extended: true }));
-// form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
+//form-urlencoded
 
 // // for parsing multipart/form-data
+
 // app.use(upload.array());
 // app.use(express.static('public'));
+
+//IPFS API
+
 const limitLog = (limit: number) => log.debug(`Limit a db results to ${limit} items`);
 
-// Subscribe API
+app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
+  const hash = await ipfs.saveContent(req.body);
+  log.info('Save content with hash: ', hash);
+  res.json(hash);
+});
+
+//Subscribe API
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
   const limit = req.query.limit;
   const account = req.params.id;
@@ -84,7 +101,6 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
 
   }
 });
-
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;
   log.info(`Mark all notifications as read by account: ${account}`)
