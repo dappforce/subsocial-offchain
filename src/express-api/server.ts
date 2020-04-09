@@ -33,9 +33,11 @@ app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
 // app.use(upload.array());
 // app.use(express.static('public'));
 
-//IPFS API
+// IPFS API
 
-const limitLog = (limit: number) => log.debug(`Limit a db results to ${limit} items`);
+
+const limitLog = (limit: number) => log.debug(`Limit db results to ${limit} items`);
+
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const hash = await ipfs.saveContent(req.body);
@@ -43,7 +45,8 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
   res.json(hash);
 });
 
-//Subscribe API
+// User feed and notifications API
+
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
   const limit = req.query.limit;
   const account = req.params.id;
