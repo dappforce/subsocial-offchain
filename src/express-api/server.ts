@@ -12,7 +12,7 @@ import { newLogger } from '@subsocial/utils';
 // const upload = multer();
 
 require("dotenv").config();
-const LIMIT = process.env.PGLIMIT;
+const LIMIT = process.env.PGLIMIT || '20';
 
 const log = newLogger('ExpressOffchainApi')
 const app = express();
