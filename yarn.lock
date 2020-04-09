@@ -2336,22 +2336,24 @@
     ipfs-http-client "^42.0.0"
     it-all "^1.0.1"
 
-"@subsocial/api@^0.1.22-beta7":
-  version "0.1.22-beta7"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.1.22-beta7.tgz#c92e6e993b0e1064384c885d011b7740fcd30bf2"
-  integrity sha512-JFd1U4Qln8D/JDAGf9RFgojEypjqmnenZaAHzftXXJs+Qw6/FqM4/bU4Zs8JlI0WPb2xbRWViFkSNykOhx6muw==
+"@subsocial/api@^0.2.0-beta6":
+  version "0.2.0-beta6"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.2.0-beta6.tgz#f81c91ede96af46ae701389836cce3510d6c6978"
+  integrity sha512-jmjTrs/QnGUzsaHd60abVoyIyU0Gu/7VxmQPF3yq4d6fSMlQI3058FHxWV/IX5rio0ZLAoSsgj0uN7WPShZeuw==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@polkadot/api" "^1.4.0-beta.46"
     "@subsocial/api" "^0.1.21"
     "@subsocial/types" "^0.1.20-beta4"
     "@subsocial/utils" "^0.1.16"
+    "@types/axios" "^0.14.0"
+    axios "^0.19.2"
     ipfs-http-client "^33.1.0"
 
-"@subsocial/types@0.1.20-beta10":
-  version "0.1.20-beta10"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.1.20-beta10.tgz#a77186fa05b10b3a7dcb9b283445ee322b22ea9e"
-  integrity sha512-6vYHtVo2NjvoCUqodQWF59kY1weFQIbD5loLYMftd4XHXLwHS47OkuWTy0iiwnNHhybOmdpgWSltfqpaS/JNKA==
+"@subsocial/types@0.1.20-beta12":
+  version "0.1.20-beta12"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.1.20-beta12.tgz#26d08a84dea44bba346309889cf236912e8abec2"
+  integrity sha512-b7uBSPWakwB0A0AH+UDAwXQL0YB9NcAfAAwqUuwun2+Pq+gDBqUbgndJfSCug0AnyftQwK+UY2VwvKioKv9dBg==
   dependencies:
     "@babel/runtime" "^7.8.4"
 
@@ -2397,10 +2399,10 @@
     markdown-to-txt "^1.0.1"
     winston "^3.2.0"
 
-"@subsocial/utils@^0.1.17":
-  version "0.1.17"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.1.17.tgz#e67054318d35039e2746e6453a0a34ecf26245a7"
-  integrity sha512-6pHWSHSIlxbnleqXjoTt6tuxhxlf3tGtGWAtk2DNUVgCwKOOtoq5dU/yR8QWtaFAHSlm9F2GkK+cGnstSux6mA==
+"@subsocial/utils@^0.1.19":
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.1.19.tgz#1b794f28f058eb893e93d14633d89b8911e290db"
+  integrity sha512-bNelwjP4eP2ncskpArsrYAmhLgaaJBWoq5OsNo1jlBDzSieVyfgu8h6XSddxfp6NgReAKSjkJG4PgdxPQWHFCA==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@types/lodash.truncate" "^4.4.6"
@@ -3657,7 +3659,7 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.9.1.tgz#7e33d8f7d449b3f673cd72deb9abdc552dbe528e"
   integrity sha512-wMHVg2EOHaMRxbzgFJ9gtjOOCrI80OHLG14rxi28XwOW8ux6IiEbRCGGGqCtdAIg4FQCbW20k9RsT4y3gJlFug==
 
-axios@*, axios@^0.19.0:
+axios@*, axios@^0.19.0, axios@^0.19.2:
   version "0.19.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
   integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
