@@ -19,7 +19,8 @@ const app = express();
 
 app.use(cors());
 
-const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE_BYTES
+const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE
+
 
 // for parsing application/json
 app.use(bodyParser.json({ limit: fileSizeLimit }));
@@ -35,13 +36,12 @@ app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
 
 // IPFS API
 
-
 const limitLog = (limit: number) => log.debug(`Limit db results to ${limit} items`);
-
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const hash = await ipfs.saveContent(req.body);
-  log.info('Save content with hash: ', hash);
+  log.info('Content saved to IPFS with hash:', hash);
+
   res.json(hash);
 });
 
