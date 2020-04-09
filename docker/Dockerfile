@@ -7,6 +7,8 @@ RUN yarn install --no-optional
 
 COPY . .
 RUN yarn && yarn cache clean --force
+
+COPY localhost.env .env
 RUN NODE_ENV=production yarn build
 
 FROM node:10
