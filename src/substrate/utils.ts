@@ -62,7 +62,7 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
       indexData = {
         blog_name: name,
         blog_desc: desc,
-        blog_tags: tags
+        tags: tags
       };
       break;
     }
@@ -75,7 +75,7 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
       indexData = {
         post_title: title,
         post_body: body,
-        post_tags: tags,
+        tags: tags,
       };
       break;
     }
