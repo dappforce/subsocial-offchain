@@ -4,47 +4,45 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
     container_name: subsocial-elasticsearch
+    restart: on-failure
     environment:
-      - cluster.name=subsocial-cluster
-      - node.name=subsocial-node
-      - node.data=true
-      - network.host=127.0.0.1
-      - http.port=9200
-      - http.cors.enabled=true
-      - http.cors.allow-credentials=true
-      - http.cors.allow-origin=*
-      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,Access-Control-Allow-Headers,Accept
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    network_mode: "host"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      MAX_MAP_COUNT: "64000"
+      discovery.type: "single-node"
+      cluster.name: "subsocial-cluster"
+      node.name: "subsocial-node"
+      http.port: "9200"
+      http.cors.enabled: "true"
+      http.cors.allow-credentials: "true"
+      http.cors.allow-origin: "*"
+      http.cors.allow-methods: "GET"
+      http.cors.allow-headers: "X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,Access-Control-Allow-Headers,Accept"
     volumes:
       - es_data:/usr/share/elasticsearch/data
-    restart: always
+    network_mode: "host"
 
   postgres:
     image: postgres
     container_name: subsocial-postgres
+    restart: on-failure
     environment:
       POSTGRES_DB: subsocial
       POSTGRES_USER: dev
       POSTGRES_PASSWORD: 1986
-    network_mode: "host"
-    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    network_mode: "host"
 
   ipfs:
     image: ipfs/go-ipfs:master-latest
     container_name: subsocial-ipfs
-    network_mode: "host"
-    restart: always
+    restart: on-failure
     volumes:
       - ipfs_staging:/export
       - ipfs_data:/data/ipfs
+    network_mode: "host"
 
-  subsocial-offchain:
+  offchain:
     build:
       context: ..
       dockerfile: ./docker/Dockerfile
@@ -54,12 +52,10 @@ services:
       - postgres
       - elasticsearch
       - ipfs
+    restart: on-failure
     environment:
       - NODE_ENV=production
     network_mode: "host"
-    restart: on-failure
-    volumes:
-      - ~/ipfs:/data
 
 volumes:
   es_data:
