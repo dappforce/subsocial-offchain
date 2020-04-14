@@ -58,10 +58,11 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
       const content = await getJson<BlogContent>(ipfsHash)
       if (!content) return;
 
-      const { name, desc } = content
+      const { name, desc, tags } = content
       indexData = {
         blog_name: name,
-        blog_desc: desc
+        blog_desc: desc,
+        blog_tags: tags
       };
       break;
     }
@@ -70,10 +71,11 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
       const content = await getJson<PostContent>(ipfsHash)
       if (!content) return;
 
-      const { title, body } = content
+      const { title, body, tags } = content
       indexData = {
         post_title: title,
-        post_body: body
+        post_body: body,
+        post_tags: tags,
       };
       break;
     }

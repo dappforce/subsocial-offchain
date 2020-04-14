@@ -51,6 +51,15 @@
             "analyzer": "english"
           }
         }
+      },
+      "blog_tags": {
+        "type": "text",
+        "fields": {
+          "english": {
+            "type": "text",
+            "analyzer": "english"
+          }
+        }
       }
     }
   }
