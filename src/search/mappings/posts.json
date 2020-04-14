@@ -52,7 +52,7 @@
           }
         }
       },
-      "post_tags": {
+      "tags": {
         "type": "text",
         "fields": {
           "english": {
