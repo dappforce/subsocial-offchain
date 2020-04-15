@@ -29,7 +29,10 @@
   },
   "mappings": {
     "properties": {
-      "blog_name": {
+      "id": {
+        "type": "text"
+      },
+      "name": {
         "type": "text",
         "fields": {
           "suggest": {
@@ -43,7 +46,7 @@
           }
         }
       },
-      "blog_desc": {
+      "desc": {
         "type": "text",
         "fields": {
           "english": {

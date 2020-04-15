@@ -29,7 +29,10 @@
   },
   "mappings": {
     "properties": {
-      "post_title": {
+      "id": {
+        "type": "text"
+      },
+      "title": {
         "type": "text",
         "fields": {
           "suggest": {
@@ -43,7 +46,7 @@
           }
         }
       },
-      "post_body": {
+      "body": {
         "type": "text",
         "fields": {
           "english": {
