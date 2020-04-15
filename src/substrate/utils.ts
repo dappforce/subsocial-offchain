@@ -60,9 +60,9 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
 
       const { name, desc, tags } = content
       indexData = {
-        blog_name: name,
-        blog_desc: desc,
-        tags: tags
+        name,
+        desc,
+        tags
       };
       break;
     }
@@ -73,9 +73,9 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
 
       const { title, body, tags } = content
       indexData = {
-        post_title: title,
-        post_body: body,
-        tags: tags,
+        title,
+        body,
+        tags,
       };
       break;
     }
@@ -86,7 +86,7 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
 
       const { body } = content
       indexData = {
-        comment_body: body
+        body
       };
       break;
     }
@@ -97,9 +97,9 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
 
       const { fullname, about } = content
       indexData = {
-        profile_username: extData && extData.toString(),
-        profile_fullname: fullname,
-        profile_about: about
+        username: extData && extData.toString(),
+        fullname,
+        about
       }
       break;
     }

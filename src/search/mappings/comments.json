@@ -29,7 +29,10 @@
   },
   "mappings": {
     "properties": {
-      "comment_body": {
+      "id": {
+        "type": "text"
+      },
+      "body": {
         "type": "text",
         "fields": {
           "english": {
