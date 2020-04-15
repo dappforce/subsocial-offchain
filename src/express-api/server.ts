@@ -7,13 +7,7 @@ import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
 import ipfs from '../adaptors/connect-ipfs';
 import { pool } from '../adaptors/connect-postgre';
 import { logSuccess, logError } from '../postgres/postges-logger';
-import { getUnreadNotifications, eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../postgres/notifications';
 import { newLogger } from '@subsocial/utils';
-
-require('dotenv').config();
-const LIMIT = process.env.PGLIMIT;
-// import * as multer from 'multer';
-// const upload = multer();
 
 require("dotenv").config();
 const LIMIT = process.env.PGLIMIT || '20';
