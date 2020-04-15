@@ -6,7 +6,7 @@ services:
     container_name: subsocial-elasticsearch
     restart: on-failure
     environment:
-      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      ES_JAVA_OPTS: "-Xms512m -Xmx1024m"
       MAX_MAP_COUNT: "64000"
       discovery.type: "single-node"
       cluster.name: "subsocial-cluster"
