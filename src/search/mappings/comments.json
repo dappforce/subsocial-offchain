@@ -29,9 +29,6 @@
   },
   "mappings": {
     "properties": {
-      "id": {
-        "type": "text"
-      },
       "body": {
         "type": "text",
         "fields": {
