@@ -81,7 +81,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
   }
 });
 
-app.post('/v1/offchain/parser/', async (req: express.Request, res: express.Response) => {
+app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await siteParser(req.body.url)
 
   console.log('===== parsed data:', data)
