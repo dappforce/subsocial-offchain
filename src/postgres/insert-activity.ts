@@ -1,4 +1,4 @@
-import { pool } from '../connections/connect-postgres';
+import { pg } from '../connections/connect-postgres';
 import { encodeStructIds } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
@@ -16,7 +16,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
       RETURNING *`
 
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     insertActivityLog('owner')
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
@@ -64,7 +64,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: Su
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
   const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
   try {
-    const res = await pool.query(query, params)
+    const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
 
     insertActivityLog('comment')
@@ -90,7 +90,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: Su
     log.debug('Params of update query:', [ ...paramsIdsUpd ]);
     log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
     const paramsUpdate = [ activityId, eventName, ...paramsIdsUpd ];
-    const resUpdate = await pool.query(queryUpdate, paramsUpdate);
+    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
     return activityId;
   } catch (err) {
@@ -111,7 +111,7 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
       RETURNING *`
   const params = [ accountId, eventName, objectId, blockHeight, count ];
   try {
-    const res = await pool.query(query, params)
+    const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
     const queryUpdate = `
           UPDATE df.activities
@@ -123,7 +123,7 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
           RETURNING *`;
 
     const paramsUpdate = [ activityId, eventName, accountId ];
-    const resUpdate = await pool.query(queryUpdate, paramsUpdate);
+    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
     insertActivityLog('account')
     return activityId;
@@ -145,7 +145,7 @@ export const insertActivityForBlog = async (eventAction: EventAction, count: num
       RETURNING *`
   const params = [ accountId, eventName, blogId, blockHeight, count, aggregated ];
   try {
-    const res = await pool.query(query, params)
+    const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
     const paramsUpdate = [ activityId, eventName, blogId ];
     const queryUpdate = `
@@ -157,7 +157,7 @@ export const insertActivityForBlog = async (eventAction: EventAction, count: num
               AND blog_id = $3
           RETURNING *`;
 
-    const resUpdate = await pool.query(queryUpdate, paramsUpdate);
+    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
     insertActivityLog('blog')
     return activityId;
@@ -189,7 +189,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Subst
 
   const params = [ accountId, eventName, ...paramsIds, blockHeight, newCount ];
   try {
-    const res = await pool.query(query, params)
+    const res = await pg.query(query, params)
     insertActivityLog('post')
     return res.rows[0].id;
   } catch (err) {
@@ -215,7 +215,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
       RETURNING *`
   const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
   try {
-    const res = await pool.query(query, params)
+    const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
     insertActivityLog('post reaction')
     const postId = paramsIds.pop();
@@ -229,7 +229,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
           RETURNING *`;
 
     const paramsUpdate = [ activityId, eventName, postId ];
-    const resUpdate = await pool.query(queryUpdate, paramsUpdate);
+    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
 
     return activityId;
@@ -256,7 +256,7 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
       RETURNING *`
   const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
   try {
-    const res = await pool.query(query, params)
+    const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
     insertActivityLog('comment reaction')
     const queryUpdate = `
@@ -270,7 +270,7 @@ export const insertActivityForCommentReaction = async (eventAction: EventAction,
           RETURNING *`;
 
     const paramsUpdate = [ activityId, eventName, ...paramsIds ];
-    const resUpdate = await pool.query(queryUpdate, paramsUpdate);
+    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
 
     return activityId;

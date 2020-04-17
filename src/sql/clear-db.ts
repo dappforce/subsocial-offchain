@@ -1,5 +1,5 @@
 
-import { pool } from '../connections/connect-postgres';
+import { pg } from '../connections/connect-postgres';
 import { release } from 'os';
 import { postgesLog as log } from '../connections/loggers';
 
@@ -14,7 +14,7 @@ const query = `
   df.notifications,
   df.notifications_counter`;
 
-pool.query(query, (err) => {
+pg.query(query, (err) => {
   if (err) throw err;
   log.info('The database has been cleared')
   release();

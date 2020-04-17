@@ -1,4 +1,4 @@
-import { pool } from '../connections/connect-postgres';
+import { pg } from '../connections/connect-postgres';
 import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
 
@@ -10,7 +10,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
     RETURNING *`
 
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     insertActivityLog('owner')
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
@@ -35,7 +35,7 @@ export const getAggregationCount = async (props: AggCountProps) => {
       AND post_id = $3`
 
   try {
-    const res = await pool.query(query, params)
+    const res = await pg.query(query, params)
     log.info(`Get ${res.rows[0].count} distinct activities by post id: ${post_id}`)
     return res.rows[0].count as number;
   } catch (err) {
@@ -65,7 +65,7 @@ export const updateCountOfUnreadNotifications = async (account: string) => {
     )`
 
   try {
-    const res = await pool.query(query, [ account ])
+    const res = await pg.query(query, [ account ])
     log.debug(`Successfully updated unread notifications by account ${account}. Query result: ${res.rows}`)
     const currentUnreadCount = await getCountOfUnreadNotifications(account)
     informClientAboutUnreadNotifications(account, currentUnreadCount);
@@ -81,7 +81,7 @@ export const getCountOfUnreadNotifications = async (account: string) => {
     WHERE account = $1
   `
   try {
-    const res = await pool.query(query, [ account ])
+    const res = await pg.query(query, [ account ])
     log.debug(`Found ${res.rows[0].unread_count} unread notifications by account ${account}`)
     return res.rows[0].unread_count as number;
   } catch (err) {

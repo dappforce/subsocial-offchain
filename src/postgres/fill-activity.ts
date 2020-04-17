@@ -1,4 +1,4 @@
-import { pool } from '../connections/connect-postgres';
+import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';
@@ -17,7 +17,7 @@ export const fillNewsFeedWithAccountFollowers = async (account: string, activity
       RETURNING *`
   const params = [ account, activityId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     fillNewsFeedLog('account')
   } catch (err) {
     fillNewsFeedLogError('account', err.stack);
@@ -38,7 +38,7 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
       RETURNING *`
   const params = [ account, activityId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     fillNotificationsLog('account')
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
@@ -61,7 +61,7 @@ export const fillNewsFeedWithBlogFollowers = async (blogId: BlogId, account: str
   const hexBlogId = encodeStructId(blogId);
   const params = [ hexBlogId, account, activityId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     fillNewsFeedLog('blog')
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
@@ -83,7 +83,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
   const hexPostId = encodeStructId(postId);
   const params = [ hexPostId, account, activityId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     fillNotificationsLog('post')
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
@@ -104,7 +104,7 @@ export const fillNotificationsWithCommentFollowers = async (commentId: CommentId
   const hexCommentId = encodeStructId(commentId);
   const params = [ hexCommentId, account, activityId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     fillNotificationsLog('comment')
     await updateCountOfUnreadNotifications(account)
   } catch (err) {

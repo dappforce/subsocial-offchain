@@ -1,5 +1,5 @@
 import { EventData } from '@polkadot/types/generic/Event';
-import { pool } from '../connections/connect-postgres';
+import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { insertFollowersLog, insertFollowersLogError } from './postges-logger';
@@ -11,7 +11,7 @@ export const insertAccountFollower = async (data: EventData) => {
       RETURNING *`;
   const params = [ data[0].toString(), data[1].toString() ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     insertFollowersLog('account')
   } catch (err) {
     insertFollowersLogError('account', err.stack)
@@ -26,7 +26,7 @@ export const insertPostFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), postId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     insertFollowersLog('post')
   } catch (err) {
     insertFollowersLogError('post', err.stack)
@@ -41,7 +41,7 @@ export const insertCommentFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), commentId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     insertFollowersLog('comment')
   } catch (err) {
     insertFollowersLogError('comment', err.stack)
@@ -56,7 +56,7 @@ export const insertBlogFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), blogId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     insertFollowersLog('blog')
   } catch (err) {
     insertFollowersLogError('blog', err.stack)

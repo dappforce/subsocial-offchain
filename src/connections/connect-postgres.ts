@@ -17,4 +17,4 @@ if (!greeted) {
   log.info(`Connecting to Postgres at ${pgConf.host}:${pgConf.port} as a user '${pgConf.user}'`);
 }
 
-export const pool = new Pool(pgConf);
+export const pg = new Pool(pgConf);

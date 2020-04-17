@@ -1,4 +1,4 @@
-import { pool } from '../connections/connect-postgres';
+import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { deleteNotificationsLog, deleteNotificationsLogError } from './postges-logger';
@@ -15,7 +15,7 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
   const hexCommentId = encodeStructId(commentId);
   const params = [ userId, hexCommentId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     deleteNotificationsLog('comment')
   } catch (err) {
     deleteNotificationsLogError('comment', err.stack)
@@ -34,7 +34,7 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
       RETURNING *`
   const params = [ userId, accountId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     deleteNotificationsLog('account')
   } catch (err) {
     deleteNotificationsLogError('account', err.stack)
@@ -53,7 +53,7 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
   const hexPostId = encodeStructId(postId);
   const params = [ userId, hexPostId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     deleteNotificationsLog('post')
   } catch (err) {
     deleteNotificationsLogError('post', err.stack)
@@ -73,7 +73,7 @@ export const deleteNotificationsAboutBlog = async (userId: string, blogId: BlogI
   const hexBlogId = encodeStructId(blogId);
   const params = [ userId, hexBlogId ];
   try {
-    await pool.query(query, params)
+    await pg.query(query, params)
     deleteNotificationsLog('blog')
   } catch (err) {
     deleteNotificationsLogError('blog', err.stack)

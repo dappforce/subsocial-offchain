@@ -2,7 +2,7 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
 import ipfs from '../connections/connect-ipfs';
-import { pool } from '../connections/connect-postgres';
+import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger } from '@subsocial/utils';
 import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
@@ -66,7 +66,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
   log.debug(`SQL params: ${params}`);
 
   try {
-    const data = await pool.query(query, params)
+    const data = await pg.query(query, params)
     logSuccess('get feed', `by account: ${account}`)
 
     res.json(data.rows);
@@ -95,7 +95,7 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
     LIMIT $3`;
   const params = [ account, offset, limit ];
   try {
-    const data = await pool.query(query, params)
+    const data = await pg.query(query, params)
     logSuccess('get notifications', `by account: ${account}`)
 
     res.json(data.rows);
@@ -120,7 +120,7 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
     WHERE account = $1`;
   const params = [ account ];
   try {
-    const data = await pool.query(query, params)
+    const data = await pg.query(query, params)
     informClientAboutUnreadNotifications(account, 0);
     logSuccess('mark all notifications as read', `by account: ${account}`)
 
