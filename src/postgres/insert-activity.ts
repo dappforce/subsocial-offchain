@@ -6,7 +6,7 @@ import { substrate } from '../substrate/server';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
-import { EventAction } from '../substrate/types';
+import { SubstrateEvent } from '../substrate/types';
 
 export const insertNotificationForOwner = async (id: number, account: string) => {
   const params = [ account, id ]
@@ -24,7 +24,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
   }
 }
 
-export const insertActivityComments = async (eventAction: EventAction, ids: SubstrateId[], commentLast: Comment) => {
+export const insertActivityComments = async (eventAction: SubstrateEvent, ids: SubstrateId[], commentLast: Comment) => {
   let comment = commentLast;
   const lastCommentAccount = commentLast.created.account.toString();
   while (comment.parent_id.isSome) {
@@ -45,7 +45,7 @@ export const insertActivityComments = async (eventAction: EventAction, ids: Subs
   }
 };
 
-export const insertActivityForComment = async (eventAction: EventAction, ids: SubstrateId[], creator: string): Promise<number> => {
+export const insertActivityForComment = async (eventAction: SubstrateEvent, ids: SubstrateId[], creator: string): Promise<number> => {
   const paramsIds = encodeStructIds(ids)
 
   if (isEmptyArray(paramsIds)) {
@@ -99,7 +99,7 @@ export const insertActivityForComment = async (eventAction: EventAction, ids: Su
   }
 };
 
-export const insertActivityForAccount = async (eventAction: EventAction, count: number): Promise<number> => {
+export const insertActivityForAccount = async (eventAction: SubstrateEvent, count: number): Promise<number> => {
 
   const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
@@ -133,7 +133,7 @@ export const insertActivityForAccount = async (eventAction: EventAction, count: 
   }
 };
 
-export const insertActivityForBlog = async (eventAction: EventAction, count: number, creator?: string): Promise<number> => {
+export const insertActivityForBlog = async (eventAction: SubstrateEvent, count: number, creator?: string): Promise<number> => {
 
   const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
@@ -167,7 +167,7 @@ export const insertActivityForBlog = async (eventAction: EventAction, count: num
   }
 };
 
-export const insertActivityForPost = async (eventAction: EventAction, ids: SubstrateId[], count?: number): Promise<number> => {
+export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: SubstrateId[], count?: number): Promise<number> => {
 
   const paramsIds = encodeStructIds(ids)
 
@@ -198,7 +198,7 @@ export const insertActivityForPost = async (eventAction: EventAction, ids: Subst
   }
 };
 
-export const insertActivityForPostReaction = async (eventAction: EventAction, count: number, ids: SubstrateId[], creator: string): Promise<number> => {
+export const insertActivityForPostReaction = async (eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): Promise<number> => {
   const paramsIds = encodeStructIds(ids)
 
   if (isEmptyArray(paramsIds)) {
@@ -239,7 +239,7 @@ export const insertActivityForPostReaction = async (eventAction: EventAction, co
   }
 };
 
-export const insertActivityForCommentReaction = async (eventAction: EventAction, count: number, ids: SubstrateId[], creator: string): Promise<number> => {
+export const insertActivityForCommentReaction = async (eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): Promise<number> => {
   const paramsIds = encodeStructIds(ids)
 
   if (isEmptyArray(paramsIds)) {

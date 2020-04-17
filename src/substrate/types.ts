@@ -1,7 +1,7 @@
 import { EventData } from '@polkadot/types/generic/Event'
 import BN from 'bn.js';
 
-export type EventAction = {
+export type SubstrateEvent = {
   eventName: string,
   data: EventData,
   blockHeight: BN
