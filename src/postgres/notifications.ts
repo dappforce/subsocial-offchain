@@ -1,14 +1,6 @@
 import { pool } from '../adaptors/connect-postgre';
-import * as events from 'events'
 import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
-export const eventEmitter = new events.EventEmitter();
-export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
-
-type AggCountProps = {
-  eventName: string,
-  account: string,
-  post_id: string
-}
+import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER, AggCountProps } from '../adaptors/events';
 
 export const insertNotificationForOwner = async (id: number, account: string) => {
   const query = `
