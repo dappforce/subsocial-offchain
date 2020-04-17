@@ -1,7 +1,7 @@
 import { pool } from '../adaptors/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { updateUnreadNotifications } from './notifications';
+import { updateCountOfUnreadNotifications } from './notifications';
 import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedLogError, fillNotificationsLogError } from './postges-logger';
 
 export const fillNewsFeedWithAccountFollowers = async (account: string, activityId: number) => {
@@ -40,7 +40,7 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
   try {
     await pool.query(query, params)
     fillNotificationsLog('account')
-    await updateUnreadNotifications(account)
+    await updateCountOfUnreadNotifications(account)
   } catch (err) {
     fillNotificationsLogError('account', err.stack);
   }
@@ -63,7 +63,7 @@ export const fillNewsFeedWithBlogFollowers = async (blogId: BlogId, account: str
   try {
     await pool.query(query, params)
     fillNewsFeedLog('blog')
-    await updateUnreadNotifications(account)
+    await updateCountOfUnreadNotifications(account)
   } catch (err) {
     fillNewsFeedLogError('blog', err.stack);
   }
@@ -85,7 +85,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
   try {
     await pool.query(query, params)
     fillNotificationsLog('post')
-    await updateUnreadNotifications(account)
+    await updateCountOfUnreadNotifications(account)
   } catch (err) {
     fillNotificationsLogError('post', err.stack);
   }
@@ -106,7 +106,7 @@ export const fillNotificationsWithCommentFollowers = async (commentId: CommentId
   try {
     await pool.query(query, params)
     fillNotificationsLog('comment')
-    await updateUnreadNotifications(account)
+    await updateCountOfUnreadNotifications(account)
   } catch (err) {
     fillNotificationsLogError('comment', err.stack);
   }

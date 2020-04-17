@@ -6,7 +6,7 @@ import { pool } from '../adaptors/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger } from '@subsocial/utils';
 import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
-import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from './events';
+import { informClientAboutUnreadNotifications } from './events';
 import { startNotificationsServer } from './ws';
 
 // import * as multer from 'multer';
@@ -121,7 +121,7 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
   const params = [ account ];
   try {
     const data = await pool.query(query, params)
-    eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, 0);
+    informClientAboutUnreadNotifications(account, 0);
     logSuccess('mark all notifications as read', `by account: ${account}`)
 
     res.json(data.rows);

@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws'
 import { newLogger } from '@subsocial/utils'
 import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from './events'
-import { getUnreadNotifications } from '../postgres/notifications'
+import { getCountOfUnreadNotifications } from '../postgres/notifications'
 
 require('dotenv').config()
 
@@ -26,7 +26,7 @@ export function startNotificationsServer() {
     ws.on('message', async (account: string) => {
       log.debug('Received a message from account', account)
       wsClients[account] = ws
-      const unreadCount = await getUnreadNotifications(account)
+      const unreadCount = await getCountOfUnreadNotifications(account)
       sendUnreadCount(account, unreadCount)
     })
 

@@ -3,7 +3,7 @@ import { encodeStructIds } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../substrate/server';
-import { updateUnreadNotificationsCount, getAggregationCount } from './notifications';
+import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { EventAction } from '../adaptors/events';
@@ -18,7 +18,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
   try {
     await pool.query(query, params)
     insertActivityLog('owner')
-    await updateUnreadNotificationsCount(account)
+    await updateCountOfUnreadNotifications(account)
   } catch (err) {
     insertActivityLogError('owner', err.stack)
   }
