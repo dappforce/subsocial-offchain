@@ -9,6 +9,7 @@ import { newLogger } from '@subsocial/utils';
 import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
 import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../adaptors/events';
 import { getUnreadNotifications } from '../postgres/notifications';
+import * as multer from 'multer';
 
 // import * as multer from 'multer';
 // const upload = multer();
@@ -35,6 +36,26 @@ app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
 
 // app.use(upload.array());
 // app.use(express.static('public'));
+
+const fileSizeLimitInt = parseInt(fileSizeLimit)
+const upload = multer({ limits: { fieldSize: fileSizeLimitInt * 1024 * 1024 }})
+
+app.post('/offchain/upload', upload.single('picture'), async (req, res) => {
+
+  if (req.file.size > fileSizeLimitInt * 1024 * 1024) {
+    res.statusCode = 400
+    res.json({ status: 'error', message: `Image should be less than ${fileSizeLimitInt} MB` })
+  }
+  const finalImg = {
+      mimetype: req.file.mimetype,
+      image:  req.file.buffer.toString('base64')
+  };
+  
+  const hash = await ipfs.saveContent(finalImg as any);
+  log.info('Image saved to IPFS with hash:', hash);
+
+  res.json({ status: 'ok', hash });
+})
 
 // IPFS API
 
