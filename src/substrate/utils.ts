@@ -28,7 +28,7 @@ export const getEventMethods = () => {
 
 export function encodeStructIds (ids: SubstrateId[]) {
   try {
-    return ids.map(encodeStructId
+    return ids.map(encodeStructId)
   } catch (err) {
     log.error('Failed to encode struct ids:', err)
     return []
