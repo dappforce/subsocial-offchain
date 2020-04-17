@@ -1,5 +1,5 @@
 
-import { pool } from '../adaptors/connect-postgre';
+import { pool } from '../adaptors/connect-postgres';
 import { release } from 'os';
 import { postgesLog as log } from '../adaptors/loggers';
 

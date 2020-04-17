@@ -14,7 +14,7 @@ const pgConf: any = {
 let greeted = false
 if (!greeted) {
   greeted = true;
-  log.info(`Connecting to Postgres at ${pgConf.host}:${pgConf.port} as user '${pgConf.user}'`);
+  log.info(`Connecting to Postgres at ${pgConf.host}:${pgConf.port} as a user '${pgConf.user}'`);
 }
 
 export const pool = new Pool(pgConf);

@@ -1,4 +1,4 @@
-import { pool } from '../adaptors/connect-postgre';
+import { pool } from '../adaptors/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { deleteNotificationsLog, deleteNotificationsLogError } from './postges-logger';

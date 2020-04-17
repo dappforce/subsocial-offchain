@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { pool } from '../adaptors/connect-postgre';
+import { pool } from '../adaptors/connect-postgres';
 import { postgesLog as log } from '../adaptors/loggers';
 
 const ENV = process.env.NODE_ENV || 'development';

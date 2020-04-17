@@ -1,4 +1,4 @@
-import { pool } from '../adaptors/connect-postgre';
+import { pool } from '../adaptors/connect-postgres';
 import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
 import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER, AggCountProps } from '../adaptors/events';
 
