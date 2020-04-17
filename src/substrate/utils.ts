@@ -3,8 +3,8 @@ import { CommentContent, BlogContent, CommonContent, PostContent, ProfileContent
 import { ipfs } from '../adaptors/connect-ipfs';
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
-import searchClient from '../adaptors/connect-elasticsearch'
-import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
+import elastic from '../adaptors/connect-elasticsearch'
+import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/config';
 import { bnToHex } from '@polkadot/util'
 import { newLogger } from '@subsocial/utils';
 import { substrate } from './server';
@@ -113,7 +113,7 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
   }
 
   if (indexData) {
-    await searchClient.index({
+    await elastic.index({
       index,
       id: id instanceof GenericAccountId ? id.toString() : encodeStructId(id),
       body: indexData

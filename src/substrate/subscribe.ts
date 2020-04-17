@@ -1,7 +1,7 @@
 import { EventData } from '@polkadot/types/generic/Event';
 import BN from 'bn.js';
 import { insertElasticSearch } from './utils';
-import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
+import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/config';
 import { BlogId, PostId, CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
 import { substrate } from './server';
