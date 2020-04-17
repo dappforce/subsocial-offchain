@@ -1,6 +1,4 @@
-import { EventData } from '@polkadot/types/generic/Event';
-import BN from 'bn.js';
-import { insertElasticSearch } from './utils';
+import { indexContentFromIpfs } from '../search/indexer';
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/config';
 import { BlogId, PostId, CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
@@ -12,11 +10,7 @@ import { deleteAccountFollower, deleteBlogFollower, deletePostFollower, deleteCo
 import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers, fillNotificationsWithCommentFollowers, fillNotificationsWithPostFollowers } from '../postgres/fill-activity';
 import { insertNotificationForOwner } from '../postgres/notifications';
 import { substrateLog as log } from '../adaptors/loggers';
-type EventAction = {
-  eventName: string,
-  data: EventData,
-  blockHeight: BN
-}
+import { EventAction } from './types';
 
 export const DispatchForDb = async (eventAction: EventAction) => {
   const { data } = eventAction;
@@ -51,7 +45,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const blog = await substrate.findBlog(blogId);
       if (!blog) return;
 
-      insertElasticSearch(ES_INDEX_BLOGS, blog.ipfs_hash.toString(), blogId);
+      indexContentFromIpfs(ES_INDEX_BLOGS, blog.ipfs_hash.toString(), blogId);
       break;
     }
     case 'BlogUpdated': {
@@ -59,7 +53,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const blog = await substrate.findBlog(blogId);
       if (!blog) return;
 
-      insertElasticSearch(ES_INDEX_BLOGS, blog.ipfs_hash.toString(), blogId);
+      indexContentFromIpfs(ES_INDEX_BLOGS, blog.ipfs_hash.toString(), blogId);
       break;
     }
     case 'BlogFollowed': {
@@ -100,7 +94,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
 
       await fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
       await fillNewsFeedWithAccountFollowers(follower, activityId);
-      insertElasticSearch(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
+      indexContentFromIpfs(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
       break;
     }
     case 'PostUpdated': {
@@ -108,7 +102,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const post = await substrate.findPost(postId);
       if (!post) return;
 
-      insertElasticSearch(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
+      indexContentFromIpfs(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
       break;
     }
     case 'PostShared': {
@@ -160,7 +154,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
         await fillNotificationsWithPostFollowers(postId, commentCreator, activityId);
         await fillNotificationsWithAccountFollowers(commentCreator, activityId);
       }
-      insertElasticSearch(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
+      indexContentFromIpfs(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
       break;
     }
     case 'CommentUpdated': {
@@ -168,7 +162,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       const comment = await substrate.findComment(commentId);
       if (!comment) return;
 
-      insertElasticSearch(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
+      indexContentFromIpfs(ES_INDEX_COMMENTS, comment.ipfs_hash.toString(), commentId);
       break;
     }
     case 'CommentShared': {
@@ -240,7 +234,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap();
-      insertElasticSearch(ES_INDEX_PROFILES, profile.ipfs_hash.toString(), accountId, { username: profile.username.toString() });
+      indexContentFromIpfs(ES_INDEX_PROFILES, profile.ipfs_hash.toString(), accountId, { username: profile.username.toString() });
       break;
     }
     case 'ProfileUpdated' : {
@@ -252,7 +246,7 @@ export const DispatchForDb = async (eventAction: EventAction) => {
       if (profileOpt.isNone) return;
 
       const profile = profileOpt.unwrap();
-      insertElasticSearch(ES_INDEX_PROFILES, profile.ipfs_hash.toString(), accountId, { username: profile.username.toString() });
+      indexContentFromIpfs(ES_INDEX_PROFILES, profile.ipfs_hash.toString(), accountId, { username: profile.username.toString() });
       break;
     }
   }

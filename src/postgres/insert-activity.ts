@@ -6,7 +6,7 @@ import { substrate } from '../substrate/server';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
-import { EventAction } from '../adaptors/events';
+import { EventAction } from '../substrate/types';
 
 export const insertNotificationForOwner = async (id: number, account: string) => {
   const params = [ account, id ]
