@@ -1,24 +1,24 @@
-import { pool } from '../adaptors/connect-postgre';
+import { pool } from '../adaptors/connect-postgres';
 import { encodeStructIds } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../substrate/server';
-import { updateUnreadNotifications, getAggregationCount } from './notifications';
+import { updateUnreadNotificationsCount, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { EventAction } from '../adaptors/events';
 
-
 export const insertNotificationForOwner = async (id: number, account: string) => {
+  const params = [ account, id ]
   const query = `
       INSERT INTO df.notifications
         VALUES($1, $2) 
-      RETURNING *`;
-  const params = [ account, id ];
+      RETURNING *`
+
   try {
     await pool.query(query, params)
     insertActivityLog('owner')
-    await updateUnreadNotifications(account)
+    await updateUnreadNotificationsCount(account)
   } catch (err) {
     insertActivityLogError('owner', err.stack)
   }
