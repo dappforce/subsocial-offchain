@@ -172,8 +172,9 @@ function setPrettyString (obj: Og | Fb | Twitter, propName: string, getValueFn: 
   }
 }
 
+// TODO make all the fields optional except 'url'
 type PressMeta = {
-  generated: boolean,
+  generated: boolean, // TODO delete 'generated' field
   url: string,
   title: string,
   desc: string,
@@ -184,17 +185,17 @@ type PressMeta = {
 
 export default function parse (siteUrls: string[]) {
 
-  const parseSitePromises: ParsedSite[] = []
+  const parseSitePromises: Promise<ParsedSite>[] = []
   siteUrls = siteUrls.map(x => nonEmptyStr(x) ? x.trim() : x)
-  siteUrls.forEach(async (pressUrl: string) => {
+  siteUrls.forEach(pressUrl => {
     if (nonEmptyStr(pressUrl)) {
-      parseSitePromises.push(await parseSiteWithRequest(pressUrl));
+      parseSitePromises.push(parseSiteWithRequest(pressUrl));
     }
   });
 
   return Promise.all(parseSitePromises)
     .then(results => {
-      // console.log(`Press mentions parser: Promise results`, results);
+      // console.log(`Site parser: Promise results`, results);
 
       const urlToMetaMap = new Map();
       results.forEach(({ url, siteMeta }) => {
@@ -207,6 +208,7 @@ export default function parse (siteUrls: string[]) {
           parsedPress.push(pressUrl);
           return;
         }
+
         const pressMeta = {
           generated: true,
           url: pressUrl,
@@ -216,6 +218,7 @@ export default function parse (siteUrls: string[]) {
           date: '',
           author: ''
         };
+
         if (urlToMetaMap.has(pressUrl)) {
           const sm = urlToMetaMap.get(pressUrl);
 
