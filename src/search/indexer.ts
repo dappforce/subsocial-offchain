@@ -4,8 +4,8 @@ import { PostId, SubstrateId } from '@subsocial/types/substrate/interfaces';
 import { CommentContent, BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { encodeStructId } from '../substrate/utils';
 import { substrate } from '../substrate/server';
-import { ipfs } from '../adaptors/connect-ipfs';
-import elastic from '../adaptors/connect-elasticsearch'
+import { ipfs } from '../connections/connect-ipfs';
+import elastic from '../connections/connect-elasticsearch'
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from './config';
 
 export async function indexContentFromIpfs (

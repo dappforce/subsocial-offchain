@@ -9,7 +9,7 @@ import { deleteNotificationsAboutAccount, deleteNotificationsAboutBlog, deleteNo
 import { deleteAccountFollower, deleteBlogFollower, deletePostFollower, deleteCommentFollower } from '../postgres/delete-follower';
 import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers, fillNotificationsWithCommentFollowers, fillNotificationsWithPostFollowers } from '../postgres/fill-activity';
 import { insertNotificationForOwner } from '../postgres/notifications';
-import { substrateLog as log } from '../adaptors/loggers';
+import { substrateLog as log } from '../connections/loggers';
 import { EventAction } from './types';
 
 export const DispatchForDb = async (eventAction: EventAction) => {

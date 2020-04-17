@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
-import { pool } from '../adaptors/connect-postgres';
-import { postgesLog as log } from '../adaptors/loggers';
+import { pool } from '../connections/connect-postgres';
+import { postgesLog as log } from '../connections/loggers';
 
 const ENV = process.env.NODE_ENV || 'development';
 const buildPath = ENV === 'production' ? 'build/' : '';

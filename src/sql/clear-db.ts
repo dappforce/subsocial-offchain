@@ -1,7 +1,7 @@
 
-import { pool } from '../adaptors/connect-postgres';
+import { pool } from '../connections/connect-postgres';
 import { release } from 'os';
-import { postgesLog as log } from '../adaptors/loggers';
+import { postgesLog as log } from '../connections/loggers';
 
 const query = `
   TRUNCATE

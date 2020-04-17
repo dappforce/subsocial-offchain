@@ -1,4 +1,4 @@
-import { pool } from '../adaptors/connect-postgres';
+import { pool } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';

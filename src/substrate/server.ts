@@ -3,7 +3,7 @@ import { DispatchForDb } from './subscribe'
 import { getEventSections, getEventMethods } from './utils';
 import { Api } from '@subsocial/api/substrateConnect';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { substrateLog as log } from '../adaptors/loggers';
+import { substrateLog as log } from '../connections/loggers';
 
 export let substrate: SubsocialSubstrateApi;
 

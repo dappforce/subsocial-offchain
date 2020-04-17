@@ -1,10 +1,10 @@
-import elastic from '../adaptors/connect-elasticsearch'
+import elastic from '../connections/connect-elasticsearch'
 import * as BlogsMapping from './mappings/blogs.json'
 import * as PostsMapping from './mappings/posts.json'
 import * as CommentsMapping from './mappings/comments.json'
 import * as ProfilesMapping from './mappings/profiles.json'
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from './config'
-import { elasticLog as log } from '../adaptors/loggers';
+import { elasticLog as log } from '../connections/loggers';
 
 async function maybeCreateIndices () {
   await createIndexIfNoFound(ES_INDEX_BLOGS, BlogsMapping)

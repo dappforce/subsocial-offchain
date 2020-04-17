@@ -1,8 +1,8 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import ipfs from '../adaptors/connect-ipfs';
-import { pool } from '../adaptors/connect-postgres';
+import ipfs from '../connections/connect-ipfs';
+import { pool } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger } from '@subsocial/utils';
 import { parseSiteWithRequest as siteParser } from '../parser/parse-site'

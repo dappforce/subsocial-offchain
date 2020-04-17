@@ -1,5 +1,5 @@
 
-import { postgesLog as log } from '../adaptors/loggers';
+import { postgesLog as log } from '../connections/loggers';
 
 export { log };
 

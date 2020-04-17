@@ -1,4 +1,4 @@
-import { pool } from '../adaptors/connect-postgres';
+import { pool } from '../connections/connect-postgres';
 import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
 
