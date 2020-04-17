@@ -5,8 +5,10 @@ import * as cors from 'cors';
 import ipfs from '../adaptors/connect-ipfs';
 import { pool } from '../adaptors/connect-postgre';
 import { logSuccess, logError } from '../postgres/postges-logger';
-import { getUnreadNotifications, eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../postgres/notifications';
 import { newLogger } from '@subsocial/utils';
+import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
+import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from '../adaptors/events';
+import { getUnreadNotifications } from '../postgres/notifications';
 
 // import * as multer from 'multer';
 // const upload = multer();
@@ -128,6 +130,12 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
     logError('mark all notifications as read', `by account: ${account}`, err.stack);
 
   }
+});
+
+app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
+  const data = await siteParser(req.body.url)
+
+  res.send(data);
 });
 
 const wsPort = parseInt(process.env.OFFCHAIN_WS_PORT || '3011')

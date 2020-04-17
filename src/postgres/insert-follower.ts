@@ -1,11 +1,8 @@
 import { EventData } from '@polkadot/types/generic/Event';
 import { pool } from '../adaptors/connect-postgre';
 import { encodeStructId } from '../substrate/utils';
-import * as events from 'events'
 import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { insertFollowersLog, insertFollowersLogError } from './postges-logger';
-export const eventEmitter = new events.EventEmitter();
-export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
 
 export const insertAccountFollower = async (data: EventData) => {
   const query = `

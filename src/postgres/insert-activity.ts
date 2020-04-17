@@ -1,22 +1,13 @@
-import { EventData } from '@polkadot/types/generic/Event';
 import { pool } from '../adaptors/connect-postgre';
 import { encodeStructIds } from '../substrate/utils';
-import BN from 'bn.js';
-import * as events from 'events'
 import { isEmptyArray } from '@subsocial/utils/array'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../substrate/server';
 import { updateUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
-export const eventEmitter = new events.EventEmitter();
-export const EVENT_UPDATE_NOTIFICATIONS_COUNTER = 'eventUpdateNotificationsCounter'
+import { EventAction } from '../adaptors/events';
 
-type EventAction = {
-  eventName: string,
-  data: EventData,
-  blockHeight: BN
-}
 
 export const insertNotificationForOwner = async (id: number, account: string) => {
   const query = `

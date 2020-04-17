@@ -21,15 +21,15 @@ async function main () {
   // internally connects to all storage sinks
   const api = await Api.connect(process.env.SUBSTRATE_URL)
   substrate = new SubsocialSubstrateApi(api);
-  substrate.api.query.system.events((events) => {
+  api.query.system.events((events) => {
     events.forEach(async (record) => {
       // extract the event object
       const { event } = record;
       // check section filter
       if ((eventsFilterSections.includes(event.section.toString()) && eventsFilterMethods.includes(event.method.toString())) || eventsFilterSections.includes('all')) {
         // create event object for data sink
-        const blockHash = await substrate.api.rpc.chain.getFinalizedHead();
-        const header = await substrate.api.rpc.chain.getHeader(blockHash);
+        const blockHash = await api.rpc.chain.getFinalizedHead();
+        const header = await api.rpc.chain.getHeader(blockHash);
 
         const eventObj = {
           section: event.section,
