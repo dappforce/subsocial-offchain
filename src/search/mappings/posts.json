@@ -29,6 +29,9 @@
   },
   "mappings": {
     "properties": {
+      "blog_id": {
+        "type": "text"
+      },
       "title": {
         "type": "text",
         "fields": {

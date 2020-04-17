@@ -7,6 +7,8 @@ import searchClient from '../adaptors/connect-elasticsearch'
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from '../search/indexes';
 import { bnToHex } from '@polkadot/util'
 import { newLogger } from '@subsocial/utils';
+import { substrate } from './server';
+import { PostId } from '@subsocial/types/substrate/interfaces';
 
 const log = newLogger('Substrate utils')
 
@@ -72,7 +74,9 @@ export async function insertElasticSearch (index: string, ipfsHash: string, id: 
       if (!content) return;
 
       const { title, body, tags } = content
+      const { blog_id } = await substrate.findPost(id as PostId);
       indexData = {
+        blog_id: encodeStructId(blog_id),
         title,
         body,
         tags,

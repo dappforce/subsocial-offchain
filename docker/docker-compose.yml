@@ -15,7 +15,7 @@ services:
       http.cors.enabled: "true"
       http.cors.allow-credentials: "true"
       http.cors.allow-origin: "*"
-      http.cors.allow-methods: "GET"
+      http.cors.allow-methods: "GET, PUT"
       http.cors.allow-headers: "X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization,Access-Control-Allow-Headers,Accept"
     volumes:
       - es_data:/usr/share/elasticsearch/data
