@@ -6,3 +6,11 @@ export type SubstrateEvent = {
   data: EventData,
   blockHeight: BN
 }
+
+export type OffchainState = {
+  lastBlock?: number
+}
+
+export const defaultOffchainState = (): OffchainState => ({
+  lastBlock: undefined
+})
