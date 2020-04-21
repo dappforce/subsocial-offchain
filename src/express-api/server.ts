@@ -7,7 +7,7 @@ import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger } from '@subsocial/utils';
 import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
 import { informClientAboutUnreadNotifications } from './events';
-import { startNotificationsServer } from './ws';
+// import { startNotificationsServer } from './ws';
 
 // import * as multer from 'multer';
 // const upload = multer();
@@ -137,7 +137,7 @@ app.post('/offchain/parser/', async (req: express.Request, res: express.Response
   res.send(data);
 });
 
-startNotificationsServer()
+// startNotificationsServer()
 
 const port = process.env.OFFCHAIN_SERVER_PORT
 app.listen(port, () => {

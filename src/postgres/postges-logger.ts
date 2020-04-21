@@ -7,7 +7,7 @@ export const logSuccess = (operation: string, structName: string) =>
   log.debug(`Succeeded to ${operation} ${structName}`)
 
 export const logError = (operation: string, structName: string, error: any) =>
-  log.error(`Failed to ${operation} ${structName}. Error:`, error)
+  log.error(`Failed to ${operation} ${structName}. Error: ${error}`)
 
 type StructName = 'post' | 'blog' | 'comment' | 'account' | 'owner' | 'post reaction' | 'comment reaction';
 

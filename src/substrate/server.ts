@@ -26,6 +26,7 @@ async function main () {
       // extract the event object
       const { event } = record;
       // check section filter
+  
       if ((eventsFilterSections.includes(event.section.toString()) && eventsFilterMethods.includes(event.method.toString())) || eventsFilterSections.includes('all')) {
         // create event object for data sink
         const blockHash = await api.rpc.chain.getFinalizedHead();
