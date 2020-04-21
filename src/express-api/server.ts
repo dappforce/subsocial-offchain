@@ -4,7 +4,7 @@ import * as cors from 'cors';
 import ipfs from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
-import { newLogger } from '@subsocial/utils';
+import { newLogger, nonEmptyStr, parseNumStr } from '@subsocial/utils';
 import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws';
@@ -13,7 +13,7 @@ import { informClientAboutUnreadNotifications } from './events';
 // const upload = multer();
 
 require('dotenv').config();
-const LIMIT = process.env.PGLIMIT || '20';
+const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
 const log = newLogger('ExpressOffchainApi')
 const app = express();
@@ -36,19 +36,27 @@ app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
 
 // IPFS API
 
-const limitLog = (limit: string) => log.debug(`Limit db results to ${limit} items`);
+
+const limitLog = (limit: number) =>
+  log.debug(`Limit db results to ${limit} items`);
+
+const getLimitFromRequest = (req: express.Request): number => {
+  const reqLimit = req.query.limit
+  const limit = nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : RESULT_LIMIT
+  limitLog(limit)
+  return limit
+}
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const hash = await ipfs.saveContent(req.body);
   log.info('Content saved to IPFS with hash:', hash);
-
   res.json(hash);
 });
 
 // User feed and notifications API
 
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
-  const limit = req.query.limit.toString();
+  const limit = getLimitFromRequest(req);
   const account = req.params.id;
   limitLog(limit)
   const offset = req.query.offset;
@@ -78,8 +86,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
 });
 
 app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
-  const limit = req.query.limit > LIMIT ? LIMIT : req.query.limit.toString();
-  limitLog(limit)
+  const limit = getLimitFromRequest(req);
   const offset = req.query.offset;
   const account = req.params.id;
   const query = `
