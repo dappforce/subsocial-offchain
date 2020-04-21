@@ -12,6 +12,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   await insertCommentFollower(data);
   const commentId = data[1] as CommentId;
+
   const comment = await substrate.findComment(commentId);
   if (!comment) return;
 

@@ -46,6 +46,7 @@ export const insertActivityComments = async (eventAction: SubstrateEvent, ids: S
 };
 
 export const insertActivityForComment = async (eventAction: SubstrateEvent, ids: SubstrateId[], creator: string): Promise<number> => {
+
   const paramsIds = encodeStructIds(ids)
 
   if (isEmptyArray(paramsIds)) {
@@ -53,12 +54,16 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
     return -1
   }
 
+  if (paramsIds.length !== 3) {
+    paramsIds.push(null);
+  }
+
   const [ postId ] = paramsIds;
   const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-      INSERT INTO df.activities(account, event, post_id, comment_id, parent_comment_id, block_height, agg_count,aggregated)
+      INSERT INTO df.activities(account, event, post_id, comment_id, parent_comment_id, block_height, agg_count, aggregated)
         VALUES($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *`
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
@@ -209,11 +214,13 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
   const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
+  
   const query = `
       INSERT INTO df.activities(account, event, post_id, block_height, agg_count,aggregated)
         VALUES($1, $2, $3, $4, $5, $6)
       RETURNING *`
   const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
+  console.log('PostREaction >>>>>>>>>>>>>>>>>>>', params)
   try {
     const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
@@ -234,6 +241,7 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
 
     return activityId;
   } catch (err) {
+    console.log('PostREaction >>>>>>>>>>>>>>>>>>> error', err.stack)
     insertActivityLogError('post reaction', err.stack);
     return -1;
   }
