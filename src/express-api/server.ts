@@ -36,7 +36,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
 
 // IPFS API
 
-const limitLog = (limit: number) => log.debug(`Limit db results to ${limit} items`);
+const limitLog = (limit: string) => log.debug(`Limit db results to ${limit} items`);
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const hash = await ipfs.saveContent(req.body);
@@ -48,7 +48,7 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
 // User feed and notifications API
 
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
-  const limit = req.query.limit;
+  const limit = req.query.limit.toString();
   const account = req.params.id;
   limitLog(limit)
   const offset = req.query.offset;
@@ -78,7 +78,7 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
 });
 
 app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
-  const limit = req.query.limit > LIMIT ? LIMIT : req.query.limit;
+  const limit = req.query.limit > LIMIT ? LIMIT : req.query.limit.toString();
   limitLog(limit)
   const offset = req.query.offset;
   const account = req.params.id;
