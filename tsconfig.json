@@ -3,6 +3,7 @@
     "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "importHelpers": true,
@@ -19,11 +20,7 @@
     "strictNullChecks": false
   },
   "include": [
-    "src/subscribe-substrate/*",
-    "__tests__/**/*", "src/server.ts"
-  ],
-  "exclude": [
-    "src/df-types",
-    "df-types"
-]
+    "src/**/*",
+    "__tests__/**/*"
+  ]
 }

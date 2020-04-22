@@ -3,14 +3,13 @@
 ## Setup
 
 ```sh
-# Install Node.js dependencies:
+# Install Node.js dependencies
 yarn
 
-# Run TypeScript compilation:
+# Compile TypeScript
 yarn build
 
-
-## Usage
+# Run
 yarn start
 ```
 
@@ -22,14 +21,17 @@ yarn start
 + `api` - run only express-api server,
 + `subscribe` - run only subscribe server
 
-## What's included:
+## Building from Docker
 
-+ [TypeScript][typescript] [3.5][typescript-35],
-+ [TSLint][tslint] with [Microsoft rules][tslint-microsoft-contrib],
-+ [Jest][jest] unit testing and code coverage,
-+ Type definitions for Node.js and Jest,
-+ [Prettier][prettier] to enforce a consistent code style,
-+ [NPM scripts for common operations](#available-scripts),
-+ .editorconfig for consistent file format.
+### Easiest start
 
-The main code is located in the `src/substrate-subsrcibe`
+To start Subsocial offchain storage separately (you should have docker-compose):
+
+```
+cd docker/
+./compose.sh
+```
+
+It will start 3 containers: postgres, elasticsearch and offchain itself.
+
+### Start all parts of Subsocial at once with [Subsocial-Starter](https://github.com/dappforce/dappforce-subsocial-starter)
