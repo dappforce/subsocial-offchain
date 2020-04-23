@@ -8,8 +8,25 @@ import { ipfs } from '../connections/connect-ipfs';
 import elastic from '../connections/connect-elasticsearch'
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
+import { newLogger } from '@subsocial/utils';
+
+const log = newLogger(indexContentFromIpfs.name)
 
 export async function indexContentFromIpfs (
+  index: string,
+  ipfsHash: string,
+  id: SubstrateId | AccountId,
+  extData?: object
+): Promise<Error | void> {
+  try {
+    await doIndexContentFromIpfs(index, ipfsHash, id, extData)
+  } catch (err) {
+    log.error('Failed to index content into Elastic')
+    return err
+  }
+}
+
+async function doIndexContentFromIpfs (
   index: string,
   ipfsHash: string,
   id: SubstrateId | AccountId,

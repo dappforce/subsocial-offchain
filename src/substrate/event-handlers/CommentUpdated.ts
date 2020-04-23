@@ -2,9 +2,9 @@ import { indexContentFromIpfs } from '../../search/indexer';
 import { ES_INDEX_COMMENTS } from '../../search/config';
 import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../server';
-import { SubstrateEvent } from '../types';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
 
-export const onCommentUpdated = async (eventAction: SubstrateEvent) => {
+export const onCommentUpdated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
   const commentId = data[1] as CommentId;
   const comment = await substrate.findComment(commentId);

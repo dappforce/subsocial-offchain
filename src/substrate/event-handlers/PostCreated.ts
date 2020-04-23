@@ -5,9 +5,9 @@ import { substrate } from '../server';
 import { insertPostFollower } from '../../postgres/insert-follower';
 import { insertActivityForPost } from '../../postgres/insert-activity';
 import { fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers } from '../../postgres/fill-activity';
-import { SubstrateEvent } from '../types';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
 
-export const onPostCreated = async (eventAction: SubstrateEvent) => {
+export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
   insertPostFollower(data);
   const postId = data[1] as PostId;

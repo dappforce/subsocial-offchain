@@ -1,25 +1,16 @@
-import { SubstrateEvent } from './types'
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from './types'
 import * as handlers from './event-handlers/index'
+import { newLogger } from '@subsocial/utils'
 
-export const DispatchForDb = async (event: SubstrateEvent) => {
-  switch (event.eventName) {
-    case 'AccountFollowed': return handlers.onAccountFollowed(event)
-    case 'AccountUnfollowed': return handlers.onAccountUnfollowed(event)
-    case 'BlogCreated': return handlers.onBlogCreated(event)
-    case 'BlogUpdated': return handlers.onBlogUpdated(event)
-    case 'BlogFollowed': return handlers.onBlogFollowed(event)
-    case 'BlogUnfollowed': return handlers.onBlogUnfollowed(event)
-    case 'PostCreated': return handlers.onPostCreated(event)
-    case 'PostUpdated': return handlers.onPostUpdated(event)
-    case 'PostShared': return handlers.onPostShared(event)
-    case 'PostDeleted': return handlers.onPostDeleted(event)
-    case 'CommentCreated': return handlers.onCommentCreated(event)
-    case 'CommentUpdated': return handlers.onCommentUpdated(event)
-    case 'CommentShared': return handlers.onCommentShared(event)
-    case 'CommentDeleted': return handlers.onCommentDeleted(event)
-    case 'PostReactionCreated': return handlers.onPostReactionCreated(event)
-    case 'CommentReactionCreated': return handlers.onCommentReactionCreated(event)
-    case 'ProfileCreated' : return handlers.onProfileCreated(event)
-    case 'ProfileUpdated' : return handlers.onProfileUpdated(event)
+export const DispatchForDb: EventHandlerFn = async (event: SubstrateEvent): Promise<HandlerResult> => {
+  const { eventName } = event
+  const handle: EventHandlerFn | undefined = handlers[`on${eventName}`]
+  if (typeof handle === 'function') {
+    return handle(event)
+  } else {
+    log.debug(`No handler defined for Substrate event '${eventName}'`)
+    return HandlerResultOK
   }
 }
+
+const log = newLogger(DispatchForDb.name)

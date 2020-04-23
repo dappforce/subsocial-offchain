@@ -1,8 +1,8 @@
 import { deleteNotificationsAboutAccount } from '../../postgres/delete-activity';
 import { deleteAccountFollower } from '../../postgres/delete-follower';
-import { SubstrateEvent } from '../types';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
 
-export const onAccountUnfollowed = async (eventAction: SubstrateEvent) => {
+export const onAccountUnfollowed: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
   const follower = data[0].toString();
   const following = data[1].toString();

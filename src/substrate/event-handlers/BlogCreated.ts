@@ -4,9 +4,9 @@ import { BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../server';
 import { insertActivityForBlog } from '../../postgres/insert-activity';
 import { fillNotificationsWithAccountFollowers } from '../../postgres/fill-activity';
-import { SubstrateEvent } from '../types';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
 
-export const onBlogCreated = async (eventAction: SubstrateEvent) => {
+export const onBlogCreated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
   const account = data[0].toString();
   const activityId = await insertActivityForBlog(eventAction, 0);

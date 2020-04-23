@@ -6,9 +6,9 @@ import { insertCommentFollower } from '../../postgres/insert-follower';
 import { insertActivityComments, insertActivityForComment } from '../../postgres/insert-activity';
 import { fillNotificationsWithAccountFollowers, fillNotificationsWithPostFollowers } from '../../postgres/fill-activity';
 import { substrateLog as log } from '../../connections/loggers';
-import { SubstrateEvent } from '../types';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
 
-export const onCommentCreated = async (eventAction: SubstrateEvent) => {
+export const onCommentCreated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
   await insertCommentFollower(data);
   const commentId = data[1] as CommentId;
