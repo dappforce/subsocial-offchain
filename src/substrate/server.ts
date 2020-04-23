@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { BlockNumber, Event, EventRecord, Hash } from '@polkadot/types/interfaces';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { Api, api } from '@subsocial/api/substrateConnect';
+import { Api } from '@subsocial/api/substrateConnect';
+import { ApiPromise } from '@polkadot/api'
 import { isDef, parseNumStr } from '@subsocial/utils';
-import { readFile } from 'fs';
+import { readFile, writeFile } from 'fs';
 import { substrateLog as log } from '../connections/loggers';
 import { DispatchForDb } from './subscribe';
 import { defaultOffchainState, OffchainState } from './types';
@@ -11,19 +12,20 @@ import { eventsFilterMethods, eventsFilterSections } from './utils';
 import { promisify } from 'util'
 
 const asyncReadFile = promisify(readFile)
+const asyncWriteFile = promisify(writeFile)
+const stateFilePath = `${__dirname}/../state.json`
 
 export let substrate: SubsocialSubstrateApi;
 
 require('dotenv').config();
 
 async function readOffchainState (): Promise<OffchainState> {
-  const stateFilePath = `${__dirname}/../state.json`
   let state = defaultOffchainState()
   try {
     const json = await asyncReadFile(stateFilePath, 'utf8')
     state = JSON.parse(json) as OffchainState
   } catch (err) {
-    log.error('Failed to read offchain state from file:', stateFilePath)
+    log.error(`Failed to read offchain state from file: ${stateFilePath}`)
   }
   return state
 }
@@ -41,25 +43,46 @@ async function main () {
   substrate = new SubsocialSubstrateApi(api);
 
   const { lastBlock } = await readOffchainState()
+  const slotDuration = api.consts.timestamp?.minimumPeriod.muln(2).toNumber();
 
-  const blockIndex = (isDef(lastBlock) && lastBlock >= 0
+  let blockIndex = (isDef(lastBlock) && lastBlock >= 0
     ? lastBlock
     : parseNumStr(process.env.SUBSTRATE_START_FROM_BLOCK)
-   ) || 0
+  ) || 0
 
-  const blockNumber: BlockNumber = api.createType('BlockNumber', blockIndex)
-  const blockHash: Hash = await api.rpc.chain.getBlockHash(blockNumber)
-  log.info(`Block hash at height ${blockIndex}: ${blockHash}`)
+  let lastKnownBestFinalized = (
+    await api.derive.chain.bestNumberFinalized()
+  ).toNumber()
 
-  // TODO run in while () {
+  while (true) {
+    if (blockIndex > lastKnownBestFinalized) {
+      log.debug('Waiting for finalization.')
+
+      const bestFinalizedBlock = (await api.derive.chain.bestNumberFinalized()).toNumber();
+      lastKnownBestFinalized = bestFinalizedBlock;
+
+      await new Promise(r => setTimeout(r, slotDuration));
+      continue;
+    }
+
+    log.debug(`Block index: ${blockIndex}`)
+    log.debug(`Last known best finalized: ${lastKnownBestFinalized}`)
+    const blockNumber: BlockNumber = api.createType('BlockNumber', blockIndex)
+    const blockHash: Hash = await api.rpc.chain.getBlockHash(blockNumber)
+    log.debug(`Block hash: ${blockHash}`)
+
     const events = await api.query.system.events.at(blockHash)
     // Process all events of the current block
     for(const record of events) {
-      await processEventRecord(record)
+      await processEventRecord(api, record)
     }
-    // TODO save this block height to state.json: { lastBlock: blockIndex }
-    // TODO increment block: blockIndex++
-  // } // end of while
+
+    blockIndex += 1;
+    const json = JSON.stringify({
+      lastBlock: blockIndex
+    } as OffchainState);
+    await asyncWriteFile(stateFilePath, json, 'utf8');
+  }
 }
 
 function shouldProcessEvent (event: Event): boolean {
@@ -69,7 +92,7 @@ function shouldProcessEvent (event: Event): boolean {
   ) || eventsFilterSections.includes('all')
 }
 
-async function processEventRecord (record: EventRecord) {
+async function processEventRecord (api: ApiPromise, record: EventRecord) {
   // extract the event object
   const { event } = record;
   if (!shouldProcessEvent(event)) return;
