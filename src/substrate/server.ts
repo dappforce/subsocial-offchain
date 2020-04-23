@@ -42,10 +42,53 @@ async function main () {
 
         log.debug('Event received:', JSON.stringify(eventObj))
 
-        await DispatchForDb({ eventName: eventObj.method, data: eventObj.data, blockHeight: eventObj.blockHeight });
+        // TODO get real state from file here:
+        const state: OffchainState = {} as OffchainState
+
+        const lastPostgresBlock = state.Postgres.lastBlock
+        const lastElasticBlock = state.Elastic.lastBlock
+
+        let processPostgres = false
+        let processElastic = false
+        
+        if (lastPostgresBlock < lastElasticBlock) {
+          // Process event only for Postgres
+          processPostgres = true
+        } else if (lastElasticBlock < lastPostgresBlock) {
+          // Process event only for ElasticSearch
+          processElastic = true
+        } else {
+          // Process event for both Postgres and ElasticSearch
+          processPostgres = true
+          processElastic = true
+        }
+
+        const eventData = { eventName: eventObj.method, data: eventObj.data, blockHeight: eventObj.blockHeight }
+        
+        const res = await DispatchForDb({ ...eventData, processPostgres, processElastic })
+        // TODO get HandlerResult here and update corresponding state in state.json file 
+        // for both Postgres and Elastic
+        
+        if (res.PostgresError) {
+          // TODO stop processing postgres
+        }
+
+        if (res.ElasticError) {
+          // TODO stop processing Elastic
+        }
       }
     });
   });
+}
+
+type CommonDbState = {
+  lastBlock?: number
+  lastError?: string
+}
+
+type OffchainState = {
+  Postgres: CommonDbState,
+  Elastic: CommonDbState
 }
 
 main().catch((error) => {

@@ -3,9 +3,9 @@ import { substrate } from '../server';
 import { insertBlogFollower } from '../../postgres/insert-follower';
 import { insertActivityForBlog } from '../../postgres/insert-activity';
 import { insertNotificationForOwner } from '../../postgres/notifications';
-import { SubstrateEvent } from '../types';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
 
-export const onBlogFollowed = async (eventAction: SubstrateEvent) => {
+export const onBlogFollowed: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
   await insertBlogFollower(data);
   const blogId = data[1] as BlogId;

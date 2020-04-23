@@ -2,9 +2,9 @@ import { indexContentFromIpfs } from '../../search/indexer';
 import { ES_INDEX_BLOGS } from '../../search/config';
 import { BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../server';
-import { SubstrateEvent } from '../types';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
 
-export const onBlogUpdated = async (eventAction: SubstrateEvent) => {
+export const onBlogUpdated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
   const blogId = data[1] as BlogId;
   const blog = await substrate.findBlog(blogId);
