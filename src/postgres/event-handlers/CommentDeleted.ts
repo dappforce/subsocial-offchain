@@ -1,7 +1,7 @@
 import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { deleteNotificationsAboutComment } from '../../postgres/delete-activity';
-import { deleteCommentFollower } from '../../postgres/delete-follower';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
+import { deleteNotificationsAboutComment } from '../delete-activity';
+import { deleteCommentFollower } from '../delete-follower';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
 
 export const onCommentDeleted: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
@@ -9,4 +9,5 @@ export const onCommentDeleted: EventHandlerFn = async (eventAction: SubstrateEve
   const following = data[1] as CommentId;
   await deleteNotificationsAboutComment(follower, following);
   await deleteCommentFollower(data);
+  return HandlerResultOK;
 }

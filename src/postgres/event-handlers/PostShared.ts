@@ -1,9 +1,9 @@
 import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../server';
-import { insertActivityForPost } from '../../postgres/insert-activity';
-import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers } from '../../postgres/fill-activity';
-import { insertNotificationForOwner } from '../../postgres/notifications';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK, HandlerResultErrorInPostgres } from '../types';
+import { substrate } from '../../substrate/server';
+import { insertActivityForPost } from '../insert-activity';
+import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers } from '../fill-activity';
+import { insertNotificationForOwner } from '../notifications';
+import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
 
 export const onPostShared: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
   const { data } = eventAction;
@@ -11,15 +11,16 @@ export const onPostShared: EventHandlerFn = async (eventAction: SubstrateEvent):
   const follower = data[0].toString();
 
   const post = await substrate.findPost(postId);
-  if (!post) return;
+  if (!post) return HandlerResultOK;
 
   const ids = [ post.blog_id, postId ];
   const activityId = await insertActivityForPost(eventAction, ids);
-  if (activityId === -1) return;
+  if (activityId === -1) return HandlerResultOK;
 
   const account = post.created.account.toString();
   insertNotificationForOwner(activityId, account);
   fillNotificationsWithAccountFollowers(follower, activityId);
   fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
   fillNewsFeedWithAccountFollowers(follower, activityId)
+  return HandlerResultOK;
 }

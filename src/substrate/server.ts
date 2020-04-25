@@ -7,7 +7,6 @@ import { isDef, parseNumStr } from '@subsocial/utils';
 import { readFile, writeFile } from 'fs';
 import { substrateLog as log } from '../connections/loggers';
 import { DispatchForDb } from './subscribe';
-import { defaultOffchainState, OffchainState } from './types';
 import { eventsFilterMethods, eventsFilterSections } from './utils';
 import { promisify } from 'util'
 
@@ -42,8 +41,11 @@ async function main () {
   const api = await Api.connect(process.env.SUBSTRATE_URL)
   substrate = new SubsocialSubstrateApi(api);
 
-  const { lastBlock } = await readOffchainState()
   const slotDuration = api.consts.timestamp?.minimumPeriod.muln(2).toNumber();
+  const offchainState = await readOffchainState()
+  const lastBlock = offchainState.Elastic.lastBlock < offchainState.Postgres.lastBlock
+    ? offchainState.Elastic.lastBlock
+    : offchainState.Postgres.lastBlock
 
   let blockIndex = (isDef(lastBlock) && lastBlock >= 0
     ? lastBlock
@@ -56,7 +58,7 @@ async function main () {
 
   while (true) {
     if (blockIndex > lastKnownBestFinalized) {
-      log.debug('Waiting for finalization.')
+      log.debug('Waiting for finalization...')
 
       const bestFinalizedBlock = (await api.derive.chain.bestNumberFinalized()).toNumber();
       lastKnownBestFinalized = bestFinalizedBlock;
@@ -65,22 +67,21 @@ async function main () {
       continue;
     }
 
-    log.debug(`Block index: ${blockIndex}`)
-    log.debug(`Last known best finalized: ${lastKnownBestFinalized}`)
     const blockNumber: BlockNumber = api.createType('BlockNumber', blockIndex)
     const blockHash: Hash = await api.rpc.chain.getBlockHash(blockNumber)
+
+    log.debug(`Block index: ${blockIndex}`)
+    log.debug(`Last known best finalized: ${lastKnownBestFinalized}`)
     log.debug(`Block hash: ${blockHash}`)
 
     const events = await api.query.system.events.at(blockHash)
     // Process all events of the current block
     for(const record of events) {
-      await processEventRecord(api, record)
+      await processEventRecord(api, record, offchainState)
     }
 
     blockIndex += 1;
-    const json = JSON.stringify({
-      lastBlock: blockIndex
-    } as OffchainState);
+    const json = JSON.stringify(offchainState);
     await asyncWriteFile(stateFilePath, json, 'utf8');
   }
 }
@@ -92,7 +93,7 @@ function shouldProcessEvent (event: Event): boolean {
   ) || eventsFilterSections.includes('all')
 }
 
-async function processEventRecord (api: ApiPromise, record: EventRecord) {
+async function processEventRecord (api: ApiPromise, record: EventRecord, state: OffchainState) {
   // extract the event object
   const { event } = record;
   if (!shouldProcessEvent(event)) return;
@@ -110,9 +111,6 @@ async function processEventRecord (api: ApiPromise, record: EventRecord) {
   };
 
   log.debug(`Received event at block ${header}:`, JSON.stringify(eventObj))
-
-  // TODO get real state from file here:
-  const state: OffchainState = {} as OffchainState
 
   const lastPostgresBlock = state.Postgres.lastBlock
   const lastElasticBlock = state.Elastic.lastBlock
@@ -135,20 +133,24 @@ async function processEventRecord (api: ApiPromise, record: EventRecord) {
   const eventData = { eventName: eventObj.method, data: eventObj.data, blockHeight: eventObj.blockHeight }
   
   const res = await DispatchForDb({ ...eventData, processPostgres, processElastic })
-  // TODO get HandlerResult here and update corresponding state in state.json file 
-  // for both Postgres and Elastic
-  
+
+  // TODO: stop trying to sync with Postgres/Elastic if an error occured
+  // TODO: fix bug with lastBlock counting
   if (res.PostgresError) {
-    // TODO stop processing postgres
+    state.Postgres.lastError = res.PostgresError.stack
+  } else {
+    state.Postgres.lastBlock += 1
   }
 
   if (res.ElasticError) {
-    // TODO stop processing Elastic
+    state.Elastic.lastError = res.ElasticError.stack
+  } else {
+    state.Elastic.lastBlock += 1
   }
 }
 
 type CommonDbState = {
-  lastBlock?: number
+  lastBlock: number
   lastError?: string
 }
 
@@ -156,6 +158,11 @@ type OffchainState = {
   Postgres: CommonDbState,
   Elastic: CommonDbState
 }
+
+const defaultOffchainState = (): OffchainState => ({
+  Postgres: { lastBlock: 0 },
+  Elastic: { lastBlock: 0 }
+})
 
 main().catch((error) => {
   log.error('Failed to subscribe to events', error);

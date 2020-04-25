@@ -16,10 +16,4 @@ export type HandlerResult = {
 
 export const HandlerResultOK = {}
 
-export const HandlerResultErrorInPostgres = (err: Error) =>
-  ({ PostgresError: err })
-
-export const HandlerResultErrorInElastic = (err: Error) =>
-  ({ ElasticError: err })
-
 export type EventHandlerFn = (event: SubstrateEvent) => Promise<HandlerResult>
