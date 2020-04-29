@@ -21,6 +21,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
     insertActivityLogError('owner', err.stack)
+    throw err
   }
 }
 
@@ -100,6 +101,7 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
     return activityId;
   } catch (err) {
     insertActivityLogError('comment', err.stack);
+    throw err
     return -1;
   }
 };
@@ -134,6 +136,7 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
     return activityId;
   } catch (err) {
     insertActivityLogError('account', err.stack);
+    throw err
     return -1;
   }
 };
@@ -168,6 +171,7 @@ export const insertActivityForBlog = async (eventAction: SubstrateEvent, count: 
     return activityId;
   } catch (err) {
     insertActivityLogError('blog', err.stack);
+    throw err
     return -1;
   }
 };
@@ -199,6 +203,7 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
     return res.rows[0].id;
   } catch (err) {
     insertActivityLogError('post', err.stack);
+    throw err
     return -1;
   }
 };
@@ -241,8 +246,8 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
 
     return activityId;
   } catch (err) {
-    console.log('PostREaction >>>>>>>>>>>>>>>>>>> error', err.stack)
     insertActivityLogError('post reaction', err.stack);
+    throw err
     return -1;
   }
 };
@@ -284,6 +289,7 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
     return activityId;
   } catch (err) {
     insertActivityLogError('comment reaction', err.stack);
+    throw err
     return -1;
   }
 };

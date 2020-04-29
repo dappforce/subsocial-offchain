@@ -20,6 +20,6 @@ export const onBlogFollowed: EventHandlerFn = async (eventAction: SubstrateEvent
   const follower = data[0].toString();
   if (follower === account) return HandlerResultOK;
 
-  insertNotificationForOwner(id, account);
+  await insertNotificationForOwner(id, account);
   return HandlerResultOK;
 }

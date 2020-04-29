@@ -15,6 +15,7 @@ export const insertAccountFollower = async (data: EventData) => {
     insertFollowersLog('account')
   } catch (err) {
     insertFollowersLogError('account', err.stack)
+    throw err
   }
 };
 
@@ -30,6 +31,7 @@ export const insertPostFollower = async (data: EventData) => {
     insertFollowersLog('post')
   } catch (err) {
     insertFollowersLogError('post', err.stack)
+    throw err
   }
 };
 
@@ -45,6 +47,7 @@ export const insertCommentFollower = async (data: EventData) => {
     insertFollowersLog('comment')
   } catch (err) {
     insertFollowersLogError('comment', err.stack)
+    throw err
   }
 };
 
@@ -60,5 +63,6 @@ export const insertBlogFollower = async (data: EventData) => {
     insertFollowersLog('blog')
   } catch (err) {
     insertFollowersLogError('blog', err.stack)
+    throw err
   }
 };

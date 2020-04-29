@@ -3,7 +3,7 @@ import { BlockNumber, Event, EventRecord, Hash } from '@polkadot/types/interface
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { Api } from '@subsocial/api/substrateConnect';
 import { ApiPromise } from '@polkadot/api'
-import { isDef, parseNumStr } from '@subsocial/utils';
+import { notDef } from '@subsocial/utils';
 import { readFile, writeFile } from 'fs';
 import { substrateLog as log } from '../connections/loggers';
 import { DispatchForDb } from './subscribe';
@@ -43,22 +43,23 @@ async function main () {
 
   const slotDuration = api.consts.timestamp?.minimumPeriod.muln(2).toNumber();
   const offchainState = await readOffchainState()
-  const lastBlock = offchainState.Elastic.lastBlock < offchainState.Postgres.lastBlock
-    ? offchainState.Elastic.lastBlock
-    : offchainState.Postgres.lastBlock
-
-  let blockIndex = (isDef(lastBlock) && lastBlock >= 0
-    ? lastBlock
-    : parseNumStr(process.env.SUBSTRATE_START_FROM_BLOCK)
-  ) || 0
+  const startFromBlock = process.env.SUBSTRATE_START_FROM_BLOCK || 0
 
   let lastKnownBestFinalized = (
     await api.derive.chain.bestNumberFinalized()
   ).toNumber()
 
   while (true) {
+    const lastBlock = offchainState.Elastic.lastBlock < offchainState.Postgres.lastBlock
+    ? offchainState.Elastic.lastBlock
+    : offchainState.Postgres.lastBlock
+
+    const blockIndex = lastBlock >= startFromBlock
+      ? lastBlock
+      : startFromBlock
+
     if (blockIndex > lastKnownBestFinalized) {
-      log.debug('Waiting for finalization...')
+      log.warn('Waiting for finalization...')
 
       const bestFinalizedBlock = (await api.derive.chain.bestNumberFinalized()).toNumber();
       lastKnownBestFinalized = bestFinalizedBlock;
@@ -80,7 +81,12 @@ async function main () {
       await processEventRecord(api, record, offchainState)
     }
 
-    blockIndex += 1;
+    if (notDef(offchainState.Postgres.lastError)) {
+      offchainState.Postgres.lastBlock += 1
+    }
+    if (notDef(offchainState.Elastic.lastError)) {
+      offchainState.Elastic.lastBlock += 1
+    }
     const json = JSON.stringify(offchainState);
     await asyncWriteFile(stateFilePath, json, 'utf8');
   }
@@ -134,18 +140,17 @@ async function processEventRecord (api: ApiPromise, record: EventRecord, state: 
   
   const res = await DispatchForDb({ ...eventData, processPostgres, processElastic })
 
-  // TODO: stop trying to sync with Postgres/Elastic if an error occured
-  // TODO: fix bug with lastBlock counting
+  log.info('Errors state: %o', res)
+  log.info('Offchain state is: %o', state);
+
   if (res.PostgresError) {
     state.Postgres.lastError = res.PostgresError.stack
-  } else {
-    state.Postgres.lastBlock += 1
+    log.error('An error occured in Postgres: %s', res.PostgresError)
   }
 
   if (res.ElasticError) {
     state.Elastic.lastError = res.ElasticError.stack
-  } else {
-    state.Elastic.lastBlock += 1
+    log.error('An error occured in Elastic: %s', res.ElasticError)
   }
 }
 
