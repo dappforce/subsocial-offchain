@@ -35,18 +35,33 @@ async function main () {
 
   const offchainState = await readOffchainState()
 
-  const lastProcessedBlock = offchainState.Elastic.lastBlock < offchainState.Postgres.lastBlock
-    ? offchainState.Elastic.lastBlock
-    : offchainState.Postgres.lastBlock
-
-  let blockToProcess = lastProcessedBlock > 0 ? lastProcessedBlock + 1 : 0
+  const lastPostgresBlock = () => offchainState.Postgres.lastBlock
+  const lastElasticBlock = () => offchainState.Elastic.lastBlock
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
-
-  let processPostgres = true
-  let processElastic = true
+  let blockToProcess = 0
+  let processPostgres = false
+  let processElastic = false
 
   while (true) {
+
+    // Doesn't matter if both Postgres and Elastic have the same last block number:
+    blockToProcess = lastPostgresBlock()
+    processPostgres = false
+    processElastic = false
+    
+    if (lastElasticBlock() < lastPostgresBlock()) {
+      blockToProcess = lastElasticBlock()
+      processElastic = true
+    } else if (lastPostgresBlock() < lastElasticBlock()) {
+      blockToProcess = lastPostgresBlock()
+      processPostgres = true
+    } else {
+      processPostgres = true
+      processElastic = true
+    }
+
+    blockToProcess++
 
     if (bestFinalizedBlock.toNumber() < blockToProcess) {
       log.debug('Waiting for the best finalized block...')
@@ -77,9 +92,7 @@ async function main () {
           if (error) {
             processPostgres = false
             offchainState.Postgres.lastError = error.stack
-            if (blockToProcess > 0) {
-              offchainState.Postgres.lastBlock--
-            }
+            offchainState.Postgres.lastBlock = blockToProcess - 1
           }
         }
 
@@ -88,9 +101,7 @@ async function main () {
           if (error) {
             processElastic = false
             offchainState.Elastic.lastError = error.stack
-            if (blockToProcess > 0) {
-              offchainState.Elastic.lastBlock--
-            }
+            offchainState.Elastic.lastBlock = blockToProcess - 1
           }
         }
       }
@@ -98,12 +109,12 @@ async function main () {
 
     if (processPostgres) {
       delete offchainState.Postgres.lastError
-      offchainState.Postgres.lastBlock += 1
+      offchainState.Postgres.lastBlock = blockToProcess
     }
 
     if (processElastic) {
       delete offchainState.Elastic.lastError
-      offchainState.Elastic.lastBlock += 1
+      offchainState.Elastic.lastBlock = blockToProcess
     }
 
     await writeOffchainState(offchainState)
@@ -111,8 +122,6 @@ async function main () {
     if (!processPostgres && !processElastic) {
       log.warn('Both Postgres and Elastic event handlers returned errors. Cannot continue block processing')
       break
-    } else {
-      blockToProcess++
     }
   }
 }
