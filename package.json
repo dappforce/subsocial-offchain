@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "concurrently \"yarn subscribe\" \"yarn api\" \"yarn init-search\"",
-    "subscribe": "node ./build/src/substrate/server.js",
+    "subscribe": "node ./build/src/substrate/subscribe.js",
     "api": "node ./build/src/express-api/server.js",
     "init-search": "node ./build/src/search/index.js",
     "init-offchain": "node ./build/src/sql/init.js",
