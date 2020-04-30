@@ -13,7 +13,7 @@ export const DispatchForDb: EventHandlerFn = async (event: SubstrateEvent): Prom
 
   if (typeof handlePostgres === 'function') {
     try {
-      handlePostgres(event)
+      await handlePostgres(event)
     } catch (err) {
       log.error('Failed to PG')
       PostgresError = err
@@ -22,7 +22,7 @@ export const DispatchForDb: EventHandlerFn = async (event: SubstrateEvent): Prom
   
   if (typeof handleElastic === 'function') {
     try {
-      handleElastic(event)
+      await handleElastic(event)
     } catch (err) {
       log.error('Failed to Elastic')
       ElasticError = err
