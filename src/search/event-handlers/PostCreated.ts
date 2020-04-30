@@ -1,7 +1,7 @@
 import { indexContentFromIpfs } from '../../search/indexer';
 import { ES_INDEX_POSTS } from '../../search/config';
 import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/server';
+import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
 export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {

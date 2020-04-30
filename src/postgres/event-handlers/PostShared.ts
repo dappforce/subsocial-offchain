@@ -1,5 +1,5 @@
 import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/server';
+import { substrate } from '../../substrate/subscribe';
 import { insertActivityForPost } from '../insert-activity';
 import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers } from '../fill-activity';
 import { insertNotificationForOwner } from '../notifications';

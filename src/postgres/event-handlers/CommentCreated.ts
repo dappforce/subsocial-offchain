@@ -1,5 +1,5 @@
 import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/server';
+import { substrate } from '../../substrate/subscribe';
 import { insertCommentFollower } from '../insert-follower';
 import { insertActivityComments, insertActivityForComment } from '../insert-activity';
 import { fillNotificationsWithAccountFollowers, fillNotificationsWithPostFollowers } from '../fill-activity';

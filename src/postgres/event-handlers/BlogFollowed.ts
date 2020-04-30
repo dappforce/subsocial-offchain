@@ -1,5 +1,5 @@
 import { BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/server';
+import { substrate } from '../../substrate/subscribe';
 import { insertBlogFollower } from '../insert-follower';
 import { insertActivityForBlog } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';

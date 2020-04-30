@@ -1,7 +1,7 @@
 import { indexContentFromIpfs } from '../../search/indexer';
 import { ES_INDEX_COMMENTS } from '../../search/config';
 import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/server';
+import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
 export const onCommentCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {

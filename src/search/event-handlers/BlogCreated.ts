@@ -1,7 +1,7 @@
 import { indexContentFromIpfs } from '../../search/indexer';
 import { ES_INDEX_BLOGS } from '../../search/config';
 import { BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/server';
+import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
 export const onBlogCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {

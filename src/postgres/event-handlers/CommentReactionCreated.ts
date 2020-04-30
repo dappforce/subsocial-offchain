@@ -1,5 +1,5 @@
 import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/server';
+import { substrate } from '../../substrate/subscribe';
 import { insertActivityForCommentReaction } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';

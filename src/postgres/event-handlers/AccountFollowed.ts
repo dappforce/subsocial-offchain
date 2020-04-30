@@ -1,4 +1,4 @@
-import { substrate } from '../../substrate/server';
+import { substrate } from '../../substrate/subscribe';
 import { insertAccountFollower } from '../../postgres/insert-follower';
 import { insertActivityForAccount } from '../../postgres/insert-activity';
 import { insertNotificationForOwner } from '../../postgres/notifications';

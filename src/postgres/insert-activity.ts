@@ -2,7 +2,7 @@ import { pg } from '../connections/connect-postgres';
 import { encodeStructIds } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
 import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../substrate/server';
+import { substrate } from '../substrate/subscribe';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
