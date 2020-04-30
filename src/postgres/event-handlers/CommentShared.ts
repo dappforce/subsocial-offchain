@@ -19,6 +19,6 @@ export const onCommentShared: EventHandlerFn = async (eventAction: SubstrateEven
   const activityId = await insertActivityForComment(eventAction, ids, account);
   if (activityId === -1) return;
 
-  fillNotificationsWithCommentFollowers(commentId, account, activityId);
-  fillNotificationsWithAccountFollowers(account, activityId);
+  await fillNotificationsWithCommentFollowers(commentId, account, activityId);
+  await fillNotificationsWithAccountFollowers(account, activityId);
 }

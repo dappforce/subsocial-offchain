@@ -20,5 +20,5 @@ export const onCommentReactionCreated: EventHandlerFn = async (eventAction: Subs
   if (follower === account) return;
 
   // insertAggStream(eventAction, commentId);
-  insertNotificationForOwner(activityId, account);
+  await insertNotificationForOwner(activityId, account);
 }

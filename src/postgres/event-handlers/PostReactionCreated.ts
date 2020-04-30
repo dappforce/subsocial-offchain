@@ -19,5 +19,5 @@ export const onPostReactionCreated: EventHandlerFn = async (eventAction: Substra
 
   if (follower === account) return;
 
-  insertNotificationForOwner(activityId, account);
+  await insertNotificationForOwner(activityId, account);
 }

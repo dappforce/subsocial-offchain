@@ -18,8 +18,8 @@ export const onPostShared: EventHandlerFn = async (eventAction: SubstrateEvent) 
   if (activityId === -1) return;
 
   const account = post.created.account.toString();
-  insertNotificationForOwner(activityId, account);
-  fillNotificationsWithAccountFollowers(follower, activityId);
-  fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
-  fillNewsFeedWithAccountFollowers(follower, activityId)
+  await insertNotificationForOwner(activityId, account);
+  await fillNotificationsWithAccountFollowers(follower, activityId);
+  await fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
+  await fillNewsFeedWithAccountFollowers(follower, activityId)
 }

@@ -23,7 +23,7 @@ export const onCommentCreated: EventHandlerFn = async (eventAction: SubstrateEve
   const ids = [ postId, commentId ];
   if (comment.parent_id.isSome) {
     log.debug('Comment has a parent id');
-    insertActivityComments(eventAction, ids, comment);
+    await insertActivityComments(eventAction, ids, comment);
   } else {
     const activityId = await insertActivityForComment(eventAction, ids, postCreator);
     if (activityId === -1) return;

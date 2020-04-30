@@ -7,7 +7,7 @@ import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
 export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
-  insertPostFollower(data);
+  await insertPostFollower(data);
   const postId = data[1] as PostId;
   const follower = data[0].toString();
 
