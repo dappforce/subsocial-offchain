@@ -75,26 +75,34 @@ async function main () {
         if (processPostgres) {
           const error = await handleEventForPostgres(eventMeta)
           if (error) {
-            offchainState.Postgres.lastError = error.stack
             processPostgres = false
+            offchainState.Postgres.lastError = error.stack
+            if (blockToProcess > 0) {
+              offchainState.Postgres.lastBlock--
+            }
           }
         }
 
         if (processElastic) {
           const error = await handleEventForElastic(eventMeta)
           if (error) {
-            offchainState.Elastic.lastError = error.stack
             processElastic = false
+            offchainState.Elastic.lastError = error.stack
+            if (blockToProcess > 0) {
+              offchainState.Elastic.lastBlock--
+            }
           }
         }
       }
     }
 
     if (processPostgres) {
+      delete offchainState.Postgres.lastError
       offchainState.Postgres.lastBlock += 1
     }
 
     if (processElastic) {
+      delete offchainState.Elastic.lastError
       offchainState.Elastic.lastBlock += 1
     }
 
