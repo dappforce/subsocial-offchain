@@ -2,9 +2,9 @@ import { indexContentFromIpfs } from '../../search/indexer';
 import { ES_INDEX_POSTS } from '../../search/config';
 import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/server';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const postId = data[1] as PostId;
 

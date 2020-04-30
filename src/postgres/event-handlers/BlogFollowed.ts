@@ -3,9 +3,9 @@ import { substrate } from '../../substrate/server';
 import { insertBlogFollower } from '../insert-follower';
 import { insertActivityForBlog } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onBlogFollowed: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onBlogFollowed: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   await insertBlogFollower(data);
   const blogId = data[1] as BlogId;

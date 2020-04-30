@@ -2,9 +2,9 @@ import { indexContentFromIpfs } from '../../search/indexer';
 import { ES_INDEX_PROFILES } from '../../search/config';
 import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
 import { substrate } from '../../substrate/server';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onProfileUpdated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onProfileUpdated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const accountId = data[0] as AccountId;
   const socialAccount = await substrate.findSocialAccount(accountId)

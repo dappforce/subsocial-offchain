@@ -2,9 +2,9 @@ import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/server';
 import { insertActivityForComment } from '../insert-activity';
 import { fillNotificationsWithAccountFollowers, fillNotificationsWithCommentFollowers } from '../fill-activity';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onCommentShared: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onCommentShared: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const commentId = data[1] as CommentId;
   const comment = await substrate.findComment(commentId);

@@ -19,12 +19,13 @@ export async function readOffchainState (): Promise<OffchainState> {
     const json = await asyncReadFile(stateFilePath, 'utf8')
     state = JSON.parse(json) as OffchainState
   } catch (err) {
-    log.error(`Failed to read offchain state from file: ${stateFilePath}`)
+    log.warn(`Could not read the offchain state from file: ${stateFilePath}`)
   }
   return state
 }
 
-export async function writeOffchainState (offchainState: OffchainState) {
-  const json = JSON.stringify(offchainState)
+export async function writeOffchainState (state: OffchainState) {
+  log.debug('Write the offchain state to FS: %o', state);
+  const json = JSON.stringify(state)
   return asyncWriteFile(stateFilePath, json, 'utf8')
 }

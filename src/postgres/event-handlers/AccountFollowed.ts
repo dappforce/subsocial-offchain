@@ -2,9 +2,9 @@ import { substrate } from '../../substrate/server';
 import { insertAccountFollower } from '../../postgres/insert-follower';
 import { insertActivityForAccount } from '../../postgres/insert-activity';
 import { insertNotificationForOwner } from '../../postgres/notifications';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onAccountFollowed: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onAccountFollowed: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   await insertAccountFollower(data);
   const account = data[1].toString()

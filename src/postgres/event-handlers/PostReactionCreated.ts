@@ -2,9 +2,9 @@ import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/server';
 import { insertActivityForPostReaction } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onPostReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onPostReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const follower = data[0].toString();
   const postId = data[1] as PostId;

@@ -2,9 +2,9 @@ import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/server';
 import { insertActivityForCommentReaction } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onCommentReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onCommentReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const follower = data[0].toString();
   const commentId = data[1] as CommentId;

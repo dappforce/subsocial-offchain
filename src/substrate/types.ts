@@ -7,23 +7,18 @@ type CommonDbState = {
 }
 
 export type OffchainState = {
-  Postgres: CommonDbState,
+  Postgres: CommonDbState
   Elastic: CommonDbState
 }
 
 export type SubstrateEvent = {
-  eventName: string,
-  data: EventData,
-  blockHeight: BN,
-  processPostgres: boolean
-  processElastic: boolean
+  eventName: string
+  data: EventData
+  blockHeight: BN
 }
 
-export type HandlerResult = {
-  PostgresError?: Error
-  ElasticError?: Error
-}
+export type HandlerResult = Error | undefined
 
-export const HandlerResultOK = {}
+export const HandlerResultOK = undefined
 
 export type EventHandlerFn = (event: SubstrateEvent) => Promise<HandlerResult>

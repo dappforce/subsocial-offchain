@@ -1,9 +1,9 @@
 import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { deleteNotificationsAboutPost } from '../delete-activity';
 import { deletePostFollower } from '../delete-follower';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onPostDeleted: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onPostDeleted: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const follower = data[0].toString();
   const following = data[1] as PostId;

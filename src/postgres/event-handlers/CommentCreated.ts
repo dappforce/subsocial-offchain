@@ -4,9 +4,9 @@ import { insertCommentFollower } from '../insert-follower';
 import { insertActivityComments, insertActivityForComment } from '../insert-activity';
 import { fillNotificationsWithAccountFollowers, fillNotificationsWithPostFollowers } from '../fill-activity';
 import { substrateLog as log } from '../../connections/loggers';
-import { SubstrateEvent, EventHandlerFn, HandlerResult, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
 
-export const onCommentCreated: EventHandlerFn = async (eventAction: SubstrateEvent): Promise<HandlerResult> => {
+export const onCommentCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   await insertCommentFollower(data);
   const commentId = data[1] as CommentId;

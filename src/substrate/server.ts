@@ -1,21 +1,24 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
-import { BlockNumber, Hash } from '@polkadot/types/interfaces';
+import { BlockNumber, Hash, Event } from '@polkadot/types/interfaces';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { Api } from '@subsocial/api/substrateConnect';
 import { substrateLog as log } from '../connections/loggers';
-import { eventsFilterMethods } from './utils';
+import { eventsFilterMethods, eventsFilterSections } from './utils';
 import { readOffchainState, writeOffchainState } from './offchain-state';
-import { processEventRecord } from './process-event';
-import BN from 'bn.js';
+import { handleEventForElastic } from './handle-elastic';
+import { handleEventForPostgres } from './handle-postgres';
 
 require('dotenv').config();
 
 export let substrate: SubsocialSubstrateApi;
 
-const ONE = new BN(1)
+function shouldHandleEvent (event: Event): boolean {
+  return (
+    eventsFilterSections.includes(event.section.toString()) && 
+    eventsFilterMethods.includes(event.method.toString())
+  ) || eventsFilterSections.includes('all')
+}
 
 async function main () {
-  
   log.info(`Subscribe to Substrate events: ${eventsFilterMethods}`);
 
   // Connect to Substrate node:
@@ -36,51 +39,72 @@ async function main () {
     ? offchainState.Elastic.lastBlock
     : offchainState.Postgres.lastBlock
 
-  let blockToProcess = new BN(lastProcessedBlock > 0 ? lastProcessedBlock + 1 : 0)
+  let blockToProcess = lastProcessedBlock > 0 ? lastProcessedBlock + 1 : 0
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
 
+  let processPostgres = true
+  let processElastic = true
+
   while (true) {
 
-    if (bestFinalizedBlock.lt(blockToProcess)) {
+    if (bestFinalizedBlock.toNumber() < blockToProcess) {
       log.debug('Waiting for the best finalized block...')
       await waitNextBlock()
       bestFinalizedBlock = await getBestFinalizedBlock()
       continue
     }
 
-    log.debug(`Best finalized block: ${bestFinalizedBlock.toString()}`)
-    log.debug(`Block number to process: ${blockToProcess.toString()}`)
-
     const blockNumber: BlockNumber = api.createType('BlockNumber', blockToProcess)
     const blockHash: Hash = await api.rpc.chain.getBlockHash(blockNumber)
     const events = await api.query.system.events.at(blockHash)
 
+    log.debug(`Best finalized block: ${bestFinalizedBlock.toString()}`)
+    log.debug(`Block number to process: ${blockToProcess} with hash ${blockHash.toHex()}`)
+
     // Process all events of the current block
-    for (const event of events) {
-      await processEventRecord({
-        event,
-        blockNumber,
-        blockHash,
-        offchainState
-      })
+    for (const { event } of events) {
+      if (shouldHandleEvent(event)) {
+        log.debug(`Handle a new event: %o`, event.data)
+        const eventMeta = {
+          eventName: event.method,
+          data: event.data,
+          blockHeight: blockNumber
+        }
+
+        if (processPostgres) {
+          const error = await handleEventForPostgres(eventMeta)
+          if (error) {
+            offchainState.Postgres.lastError = error.stack
+            processPostgres = false
+          }
+        }
+
+        if (processElastic) {
+          const error = await handleEventForElastic(eventMeta)
+          if (error) {
+            offchainState.Elastic.lastError = error.stack
+            processElastic = false
+          }
+        }
+      }
     }
 
-    if (!offchainState.Postgres.lastError) {
+    if (processPostgres) {
       offchainState.Postgres.lastBlock += 1
     }
 
-    if (!offchainState.Elastic.lastError) {
+    if (processElastic) {
       offchainState.Elastic.lastBlock += 1
     }
 
     await writeOffchainState(offchainState)
 
-    if (offchainState.Postgres.lastError && offchainState.Elastic.lastError) {
+    if (!processPostgres && !processElastic) {
       log.warn('Both Postgres and Elastic event handlers returned errors. Cannot continue block processing')
       break
     } else {
-      blockToProcess = blockToProcess.add(ONE)
+      blockToProcess++
     }
   }
 }
