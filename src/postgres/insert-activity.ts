@@ -225,7 +225,6 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
         VALUES($1, $2, $3, $4, $5, $6)
       RETURNING *`
   const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
-  console.log('PostREaction >>>>>>>>>>>>>>>>>>>', params)
   try {
     const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
