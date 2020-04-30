@@ -3,7 +3,7 @@ import { substrate } from '../../substrate/server';
 import { insertPostFollower } from '../insert-follower';
 import { insertActivityForPost } from '../insert-activity';
 import { fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers } from '../fill-activity';
-import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
 export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -12,13 +12,12 @@ export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent)
   const follower = data[0].toString();
 
   const post = await substrate.findPost(postId);
-  if (!post) return HandlerResultOK;
+  if (!post) return;
 
   const ids = [ post.blog_id, postId ];
   const activityId = await insertActivityForPost(eventAction, ids, 0);
-  if (activityId === -1) return HandlerResultOK;
+  if (activityId === -1) return;
 
   await fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
   await fillNewsFeedWithAccountFollowers(follower, activityId);
-  return HandlerResultOK;
 }

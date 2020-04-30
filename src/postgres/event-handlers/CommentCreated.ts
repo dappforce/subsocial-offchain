@@ -4,7 +4,7 @@ import { insertCommentFollower } from '../insert-follower';
 import { insertActivityComments, insertActivityForComment } from '../insert-activity';
 import { fillNotificationsWithAccountFollowers, fillNotificationsWithPostFollowers } from '../fill-activity';
 import { substrateLog as log } from '../../connections/loggers';
-import { SubstrateEvent, EventHandlerFn, HandlerResultOK } from '../../substrate/types';
+import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
 export const onCommentCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -12,11 +12,11 @@ export const onCommentCreated: EventHandlerFn = async (eventAction: SubstrateEve
   const commentId = data[1] as CommentId;
 
   const comment = await substrate.findComment(commentId);
-  if (!comment) return HandlerResultOK;
+  if (!comment) return;
 
   const postId = comment.post_id;
   const post = await substrate.findPost(postId);
-  if (!post) return HandlerResultOK;
+  if (!post) return;
 
   const postCreator = post.created.account.toString();
   const commentCreator = comment.created.account.toString();
@@ -26,11 +26,10 @@ export const onCommentCreated: EventHandlerFn = async (eventAction: SubstrateEve
     insertActivityComments(eventAction, ids, comment);
   } else {
     const activityId = await insertActivityForComment(eventAction, ids, postCreator);
-    if (activityId === -1) return HandlerResultOK;
+    if (activityId === -1) return;
 
     log.debug('Comment does not have a parent id');
     await fillNotificationsWithPostFollowers(postId, commentCreator, activityId);
     await fillNotificationsWithAccountFollowers(commentCreator, activityId);
   }
-  return HandlerResultOK;
 }

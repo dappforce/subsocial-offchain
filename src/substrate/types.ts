@@ -17,8 +17,6 @@ export type SubstrateEvent = {
   blockHeight: BN
 }
 
-export type HandlerResult = Error | undefined
-
-export const HandlerResultOK = undefined
+export type HandlerResult = Error | void
 
 export type EventHandlerFn = (event: SubstrateEvent) => Promise<HandlerResult>
