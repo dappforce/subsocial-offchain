@@ -33,10 +33,10 @@ async function main () {
   const waitNextBlock = async () =>
     new Promise(r => setTimeout(r, blockTime))
 
-  const offchainState = await readOffchainState()
+  const state = await readOffchainState()
 
-  const lastPostgresBlock = () => offchainState.postgres.lastBlock
-  const lastElasticBlock = () => offchainState.elastic.lastBlock
+  const lastPostgresBlock = () => state.postgres.lastBlock
+  const lastElasticBlock = () => state.elastic.lastBlock
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
   let blockToProcess = 0
@@ -91,8 +91,8 @@ async function main () {
           const error = await handleEventForPostgres(eventMeta)
           if (error) {
             processPostgres = false
-            offchainState.postgres.lastError = error.stack
-            offchainState.postgres.lastBlock = blockToProcess - 1
+            state.postgres.lastError = error.stack
+            state.postgres.lastBlock = blockToProcess - 1
           }
         }
 
@@ -100,24 +100,24 @@ async function main () {
           const error = await handleEventForElastic(eventMeta)
           if (error) {
             processElastic = false
-            offchainState.elastic.lastError = error.stack
-            offchainState.elastic.lastBlock = blockToProcess - 1
+            state.elastic.lastError = error.stack
+            state.elastic.lastBlock = blockToProcess - 1
           }
         }
       }
     }
 
     if (processPostgres) {
-      delete offchainState.postgres.lastError
-      offchainState.postgres.lastBlock = blockToProcess
+      delete state.postgres.lastError
+      state.postgres.lastBlock = blockToProcess
     }
 
     if (processElastic) {
-      delete offchainState.elastic.lastError
-      offchainState.elastic.lastBlock = blockToProcess
+      delete state.elastic.lastError
+      state.elastic.lastBlock = blockToProcess
     }
 
-    await writeOffchainState(offchainState)
+    await writeOffchainState(state)
 
     if (!processPostgres && !processElastic) {
       log.warn('Both Postgres and Elastic event handlers returned errors. Cannot continue block processing')
