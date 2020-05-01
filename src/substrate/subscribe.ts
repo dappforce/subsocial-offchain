@@ -22,6 +22,8 @@ async function main () {
   const waitNextBlock = async () =>
     new Promise(resolve => setTimeout(resolve, blockTime))
 
+  const continueOnFail : boolean = JSON.parse(process.env.SUBSTRATE_CONTINUE_ON_FAIL) || true
+
   const state = await readOffchainState()
   // Clean up the state from the last errors:
   delete state.postgres.lastError
@@ -44,11 +46,11 @@ async function main () {
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
 
-  while (true) {
+  const processBlock = async () => {
 
     if (lastPostgresError() && lastElasticError()) {
       log.warn('Both Postgres and Elastic event handlers returned errors. Cannot continue event processing')
-      break
+      process.exit(-1)
     }
 
     // Reset processing flags:
@@ -72,7 +74,7 @@ async function main () {
       log.debug('Waiting for the best finalized block...')
       await waitNextBlock()
       bestFinalizedBlock = await getBestFinalizedBlock()
-      continue
+      return;
     }
 
     const blockNumber = api.createType('BlockNumber', blockToProcess)
@@ -122,6 +124,19 @@ async function main () {
     }
 
     await writeOffchainState(state)
+  }
+
+  while (true) {
+    try {
+      await processBlock()
+    } catch {
+      if (!continueOnFail) {
+        log.error('Failed to process block')
+        break;
+      } else {
+        continue;
+      }
+    }
   }
 }
 
