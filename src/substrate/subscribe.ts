@@ -22,7 +22,10 @@ async function main () {
   const waitNextBlock = async () =>
     new Promise(resolve => setTimeout(resolve, blockTime))
 
-  const continueOnFail: boolean = JSON.parse(process.env.SUBSTRATE_CONTINUE_ON_FAIL) || true
+  const dotenvContinueOnFail =  process.env.SUBSTRATE_CONTINUE_ON_FAIL
+  const continueOnFail = typeof dotenvContinueOnFail === 'undefined'
+    ? true
+    : dotenvContinueOnFail !== 'false'
 
   const state = await readOffchainState()
   // Clean up the state from the last errors:
@@ -130,7 +133,7 @@ async function main () {
     try {
       await processBlock()
     } catch {
-      if (!continueOnFail) {
+      if (continueOnFail === false) {
         log.error('Failed to process block')
         break;
       }
