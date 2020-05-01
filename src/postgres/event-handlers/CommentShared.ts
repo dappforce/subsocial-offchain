@@ -1,10 +1,10 @@
 import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../server';
-import { insertActivityForComment } from '../../postgres/insert-activity';
-import { fillNotificationsWithAccountFollowers, fillNotificationsWithCommentFollowers } from '../../postgres/fill-activity';
-import { SubstrateEvent } from '../types';
+import { substrate } from '../../substrate/subscribe';
+import { insertActivityForComment } from '../insert-activity';
+import { fillNotificationsWithAccountFollowers, fillNotificationsWithCommentFollowers } from '../fill-activity';
+import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
-export const onCommentShared = async (eventAction: SubstrateEvent) => {
+export const onCommentShared: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const commentId = data[1] as CommentId;
   const comment = await substrate.findComment(commentId);
@@ -19,6 +19,6 @@ export const onCommentShared = async (eventAction: SubstrateEvent) => {
   const activityId = await insertActivityForComment(eventAction, ids, account);
   if (activityId === -1) return;
 
-  fillNotificationsWithCommentFollowers(commentId, account, activityId);
-  fillNotificationsWithAccountFollowers(account, activityId);
+  await fillNotificationsWithCommentFollowers(commentId, account, activityId);
+  await fillNotificationsWithAccountFollowers(account, activityId);
 }

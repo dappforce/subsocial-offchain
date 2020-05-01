@@ -1,10 +1,10 @@
 import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../server';
-import { insertActivityForPostReaction } from '../../postgres/insert-activity';
-import { insertNotificationForOwner } from '../../postgres/notifications';
-import { SubstrateEvent } from '../types';
+import { substrate } from '../../substrate/subscribe';
+import { insertActivityForPostReaction } from '../insert-activity';
+import { insertNotificationForOwner } from '../notifications';
+import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
-export const onPostReactionCreated = async (eventAction: SubstrateEvent) => {
+export const onPostReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const follower = data[0].toString();
   const postId = data[1] as PostId;
@@ -19,5 +19,5 @@ export const onPostReactionCreated = async (eventAction: SubstrateEvent) => {
 
   if (follower === account) return;
 
-  insertNotificationForOwner(activityId, account);
+  await insertNotificationForOwner(activityId, account);
 }

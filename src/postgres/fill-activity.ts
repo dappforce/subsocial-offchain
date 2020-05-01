@@ -21,6 +21,7 @@ export const fillNewsFeedWithAccountFollowers = async (account: string, activity
     fillNewsFeedLog('account')
   } catch (err) {
     fillNewsFeedLogError('account', err.stack);
+    throw err
   }
 }
 
@@ -43,6 +44,7 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
     fillNotificationsLogError('account', err.stack);
+    throw err
   }
 }
 
@@ -66,6 +68,7 @@ export const fillNewsFeedWithBlogFollowers = async (blogId: BlogId, account: str
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
     fillNewsFeedLogError('blog', err.stack);
+    throw err
   }
 }
 
@@ -88,6 +91,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
     fillNotificationsLogError('post', err.stack);
+    throw err
   }
 }
 
@@ -109,5 +113,6 @@ export const fillNotificationsWithCommentFollowers = async (commentId: CommentId
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
     fillNotificationsLogError('comment', err.stack);
+    throw err
   }
 }

@@ -15,6 +15,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
     insertActivityLogError('owner', err.stack)
+    throw insertActivityLogError
   }
 }
 
@@ -40,6 +41,7 @@ export const getAggregationCount = async (props: AggCountProps) => {
     return res.rows[0].count as number;
   } catch (err) {
     log.error('Failed to getAggregationCount:', err.stack)
+    throw err
     return 0;
   }
 }
@@ -70,7 +72,8 @@ export const updateCountOfUnreadNotifications = async (account: string) => {
     const currentUnreadCount = await getCountOfUnreadNotifications(account)
     informClientAboutUnreadNotifications(account, currentUnreadCount);
   } catch (err) {
-    log.error(`Failed to update unread notifications by account ${account}. Error:`, err.stack);
+    log.error(`Failed to update unread notifications by account ${account}. Error: %s`, err.stack);
+    throw err
   }
 }
 
@@ -85,7 +88,8 @@ export const getCountOfUnreadNotifications = async (account: string) => {
     log.debug(`Found ${res.rows[0].unread_count} unread notifications by account ${account}`)
     return res.rows[0].unread_count as number;
   } catch (err) {
-    log.error(`Failed to get a count of unread notifications by account ${account}. Error:`, err.stack);
+    log.error(`Failed to get a count of unread notifications by account ${account}. Error: %s`, err.stack);
+    throw err
     return 0
   }
 }

@@ -3,8 +3,9 @@ import * as request from 'request'
 
 // Works with cheerio '^1.0.0-rc.2'
 import * as cheerio from 'cheerio'
+import { nonEmptyStr, newLogger } from '@subsocial/utils';
 
-import { nonEmptyStr } from '@subsocial/utils';
+const log = newLogger('SitePreviewParser')
 
 function $loadHtml (html: string) {
   // 'decodeEntities = true' is to convert HTML entities like '&amp' to '&', etc.
@@ -20,7 +21,7 @@ type ParsedSite = {
 
 export function parseSiteWithRequest (url: string): Promise<ParsedSite> {
   return new Promise((resolve) => {
-    console.log(`\nRequest site at URL: ${url}`);
+    log.debug(`Parsing preview of the site at URL: ${url}`);
     request(
       {
         url: url,
@@ -46,7 +47,6 @@ export function parseSiteWithRequest (url: string): Promise<ParsedSite> {
         } else if (res.statusCode === 200) {
           try {
             const siteMeta = parseSiteHtml(url, body);
-            console.log(`\nParsed HTML meta of site ${url}:\n`, siteMeta);
             resolve({ ok: true, url, siteMeta });
             return;
 
@@ -101,7 +101,6 @@ type Twitter = {
 }
 
 function parseSiteHtml (url: string, html: string) {
-  console.log(url)
   const $ = $loadHtml(html);
 
   const meta: Meta = {
@@ -134,6 +133,8 @@ function parseSiteHtml (url: string, html: string) {
   }
 
   deleteEmptyKeys(meta);
+
+  log.debug(`\nParsed HTML meta of the site ${url}:\n`, meta);
 
   return meta;
 }
@@ -187,15 +188,20 @@ export default function parse (siteUrls: string[]) {
 
   const parseSitePromises: Promise<ParsedSite>[] = []
   siteUrls = siteUrls.map(x => nonEmptyStr(x) ? x.trim() : x)
-  siteUrls.forEach(pressUrl => {
-    if (nonEmptyStr(pressUrl)) {
-      parseSitePromises.push(parseSiteWithRequest(pressUrl));
+  siteUrls.forEach(url => {
+    if (nonEmptyStr(url)) {
+      parseSitePromises.push(
+        parseSiteWithRequest(url)
+          .catch((err) => {
+            const errMsg = `Failed to parse a preview of the site ${url}. Error: ${err}`
+            log.error(errMsg)
+            return { ok: false, error: errMsg }
+          }));
     }
   });
 
   return Promise.all(parseSitePromises)
     .then(results => {
-      // console.log(`Site parser: Promise results`, results);
 
       const urlToMetaMap = new Map();
       results.forEach(({ url, siteMeta }) => {
@@ -260,8 +266,8 @@ export default function parse (siteUrls: string[]) {
       return { result: parsedPress };
     })
     .catch(err => {
-      const betterError = `Failed to parsePressMentions: ${err}`;
-      console.log(betterError);
-      return { error: betterError };
+      const errorMsg = `Unexpected error occured while parsing site previews: ${err}`;
+      console.error(errorMsg);
+      return { error: errorMsg };
     });
 }

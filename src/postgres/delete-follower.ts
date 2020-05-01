@@ -17,6 +17,7 @@ export const deletePostFollower = async (data: EventData) => {
     deleteFollowersLog('post')
   } catch (err) {
     deleteFollowersLogError('post', err.stack)
+    throw err
   }
 };
 
@@ -33,7 +34,7 @@ export const deleteCommentFollower = async (data: EventData) => {
     deleteFollowersLog('comment')
   } catch (err) {
     deleteFollowersLogError('comment', err.stack)
-
+    throw err
   }
 };
 
@@ -50,7 +51,7 @@ export const deleteBlogFollower = async (data: EventData) => {
     deleteFollowersLog('blog')
   } catch (err) {
     deleteFollowersLogError('blog', err.stack)
-
+    throw err
   }
 };
 
@@ -66,6 +67,6 @@ export const deleteAccountFollower = async (data: EventData) => {
     deleteFollowersLog('account')
   } catch (err) {
     deleteFollowersLogError('account', err.stack)
-
+    throw err
   }
 };

@@ -29,4 +29,7 @@ async function createIndexIfNoFound (indexName: string, mapping: any) {
 }
 
 maybeCreateIndices()
-  .catch(err => log.error('Failed to create indices:', err))
+  .catch(err => {
+    log.error('Failed to create indices:', err)
+    throw err
+  })

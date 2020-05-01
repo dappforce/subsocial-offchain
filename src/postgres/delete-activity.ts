@@ -19,6 +19,7 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
     deleteNotificationsLog('comment')
   } catch (err) {
     deleteNotificationsLogError('comment', err.stack)
+    throw err
   }
 }
 
@@ -38,6 +39,7 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
     deleteNotificationsLog('account')
   } catch (err) {
     deleteNotificationsLogError('account', err.stack)
+    throw err
   }
 }
 
@@ -57,6 +59,7 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
     deleteNotificationsLog('post')
   } catch (err) {
     deleteNotificationsLogError('post', err.stack)
+    throw err
   }
 }
 
@@ -77,5 +80,6 @@ export const deleteNotificationsAboutBlog = async (userId: string, blogId: BlogI
     deleteNotificationsLog('blog')
   } catch (err) {
     deleteNotificationsLogError('blog', err.stack)
+    throw err
   }
 }
