@@ -1,4 +1,3 @@
-
 import { substrateLog as log } from '../connections/loggers';
 import { OffchainState } from './types';
 import { readFile, writeFile } from 'fs';
@@ -14,18 +13,19 @@ const defaultOffchainState = (): OffchainState => ({
 })
 
 export async function readOffchainState (): Promise<OffchainState> {
-  let state = defaultOffchainState()
   try {
     const json = await asyncReadFile(stateFilePath, 'utf8')
-    state = JSON.parse(json) as OffchainState
+    const state = JSON.parse(json) as OffchainState
+    log.debug('Read the offchain state from FS: %o', state)
+    return state
   } catch (err) {
-    log.warn(`Could not read the offchain state from file: ${stateFilePath}`)
+    log .warn(`Could not read the offchain state from file: ${stateFilePath}`)
+    return defaultOffchainState()
   }
-  return state
 }
 
 export async function writeOffchainState (state: OffchainState) {
-  log.debug('Write the offchain state to FS: %o', state);
+  log.debug('Write the offchain state to FS: %o', state)
   const json = JSON.stringify(state)
   return asyncWriteFile(stateFilePath, json, 'utf8')
 }
