@@ -8,7 +8,7 @@ require('dotenv').config();
 
 // gets the event sections to filter on
 // if not set in the .env file then all events are processed
-export const getEventSections = () => {
+const getEventSections = () => {
   const sections = process.env.SUBSTRATE_EVENT_SECTIONS;
   if (sections) {
     return sections.split(',');
@@ -17,7 +17,7 @@ export const getEventSections = () => {
   }
 };
 
-export const getEventMethods = () => {
+const getEventMethods = () => {
   const methods = process.env.SUBSTRATE_EVENT_METHODS;
   if (methods) {
     return methods.split(',');
@@ -25,6 +25,11 @@ export const getEventMethods = () => {
     return [ 'all' ];
   }
 };
+
+// get event filters from config
+export const eventsFilterSections = getEventSections();
+
+export const eventsFilterMethods = getEventMethods();
 
 export function encodeStructIds (ids: SubstrateId[]) {
   try {

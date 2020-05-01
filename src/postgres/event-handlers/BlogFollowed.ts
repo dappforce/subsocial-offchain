@@ -1,11 +1,11 @@
 import { BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../server';
-import { insertBlogFollower } from '../../postgres/insert-follower';
-import { insertActivityForBlog } from '../../postgres/insert-activity';
-import { insertNotificationForOwner } from '../../postgres/notifications';
-import { SubstrateEvent } from '../types';
+import { substrate } from '../../substrate/subscribe';
+import { insertBlogFollower } from '../insert-follower';
+import { insertActivityForBlog } from '../insert-activity';
+import { insertNotificationForOwner } from '../notifications';
+import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
-export const onBlogFollowed = async (eventAction: SubstrateEvent) => {
+export const onBlogFollowed: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   await insertBlogFollower(data);
   const blogId = data[1] as BlogId;
@@ -20,5 +20,5 @@ export const onBlogFollowed = async (eventAction: SubstrateEvent) => {
   const follower = data[0].toString();
   if (follower === account) return;
 
-  insertNotificationForOwner(id, account);
+  await insertNotificationForOwner(id, account);
 }

@@ -3,7 +3,7 @@ import { GenericAccountId } from '@polkadot/types';
 import { PostId } from '@subsocial/types/substrate/interfaces';
 import { CommentContent, BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { encodeStructId } from '../substrate/utils';
-import { substrate } from '../substrate/server';
+import { substrate } from '../substrate/subscribe';
 import { ipfs } from '../connections/connect-ipfs';
 import elastic from '../connections/connect-elasticsearch'
 import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from './config';

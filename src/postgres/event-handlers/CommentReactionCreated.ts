@@ -1,10 +1,10 @@
 import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../server';
-import { insertActivityForCommentReaction } from '../../postgres/insert-activity';
-import { insertNotificationForOwner } from '../../postgres/notifications';
-import { SubstrateEvent } from '../types';
+import { substrate } from '../../substrate/subscribe';
+import { insertActivityForCommentReaction } from '../insert-activity';
+import { insertNotificationForOwner } from '../notifications';
+import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 
-export const onCommentReactionCreated = async (eventAction: SubstrateEvent) => {
+export const onCommentReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const follower = data[0].toString();
   const commentId = data[1] as CommentId;
@@ -20,5 +20,5 @@ export const onCommentReactionCreated = async (eventAction: SubstrateEvent) => {
   if (follower === account) return;
 
   // insertAggStream(eventAction, commentId);
-  insertNotificationForOwner(activityId, account);
+  await insertNotificationForOwner(activityId, account);
 }
