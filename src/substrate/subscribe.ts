@@ -126,6 +126,6 @@ async function main () {
 }
 
 main().catch((error) => {
-  log.error('Failed to subscribe to events:', error)
+  log.error('Failed the event processing:', error)
   process.exit(-1)
 })
