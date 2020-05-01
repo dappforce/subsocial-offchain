@@ -19,7 +19,7 @@ export async function readOffchainState (): Promise<OffchainState> {
     log.debug('Read the offchain state from FS: %o', state)
     return state
   } catch (err) {
-    log .warn(`Could not read the offchain state from file: ${stateFilePath}`)
+    log.warn(`Could not read the offchain state from file: ${stateFilePath}`)
     return defaultOffchainState()
   }
 }
