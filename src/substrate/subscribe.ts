@@ -35,8 +35,8 @@ async function main () {
 
   const offchainState = await readOffchainState()
 
-  const lastPostgresBlock = () => offchainState.Postgres.lastBlock
-  const lastElasticBlock = () => offchainState.Elastic.lastBlock
+  const lastPostgresBlock = () => offchainState.postgres.lastBlock
+  const lastElasticBlock = () => offchainState.elastic.lastBlock
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
   let blockToProcess = 0
@@ -91,8 +91,8 @@ async function main () {
           const error = await handleEventForPostgres(eventMeta)
           if (error) {
             processPostgres = false
-            offchainState.Postgres.lastError = error.stack
-            offchainState.Postgres.lastBlock = blockToProcess - 1
+            offchainState.postgres.lastError = error.stack
+            offchainState.postgres.lastBlock = blockToProcess - 1
           }
         }
 
@@ -100,21 +100,21 @@ async function main () {
           const error = await handleEventForElastic(eventMeta)
           if (error) {
             processElastic = false
-            offchainState.Elastic.lastError = error.stack
-            offchainState.Elastic.lastBlock = blockToProcess - 1
+            offchainState.elastic.lastError = error.stack
+            offchainState.elastic.lastBlock = blockToProcess - 1
           }
         }
       }
     }
 
     if (processPostgres) {
-      delete offchainState.Postgres.lastError
-      offchainState.Postgres.lastBlock = blockToProcess
+      delete offchainState.postgres.lastError
+      offchainState.postgres.lastBlock = blockToProcess
     }
 
     if (processElastic) {
-      delete offchainState.Elastic.lastError
-      offchainState.Elastic.lastBlock = blockToProcess
+      delete offchainState.elastic.lastError
+      offchainState.elastic.lastBlock = blockToProcess
     }
 
     await writeOffchainState(offchainState)

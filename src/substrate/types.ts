@@ -7,8 +7,8 @@ type CommonDbState = {
 }
 
 export type OffchainState = {
-  Postgres: CommonDbState
-  Elastic: CommonDbState
+  postgres: CommonDbState
+  elastic: CommonDbState
 }
 
 export type SubstrateEvent = {

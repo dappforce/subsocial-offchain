@@ -8,8 +8,8 @@ const asyncWriteFile = promisify(writeFile)
 const stateFilePath = `${__dirname}/../state.json`
 
 const defaultOffchainState = (): OffchainState => ({
-  Postgres: { lastBlock: 0 },
-  Elastic: { lastBlock: 0 }
+  postgres: { lastBlock: 0 },
+  elastic: { lastBlock: 0 }
 })
 
 export async function readOffchainState (): Promise<OffchainState> {
