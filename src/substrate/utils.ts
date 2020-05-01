@@ -1,35 +1,32 @@
+import { Event } from '@polkadot/types/interfaces';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { bnToHex } from '@polkadot/util'
 import { newLogger } from '@subsocial/utils';
 
+require('dotenv').config()
+
 const log = newLogger('Substrate Utils')
 
-require('dotenv').config();
+const ANY_EVENT = '*'
 
-// gets the event sections to filter on
-// if not set in the .env file then all events are processed
-const getEventSections = () => {
-  const sections = process.env.SUBSTRATE_EVENT_SECTIONS;
-  if (sections) {
-    return sections.split(',');
-  } else {
-    return [ 'all' ];
+const parseListOfVals = (vals: string): Set<string> => {
+  if (vals) {
+    return new Set(vals.split(',').map(x => x.trim()))
   }
-};
+  return new Set([ ANY_EVENT ])
+}
 
-const getEventMethods = () => {
-  const methods = process.env.SUBSTRATE_EVENT_METHODS;
-  if (methods) {
-    return methods.split(',');
-  } else {
-    return [ 'all' ];
-  }
-};
+// Get Substrate event filters from .env
+export const eventsFilterSections = parseListOfVals(process.env.SUBSTRATE_EVENT_SECTIONS)
 
-// get event filters from config
-export const eventsFilterSections = getEventSections();
+export const eventsFilterMethods = parseListOfVals(process.env.SUBSTRATE_EVENT_METHODS)
 
-export const eventsFilterMethods = getEventMethods();
+export function shouldHandleEvent (event: Event): boolean {
+  return eventsFilterMethods.has(ANY_EVENT) || (
+    eventsFilterSections.has(event.section.toString()) && 
+    eventsFilterMethods.has(event.method.toString())
+  )
+}
 
 export function encodeStructIds (ids: SubstrateId[]) {
   try {
@@ -45,5 +42,5 @@ export function encodeStructIds (ids: SubstrateId[]) {
  * Example: '0x000012ab' -> '12ab'
  */
 export function encodeStructId (id: SubstrateId): string {
-  return bnToHex(id).split('x')[1].replace(/(0+)/, '');
+  return bnToHex(id).split('x')[1].replace(/(0+)/, '')
 }
