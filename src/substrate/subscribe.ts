@@ -22,7 +22,7 @@ async function main () {
   const waitNextBlock = async () =>
     new Promise(resolve => setTimeout(resolve, blockTime))
 
-  const continueOnFail : boolean = JSON.parse(process.env.SUBSTRATE_CONTINUE_ON_FAIL) || true
+  const continueOnFail: boolean = JSON.parse(process.env.SUBSTRATE_CONTINUE_ON_FAIL) || true
 
   const state = await readOffchainState()
   // Clean up the state from the last errors:
@@ -74,7 +74,7 @@ async function main () {
       log.debug('Waiting for the best finalized block...')
       await waitNextBlock()
       bestFinalizedBlock = await getBestFinalizedBlock()
-      return;
+      return
     }
 
     const blockNumber = api.createType('BlockNumber', blockToProcess)
@@ -133,8 +133,6 @@ async function main () {
       if (!continueOnFail) {
         log.error('Failed to process block')
         break;
-      } else {
-        continue;
       }
     }
   }
