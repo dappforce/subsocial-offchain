@@ -22,10 +22,13 @@ async function main () {
   const waitNextBlock = async () =>
     new Promise(resolve => setTimeout(resolve, blockTime))
 
-  const dotenvContinueOnFail =  process.env.SUBSTRATE_CONTINUE_ON_FAIL
-  const continueOnFail = typeof dotenvContinueOnFail === 'undefined'
-    ? true
-    : dotenvContinueOnFail !== 'false'
+  function parseBool (x: boolean | string): boolean {
+    if (typeof x === 'boolean') return x
+
+    return nonEmptyStr(x) ? ['true', 'yes'].indexOf(x.trim().toLowerCase()) >= 0 : false
+  }
+
+  const continueOnFail = parseBool(process.env.SUBSTRATE_CONTINUE_ON_FAIL)
 
   const state = await readOffchainState()
   // Clean up the state from the last errors:
