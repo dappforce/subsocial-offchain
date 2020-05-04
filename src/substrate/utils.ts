@@ -17,7 +17,7 @@ const parseListOfVals = (vals: string): Set<string> => {
 }
 
 // Get Substrate event filters from .env
-export const eventsFilterSections = parseListOfVals(process.env.SUBSTRATE_EVENT_SECTIONS)
+const eventsFilterSections = parseListOfVals(process.env.SUBSTRATE_EVENT_SECTIONS)
 
 export const eventsFilterMethods = parseListOfVals(process.env.SUBSTRATE_EVENT_METHODS)
 
