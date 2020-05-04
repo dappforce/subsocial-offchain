@@ -33,14 +33,39 @@ services:
       - postgres_data:/var/lib/postgresql/data
     network_mode: "host"
 
-  ipfs:
+## IPFS Cluster #################################
+#################################################
+
+  ipfs-peer:
     image: ipfs/go-ipfs:master-latest
     container_name: subsocial-ipfs
     restart: on-failure
+    ports:
+      - "127.0.0.1:5001:5001"
+      - "8080:8080"
     volumes:
       - ipfs_staging:/export
       - ipfs_data:/data/ipfs
-    network_mode: "host"
+
+  cluster:
+    image: ipfs/ipfs-cluster:latest
+    container_name: subsocial-ipfs-cluster
+    depends_on:
+      - ipfs-peer
+    environment:
+      CLUSTER_PEERNAME: "Subsocial Cluster"
+      CLUSTER_SECRET: ${CLUSTER_SECRET} # From shell variable if set
+      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs-peer/tcp/5001
+      CLUSTER_CRDT_TRUSTERPEERS: '*' # Trust all peers in Cluster (TODO: trust initial peers only)
+      CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: /ip4/0.0.0.0/tcp/9094 # Expose API
+      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
+    ports:
+      - "127.0.0.1:9094:9094"
+    volumes:
+      - ./data/ipfs/cluster:/data/ipfs-cluster
+
+
+#################################################
 
   offchain:
     build:
@@ -51,7 +76,7 @@ services:
     depends_on:
       - postgres
       - elasticsearch
-      - ipfs
+      - cluster
     restart: on-failure
     environment:
       - NODE_ENV=production
