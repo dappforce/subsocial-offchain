@@ -69,4 +69,4 @@ build/
 .env
 
 # local docker volumes directory
-docker/data
+docker/ipfs-data

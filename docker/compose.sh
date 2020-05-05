@@ -9,16 +9,16 @@ eval cd $DIR
 
 UTILS_ONLY=false
 
+# Generated new IPFS Cluster secret in case the 'ipfs-data' directory was deleted
+export CLUSTER_SECRET=$(od  -vN 32 -An -tx1 /dev/urandom | tr -d ' \n')
+
 case $1 in
   --down)
     time docker-compose kill
     if [[ $2 == 'clean' ]]; then
       echo "Cleaning volumes..."
       eval docker-compose down
-      echo "Cleaning data directory..."
-      sudo rm -rf data
     fi
-    eval sleep 2 && clear
     exit 0
     ;;
   --utils)
@@ -30,11 +30,12 @@ case $1 in
     printf "Start services without offchain itself:\n./compose.sh --utils\n\n"
     printf "Stop all:\n./compose.sh --down\n\n"
     printf "Clean all:\n./compose.sh --down clean\n"
+
     exit 1
     ;;
 esac
 
-UTILS=" postgres elasticsearch cluster"
+UTILS=" postgres elasticsearch ipfs-cluster ipfs-peer"
 
 ES_NODE_URL='http://127.0.0.1:9200'
 
@@ -52,6 +53,9 @@ time (
     done
     eval docker restart subsocial-offchain
   fi
+
+  # TODO: Add initial peer as the only one trusted
+
 )
 
 echo "Containers are ready."
