@@ -17,8 +17,11 @@ const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
 const log = newLogger('ExpressOffchainApi')
 const app = express();
+const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || 'http://localhost';
 
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigin
+}));
 
 const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE
 
