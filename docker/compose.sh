@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
 pushd . > /dev/null
@@ -38,24 +38,42 @@ esac
 UTILS=" postgres elasticsearch ipfs-cluster ipfs-peer"
 
 ES_NODE_URL='http://127.0.0.1:9200'
+IPFS_NODE_URL='http://127.0.0.1:8080'
 
 time (
   echo "Starting offchain in background, hang on!"
 
   if [ UTILS_ONLY ]; then
-    eval docker-compose up -d $UTILS
+    docker-compose up -d $UTILS
   else
-    eval docker-compose up -d
+    docker-compose up -d
+    docker stop subsocial-offchain
 
     echo "Starting Elasticsearch..."
     until curl -s $ES_NODE_URL > /dev/null; do
       sleep 2
     done
-    eval docker restart subsocial-offchain
+    docker start subsocial-offchain
   fi
 
-  # TODO: Add initial peer as the only one trusted
+  echo "Waiting until IPFS is ready..."
+  until curl -s --X GET ${IPFS_NODE_URL}'/api/v0/version' > /dev/null
+  do
+    sleep 1
+  done
+  for node in 0 1
+  do
+    docker exec subsocial-ipfs$node \
+      ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+    docker exec subsocial-ipfs$node \
+      ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET", "POST", "PUT"]'
+    docker exec subsocial-ipfs$node ipfs bootstrap rm --all &> /dev/null
 
+    printf "Restarting "
+    docker restart subsocial-ipfs$node
+  done
+
+  # TODO: Add initial peer as the only one trusted
 )
 
 echo "Containers are ready."
