@@ -67,3 +67,6 @@ build/
 
 # dotenv environment variables file
 .env
+
+# local docker volumes directory
+docker/ipfs-data

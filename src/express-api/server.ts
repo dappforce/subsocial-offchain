@@ -1,7 +1,7 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import ipfs from '../connections/connect-ipfs';
+import { ipfsCluster } from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger, nonEmptyStr, parseNumStr } from '@subsocial/utils';
@@ -17,8 +17,11 @@ const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
 const log = newLogger('ExpressOffchainApi')
 const app = express();
+const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || 'http://localhost';
 
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigin
+}));
 
 const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE
 
@@ -48,10 +51,22 @@ const getLimitFromRequest = (req: express.Request): number => {
 }
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
-  const hash = await ipfs.saveContent(req.body);
-  log.info('Content saved to IPFS with hash:', hash);
-  res.json(hash);
-});
+  const cid = await ipfsCluster.addContent(req.body)
+  log.info('Content added to IPFS with CID:', cid)
+  res.json(cid)
+})
+
+app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Response) => {
+  const { cid } = req.params
+  if (nonEmptyStr(cid)) {
+    await ipfsCluster.unpinContent(cid)
+    log.info('Content unpinned from IPFS by CID:', cid)
+  } else {
+    log.warn('Cannot unpin content: No CID provided ')
+    res.statusCode = 400
+    res.statusMessage = 'Bad Request'
+  }
+})
 
 // User feed and notifications API
 

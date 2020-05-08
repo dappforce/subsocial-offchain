@@ -21,5 +21,6 @@ COPY --from=builder node_modules/ ./node_modules
 RUN yarn add global concurrently
 
 EXPOSE 3001
+EXPOSE 3011
 
 CMD bash -c "yarn init-offchain && yarn start"

@@ -33,14 +33,66 @@ services:
       - postgres_data:/var/lib/postgresql/data
     network_mode: "host"
 
-  ipfs:
+## IPFS Cluster #################################
+#################################################
+
+  ipfs0:
     image: ipfs/go-ipfs:master-latest
-    container_name: subsocial-ipfs
+    container_name: subsocial-ipfs0
+    restart: on-failure
+    ports:
+      - "4001:4001"
+      - "127.0.0.1:5001:5001"
+      - "8080:8080"
+    volumes:
+      - ./ipfs-data/daemon/staging:/export
+      - ./ipfs-data/daemon/data:/data/ipfs
+
+  ipfs-cluster:
+    image: ipfs/ipfs-cluster:latest
+    container_name: subsocial-ipfs-cluster
+    depends_on:
+      - ipfs0
+    environment:
+      CLUSTER_PEERNAME: "Subsocial Cluster"
+      CLUSTER_SECRET: ${CLUSTER_SECRET} # From shell variable if set
+      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs0/tcp/5001
+      CLUSTER_CRDT_TRUSTERPEERS: '*' # Trust all peers in Cluster (initially)
+      CLUSTER_RESTAPI_CORSALLOWEDORIGINS: 'http://localhost'
+      CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: /ip4/0.0.0.0/tcp/9094 # Expose API
+      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
+    ports:
+      - "127.0.0.1:9094:9094"
+      # - "9096:9096"
+    volumes:
+      - ./ipfs-data/cluster:/data/ipfs-cluster
+
+#################################################
+
+  ipfs1:
+    image: ipfs/go-ipfs:master-latest
+    container_name: subsocial-ipfs1
     restart: on-failure
     volumes:
-      - ipfs_staging:/export
-      - ipfs_data:/data/ipfs
-    network_mode: "host"
+      - peer_staging:/export
+      - peer_data:/data/ipfs
+
+  ipfs-peer:
+    image: ipfs/ipfs-cluster:latest
+    container_name: subsocial-ipfs-peer
+    depends_on:
+      - ipfs1
+    environment:
+      CLUSTER_PEERNAME: "Subsocial Peer"
+      CLUSTER_SECRET: ${CLUSTER_SECRET}
+      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs1/tcp/5001
+      CLUSTER_CRDT_TRUSTERPEERS: '*'
+      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
+    volumes:
+      - peer_cluster:/data/ipfs-cluster
+
+#################################################
+#################################################
 
   offchain:
     build:
@@ -51,7 +103,7 @@ services:
     depends_on:
       - postgres
       - elasticsearch
-      - ipfs
+      - ipfs-cluster
     restart: on-failure
     environment:
       - NODE_ENV=production
@@ -62,7 +114,9 @@ volumes:
     driver: local
   postgres_data:
     driver: local
-  ipfs_staging:
+  peer_staging:
     driver: local
-  ipfs_data:
+  peer_data:
+    driver: local
+  peer_cluster:
     driver: local
