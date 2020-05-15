@@ -1,7 +1,7 @@
 import { pg } from '../connections/connect-postgres';
 import { encodeStructIds } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
-import { Comment } from '@subsocial/types/substrate/interfaces/subsocial';
+import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../substrate/subscribe';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
@@ -25,14 +25,14 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
   }
 }
 
-export const insertActivityComments = async (eventAction: SubstrateEvent, ids: SubstrateId[], commentLast: Comment) => {
+export const insertActivityComments = async (eventAction: SubstrateEvent, ids: SubstrateId[], commentLast: Post) => {
   let comment = commentLast;
   const lastCommentAccount = commentLast.created.account.toString();
-  while (comment.parent_id.isSome) {
+  while (comment.extension.asComment.parent_id.isSome) { // TODO find all replies and send on request to DB
     log.debug('parent_id is defined')
-    const id = comment.parent_id.unwrap();
+    const id = comment.extension.asComment.parent_id.unwrap();
     const param = [ ...ids, id ];
-    const parentComment = await substrate.findComment(id); // TODO test if working
+    const parentComment = await substrate.findPost(id); // TODO test if working
 
     if (parentComment) { // TODO maybe use isEmpty from lodash
       comment = parentComment;

@@ -1,12 +1,12 @@
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
 import { PostId } from '@subsocial/types/substrate/interfaces';
-import { CommentContent, BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
+import { BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { encodeStructId } from '../substrate/utils';
 import { substrate } from '../substrate/subscribe';
 import { ipfs } from '../connections/connect-ipfs';
 import elastic from '../connections/connect-elasticsearch'
-import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from './config';
+import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 
 export async function indexContentFromIpfs (
@@ -40,23 +40,25 @@ export async function indexContentFromIpfs (
       if (!content) return;
 
       const { title, body, tags } = content
-      const { blog_id } = await substrate.findPost(id as PostId);
+
+      const post = await substrate.findPost(id as PostId);
+
+      const { blog_id, extension: { asComment: commentExt, isComment } } = post
+
+      let blogId;
+
+      if (isComment) {
+        const rootPost = await substrate.findPost(commentExt.root_post_id);
+        blogId  = rootPost.blog_id   
+      } else {
+        blogId  = blog_id  
+      }
+
       indexData = {
-        blog_id: encodeStructId(blog_id),
+        blog_id: encodeStructId(blogId),
         title,
         body,
         tags,
-      };
-      break;
-    }
-
-    case ES_INDEX_COMMENTS: {
-      const content = await getContent<CommentContent>()
-      if (!content) return;
-
-      const { body } = content
-      indexData = {
-        body
       };
       break;
     }

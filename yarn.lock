@@ -2338,40 +2338,26 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@^0.2.19":
-  version "0.2.19"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.2.19.tgz#5c4979e575b6c3802d3d9667fff38b4edf47c85e"
-  integrity sha512-xlMQqBmrMO4Hd7aYw8sGvwnHWNOHHGwXYd968OgaaRO0WQGvgMkzQN5Qiw5Xj7bO+MQe6L70rgO7Uuj5GxxdYw==
+"@subsocial/api@^0.2.22":
+  version "0.2.22"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.2.22.tgz#92c457653ce17db8462e94a7b1722fbda3016727"
+  integrity sha512-QvKVf5G5rugiAyOPhYNm/aKwCHHPJGw2ga+jz2z+ApKwmVhQAVA/awtYXjCMNz0vRnwpaeRa9QvqzhnfjG8Kkw==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@polkadot/api" "1.11.1"
-    "@subsocial/types" "^0.1.30"
+    "@subsocial/types" "^0.2.1"
     "@subsocial/utils" "^0.1.23"
     "@types/axios" "^0.14.0"
     axios "^0.19.2"
 
-"@subsocial/types@^0.1.30":
-  version "0.1.30"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.1.30.tgz#ef8d0bc4ea0a796806bd6c5715fcd4ed8974c2ea"
-  integrity sha512-oyScFOM57e+BcMHtHCW65mBMn6vJNIpXNiAKeqjfAg74J/aa9aP5RHMTG9T3Xc1eq4k3uUDIuRRy6rGc+cSjlQ==
+"@subsocial/types@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.2.1.tgz#3c7e87a45c5c6baf5794cae867f73cc33a892899"
+  integrity sha512-FXuyRaNpUKXrSjU6E2ImqFgAx8GsjFfQDbL5bZY5/q10M3Th/9LlfmozLpCcUKKtoqQ18RX8yS9mdlf9IUCLyg==
   dependencies:
     "@babel/runtime" "^7.8.4"
-    "@subsocial/utils" ">=0.1.20"
+    "@subsocial/utils" "^0.1.23"
     cids "^0.7.1"
-
-"@subsocial/utils@>=0.1.20":
-  version "0.1.21"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.1.21.tgz#bd4b77f0f1b167e343954748482f098d19afbee4"
-  integrity sha512-uTvakYgmXD3ciNF3G1cCxSwLMVQ1Aoow/ept5+a5PdSwoDvv58x3da9aqfKc7MvQrJvQIPT+rGIq6YHJJamn+g==
-  dependencies:
-    "@babel/runtime" "^7.8.4"
-    "@types/lodash.truncate" "^4.4.6"
-    "@types/winston" "^2.4.4"
-    bn.js "^5.1.1"
-    chalk "^3.0.0"
-    lodash.truncate "^4.4.2"
-    markdown-to-txt "^1.0.1"
-    winston "^3.2.0"
 
 "@subsocial/utils@^0.1.23":
   version "0.1.23"
@@ -10513,18 +10499,6 @@ markdown-it@^8.4.1:
     linkify-it "^2.0.0"
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
-
-markdown-to-txt@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/markdown-to-txt/-/markdown-to-txt-1.0.1.tgz#f02528acaf77366d6f29569546de61acd74ba2b7"
-  integrity sha512-PACe8GiGnJ5Nf/bkE+NWIMK36qRAGW6JP9mHLeiL6BBoUA51EqEmtJd9VEI0lGl74JYUUSoKHqX0FQV4ivo1nA==
-  dependencies:
-    marked "^0.6.2"
-
-marked@^0.6.2:
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.6.3.tgz#79babad78af638ba4d522a9e715cdfdd2429e946"
-  integrity sha512-Fqa7eq+UaxfMriqzYLayfqAE40WN03jf+zHjT18/uXNuzjq3TY0XTbrAoPeqSJrAmPz11VuUA+kBPYOhHt9oOQ==
 
 marked@^0.8.0:
   version "0.8.2"

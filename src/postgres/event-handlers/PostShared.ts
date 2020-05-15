@@ -13,13 +13,14 @@ export const onPostShared: EventHandlerFn = async (eventAction: SubstrateEvent) 
   const post = await substrate.findPost(postId);
   if (!post) return;
 
-  const ids = [ post.blog_id, postId ];
+  const blogId = post.blog_id.unwrap()
+  const ids = [ blogId, postId ];
   const activityId = await insertActivityForPost(eventAction, ids);
   if (activityId === -1) return;
 
   const account = post.created.account.toString();
   await insertNotificationForOwner(activityId, account);
   await fillNotificationsWithAccountFollowers(follower, activityId);
-  await fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
+  await fillNewsFeedWithBlogFollowers(blogId, follower, activityId);
   await fillNewsFeedWithAccountFollowers(follower, activityId)
 }
