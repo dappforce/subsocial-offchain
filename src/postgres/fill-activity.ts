@@ -1,6 +1,6 @@
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';
 import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedLogError, fillNotificationsLogError } from './postges-logger';
 
@@ -95,7 +95,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
   }
 }
 
-export const fillNotificationsWithCommentFollowers = async (commentId: CommentId, account: string, activityId: number) => {
+export const fillNotificationsWithCommentFollowers = async (commentId: PostId, account: string, activityId: number) => {
   const query = `
       INSERT INTO df.notifications(account, activity_id)
         (SELECT df.comment_followers.follower_account, df.activities.id

@@ -1,9 +1,9 @@
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { deleteNotificationsLog, deleteNotificationsLogError } from './postges-logger';
 
-export const deleteNotificationsAboutComment = async (userId: string, commentId: CommentId) => {
+export const deleteNotificationsAboutComment = async (userId: string, commentId: PostId) => {
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1

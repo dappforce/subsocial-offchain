@@ -1,7 +1,7 @@
 import { EventData } from '@polkadot/types/generic/Event';
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { deleteFollowersLog, deleteFollowersLogError } from './postges-logger';
 
 export const deletePostFollower = async (data: EventData) => {
@@ -22,7 +22,7 @@ export const deletePostFollower = async (data: EventData) => {
 };
 
 export const deleteCommentFollower = async (data: EventData) => {
-  const commentId = encodeStructId(data[1] as CommentId);
+  const commentId = encodeStructId(data[1] as PostId);
   const query = `
       DELETE from df.comment_followers
       WHERE follower_account = $1
