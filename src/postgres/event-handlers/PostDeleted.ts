@@ -2,7 +2,7 @@ import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import { substrate } from '../../substrate/subscribe';
 import { onCommentDeleted } from './CommentDeleted';
-import { onRegularOrSharedPostDeleted } from './RegualrOrSharedPostDeleted';
+import { onRootPostDeleted } from './RootPostDeleted';
 
 export const onPostDeleted: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -13,6 +13,6 @@ export const onPostDeleted: EventHandlerFn = async (eventAction: SubstrateEvent)
   if (isComment) {
     onCommentDeleted(eventAction)
   } else {
-    onRegularOrSharedPostDeleted(eventAction)
+    onRootPostDeleted(eventAction)
   }
 }

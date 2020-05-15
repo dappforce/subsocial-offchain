@@ -5,7 +5,7 @@ import { fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers } from 
 import { SubstrateEvent } from '../../substrate/types';
 
 
-export const onRegualrOrSharedCreated = async (eventAction: SubstrateEvent, post: Post) => {
+export const onRootCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { data } = eventAction;
   await insertPostFollower(data);
   const postId = data[1] as PostId;

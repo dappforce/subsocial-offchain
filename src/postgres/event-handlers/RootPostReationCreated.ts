@@ -3,7 +3,7 @@ import { insertActivityForPostReaction } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent } from '../../substrate/types';
 
-export const onRegularOrSharedPostCreated = async (eventAction: SubstrateEvent, post: Post) => {
+export const onRootPostCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { data } = eventAction;
   const follower = data[0].toString();
   const postId = data[1] as PostId;

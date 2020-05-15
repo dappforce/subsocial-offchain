@@ -3,7 +3,7 @@ import { substrate } from '../../substrate/subscribe';
 import { insertPostFollower } from '../insert-follower';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import { onCommentCreated } from './CommentCreated';
-import { onRegualrOrSharedCreated } from './RegualrOrSharedPostCreated';
+import { onRootCreated } from './RootPostCreated';
 
 export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -16,6 +16,6 @@ export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent)
   if (post.extension.isComment) {
     onCommentCreated(eventAction, post)
   } else { 
-    onRegualrOrSharedCreated(eventAction, post)
+    onRootCreated(eventAction, post)
   }
 }

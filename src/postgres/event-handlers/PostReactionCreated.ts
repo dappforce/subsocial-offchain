@@ -2,7 +2,7 @@ import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import { onCommentReactionCreated } from '.';
-import { onRegularOrSharedPostCreated } from './RegularOrSharedctionPostReationCreated';
+import { onRootPostCreated } from './RootPostReationCreated';
 
 export const onPostReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -13,6 +13,6 @@ export const onPostReactionCreated: EventHandlerFn = async (eventAction: Substra
   if (post.extension.isComment) {
     onCommentReactionCreated(eventAction, post)
   } else { 
-    onRegularOrSharedPostCreated(eventAction, post)
+    onRootPostCreated(eventAction, post)
   }
 }
