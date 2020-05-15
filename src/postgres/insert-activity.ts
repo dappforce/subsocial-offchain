@@ -64,7 +64,7 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-      INSERT INTO df.activities(account, event, post_id, comment_id, parent_comment_id, block_height, agg_count, aggregated)
+      INSERT INTO df.activities(account, event, post_id, comment_id, parent_comment_id, block_number, agg_count, aggregated)
         VALUES($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *`
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
@@ -113,7 +113,7 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
   const objectId = data[1].toString();
 
   const query = `
-      INSERT INTO df.activities(account, event, following_id, block_height, agg_count)
+      INSERT INTO df.activities(account, event, following_id, block_number, agg_count)
         VALUES($1, $2, $3, $4, $5)
       RETURNING *`
   const params = [ accountId, eventName, objectId, blockHeight, count ];
@@ -148,7 +148,7 @@ export const insertActivityForBlog = async (eventAction: SubstrateEvent, count: 
   const blogId = data[1].toString();
   const aggregated = accountId !== creator;
   const query = `
-      INSERT INTO df.activities(account, event, blog_id, block_height, agg_count, aggregated)
+      INSERT INTO df.activities(account, event, blog_id, block_number, agg_count, aggregated)
         VALUES($1, $2, $3, $4, $5, $6)
       RETURNING *`
   const params = [ accountId, eventName, blogId, blockHeight, count, aggregated ];
@@ -189,7 +189,7 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
   const { eventName, data, blockHeight } = eventAction;
   const accountId = data[0].toString();
   const query = `
-      INSERT INTO df.activities(account, event, blog_id, post_id, block_height, agg_count)
+      INSERT INTO df.activities(account, event, blog_id, post_id, block_number, agg_count)
         VALUES($1, $2, $3, $4, $5, $6)
       RETURNING *`
   const newCount = eventName === 'PostShared'
@@ -221,7 +221,7 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
   const aggregated = accountId !== creator;
   
   const query = `
-      INSERT INTO df.activities(account, event, post_id, block_height, agg_count,aggregated)
+      INSERT INTO df.activities(account, event, post_id, block_number, agg_count,aggregated)
         VALUES($1, $2, $3, $4, $5, $6)
       RETURNING *`
   const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
@@ -263,7 +263,7 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-      INSERT INTO df.activities(account, event, post_id, comment_id, block_height, agg_count,aggregated)
+      INSERT INTO df.activities(account, event, post_id, comment_id, block_number, agg_count,aggregated)
         VALUES($1, $2, $3, $4, $5, $6, $7)
       RETURNING *`
   const params = [ accountId, eventName, ...paramsIds, blockHeight, count, aggregated ];
