@@ -4,6 +4,7 @@ import { insertActivityForPost } from '../insert-activity';
 import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers } from '../fill-activity';
 import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { VirtualEvents } from '../../substrate/utils';
 
 export const onPostShared: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -12,6 +13,10 @@ export const onPostShared: EventHandlerFn = async (eventAction: SubstrateEvent) 
 
   const post = await substrate.findPost(postId);
   if (!post) return;
+
+  if (post.extension.isComment) {
+    eventAction.eventName = VirtualEvents.CommentShared
+  }
 
   const blogId = post.blog_id.unwrap()
   const ids = [ blogId, postId ];

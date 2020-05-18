@@ -11,5 +11,5 @@ export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent)
   const post = await substrate.findPost(postId);
   if (!post) return;
 
-  await indexContentFromIpfs(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId);
+  await indexContentFromIpfs(ES_INDEX_POSTS, post.ipfs_hash.toString(), postId, post);
 }

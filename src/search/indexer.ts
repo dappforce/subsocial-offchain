@@ -1,6 +1,6 @@
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
-import { PostId } from '@subsocial/types/substrate/interfaces';
+import { PostId, Post } from '@subsocial/types/substrate/interfaces';
 import { BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { encodeStructId } from '../substrate/utils';
 import { substrate } from '../substrate/subscribe';
@@ -41,18 +41,25 @@ export async function indexContentFromIpfs (
 
       const { title, body, tags } = content
 
-      const post = await substrate.findPost(id as PostId);
+      let post = extData as Post;
 
-      const { blog_id, extension: { asComment: commentExt, isComment } } = post
+      if (!post) {
+        post = await substrate.findPost(id as PostId);
+      }
+
+      const { blog_id, extension } = post
 
       let blogId;
 
-      if (isComment) {
-        const rootPost = await substrate.findPost(commentExt.root_post_id);
-        blogId  = rootPost.blog_id   
+      if (extension.isComment) {
+        const rootPost = await substrate.findPost(extension.asComment.root_post_id);
+        const blogIdOpt = rootPost.blog_id;
+        blogId  = blogIdOpt.unwrapOr(undefined)
       } else {
-        blogId  = blog_id  
+        blogId  = blog_id.unwrapOr(undefined)  
       }
+
+      console.log('Blog Id:', blogId);
 
       indexData = {
         blog_id: encodeStructId(blogId),

@@ -44,3 +44,10 @@ export function encodeStructIds (ids: SubstrateId[]) {
 export function encodeStructId (id: SubstrateId): string {
   return bnToHex(id).split('x')[1].replace(/(0+)/, '')
 }
+
+export enum VirtualEvents {
+  CommentCreated = 'CommentCreated',
+  CommentShared = 'CommentShared',
+  CommentDeleted = 'CommentDeleted',
+  CommentReactionCreated = 'CommentReactionCreated'
+}

@@ -3,6 +3,7 @@ import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import { onCommentReactionCreated } from '.';
 import { onRootPostCreated } from './RootPostReationCreated';
+import { VirtualEvents } from '../../substrate/utils';
 
 export const onPostReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -11,6 +12,7 @@ export const onPostReactionCreated: EventHandlerFn = async (eventAction: Substra
   if (!post) return;
 
   if (post.extension.isComment) {
+    eventAction.eventName = VirtualEvents.CommentReactionCreated
     onCommentReactionCreated(eventAction, post)
   } else { 
     onRootPostCreated(eventAction, post)

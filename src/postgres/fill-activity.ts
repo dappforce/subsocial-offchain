@@ -54,11 +54,12 @@ export const fillNewsFeedWithBlogFollowers = async (blogId: BlogId, account: str
         (SELECT df.blog_followers.follower_account, df.activities.id
         FROM df.activities
         LEFT JOIN df.blog_followers ON df.activities.blog_id = df.blog_followers.following_blog_id
-        WHERE blog_id = $1 AND df.blog_followers.follower_account <> $2
+        WHERE blog_id = $1
+          AND df.blog_followers.follower_account <> $2
           AND id = $3
           AND aggregated = true
           AND (df.blog_followers.follower_account, df.activities.id)
-          NOT IN (SELECT account,activity_id from df.news_feed))
+            NOT IN (SELECT account,activity_id from df.news_feed))
       RETURNING *`;
   const hexBlogId = encodeStructId(blogId);
   const params = [ hexBlogId, account, activityId ];

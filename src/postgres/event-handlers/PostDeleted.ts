@@ -3,6 +3,7 @@ import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import { substrate } from '../../substrate/subscribe';
 import { onCommentDeleted } from './CommentDeleted';
 import { onRootPostDeleted } from './RootPostDeleted';
+import { VirtualEvents } from '../../substrate/utils';
 
 export const onPostDeleted: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -12,6 +13,7 @@ export const onPostDeleted: EventHandlerFn = async (eventAction: SubstrateEvent)
 
   if (isComment) {
     onCommentDeleted(eventAction)
+    eventAction.eventName = VirtualEvents.CommentDeleted
   } else {
     onRootPostDeleted(eventAction)
   }
