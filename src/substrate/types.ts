@@ -14,7 +14,7 @@ export type OffchainState = {
 export type SubstrateEvent = {
   eventName: string
   data: EventData
-  blockHeight: BN
+  blockNumber: BN
 }
 
 export type HandlerResult = Error | void
