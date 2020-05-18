@@ -5,6 +5,9 @@
   "engines": {
     "node": ">= 10.13"
   },
+  "resolutions": {
+    "@polkadot/types": "1.13.1"
+  },
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/bn.js": "^4.11.5",
@@ -41,7 +44,8 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/dev": "^0.32.17",
-    "@subsocial/api": "^0.2.22",
+    "@polkadot/types": "1.13.1",
+    "@subsocial/api": "0.2.22",
     "@subsocial/types": "^0.2.1",
     "@subsocial/utils": "^0.1.23",
     "@types/request-promise": "^4.1.46",
