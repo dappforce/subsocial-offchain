@@ -5,6 +5,7 @@ import { insertActivityComments, insertActivityForComment } from '../insert-acti
 import { fillNotificationsWithAccountFollowers, fillNotificationsWithPostFollowers } from '../fill-activity';
 import { substrateLog as log } from '../../connections/loggers';
 import { SubstrateEvent } from '../../substrate/types';
+import { VirtualEvents } from '../../substrate/utils';
 
 export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { data } = eventAction;
@@ -24,6 +25,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
   const commentCreator = account.toString();
   const ids = [ root_post_id, commentId ];
   if (parent_id.isSome) {
+    eventAction.eventName = VirtualEvents.CommentReplyCreated
     log.debug('Comment has a parent id');
     await insertActivityComments(eventAction, ids, post);
   } else {

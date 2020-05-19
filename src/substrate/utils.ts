@@ -49,5 +49,6 @@ export enum VirtualEvents {
   CommentCreated = 'CommentCreated',
   CommentShared = 'CommentShared',
   CommentDeleted = 'CommentDeleted',
-  CommentReactionCreated = 'CommentReactionCreated'
+  CommentReactionCreated = 'CommentReactionCreated',
+  CommentReplyCreated = 'CommentReplyCreated'
 }
