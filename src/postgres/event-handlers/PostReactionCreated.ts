@@ -2,7 +2,7 @@ import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import { onCommentReactionCreated } from '.';
-import { onRootPostCreated } from './RootPostReationCreated';
+import { onRootPostReactionCreated } from './RootPostReationCreated';
 import { VirtualEvents } from '../../substrate/utils';
 
 export const onPostReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
@@ -15,6 +15,6 @@ export const onPostReactionCreated: EventHandlerFn = async (eventAction: Substra
     eventAction.eventName = VirtualEvents.CommentReactionCreated
     onCommentReactionCreated(eventAction, post)
   } else { 
-    onRootPostCreated(eventAction, post)
+    onRootPostReactionCreated(eventAction, post)
   }
 }
