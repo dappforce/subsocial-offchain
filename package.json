@@ -5,6 +5,9 @@
   "engines": {
     "node": ">= 10.13"
   },
+  "resolutions": {
+    "@polkadot/types": "1.13.1"
+  },
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/bn.js": "^4.11.5",
@@ -26,6 +29,7 @@
     "init-search": "node ./build/src/search/index.js",
     "init-offchain": "node ./build/src/sql/init.js",
     "clear-offchain": "node ./build/src/sql/clear-db.js",
+    "clear-state": "rm -rf ./build/src/state.json",
     "ipfs": "yarn jsipfs daemon",
     "clean": "rimraf coverage build tmp",
     "copy-sql": "find ./src -name '*.sql' | cpio -pd ./build",
@@ -41,9 +45,9 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/dev": "^0.32.17",
-    "@polkadot/types": "1.11.1",
-    "@subsocial/api": "^0.2.19",
-    "@subsocial/types": "^0.1.30",
+    "@polkadot/types": "1.13.1",
+    "@subsocial/api": "0.2.22",
+    "@subsocial/types": "^0.2.1",
     "@subsocial/utils": "^0.1.23",
     "@types/request-promise": "^4.1.46",
     "axios": "^0.19.0",

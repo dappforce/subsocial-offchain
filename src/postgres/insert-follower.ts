@@ -1,7 +1,7 @@
 import { EventData } from '@polkadot/types/generic/Event';
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { insertFollowersLog, insertFollowersLogError } from './postges-logger';
 
 export const insertAccountFollower = async (data: EventData) => {
@@ -36,7 +36,7 @@ export const insertPostFollower = async (data: EventData) => {
 };
 
 export const insertCommentFollower = async (data: EventData) => {
-  const commentId = encodeStructId(data[1] as CommentId);
+  const commentId = encodeStructId(data[1] as PostId);
   const query = `
       INSERT INTO df.comment_followers(follower_account, following_comment_id)
         VALUES($1, $2)

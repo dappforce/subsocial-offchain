@@ -1,6 +1,6 @@
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';
 import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedLogError, fillNotificationsLogError } from './postges-logger';
 
@@ -54,11 +54,12 @@ export const fillNewsFeedWithBlogFollowers = async (blogId: BlogId, account: str
         (SELECT df.blog_followers.follower_account, df.activities.id
         FROM df.activities
         LEFT JOIN df.blog_followers ON df.activities.blog_id = df.blog_followers.following_blog_id
-        WHERE blog_id = $1 AND df.blog_followers.follower_account <> $2
+        WHERE blog_id = $1
+          AND df.blog_followers.follower_account <> $2
           AND id = $3
           AND aggregated = true
           AND (df.blog_followers.follower_account, df.activities.id)
-          NOT IN (SELECT account,activity_id from df.news_feed))
+            NOT IN (SELECT account,activity_id from df.news_feed))
       RETURNING *`;
   const hexBlogId = encodeStructId(blogId);
   const params = [ hexBlogId, account, activityId ];
@@ -95,7 +96,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
   }
 }
 
-export const fillNotificationsWithCommentFollowers = async (commentId: CommentId, account: string, activityId: number) => {
+export const fillNotificationsWithCommentFollowers = async (commentId: PostId, account: string, activityId: number) => {
   const query = `
       INSERT INTO df.notifications(account, activity_id)
         (SELECT df.comment_followers.follower_account, df.activities.id

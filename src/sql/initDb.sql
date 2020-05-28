@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS df.activities
     comment_id varchar(16) NULL,
     parent_comment_id varchar(16) NULL,
     date TIMESTAMP NOT NULL DEFAULT NOW(),
-    block_height bigint NOT NULL,
+    block_number bigint NOT NULL,
     aggregated boolean NOT NULL DEFAULT true,
     agg_count bigint NOT NULL DEFAULT 0
 );

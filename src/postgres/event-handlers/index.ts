@@ -8,7 +8,6 @@ export { onPostCreated } from './PostCreated';
 export { onPostShared } from './PostShared';
 export { onPostDeleted } from './PostDeleted';
 export { onCommentCreated } from './CommentCreated';
-export { onCommentShared } from './CommentShared';
 export { onCommentDeleted } from './CommentDeleted';
 export { onPostReactionCreated } from './PostReactionCreated';
 export { onCommentReactionCreated } from './CommentReactionCreated';

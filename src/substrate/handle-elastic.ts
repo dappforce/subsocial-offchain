@@ -2,7 +2,7 @@ import { SubstrateEvent, EventHandlerFn } from './types'
 import * as handlers from '../search/event-handlers/index'
 import { newLogger } from '@subsocial/utils'
 
-export const handleEventForElastic: EventHandlerFn = async (event: SubstrateEvent) => {
+export const handleEventForElastic = async (event: SubstrateEvent): Promise<Error | void> => {
   const handle: EventHandlerFn = handlers[`on${event.eventName}`]
   if (typeof handle === 'function') {
     try {
