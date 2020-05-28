@@ -1,20 +1,19 @@
-import { PostId, Post } from '@subsocial/types/substrate/interfaces/subsocial';
+import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { insertActivityForPostReaction } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent } from '../../substrate/types';
+import { parsePostEvent } from '../../substrate/utils';
 
 export const onRootPostReactionCreated = async (eventAction: SubstrateEvent, post: Post) => {
-  const { data } = eventAction;
-  const follower = data[0].toString();
-  const postId = data[1] as PostId;
+  const { author: voter, postId } = parsePostEvent(eventAction)
 
   const ids = [ postId ];
-  const count = post.upvotes_count.toNumber() + post.downvotes_count.toNumber() - 1;
-  const account = post.created.account.toString();
-  const activityId = await insertActivityForPostReaction(eventAction, count, ids, account);
+  const reactionCount = post.upvotes_count.add(post.downvotes_count).toNumber() - 1;
+  const postAuthor = post.created.account.toString();
+  const activityId = await insertActivityForPostReaction(eventAction, reactionCount, ids, postAuthor);
   if (activityId === -1) return;
 
-  if (follower === account) return;
+  if (voter === postAuthor) return;
 
-  await insertNotificationForOwner(activityId, account);
+  await insertNotificationForOwner(activityId, postAuthor);
 }

@@ -1,4 +1,4 @@
-import { Post, PostId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/subscribe';
 import { insertCommentFollower } from '../insert-follower';
 import { insertActivityComments, insertActivityForComment } from '../insert-activity';
@@ -6,34 +6,35 @@ import { fillNotificationsWithAccountFollowers, fillNotificationsWithPostFollowe
 import { substrateLog as log } from '../../connections/loggers';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
+import { parseCommentEvent } from '../../substrate/utils';
 
 export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) => {
-  const { data } = eventAction;
-  await insertCommentFollower(data);
-  const commentId = data[1] as PostId;
+  const { author, commentId } = parseCommentEvent(eventAction)
 
   const {
     extension: { asComment: { root_post_id, parent_id } },
-    created: { account }
   } = post
 
   const rootPost = await substrate.findPost(root_post_id);
 
   if (!rootPost) return;
 
+  await insertCommentFollower(eventAction.data);
+
   const postCreator = rootPost.created.account.toString();
-  const commentCreator = account.toString();
   const ids = [ root_post_id, commentId ];
+
   if (parent_id.isSome) {
     eventAction.eventName = VirtualEvents.CommentReplyCreated
     log.debug('Comment has a parent id');
     await insertActivityComments(eventAction, ids, post);
   } else {
+    eventAction.eventName = VirtualEvents.CommentCreated
     const activityId = await insertActivityForComment(eventAction, ids, postCreator);
     if (activityId === -1) return;
 
     log.debug('Comment does not have a parent id');
-    await fillNotificationsWithPostFollowers(root_post_id, commentCreator, activityId);
-    await fillNotificationsWithAccountFollowers(commentCreator, activityId);
+    await fillNotificationsWithPostFollowers(root_post_id, author, activityId);
+    await fillNotificationsWithAccountFollowers(author, activityId);
   }
 }
