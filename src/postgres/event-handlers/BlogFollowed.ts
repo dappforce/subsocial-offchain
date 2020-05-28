@@ -13,7 +13,7 @@ export const onBlogFollowed: EventHandlerFn = async (eventAction: SubstrateEvent
   if (!blog) return;
 
   const count = blog.followers_count.toNumber() - 1;
-  const account = blog.created.account.toString();
+  const account = blog.owner.toString();
   const id = await insertActivityForBlog(eventAction, count, account);
   if (id === -1) return;
 
