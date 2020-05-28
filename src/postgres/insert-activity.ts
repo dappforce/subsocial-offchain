@@ -25,16 +25,18 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
   }
 }
 
-export const insertActivityComments = async (eventAction: SubstrateEvent, ids: SubstrateId[], commentLast: Post) => {
-  let comment = commentLast;
-  const lastCommentAccount = commentLast.created.account.toString();
-  while (comment.extension.asComment.parent_id.isSome) { // TODO find all replies and send on request to DB
+export const insertActivityComments = async (eventAction: SubstrateEvent, ids: SubstrateId[], lastComment: Post) => {
+  let comment = lastComment;
+  const lastCommentAccount = lastComment.created.account.toString();
+
+  // TODO find all replies and insert into DB with a single query:
+  while (comment.extension.asComment.parent_id.isSome) {
     log.debug('parent_id is defined')
     const id = comment.extension.asComment.parent_id.unwrap();
     const param = [...ids, id];
-    const parentComment = await substrate.findPost(id); // TODO test if working
+    const parentComment = await substrate.findPost(id);
 
-    if (parentComment) { // TODO maybe use isEmpty from lodash
+    if (parentComment) {
       comment = parentComment;
     }
 
