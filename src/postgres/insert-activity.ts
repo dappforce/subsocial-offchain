@@ -9,11 +9,11 @@ import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { SubstrateEvent } from '../substrate/types';
 
 export const insertNotificationForOwner = async (id: number, account: string) => {
-  const params = [ account, id ]
+  const params = [account, id]
   const query = `
-      INSERT INTO df.notifications
-        VALUES($1, $2) 
-      RETURNING *`
+    INSERT INTO df.notifications
+      VALUES($1, $2) 
+    RETURNING *`
 
   try {
     await pg.query(query, params)
@@ -31,7 +31,7 @@ export const insertActivityComments = async (eventAction: SubstrateEvent, ids: S
   while (comment.extension.asComment.parent_id.isSome) { // TODO find all replies and send on request to DB
     log.debug('parent_id is defined')
     const id = comment.extension.asComment.parent_id.unwrap();
-    const param = [ ...ids, id ];
+    const param = [...ids, id];
     const parentComment = await substrate.findPost(id); // TODO test if working
 
     if (parentComment) { // TODO maybe use isEmpty from lodash
@@ -59,25 +59,25 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
     paramsIds.push(null);
   }
 
-  const [ postId ] = paramsIds;
+  const [postId] = paramsIds;
   const { eventName, data, blockNumber } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-      INSERT INTO df.activities(account, event, post_id, comment_id, parent_comment_id, block_number, agg_count, aggregated)
-        VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING *`
+    INSERT INTO df.activities(account, event, post_id, comment_id, parent_comment_id, block_number, agg_count, aggregated)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING *`
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
-  const params = [ accountId, eventName, ...paramsIds, blockNumber, count, aggregated ];
+  const params = [accountId, eventName, ...paramsIds, blockNumber, count, aggregated];
   try {
     const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
 
     insertActivityLog('comment')
 
-    const [ postId, , parentId ] = paramsIds;
+    const [postId, , parentId] = paramsIds;
     let parentEq = '';
-    const paramsIdsUpd = [ postId ];
+    const paramsIdsUpd = [postId];
     if (!parentId) {
       parentEq += 'AND parent_comment_id IS NULL'
     } else {
@@ -85,17 +85,17 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
       paramsIdsUpd.push(parentId);
     }
     const queryUpdate = `
-        UPDATE df.activities
-          SET aggregated = false
-          WHERE id <> $1
-            AND event = $2
-            AND post_id = $3
-            ${parentEq}
-            AND aggregated = true
-        RETURNING *`;
-    log.debug('Params of update query:', [ ...paramsIdsUpd ]);
+      UPDATE df.activities
+        SET aggregated = false
+        WHERE id <> $1
+          AND event = $2
+          AND post_id = $3
+          ${parentEq}
+          AND aggregated = true
+      RETURNING *`;
+    log.debug('Params of update query:', [...paramsIdsUpd]);
     log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
-    const paramsUpdate = [ activityId, eventName, ...paramsIdsUpd ];
+    const paramsUpdate = [activityId, eventName, ...paramsIdsUpd];
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
     return activityId;
@@ -113,23 +113,23 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
   const objectId = data[1].toString();
 
   const query = `
-      INSERT INTO df.activities(account, event, following_id, block_number, agg_count)
-        VALUES($1, $2, $3, $4, $5)
-      RETURNING *`
-  const params = [ accountId, eventName, objectId, blockNumber, count ];
+    INSERT INTO df.activities(account, event, following_id, block_number, agg_count)
+      VALUES($1, $2, $3, $4, $5)
+    RETURNING *`
+  const params = [accountId, eventName, objectId, blockNumber, count];
   try {
     const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
     const queryUpdate = `
-          UPDATE df.activities
-            SET aggregated = false
-            WHERE id <> $1
-              AND event = $2
-              AND aggregated = true
-              AND following_id = $3
-          RETURNING *`;
+      UPDATE df.activities
+        SET aggregated = false
+        WHERE id <> $1
+          AND event = $2
+          AND aggregated = true
+          AND following_id = $3
+      RETURNING *`;
 
-    const paramsUpdate = [ activityId, eventName, accountId ];
+    const paramsUpdate = [activityId, eventName, accountId];
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
     insertActivityLog('account')
@@ -148,22 +148,22 @@ export const insertActivityForBlog = async (eventAction: SubstrateEvent, count: 
   const blogId = data[1].toString();
   const aggregated = accountId !== creator;
   const query = `
-      INSERT INTO df.activities(account, event, blog_id, block_number, agg_count, aggregated)
-        VALUES($1, $2, $3, $4, $5, $6)
-      RETURNING *`
-  const params = [ accountId, eventName, blogId, blockNumber, count, aggregated ];
+    INSERT INTO df.activities(account, event, blog_id, block_number, agg_count, aggregated)
+      VALUES($1, $2, $3, $4, $5, $6)
+    RETURNING *`
+  const params = [accountId, eventName, blogId, blockNumber, count, aggregated];
   try {
     const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
-    const paramsUpdate = [ activityId, eventName, blogId ];
+    const paramsUpdate = [activityId, eventName, blogId];
     const queryUpdate = `
-          UPDATE df.activities
-            SET aggregated = false
-            WHERE id <> $1
-              AND event = $2
-              AND aggregated = true
-              AND blog_id = $3
-          RETURNING *`;
+      UPDATE df.activities
+        SET aggregated = false
+        WHERE id <> $1
+          AND event = $2
+          AND aggregated = true
+          AND blog_id = $3
+      RETURNING *`;
 
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
@@ -185,18 +185,18 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
     return -1
   }
 
-  const [ , postId ] = paramsIds;
+  const [, postId] = paramsIds;
   const { eventName, data, blockNumber } = eventAction;
   const accountId = data[0].toString();
   const query = `
-      INSERT INTO df.activities(account, event, blog_id, post_id, block_number, agg_count)
-        VALUES($1, $2, $3, $4, $5, $6)
-      RETURNING *`
+    INSERT INTO df.activities(account, event, blog_id, post_id, block_number, agg_count)
+      VALUES($1, $2, $3, $4, $5, $6)
+    RETURNING *`
   const newCount = eventName === 'PostShared'
     ? await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId })
     : count;
 
-  const params = [ accountId, eventName, ...paramsIds, blockNumber, newCount ];
+  const params = [accountId, eventName, ...paramsIds, blockNumber, newCount];
   try {
     const res = await pg.query(query, params)
     insertActivityLog('post')
@@ -219,27 +219,27 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
   const { eventName, data, blockNumber } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
-  
+
   const query = `
-      INSERT INTO df.activities(account, event, post_id, block_number, agg_count,aggregated)
-        VALUES($1, $2, $3, $4, $5, $6)
-      RETURNING *`
-  const params = [ accountId, eventName, ...paramsIds, blockNumber, count, aggregated ];
+    INSERT INTO df.activities(account, event, post_id, block_number, agg_count, aggregated)
+      VALUES($1, $2, $3, $4, $5, $6)
+    RETURNING *`
+  const params = [accountId, eventName, ...paramsIds, blockNumber, count, aggregated];
   try {
     const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
     insertActivityLog('post reaction')
     const postId = paramsIds.pop();
     const queryUpdate = `
-          UPDATE df.activities
-            SET aggregated = false
-            WHERE id <> $1
-              AND event = $2
-              AND aggregated = true
-              AND post_id = $3
-          RETURNING *`;
+      UPDATE df.activities
+        SET aggregated = false
+        WHERE id <> $1
+          AND event = $2
+          AND aggregated = true
+          AND post_id = $3
+      RETURNING *`;
 
-    const paramsUpdate = [ activityId, eventName, postId ];
+    const paramsUpdate = [activityId, eventName, postId];
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
 
@@ -263,25 +263,25 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-      INSERT INTO df.activities(account, event, post_id, comment_id, block_number, agg_count,aggregated)
-        VALUES($1, $2, $3, $4, $5, $6, $7)
-      RETURNING *`
-  const params = [ accountId, eventName, ...paramsIds, blockNumber, count, aggregated ];
+    INSERT INTO df.activities(account, event, post_id, comment_id, block_number, agg_count, aggregated)
+      VALUES($1, $2, $3, $4, $5, $6, $7)
+    RETURNING *`
+  const params = [accountId, eventName, ...paramsIds, blockNumber, count, aggregated];
   try {
     const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
     insertActivityLog('comment reaction')
     const queryUpdate = `
-          UPDATE df.activities
-            SET aggregated = false
-            WHERE id <> $1
-              AND event = $2
-              AND aggregated = true
-              AND post_id = $3
-              AND comment_id = $4
-          RETURNING *`;
+      UPDATE df.activities
+        SET aggregated = false
+        WHERE id <> $1
+          AND event = $2
+          AND aggregated = true
+          AND post_id = $3
+          AND comment_id = $4
+      RETURNING *`;
 
-    const paramsUpdate = [ activityId, eventName, ...paramsIds ];
+    const paramsUpdate = [activityId, eventName, ...paramsIds];
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
 
@@ -291,4 +291,4 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
     throw err
     return -1;
   }
-};
+}
