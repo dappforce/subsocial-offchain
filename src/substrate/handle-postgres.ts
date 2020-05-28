@@ -2,7 +2,7 @@ import { SubstrateEvent, EventHandlerFn } from './types'
 import * as handlers from '../postgres/event-handlers/index'
 import { newLogger } from '@subsocial/utils'
 
-export const handleEventForPostgres: EventHandlerFn = async (event: SubstrateEvent) => {
+export const handleEventForPostgres = async (event: SubstrateEvent): Promise<Error | void> => {
   const handle: EventHandlerFn = handlers[`on${event.eventName}`]
   if (typeof handle === 'function') {
     try {

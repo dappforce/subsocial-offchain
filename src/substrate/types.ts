@@ -17,6 +17,4 @@ export type SubstrateEvent = {
   blockNumber: BN
 }
 
-export type HandlerResult = Error | void
-
-export type EventHandlerFn = (event: SubstrateEvent) => Promise<HandlerResult>
+export type EventHandlerFn = (event: SubstrateEvent) => Promise<void>

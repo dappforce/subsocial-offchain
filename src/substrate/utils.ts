@@ -2,6 +2,8 @@ import { Event } from '@polkadot/types/interfaces';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { bnToHex } from '@polkadot/util'
 import { newLogger } from '@subsocial/utils';
+import { SubstrateEvent } from './types';
+import { PostId } from '@subsocial/types/substrate/interfaces';
 
 require('dotenv').config()
 
@@ -51,4 +53,16 @@ export enum VirtualEvents {
   CommentDeleted = 'CommentDeleted',
   CommentReactionCreated = 'CommentReactionCreated',
   CommentReplyCreated = 'CommentReplyCreated'
+}
+
+export const parsePostEvent = ({ data }: SubstrateEvent) => {
+  return {
+    author: data[0].toString(),
+    postId: data[1] as PostId
+  }
+}
+
+export const parseCommentEvent = (eventAction: SubstrateEvent) => {
+  const { author, postId: commentId } = parsePostEvent(eventAction)
+  return { author, commentId }
 }
