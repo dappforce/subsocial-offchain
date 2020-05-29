@@ -1,7 +1,7 @@
 import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/subscribe';
 import { insertActivityForComment } from '../insert-activity';
-import { fillNotificationsWithAccountFollowers, fillNotificationsWithCommentFollowers, fillNewsFeedWithBlogFollowers, fillNewsFeedWithAccountFollowers } from '../fill-activity';
+import { fillNotificationsWithAccountFollowers, fillNotificationsWithCommentFollowers, fillNewsFeedWithSpaceFollowers, fillNewsFeedWithAccountFollowers } from '../fill-activity';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
@@ -14,8 +14,8 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Post
   if (!rootPost) return;
 
   eventAction.eventName = VirtualEvents.CommentShared
-  const blogId = rootPost.blog_id.unwrapOr(null);
-  const ids = [ blogId, rootPostId, commentId ];
+  const spaceId = rootPost.space_id.unwrapOr(null);
+  const ids = [ spaceId, rootPostId, commentId ];
   const account = comment.created.account.toString();
 
   const activityId = await insertActivityForComment(eventAction, ids, account);
@@ -23,6 +23,6 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Post
 
   await fillNotificationsWithCommentFollowers(commentId, account, activityId);
   await fillNotificationsWithAccountFollowers(account, activityId);
-  await fillNewsFeedWithBlogFollowers(blogId, author, activityId);
+  await fillNewsFeedWithSpaceFollowers(spaceId, author, activityId);
   await fillNewsFeedWithAccountFollowers(author, activityId)
 }

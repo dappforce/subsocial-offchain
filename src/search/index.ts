@@ -1,12 +1,12 @@
 import elastic from '../connections/connect-elasticsearch'
-import * as BlogsMapping from './mappings/blogs.json'
+import * as SpacesMapping from './mappings/spaces.json'
 import * as PostsMapping from './mappings/posts.json'
 import * as ProfilesMapping from './mappings/profiles.json'
-import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config'
+import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config'
 import { elasticLog as log } from '../connections/loggers';
 
 async function maybeCreateIndices () {
-  await createIndexIfNoFound(ES_INDEX_BLOGS, BlogsMapping)
+  await createIndexIfNoFound(ES_INDEX_SPACES, SpacesMapping)
   await createIndexIfNoFound(ES_INDEX_POSTS, PostsMapping)
   await createIndexIfNoFound(ES_INDEX_PROFILES, ProfilesMapping)
 }

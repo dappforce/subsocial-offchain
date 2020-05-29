@@ -9,7 +9,7 @@ export const logSuccess = (operation: string, structName: string) =>
 export const logError = (operation: string, structName: string, error: any) =>
   log.error(`Failed to ${operation} ${structName}. Error: ${error}`)
 
-type StructName = 'post' | 'blog' | 'comment' | 'account' | 'owner' | 'post reaction' | 'comment reaction';
+type StructName = 'post' | 'space' | 'comment' | 'account' | 'owner' | 'post reaction' | 'comment reaction';
 
 // delete notifications
 

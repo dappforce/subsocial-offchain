@@ -1,12 +1,12 @@
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
 import { PostId, Post } from '@subsocial/types/substrate/interfaces';
-import { BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
+import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { encodeStructId } from '../substrate/utils';
 import { substrate } from '../substrate/subscribe';
 import { ipfs } from '../connections/connect-ipfs';
 import elastic from '../connections/connect-elasticsearch'
-import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
+import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 
 export async function indexContentFromIpfs (
@@ -22,8 +22,8 @@ export async function indexContentFromIpfs (
 
   let indexData;
   switch (index) {
-    case ES_INDEX_BLOGS: {
-      const content = await getContent<BlogContent>()
+    case ES_INDEX_SPACES: {
+      const content = await getContent<SpaceContent>()
       if (!content) return;
 
       const { name, desc, tags } = content
@@ -47,22 +47,22 @@ export async function indexContentFromIpfs (
         post = await substrate.findPost(id as PostId);
       }
 
-      const { blog_id, extension } = post
+      const { space_id, extension } = post
 
-      let blogId;
+      let spaceId;
 
       if (extension.isComment) {
         const rootPost = await substrate.findPost(extension.asComment.root_post_id);
-        const blogIdOpt = rootPost.blog_id;
-        blogId  = blogIdOpt.unwrapOr(undefined)
+        const spaceIdOpt = rootPost.space_id;
+        spaceId  = spaceIdOpt.unwrapOr(undefined)
       } else {
-        blogId  = blog_id.unwrapOr(undefined)  
+        spaceId  = space_id.unwrapOr(undefined)  
       }
 
-      console.log('Blog Id:', blogId);
+      console.log('Space Id:', spaceId);
 
       indexData = {
-        blog_id: encodeStructId(blogId),
+        space_id: encodeStructId(spaceId),
         title,
         body,
         tags,

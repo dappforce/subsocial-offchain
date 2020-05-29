@@ -143,36 +143,36 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
   }
 };
 
-export const insertActivityForBlog = async (eventAction: SubstrateEvent, count: number, creator?: string): Promise<number> => {
+export const insertActivityForSpace = async (eventAction: SubstrateEvent, count: number, creator?: string): Promise<number> => {
 
   const { eventName, data, blockNumber } = eventAction;
   const accountId = data[0].toString();
-  const blogId = data[1].toString();
+  const spaceId = data[1].toString();
   const aggregated = accountId !== creator;
   const query = `
-    INSERT INTO df.activities(account, event, blog_id, block_number, agg_count, aggregated)
+    INSERT INTO df.activities(account, event, space_id, block_number, agg_count, aggregated)
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
-  const params = [accountId, eventName, blogId, blockNumber, count, aggregated];
+  const params = [accountId, eventName, spaceId, blockNumber, count, aggregated];
   try {
     const res = await pg.query(query, params)
     const activityId = res.rows[0].id;
-    const paramsUpdate = [activityId, eventName, blogId];
+    const paramsUpdate = [activityId, eventName, spaceId];
     const queryUpdate = `
       UPDATE df.activities
         SET aggregated = false
         WHERE id <> $1
           AND event = $2
           AND aggregated = true
-          AND blog_id = $3
+          AND space_id = $3
       RETURNING *`;
 
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
-    insertActivityLog('blog')
+    insertActivityLog('space')
     return activityId;
   } catch (err) {
-    insertActivityLogError('blog', err.stack);
+    insertActivityLogError('space', err.stack);
     throw err
     return -1;
   }
@@ -191,7 +191,7 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
   const { eventName, data, blockNumber } = eventAction;
   const accountId = data[0].toString();
   const query = `
-    INSERT INTO df.activities(account, event, blog_id, post_id, block_number, agg_count)
+    INSERT INTO df.activities(account, event, space_id, post_id, block_number, agg_count)
       VALUES($1, $2, $3, $4, $5, $6)
     RETURNING *`
   const newCount = eventName === 'PostShared'

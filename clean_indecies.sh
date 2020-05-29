@@ -1,5 +1,5 @@
 curl "localhost:9200/_cat/indices?v"
-curl -X DELETE "localhost:9200/subsocial_blogs?pretty"
+curl -X DELETE "localhost:9200/subsocial_spaces?pretty"
 curl -X DELETE "localhost:9200/subsocial_posts?pretty"
 curl -X DELETE "localhost:9200/subsocial_comments?pretty"
 curl -X DELETE "localhost:9200/subsocial_profiles?pretty"

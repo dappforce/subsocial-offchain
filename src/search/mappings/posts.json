@@ -29,7 +29,7 @@
   },
   "mappings": {
     "properties": {
-      "blog_id": {
+      "space_id": {
         "type": "text"
       },
       "title": {

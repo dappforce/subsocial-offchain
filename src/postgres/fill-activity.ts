@@ -1,6 +1,6 @@
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';
 import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedLogError, fillNotificationsLogError } from './postges-logger';
 
@@ -48,27 +48,27 @@ export const fillNotificationsWithAccountFollowers = async (account: string, act
   }
 }
 
-export const fillNewsFeedWithBlogFollowers = async (blogId: BlogId, account: string, activityId: number) => {
+export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: string, activityId: number) => {
   const query = `
       INSERT INTO df.news_feed(account, activity_id)
-        (SELECT df.blog_followers.follower_account, df.activities.id
+        (SELECT df.space_followers.follower_account, df.activities.id
         FROM df.activities
-        LEFT JOIN df.blog_followers ON df.activities.blog_id = df.blog_followers.following_blog_id
-        WHERE blog_id = $1
-          AND df.blog_followers.follower_account <> $2
+        LEFT JOIN df.space_followers ON df.activities.space_id = df.space_followers.following_space_id
+        WHERE space_id = $1
+          AND df.space_followers.follower_account <> $2
           AND id = $3
           AND aggregated = true
-          AND (df.blog_followers.follower_account, df.activities.id)
+          AND (df.space_followers.follower_account, df.activities.id)
             NOT IN (SELECT account,activity_id from df.news_feed))
       RETURNING *`;
-  const hexBlogId = encodeStructId(blogId);
-  const params = [ hexBlogId, account, activityId ];
+  const hexSpaceId = encodeStructId(spaceId);
+  const params = [ hexSpaceId, account, activityId ];
   try {
     await pg.query(query, params)
-    fillNewsFeedLog('blog')
+    fillNewsFeedLog('space')
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
-    fillNewsFeedLogError('blog', err.stack);
+    fillNewsFeedLogError('space', err.stack);
     throw err
   }
 }

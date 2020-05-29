@@ -1,5 +1,5 @@
-export { onBlogCreated } from './BlogCreated';
-export { onBlogUpdated } from './BlogUpdated';
+export { onSpaceCreated } from './SpaceCreated';
+export { onSpaceUpdated } from './SpaceUpdated';
 export { onPostCreated } from './PostCreated';
 export { onPostUpdated } from './PostUpdated';
 export { onProfileCreated } from './ProfileCreated';

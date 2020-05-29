@@ -1,9 +1,9 @@
 export { onAccountFollowed } from './AccountFollowed';
 export { onAccountUnfollowed } from './AccountUnfollowed';
-export { onBlogCreated } from './BlogCreated';
-export { onBlogUpdated } from './BlogUpdated';
-export { onBlogFollowed } from './BlogFollowed';
-export { onBlogUnfollowed } from './BlogUnfollowed';
+export { onSpaceCreated } from './SpaceCreated';
+export { onSpaceUpdated } from './SpaceUpdated';
+export { onSpaceFollowed } from './SpaceFollowed';
+export { onSpaceUnfollowed } from './SpaceUnfollowed';
 export { onPostCreated } from './PostCreated';
 export { onPostShared } from './PostShared';
 export { onPostDeleted } from './PostDeleted';

@@ -3,10 +3,10 @@ DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'action') THEN
         CREATE TYPE df.action AS ENUM (
-            'BlogCreated',
-            'BlogUpdated',
-            'BlogFollowed',
-            'BlogUnfollowed',
+            'SpaceCreated',
+            'SpaceUpdated',
+            'SpaceFollowed',
+            'SpaceUnfollowed',
             'AccountFollowed',
             'AccountUnfollowed',
             'PostCreated',
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS df.activities
     account varchar(48) NOT NULL,
     event df.action NOT NULL,
     following_id varchar(48) NULL,
-    blog_id varchar(16) NULL,
+    space_id varchar(16) NULL,
     post_id varchar(16) NULL,
     comment_id varchar(16) NULL,
     parent_comment_id varchar(16) NULL,
@@ -63,10 +63,10 @@ CREATE TABLE IF NOT EXISTS df.account_followers
     following_account varchar(48) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS df.blog_followers
+CREATE TABLE IF NOT EXISTS df.space_followers
 (
     follower_account varchar(48) NOT NULL,
-    following_blog_id varchar(16) NOT NULL
+    following_space_id varchar(16) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS df.post_followers
@@ -90,8 +90,8 @@ ON df.account_followers(following_account);
 CREATE INDEX IF NOT EXISTS idx_post_follower_account 
 ON df.post_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_blog_follower_account 
-ON df.blog_followers(follower_account);
+CREATE INDEX IF NOT EXISTS idx_space_follower_account 
+ON df.space_followers(follower_account);
 
 CREATE INDEX IF NOT EXISTS idx_comment_follower_account 
 ON df.comment_followers(follower_account);
@@ -99,8 +99,8 @@ ON df.comment_followers(follower_account);
 CREATE INDEX IF NOT EXISTS idx_following_post_id 
 ON df.post_followers(following_post_id);
 
-CREATE INDEX IF NOT EXISTS idx_following_blog_id 
-ON df.blog_followers(following_blog_id);
+CREATE INDEX IF NOT EXISTS idx_following_space_id 
+ON df.space_followers(following_space_id);
 
 CREATE INDEX IF NOT EXISTS idx_following_comment_id 
 ON df.comment_followers(following_comment_id);
@@ -120,8 +120,8 @@ ON df.activities(following_id);
 CREATE INDEX IF NOT EXISTS idx_post_id
 ON df.activities(post_id);
 
-CREATE INDEX IF NOT EXISTS idx_blog_id
-ON df.activities(blog_id);
+CREATE INDEX IF NOT EXISTS idx_space_id
+ON df.activities(space_id);
 
 CREATE INDEX IF NOT EXISTS idx_comment_id
 ON df.activities(comment_id);
