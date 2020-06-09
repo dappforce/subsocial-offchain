@@ -2374,31 +2374,22 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@0.3.2-beta1":
-  version "0.3.2-beta1"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.3.2-beta1.tgz#fa7f282185d3835bad7e30b5e77100e054f65da6"
-  integrity sha512-V1OF/mjsuoKVp9Hr1dOjZ1Eh1z2q5vAX6Y7qtC3yuQ9N3DzfXHoWKp4aqeqMRxNF/Nvb0yCJyJA/1eYqO7Ew7A==
+"@subsocial/api@0.3.2-beta2":
+  version "0.3.2-beta2"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.3.2-beta2.tgz#08d7d5a1b884b8116220437f7365454d7cbefef2"
+  integrity sha512-2bzdQ8lYul+EVXqMeJBgnsWzk9Uca8KwxMPrgcuzfY5/6dBDkwLzmeCJtD+pVU7veui5hrW1sfRxYchXT/BUEA==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@polkadot/api" "1.13.1"
-    "@subsocial/types" "^0.3.1"
+    "@subsocial/types" "^0.3.2-beta2"
     "@subsocial/utils" "^0.1.23"
     "@types/axios" "^0.14.0"
     axios "^0.19.2"
 
-"@subsocial/types@0.3.2-beta1":
-  version "0.3.2-beta1"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.3.2-beta1.tgz#9d773766bf45182de5a12efb53dae96e5133f30e"
-  integrity sha512-b65pXHAGf+OIH+3Lv4GEUK4Gcn5E6yiQZqWFixrqIVZUOkIusBkCpdvMYvPjMp5AvY11qm7C+cep5yPsc/a/DA==
-  dependencies:
-    "@babel/runtime" "^7.8.4"
-    "@subsocial/utils" "^0.1.23"
-    cids "^0.7.1"
-
-"@subsocial/types@^0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.3.1.tgz#638801a3f11a73417d0965cc1655314916846395"
-  integrity sha512-T/8+PN+o3UtZTnxYMqtaSeh09dmEgZLhsBvrVaqEr/zmbTDe5ZUJV0lafdWZK3DnXnzi7MjRmb4ukwSjcQ0gEQ==
+"@subsocial/types@0.3.2-beta2", "@subsocial/types@^0.3.2-beta2":
+  version "0.3.2-beta2"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.3.2-beta2.tgz#f9e89708f6f8d0d574bf0761dada828264db39ac"
+  integrity sha512-9SLUOEGmXRmicdUHIL89witg9GFu05op5DJNrvh1duZ1Kx1PLIln/Os+QKYSyBb5ve0PR677i97eaQkl0qpqAw==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@subsocial/utils" "^0.1.23"
