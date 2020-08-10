@@ -44,7 +44,7 @@ export async function indexContentFromIpfs (
       let post = extData as Post;
 
       if (!post) {
-        post = await substrate.findPost(id as PostId);
+        post = await substrate.findPost({ id: id as PostId });
       }
 
       const { space_id, extension } = post
@@ -52,7 +52,7 @@ export async function indexContentFromIpfs (
       let spaceId;
 
       if (extension.isComment) {
-        const rootPost = await substrate.findPost(extension.asComment.root_post_id);
+        const rootPost = await substrate.findPost({ id: extension.asComment.root_post_id });
         const spaceIdOpt = rootPost.space_id;
         spaceId  = spaceIdOpt.unwrapOr(undefined)
       } else {
@@ -76,7 +76,7 @@ export async function indexContentFromIpfs (
 
       const { fullname, about } = content
       indexData = {
-        username: extData && extData.toString(),
+        handle: extData && extData.toString(),
         fullname,
         about
       }

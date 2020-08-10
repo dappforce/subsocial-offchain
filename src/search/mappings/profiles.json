@@ -29,7 +29,7 @@
   },
   "mappings": {
     "properties": {
-      "username": {
+      "handle": {
         "type": "text",
         "fields": {
           "suggest": {

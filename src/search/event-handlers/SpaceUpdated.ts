@@ -7,8 +7,8 @@ import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 export const onSpaceUpdated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const spaceId = data[1] as SpaceId;
-  const space = await substrate.findSpace(spaceId);
+  const space = await substrate.findSpace({ id: spaceId });
   if (!space) return;
 
-  await indexContentFromIpfs(ES_INDEX_SPACES, space.ipfs_hash.toString(), spaceId);
+  await indexContentFromIpfs(ES_INDEX_SPACES, space.content.asIpfs.toString(), spaceId);
 }
