@@ -34,7 +34,7 @@ export const insertActivityComments = async (eventAction: SubstrateEvent, ids: S
     log.debug('parent_id is defined')
     const id = comment.extension.asComment.parent_id.unwrap();
     const param = [...ids, id];
-    const parentComment = await substrate.findPost(id);
+    const parentComment = await substrate.findPost({ id });
 
     if (parentComment) {
       comment = parentComment;

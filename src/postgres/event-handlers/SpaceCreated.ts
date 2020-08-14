@@ -11,6 +11,6 @@ export const onSpaceCreated: EventHandlerFn = async (eventAction: SubstrateEvent
   await fillNotificationsWithAccountFollowers(account, activityId);
 
   const spaceId = data[1] as SpaceId;
-  const space = await substrate.findSpace(spaceId);
+  const space = await substrate.findSpace({ id: spaceId });
   if (!space) return;
 }

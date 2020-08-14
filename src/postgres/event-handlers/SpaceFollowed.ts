@@ -9,7 +9,7 @@ export const onSpaceFollowed: EventHandlerFn = async (eventAction: SubstrateEven
   const { data } = eventAction;
   await insertSpaceFollower(data);
   const spaceId = data[1] as SpaceId;
-  const space = await substrate.findSpace(spaceId);
+  const space = await substrate.findSpace({ id: spaceId });
   if (!space) return;
 
   const count = space.followers_count.toNumber() - 1;

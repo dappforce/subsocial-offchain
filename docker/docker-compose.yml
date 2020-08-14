@@ -58,7 +58,7 @@ services:
       CLUSTER_SECRET: ${CLUSTER_SECRET} # From shell variable if set
       CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs0/tcp/5001
       CLUSTER_CRDT_TRUSTERPEERS: '*' # Trust all peers in Cluster (initially)
-      CLUSTER_RESTAPI_CORSALLOWEDORIGINS: 'http://localhost'
+      CLUSTER_RESTAPI_CORSALLOWEDORIGINS: '*'
       CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: /ip4/0.0.0.0/tcp/9094 # Expose API
       CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
     ports:

@@ -10,7 +10,7 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Post
   const { author, commentId } = parseCommentEvent(eventAction)
 
   const rootPostId = comment.extension.asComment.root_post_id;
-  const rootPost = await substrate.findPost(rootPostId);
+  const rootPost = await substrate.findPost({ id: rootPostId });
   if (!rootPost) return;
 
   eventAction.eventName = VirtualEvents.CommentShared

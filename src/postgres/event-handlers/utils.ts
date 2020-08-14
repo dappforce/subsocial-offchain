@@ -13,7 +13,7 @@ type PostHandlers = {
 
 export const findPostAndProccess = async ({ eventAction, onRootPost, onComment }: PostHandlers) => {
   const { postId } = parsePostEvent(eventAction)
-  const post = await substrate.findPost(postId)
+  const post = await substrate.findPost({ id: postId })
   if (!post) return;
 
   if (post.extension.isComment) {

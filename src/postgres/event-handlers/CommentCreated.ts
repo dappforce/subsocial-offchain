@@ -15,7 +15,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
     extension: { asComment: { root_post_id, parent_id } },
   } = post
 
-  const rootPost = await substrate.findPost(root_post_id);
+  const rootPost = await substrate.findPost({ id: root_post_id });
 
   if (!rootPost) return;
 
