@@ -1,8 +1,8 @@
 import { indexContentFromIpfs } from '../../search/indexer';
 import { ES_INDEX_PROFILES } from '../../search/config';
-import { AccountId } from '@subsocial/types/substrate/interfaces/runtime';
 import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import AccountId from '@polkadot/types/generic/AccountId';
 
 export const onProfileUpdated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
