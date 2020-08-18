@@ -3,40 +3,34 @@ import * as request from 'request'
 
 // Works with cheerio '^1.0.0-rc.2'
 import * as cheerio from 'cheerio'
-import { nonEmptyStr, newLogger } from '@subsocial/utils';
+import { newLogger, nonEmptyStr } from '@subsocial/utils';
 
-const log = newLogger('SitePreviewParser')
+const log = newLogger('SiteParser')
 
-function $loadHtml (html: string) {
+export function $loadHtml (html: string) {
   // 'decodeEntities = true' is to convert HTML entities like '&amp' to '&', etc.
   return cheerio.load(html, { decodeEntities: true });
 }
 
-type ParsedSite = {
+export type ParsedSite = {
   ok: boolean,
   url?: string,
-  siteMeta?: Meta,
+  data?: any,
   error?: string
 }
 
-export function parseSiteWithRequest (url: string): Promise<ParsedSite> {
+type ParseFn = (url: string, body: any) => any
+
+export function parseSiteWithRequest (url: string, parseFn: ParseFn): Promise<ParsedSite> {
   return new Promise((resolve) => {
-    log.debug(`Parsing preview of the site at URL: ${url}`);
+    log.debug(`Parsing data of the site at URL: ${url}`);
     request(
       {
         url: url,
         encoding: 'UTF-8',
         gzip: true,
         headers: {
-          pragma: 'no-cache',
-          'accept-encoding': 'gzip, deflate',
-          'accept-language': 'en-US,en;q=0.8',
-          'upgrade-insecure-requests': '1',
-          'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
-          accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'cache-control': 'no-cache',
-          authority: 'www.affirm.com',
-          cookie: ''
+            'User-Agent': 'Chrome/59.0.3071.115'
         }
       },
       (error, res, body) => {
@@ -46,8 +40,8 @@ export function parseSiteWithRequest (url: string): Promise<ParsedSite> {
           errorMessage = `Error at URL [${url}]: ${error}`;
         } else if (res.statusCode === 200) {
           try {
-            const siteMeta = parseSiteHtml(url, body);
-            resolve({ ok: true, url, siteMeta });
+            const data = parseFn(url, body);
+            resolve({ ok: true, url, data });
             return;
 
           } catch (ex) {
@@ -70,85 +64,7 @@ export function parseSiteWithRequest (url: string): Promise<ParsedSite> {
   });
 }
 
-type Meta = {
-  title?: string,
-  description?: string,
-  author?: string,
-  fb?: Fb,
-  og: Og,
-  twitter?: Twitter,
-  keywords?: string[]
-}
-
-type Fb = {
-  appId?: string
-}
-
-type Og = {
-  title?: string,
-  description?: string,
-  image?: string,
-  url?: string,
-  type?: string,
-  updated_time?: string
-}
-
-type Twitter = {
-  title?: string,
-  description?: string,
-  image?: string,
-  creator?: string
-}
-
-function parseSiteHtml (url: string, html: string) {
-  const $ = $loadHtml(html);
-
-  const meta: Meta = {
-    fb: {},
-    og: {},
-    twitter: {}
-  };
-
-  setPrettyString(meta, 'title', () => $('title').text());
-  setPrettyString(meta, 'description', () => $('meta[name="description"]').attr('content'));
-  setPrettyString(meta, 'author', () => $('meta[name="author"]').attr('content'));
-
-  setPrettyString(meta.og, 'title', () => $('meta[property="og:title"]').attr('content'));
-  setPrettyString(meta.og, 'description', () => $('meta[property="og:description"]').attr('content'));
-  setPrettyString(meta.og, 'image', () => $('meta[property="og:image"]').attr('content'));
-  setPrettyString(meta.og, 'type', () => $('meta[property="og:type"]').attr('content'));
-  setPrettyString(meta.og, 'url', () => $('meta[property="og:url"]').attr('content'));
-  setPrettyString(meta.og, 'updated_time', () => $('meta[property="og:updated_time"]').attr('content'));
-
-  setPrettyString(meta.fb, 'appId', () => $('meta[property="fb:app_id"]').attr('content'));
-
-  setPrettyString(meta.twitter, 'title', () => $('meta[property="twitter:title"]').attr('content'));
-  setPrettyString(meta.twitter, 'description', () => $('meta[property="twitter:description"]').attr('content'));
-  setPrettyString(meta.twitter, 'image', () => $('meta[property="twitter:image"]').attr('content'));
-  setPrettyString(meta.twitter, 'creator', () => $('meta[property="twitter:creator"]').attr('content'));
-
-  const kws = getPrettyString(() => $('meta[name="keywords"]').attr('content'));
-  if (typeof kws !== 'undefined' && kws.length > 0) {
-    meta.keywords = kws.split(',').map((kw: string) => getPrettyString(() => kw));
-  }
-
-  deleteEmptyKeys(meta);
-
-  log.debug(`\nParsed HTML meta of the site ${url}:\n`, meta);
-
-  return meta;
-}
-
-function deleteEmptyKeys (obj: Meta) {
-  Object.keys(obj).forEach(k => {
-    const v = obj[k];
-    if (typeof v === 'object' && Object.keys(v).length === 0) {
-      delete obj[k];
-    }
-  });
-}
-
-function getPrettyString (getStringFn: () => string | undefined) {
+export function getPrettyString (getStringFn: () => string | undefined) {
   let prettyVal;
   try {
     const value = getStringFn();
@@ -166,108 +82,9 @@ function getPrettyString (getStringFn: () => string | undefined) {
   return prettyVal;
 }
 
-function setPrettyString (obj: Og | Fb | Twitter, propName: string, getValueFn: () => string | undefined) {
+export function setPrettyString <T>(obj: T, propName: string, getValueFn: () => string | undefined) {
   const value = getPrettyString(getValueFn);
   if (typeof value !== 'undefined') {
     obj[propName] = value;
   }
-}
-
-// TODO make all the fields optional except 'url'
-type PressMeta = {
-  generated: boolean, // TODO delete 'generated' field
-  url: string,
-  title: string,
-  desc: string,
-  image: string,
-  date: string,
-  author: string
-}
-
-export default function parse (siteUrls: string[]) {
-
-  const parseSitePromises: Promise<ParsedSite>[] = []
-  siteUrls = siteUrls.map(x => nonEmptyStr(x) ? x.trim() : x)
-  siteUrls.forEach(url => {
-    if (nonEmptyStr(url)) {
-      parseSitePromises.push(
-        parseSiteWithRequest(url)
-          .catch((err) => {
-            const errMsg = `Failed to parse a preview of the site ${url}. Error: ${err}`
-            log.error(errMsg)
-            return { ok: false, error: errMsg }
-          }));
-    }
-  });
-
-  return Promise.all(parseSitePromises)
-    .then(results => {
-
-      const urlToMetaMap = new Map();
-      results.forEach(({ url, siteMeta }) => {
-        urlToMetaMap.set(url, siteMeta);
-      });
-
-      const parsedPress: PressMeta[] = [];
-      siteUrls.forEach(pressUrl => {
-        if (typeof pressUrl === 'object') {
-          parsedPress.push(pressUrl);
-          return;
-        }
-
-        const pressMeta = {
-          generated: true,
-          url: pressUrl,
-          title: '',
-          desc: '',
-          image: '',
-          date: '',
-          author: ''
-        };
-
-        if (urlToMetaMap.has(pressUrl)) {
-          const sm = urlToMetaMap.get(pressUrl);
-
-          if (sm.og && sm.og.title) {
-            pressMeta.title = sm.og.title;
-          } else if (sm.twitter && sm.twitter.title) {
-            pressMeta.title = sm.twitter.title;
-          } else if (sm.title) {
-            pressMeta.title = sm.title;
-          }
-
-          if (sm.og && sm.og.description) {
-            pressMeta.desc = sm.og.description;
-          } else if (sm.twitter && sm.twitter.description) {
-            pressMeta.desc = sm.twitter.description;
-          } else if (sm.description) {
-            pressMeta.desc = sm.description;
-          }
-
-          if (sm.og && sm.og.image) {
-            pressMeta.image = sm.og.image;
-          } else if (sm.twitter && sm.twitter.image) {
-            pressMeta.image = sm.twitter.image;
-          }
-
-          if (sm.og && sm.og.updated_time) {
-            pressMeta.date = sm.og.updated_time;
-          }
-
-          if (sm.author) {
-            pressMeta.author = sm.author;
-          } else if (sm.twitter && sm.twitter.creator) {
-            pressMeta.author = sm.twitter.creator;
-          }
-        }
-        parsedPress.push(pressMeta);
-      });
-
-      return { result: parsedPress };
-    })
-    .catch(err => {
-      const errorMsg = `Unexpected error occured while parsing site previews: ${err}`;
-      console.error(errorMsg);
-      return { error: errorMsg };
-    });
 }

@@ -5,7 +5,7 @@ import { ipfsCluster } from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger, nonEmptyStr, parseNumStr } from '@subsocial/utils';
-import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
+import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws';
 
@@ -154,7 +154,7 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
 
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
-  const data = await siteParser(req.body.url)
+  const data = await parseSitePreview(req.body.url)
 
   res.send(data);
 });
