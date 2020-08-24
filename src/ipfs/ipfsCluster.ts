@@ -56,7 +56,7 @@ export class IpfsClusterApi {
         break
       }
       default: {
-        throw Error(`Unsupported endpoint recieved: ${endpoint}`)
+        throw Error(`Unsupported endpoint received: ${endpoint}`)
       }
     }
 
