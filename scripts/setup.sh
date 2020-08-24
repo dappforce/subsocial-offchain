@@ -1,5 +1,5 @@
 #!/bin/bash
 
-./init-pg.sh
+./setup-postgres.sh
 ./setup-ipfs.sh
 yarn setup
