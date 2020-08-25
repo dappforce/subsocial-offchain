@@ -7,10 +7,8 @@ import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger, nonEmptyStr, parseNumStr } from '@subsocial/utils';
 import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
-// import { startNotificationsServer } from './ws';
-
-// import * as multer from 'multer';
-// const upload = multer();
+// import { startNotificationsServer } from './ws'
+import * as multer from 'multer';
 
 require('dotenv').config();
 const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
@@ -23,22 +21,21 @@ app.use(cors({
   origin: allowedOrigin
 }));
 
-const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE
-
+const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE_BYTES || "2097152" // 2 MB in bytes as string
+const fileSizeLimitBytes = parseInt(fileSizeLimit)
+const fileSizeLimitMegabytes = fileSizeLimitBytes / 1024 / 1024
 // for parsing application/json
 app.use(bodyParser.json({ limit: fileSizeLimit }));
 
-// for parsing application/xwww-
+// for parsing application/xwww-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
-//form-urlencoded
 
-// // for parsing multipart/form-data
+// for parsing multipart/form-data
+const upload = multer({ limits: { fieldSize: fileSizeLimitBytes }})
+app.use(express.static('public'));
 
-// app.use(upload.array());
-// app.use(express.static('public'));
 
 // IPFS API
-
 
 const limitLog = (limit: number) =>
   log.debug(`Limit db results to ${limit} items`);
@@ -54,6 +51,23 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
   const cid = await ipfsCluster.addContent(req.body)
   log.info('Content added to IPFS with CID:', cid)
   res.json(cid)
+})
+
+// TODO: add multiple files upload
+// app.use(upload.array());
+app.post('/v1/ipfs/addFile', upload.single('file'), async (req: express.Request, res: express.Response) => {
+  if (req.file.size > fileSizeLimitBytes) {
+    res.statusCode = 400
+    res.json({ status: 'error', message: `Loaded file should be less than ${fileSizeLimitMegabytes} MB` })
+  } else {
+    const finalFile = {
+        mimetype: req.file.mimetype,
+        image:  req.file.buffer.toString('base64')
+    };
+    const cid = await ipfsCluster.addContent(finalFile as any);
+    log.info('File added to IPFS with CID:', cid);
+    res.json(cid);
+  }
 })
 
 app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Response) => {

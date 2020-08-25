@@ -17,14 +17,14 @@ case $1 in
     time docker-compose kill
     if [[ $2 == 'clean' ]]; then
       echo "Cleaning volumes..."
-      eval docker-compose down
+      docker-compose down -v
     fi
     exit 0
     ;;
   --utils)
     UTILS_ONLY=true
     ;;
-  *)
+  -?*)
     printf "Invalid argument provided.\n\nExamples:\n"
     printf "Start all:\n./compose.sh\n\n"
     printf "Start services without offchain itself:\n./compose.sh --utils\n\n"
@@ -32,6 +32,9 @@ case $1 in
     printf "Clean all:\n./compose.sh --down clean\n"
 
     exit 1
+    ;;
+  --)
+    UTILS_ONLY=false
     ;;
 esac
 
@@ -41,22 +44,22 @@ ES_NODE_URL='http://127.0.0.1:9200'
 IPFS_NODE_URL='http://127.0.0.1:8080'
 
 time (
-  echo "Starting offchain in background, hang on!"
+  printf "Starting offchain in background, hang on!\n\n"
 
-  if [ UTILS_ONLY ]; then
+  if $UTILS_ONLY; then
     docker-compose up -d $UTILS
   else
     docker-compose up -d
-    docker stop subsocial-offchain
+    eval docker stop subsocial-offchain &> /dev/null
 
-    echo "Starting Elasticsearch..."
+    printf "\nStarting Elasticsearch...\n"
     until curl -s $ES_NODE_URL > /dev/null; do
       sleep 2
     done
-    docker start subsocial-offchain
+    docker-compose up -d offchain
   fi
 
-  echo "Waiting until IPFS is ready..."
+  printf "\nWaiting until IPFS is ready...\n"
   until curl -s --X GET ${IPFS_NODE_URL}'/api/v0/version' > /dev/null
   do
     sleep 1
@@ -66,7 +69,7 @@ time (
     docker exec subsocial-ipfs$node \
       ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
     docker exec subsocial-ipfs$node \
-      ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET", "POST", "PUT"]'
+      ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET"]'
     docker exec subsocial-ipfs$node ipfs bootstrap rm --all &> /dev/null
 
     printf "Restarting "

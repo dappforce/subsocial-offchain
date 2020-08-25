@@ -35,6 +35,7 @@ export async function indexContentFromIpfs (
       break;
     }
 
+    // Index posts and comments:
     case ES_INDEX_POSTS: {
       const content = await getContent<PostContent>()
       if (!content) return;
@@ -54,9 +55,9 @@ export async function indexContentFromIpfs (
       if (extension.isComment) {
         const rootPost = await substrate.findPost({ id: extension.asComment.root_post_id });
         const spaceIdOpt = rootPost.space_id;
-        spaceId  = spaceIdOpt.unwrapOr(undefined)
+        spaceId = spaceIdOpt.unwrapOr(undefined)
       } else {
-        spaceId  = space_id.unwrapOr(undefined)  
+        spaceId = space_id.unwrapOr(undefined)  
       }
 
       console.log('Space Id:', spaceId);
@@ -70,6 +71,7 @@ export async function indexContentFromIpfs (
       break;
     }
 
+    // Index account profiles:
     case ES_INDEX_PROFILES: {
       const content = await getContent<ProfileContent>()
       if (!content) return;
