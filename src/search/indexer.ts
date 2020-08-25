@@ -26,10 +26,10 @@ export async function indexContentFromIpfs (
       const content = await getContent<SpaceContent>()
       if (!content) return;
 
-      const { name, desc, tags } = content
+      const { name, about, tags } = content
       indexData = {
         name,
-        desc,
+        about,
         tags
       };
       break;
@@ -74,10 +74,10 @@ export async function indexContentFromIpfs (
       const content = await getContent<ProfileContent>()
       if (!content) return;
 
-      const { fullname, about } = content
+      const { name, about } = content
       indexData = {
         handle: extData && extData.toString(),
-        fullname,
+        name,
         about
       }
       break;
