@@ -21,17 +21,19 @@ app.use(cors({
   origin: allowedOrigin
 }));
 
-const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE_BYTES || "2097152" // 2 MB in bytes as string
-const fileSizeLimitBytes = parseInt(fileSizeLimit)
-const fileSizeLimitMegabytes = fileSizeLimitBytes / 1024 / 1024
+const MB = 1024 ** 2
+
+const maxFileSizeBytes = parseInt(process.env.IPFS_MAX_FILE_SIZE_BYTES) || 2 * MB
+const maxFileSizeMB = maxFileSizeBytes / MB
+
 // for parsing application/json
-app.use(bodyParser.json({ limit: fileSizeLimit }));
+app.use(bodyParser.json({ limit: maxFileSizeBytes }));
 
 // for parsing application/xwww-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
+app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }));
 
 // for parsing multipart/form-data
-const upload = multer({ limits: { fieldSize: fileSizeLimitBytes }})
+const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
 app.use(express.static('public'));
 
 
@@ -56,9 +58,9 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
 // TODO: add multiple files upload
 // app.use(upload.array());
 app.post('/v1/ipfs/addFile', upload.single('file'), async (req: express.Request, res: express.Response) => {
-  if (req.file.size > fileSizeLimitBytes) {
+  if (req.file.size > maxFileSizeBytes) {
     res.statusCode = 400
-    res.json({ status: 'error', message: `Loaded file should be less than ${fileSizeLimitMegabytes} MB` })
+    res.json({ status: 'error', message: `Loaded file should be less than ${maxFileSizeMB} MB` })
   } else {
     const finalFile = {
         mimetype: req.file.mimetype,
