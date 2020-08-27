@@ -62,11 +62,7 @@ app.post('/v1/ipfs/addFile', upload.single('file'), async (req: express.Request,
     res.statusCode = 400
     res.json({ status: 'error', message: `Loaded file should be less than ${maxFileSizeMB} MB` })
   } else {
-    const finalFile = {
-        mimetype: req.file.mimetype,
-        image:  req.file.buffer.toString('base64')
-    };
-    const cid = await ipfsCluster.addContent(finalFile as any);
+    const cid = await ipfsCluster.addFile(req.file);
     log.info('File added to IPFS with CID:', cid);
     res.json(cid);
   }

@@ -6,6 +6,10 @@ type IpfsCid = string
 type IpfsUrl = string
 type IpfsClusterEndpoint = 'version' | 'add' | 'unpin'
 
+type FileContent = Express.Multer.File
+
+type Data = Record<string, object> | string
+
 export type IpfsClusterProps = {
   ipfsClusterUrl: IpfsUrl
 }
@@ -33,17 +37,19 @@ export class IpfsClusterApi {
 
   private async ipfsClusterRequest(
     endpoint: IpfsClusterEndpoint,
-    data?: CommonContent | IpfsCid
+    data?: IpfsCid | Data
   ): Promise<request.RequestPromise> {
 
     const options: request.Options = {
       url: `${this.ipfsClusterUrl}/${endpoint}`
+      
     };
 
     switch (endpoint) {
       case 'add': {
         options.method = 'POST'
-        options.formData = { '': JSON.stringify(data) }
+        options.formData = { '': data }
+  
         break
       }
       case 'unpin': {
@@ -72,9 +78,9 @@ export class IpfsClusterApi {
     }
   }
 
-  async addContent (content: CommonContent): Promise<IpfsCid | undefined> {
+  async add (data: Data) {
     try {
-      const res = await this.ipfsClusterRequest('add', content)
+      const res = await this.ipfsClusterRequest('add', data)
       const body = JSON.parse(res)
       const cid = body.cid['/'] as IpfsCid
       log.debug('Content added under CID: %s', cid)
@@ -84,6 +90,18 @@ export class IpfsClusterApi {
       return undefined;
     }
   }
+
+  async addFile (file: FileContent) {
+    const data = { value: file.buffer,
+      options: { filename: file.originalname, contentType: file.mimetype }
+    }
+    return this.add(data)
+  }
+
+  async addContent (content: CommonContent): Promise<IpfsCid | undefined> {
+    return this.add(JSON.stringify(content))
+  }
+
 }
 
 const log = newLogger(IpfsClusterApi.name);
