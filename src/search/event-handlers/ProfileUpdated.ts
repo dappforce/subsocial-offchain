@@ -14,5 +14,5 @@ export const onProfileUpdated: EventHandlerFn = async (eventAction: SubstrateEve
   if (profileOpt.isNone) return;
 
   const profile = profileOpt.unwrap();
-  await indexContentFromIpfs(ES_INDEX_PROFILES, profile.content.asIpfs.toString(), accountId, { handle: profile.handle.toString() });
+  await indexContentFromIpfs(ES_INDEX_PROFILES, profile.content.asIpfs.toString(), accountId);
 }
