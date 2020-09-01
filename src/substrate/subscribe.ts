@@ -85,12 +85,12 @@ async function main () {
     // Process all events of the current block
     for (const { event } of events) {
       if (shouldHandleEvent(event)) {
-        log.debug(`Handle a new event: %o`, event.data)
+        log.debug(`Handle a new event: %o`, event.method)
 
         const eventMeta = {
           eventName: event.method,
           data: event.data,
-          blockHeight: blockNumber
+          blockNumber: blockNumber
         }
 
         if (processPostgres) {

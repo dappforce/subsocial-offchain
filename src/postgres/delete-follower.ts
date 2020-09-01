@@ -1,7 +1,7 @@
 import { EventData } from '@polkadot/types/generic/Event';
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { deleteFollowersLog, deleteFollowersLogError } from './postges-logger';
 
 export const deletePostFollower = async (data: EventData) => {
@@ -22,7 +22,7 @@ export const deletePostFollower = async (data: EventData) => {
 };
 
 export const deleteCommentFollower = async (data: EventData) => {
-  const commentId = encodeStructId(data[1] as CommentId);
+  const commentId = encodeStructId(data[1] as PostId);
   const query = `
       DELETE from df.comment_followers
       WHERE follower_account = $1
@@ -38,19 +38,19 @@ export const deleteCommentFollower = async (data: EventData) => {
   }
 };
 
-export const deleteBlogFollower = async (data: EventData) => {
-  const blogId = encodeStructId(data[1] as BlogId);
+export const deleteSpaceFollower = async (data: EventData) => {
+  const spaceId = encodeStructId(data[1] as SpaceId);
   const query = `
-      DELETE from df.blog_followers
+      DELETE from df.space_followers
       WHERE follower_account = $1
-        AND following_blog_id = $2
+        AND following_space_id = $2
       RETURNING *`
-  const params = [ data[0].toString(), blogId ];
+  const params = [ data[0].toString(), spaceId ];
   try {
     await pg.query(query, params)
-    deleteFollowersLog('blog')
+    deleteFollowersLog('space')
   } catch (err) {
-    deleteFollowersLogError('blog', err.stack)
+    deleteFollowersLogError('space', err.stack)
     throw err
   }
 };

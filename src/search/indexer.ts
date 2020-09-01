@@ -1,12 +1,12 @@
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
-import { PostId } from '@subsocial/types/substrate/interfaces';
-import { CommentContent, BlogContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
+import { PostId, Post } from '@subsocial/types/substrate/interfaces';
+import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { encodeStructId } from '../substrate/utils';
 import { substrate } from '../substrate/subscribe';
 import { ipfs } from '../connections/connect-ipfs';
 import elastic from '../connections/connect-elasticsearch'
-import { ES_INDEX_BLOGS, ES_INDEX_POSTS, ES_INDEX_COMMENTS, ES_INDEX_PROFILES } from './config';
+import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 
 export async function indexContentFromIpfs (
@@ -22,27 +22,48 @@ export async function indexContentFromIpfs (
 
   let indexData;
   switch (index) {
-    case ES_INDEX_BLOGS: {
-      const content = await getContent<BlogContent>()
+    case ES_INDEX_SPACES: {
+      const content = await getContent<SpaceContent>()
       if (!content) return;
 
-      const { name, desc, tags } = content
+      const { name, about, tags } = content
       indexData = {
         name,
-        desc,
+        about,
         tags
       };
       break;
     }
 
+    // Index posts and comments:
     case ES_INDEX_POSTS: {
       const content = await getContent<PostContent>()
       if (!content) return;
 
       const { title, body, tags } = content
-      const { blog_id } = await substrate.findPost(id as PostId);
+
+      let post = extData as Post;
+
+      if (!post) {
+        post = await substrate.findPost({ id: id as PostId });
+      }
+
+      const { space_id, extension } = post
+
+      let spaceId;
+
+      if (extension.isComment) {
+        const rootPost = await substrate.findPost({ id: extension.asComment.root_post_id });
+        const spaceIdOpt = rootPost.space_id;
+        spaceId = spaceIdOpt.unwrapOr(undefined)
+      } else {
+        spaceId = space_id.unwrapOr(undefined)  
+      }
+
+      console.log('Space Id:', spaceId);
+
       indexData = {
-        blog_id: encodeStructId(blog_id),
+        space_id: encodeStructId(spaceId),
         title,
         body,
         tags,
@@ -50,25 +71,15 @@ export async function indexContentFromIpfs (
       break;
     }
 
-    case ES_INDEX_COMMENTS: {
-      const content = await getContent<CommentContent>()
-      if (!content) return;
-
-      const { body } = content
-      indexData = {
-        body
-      };
-      break;
-    }
-
+    // Index account profiles:
     case ES_INDEX_PROFILES: {
       const content = await getContent<ProfileContent>()
       if (!content) return;
 
-      const { fullname, about } = content
+      const { name, about } = content
       indexData = {
-        username: extData && extData.toString(),
-        fullname,
+        handle: extData && extData.toString(),
+        name,
         about
       }
       break;

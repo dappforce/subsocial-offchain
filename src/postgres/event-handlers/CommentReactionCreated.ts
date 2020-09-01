@@ -1,24 +1,31 @@
-import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/subscribe';
+import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { insertActivityForCommentReaction } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';
-import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { SubstrateEvent } from '../../substrate/types';
+import { parseCommentEvent } from '../../substrate/utils';
+import { VirtualEvents } from '../../substrate/utils';
 
-export const onCommentReactionCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
-  const { data } = eventAction;
-  const follower = data[0].toString();
-  const commentId = data[1] as CommentId;
-  const comment = await substrate.findComment(commentId);
-  if (!comment) return;
+export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post: Post) => {
+  const { author: voter, commentId } = parseCommentEvent(eventAction)
 
-  const ids = [ comment.post_id, commentId ];
-  const account = comment.created.account.toString();
-  const count = (comment.upvotes_count.toNumber() + comment.downvotes_count.toNumber()) - 1;
-  const activityId = await insertActivityForCommentReaction(eventAction, count, ids, account);
+  const { 
+    extension: { asComment: { parent_id, root_post_id } },
+    created: { account },
+    upvotes_count,
+    downvotes_count
+  } = post;
+  
+  eventAction.eventName = VirtualEvents.CommentReactionCreated
+  const commentAuthor = account.toString()
+  const parentId = parent_id.unwrapOr(root_post_id)
+  const ids = [ parentId, commentId ];
+  const reactionCount = upvotes_count.add(downvotes_count).toNumber() - 1;
+
+  const activityId = await insertActivityForCommentReaction(eventAction, reactionCount, ids, commentAuthor);
   if (activityId === -1) return;
 
-  if (follower === account) return;
+  if (voter === commentAuthor) return;
 
   // insertAggStream(eventAction, commentId);
-  await insertNotificationForOwner(activityId, account);
+  await insertNotificationForOwner(activityId, commentAuthor);
 }

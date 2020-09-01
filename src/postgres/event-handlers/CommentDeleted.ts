@@ -1,12 +1,12 @@
-import { CommentId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { deleteNotificationsAboutComment } from '../delete-activity';
 import { deleteCommentFollower } from '../delete-follower';
-import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { EventHandlerFn } from '../../substrate/types';
+import { VirtualEvents } from '../../substrate/utils';
+import { parseCommentEvent } from '../../substrate/utils';
 
-export const onCommentDeleted: EventHandlerFn = async (eventAction: SubstrateEvent) => {
-  const { data } = eventAction;
-  const follower = data[0].toString();
-  const following = data[1] as CommentId;
-  await deleteNotificationsAboutComment(follower, following);
-  await deleteCommentFollower(data);
+export const onCommentDeleted: EventHandlerFn = async (eventAction) => {
+  const { author, commentId } = parseCommentEvent(eventAction)
+  eventAction.eventName = VirtualEvents.CommentDeleted
+  await deleteNotificationsAboutComment(author, commentId)
+  await deleteCommentFollower(eventAction.data)
 }

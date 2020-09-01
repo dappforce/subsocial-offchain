@@ -1,9 +1,9 @@
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { deleteNotificationsLog, deleteNotificationsLogError } from './postges-logger';
 
-export const deleteNotificationsAboutComment = async (userId: string, commentId: CommentId) => {
+export const deleteNotificationsAboutComment = async (userId: string, commentId: PostId) => {
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1
@@ -63,23 +63,23 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
   }
 }
 
-export const deleteNotificationsAboutBlog = async (userId: string, blogId: BlogId) => {
+export const deleteNotificationsAboutSpace = async (userId: string, spaceId: SpaceId) => {
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1
         AND activity_id IN
           (SELECT df.activities.id
           FROM df.activities
-          LEFT JOIN df.blog_followers ON df.activities.account = df.blog_followers.following_blog_id
-          WHERE blog_id = $2)
+          LEFT JOIN df.space_followers ON df.activities.account = df.space_followers.following_space_id
+          WHERE space_id = $2)
       RETURNING *`
-  const hexBlogId = encodeStructId(blogId);
-  const params = [ userId, hexBlogId ];
+  const hexSpaceId = encodeStructId(spaceId);
+  const params = [ userId, hexSpaceId ];
   try {
     await pg.query(query, params)
-    deleteNotificationsLog('blog')
+    deleteNotificationsLog('space')
   } catch (err) {
-    deleteNotificationsLogError('blog', err.stack)
+    deleteNotificationsLogError('space', err.stack)
     throw err
   }
 }

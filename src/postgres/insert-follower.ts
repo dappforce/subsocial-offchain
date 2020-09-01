@@ -1,7 +1,7 @@
 import { EventData } from '@polkadot/types/generic/Event';
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
-import { PostId, CommentId, BlogId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { insertFollowersLog, insertFollowersLogError } from './postges-logger';
 
 export const insertAccountFollower = async (data: EventData) => {
@@ -36,7 +36,7 @@ export const insertPostFollower = async (data: EventData) => {
 };
 
 export const insertCommentFollower = async (data: EventData) => {
-  const commentId = encodeStructId(data[1] as CommentId);
+  const commentId = encodeStructId(data[1] as PostId);
   const query = `
       INSERT INTO df.comment_followers(follower_account, following_comment_id)
         VALUES($1, $2)
@@ -51,18 +51,18 @@ export const insertCommentFollower = async (data: EventData) => {
   }
 };
 
-export const insertBlogFollower = async (data: EventData) => {
-  const blogId = encodeStructId(data[1] as BlogId);
+export const insertSpaceFollower = async (data: EventData) => {
+  const spaceId = encodeStructId(data[1] as SpaceId);
   const query = `
-      INSERT INTO df.blog_followers(follower_account, following_blog_id)
+      INSERT INTO df.space_followers(follower_account, following_space_id)
         VALUES($1, $2)
       RETURNING *`
-  const params = [ data[0].toString(), blogId ];
+  const params = [ data[0].toString(), spaceId ];
   try {
     await pg.query(query, params)
-    insertFollowersLog('blog')
+    insertFollowersLog('space')
   } catch (err) {
-    insertFollowersLogError('blog', err.stack)
+    insertFollowersLogError('space', err.stack)
     throw err
   }
 };

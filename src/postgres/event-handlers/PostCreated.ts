@@ -1,23 +1,12 @@
-import { PostId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../substrate/subscribe';
-import { insertPostFollower } from '../insert-follower';
-import { insertActivityForPost } from '../insert-activity';
-import { fillNewsFeedWithAccountFollowers, fillNewsFeedWithBlogFollowers } from '../fill-activity';
-import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { EventHandlerFn } from '../../substrate/types';
+import { onCommentCreated } from './CommentCreated';
+import { onRootCreated } from './RootPostCreated';
+import { findPostAndProccess } from './utils';
 
-export const onPostCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
-  const { data } = eventAction;
-  await insertPostFollower(data);
-  const postId = data[1] as PostId;
-  const follower = data[0].toString();
-
-  const post = await substrate.findPost(postId);
-  if (!post) return;
-
-  const ids = [ post.blog_id, postId ];
-  const activityId = await insertActivityForPost(eventAction, ids, 0);
-  if (activityId === -1) return;
-
-  await fillNewsFeedWithBlogFollowers(post.blog_id, follower, activityId);
-  await fillNewsFeedWithAccountFollowers(follower, activityId);
+export const onPostCreated: EventHandlerFn = async (eventAction) => {
+  findPostAndProccess({
+    onRootPost: onRootCreated,
+    onComment: onCommentCreated,
+    eventAction
+  })
 }

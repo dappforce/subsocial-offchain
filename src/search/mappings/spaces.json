@@ -43,7 +43,7 @@
           }
         }
       },
-      "desc": {
+      "about": {
         "type": "text",
         "fields": {
           "english": {

@@ -1,41 +1,43 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import ipfs from '../connections/connect-ipfs';
+import { ipfsCluster } from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger, nonEmptyStr, parseNumStr } from '@subsocial/utils';
-import { parseSiteWithRequest as siteParser } from '../parser/parse-site'
+import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
-// import { startNotificationsServer } from './ws';
-
-// import * as multer from 'multer';
-// const upload = multer();
+// import { startNotificationsServer } from './ws'
+import * as multer from 'multer';
 
 require('dotenv').config();
 const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
 const log = newLogger('ExpressOffchainApi')
 const app = express();
+const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || 'http://localhost';
 
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigin
+}));
 
-const fileSizeLimit = process.env.IPFS_MAX_FILE_SIZE
+const MB = 1024 ** 2
+
+const maxFileSizeBytes = parseInt(process.env.IPFS_MAX_FILE_SIZE_BYTES) || 2 * MB
+const maxFileSizeMB = maxFileSizeBytes / MB
 
 // for parsing application/json
-app.use(bodyParser.json({ limit: fileSizeLimit }));
+app.use(bodyParser.json({ limit: maxFileSizeBytes }));
 
-// for parsing application/xwww-
-app.use(bodyParser.urlencoded({ extended: true, limit: fileSizeLimit }));
-//form-urlencoded
+// for parsing application/xwww-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }));
 
-// // for parsing multipart/form-data
+// for parsing multipart/form-data
+const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
+app.use(express.static('public'));
 
-// app.use(upload.array());
-// app.use(express.static('public'));
 
 // IPFS API
-
 
 const limitLog = (limit: number) =>
   log.debug(`Limit db results to ${limit} items`);
@@ -48,10 +50,35 @@ const getLimitFromRequest = (req: express.Request): number => {
 }
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
-  const hash = await ipfs.saveContent(req.body);
-  log.info('Content saved to IPFS with hash:', hash);
-  res.json(hash);
-});
+  const cid = await ipfsCluster.addContent(req.body)
+  log.info('Content added to IPFS with CID:', cid)
+  res.json(cid)
+})
+
+// TODO: add multiple files upload
+// app.use(upload.array());
+app.post('/v1/ipfs/addFile', upload.single('file'), async (req: express.Request, res: express.Response) => {
+  if (req.file.size > maxFileSizeBytes) {
+    res.statusCode = 400
+    res.json({ status: 'error', message: `Loaded file should be less than ${maxFileSizeMB} MB` })
+  } else {
+    const cid = await ipfsCluster.addFile(req.file);
+    log.info('File added to IPFS with CID:', cid);
+    res.json(cid);
+  }
+})
+
+app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Response) => {
+  const { cid } = req.params
+  if (nonEmptyStr(cid)) {
+    await ipfsCluster.unpinContent(cid)
+    log.info('Content unpinned from IPFS by CID:', cid)
+  } else {
+    log.warn('Cannot unpin content: No CID provided ')
+    res.statusCode = 400
+    res.statusMessage = 'Bad Request'
+  }
+})
 
 // User feed and notifications API
 
@@ -139,7 +166,7 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
 
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
-  const data = await siteParser(req.body.url)
+  const data = await parseSitePreview(req.body.url)
 
   res.send(data);
 });
