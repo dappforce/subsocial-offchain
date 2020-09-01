@@ -5,12 +5,16 @@
   "engines": {
     "node": ">= 10.13"
   },
+  "resolutions": {
+    "@polkadot/types": "^1.28.1"
+  },
   "devDependencies": {
     "@types/axios": "^0.14.0",
     "@types/bn.js": "^4.11.5",
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.3",
     "@types/jest": "^24.0.15",
+    "@types/multer": "^1.4.4",
     "@types/node": "^10.14.10",
     "@types/pg": "^7.14.3",
     "@types/ws": "^7.2.3",
@@ -26,6 +30,7 @@
     "init-search": "node ./build/src/search/index.js",
     "init-offchain": "node ./build/src/sql/init.js",
     "clear-offchain": "node ./build/src/sql/clear-db.js",
+    "clear-state": "rm -rf ./build/src/state.json",
     "ipfs": "yarn jsipfs daemon",
     "clean": "rimraf coverage build tmp",
     "copy-sql": "find ./src -name '*.sql' | cpio -pd ./build",
@@ -41,16 +46,18 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/dev": "^0.32.17",
-    "@polkadot/types": "1.11.1",
-    "@subsocial/api": "^0.2.16",
-    "@subsocial/types": "^0.1.30",
+    "@polkadot/types": "^1.28.1",
+    "@subsocial/api": "0.4.1-beta.2",
+    "@subsocial/types": "0.4.1-beta.2",
     "@subsocial/utils": "^0.1.23",
+    "@types/request-promise": "^4.1.46",
     "axios": "^0.19.0",
     "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
     "cheerio": "^1.0.0-rc.3",
     "concurrently": "^4.1.2",
     "cors": "^2.8.5",
+    "csvtojson": "^2.0.10",
     "dotenv": "^8.0.0",
     "eslint": "^6.8.0",
     "express": "^4.17.1",
@@ -58,6 +65,6 @@
     "lodash.isempty": "^4.4.0",
     "multer": "^1.4.2",
     "pg": "^7.12.1",
-    "request": "^2.88.2"
+    "request-promise": "^4.2.5"
   }
 }
