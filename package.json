@@ -6,7 +6,7 @@
     "node": ">= 10.13"
   },
   "resolutions": {
-    "@polkadot/types": "^1.28.1"
+    "@polkadot/types": "1.28.1"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
