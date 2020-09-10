@@ -24,6 +24,10 @@ const eventsFilterSections = parseListOfVals(process.env.SUBSTRATE_EVENT_SECTION
 export const eventsFilterMethods = parseListOfVals(process.env.SUBSTRATE_EVENT_METHODS)
 
 export function shouldHandleEvent (event: Event): boolean {
+  if (!event || !event.section || !event.method) {
+    return false
+  }
+
   return eventsFilterMethods.has(ANY_EVENT) || (
     eventsFilterSections.has(event.section.toString()) && 
     eventsFilterMethods.has(event.method.toString())
