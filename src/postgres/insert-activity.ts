@@ -1,7 +1,7 @@
 import { pg } from '../connections/connect-postgres';
-import { encodeStructIds } from '../substrate/utils';
+import { encodeStructIds, encodeStructId } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
-import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
+import { Post, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../substrate/subscribe';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
@@ -147,7 +147,8 @@ export const insertActivityForSpace = async (eventAction: SubstrateEvent, count:
 
   const { eventName, data, blockNumber } = eventAction;
   const accountId = data[0].toString();
-  const spaceId = data[1].toString();
+  const space_id = data[1] as SpaceId
+  const spaceId = encodeStructId(space_id);
   const aggregated = accountId !== creator;
   const query = `
     INSERT INTO df.activities(account, event, space_id, block_number, agg_count, aggregated)
