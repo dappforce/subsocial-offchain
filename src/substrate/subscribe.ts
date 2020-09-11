@@ -27,11 +27,19 @@ async function main () {
   delete state.postgres.lastError
   delete state.elastic.lastError
 
-  const lastPostgresBlock = () => state.postgres.lastBlock
-  const lastElasticBlock = () => state.elastic.lastBlock
+  const lastPostgresBlock = () =>
+    (!isNaN(maybeSyncPostgresAt) && maybeSyncPostgresAt !== 0)
+      ? maybeSyncElasticAt : state.postgres.lastBlock
+
+  const lastElasticBlock = () =>
+    (!isNaN(maybeSyncElasticAt) && maybeSyncElasticAt !== 0)
+      ? maybeSyncElasticAt : state.elastic.lastBlock
 
   const lastPostgresError = () => state.postgres.lastError
   const lastElasticError = () => state.elastic.lastError
+
+  const maybeSyncPostgresAt = parseInt(process.env.PROCESS_POSTGRES_AT_BLOCK)
+  const maybeSyncElasticAt = parseInt(process.env.START_ELASTIC_SYNC_AT)
 
   // Set default vals:
   let processPostgres = true
