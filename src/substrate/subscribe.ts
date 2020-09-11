@@ -8,9 +8,13 @@ import { handleEventForPostgres } from './handle-postgres';
 
 require('dotenv').config()
 
+const maybeSyncPostgresAt = parseInt(process.env.PROCESS_POSTGRES_AT_BLOCK) || 0
+const maybeSyncElasticAt = parseInt(process.env.START_ELASTIC_SYNC_AT) || 0
+
 export let substrate: SubsocialSubstrateApi
 
 async function main () {
+
   log.info(`Subscribe to Substrate events: ${Array.from(eventsFilterMethods)}`)
 
   // Connect to Subsocial's Substrate node:
@@ -23,23 +27,25 @@ async function main () {
     new Promise(resolve => setTimeout(resolve, blockTime))
 
   const state = await readOffchainState()
+
+  if (state.postgres.lastBlock < maybeSyncPostgresAt) {
+    state.postgres.lastBlock = maybeSyncPostgresAt
+  }
+
+  if (state.elastic.lastBlock < maybeSyncElasticAt) {
+    state.elastic.lastBlock = maybeSyncElasticAt
+  }
+
   // Clean up the state from the last errors:
   delete state.postgres.lastError
   delete state.elastic.lastError
 
-  const lastPostgresBlock = () =>
-    (!isNaN(maybeSyncPostgresAt) && maybeSyncPostgresAt !== 0)
-      ? maybeSyncElasticAt : state.postgres.lastBlock
+  const lastPostgresBlock = () => state.postgres.lastBlock
 
-  const lastElasticBlock = () =>
-    (!isNaN(maybeSyncElasticAt) && maybeSyncElasticAt !== 0)
-      ? maybeSyncElasticAt : state.elastic.lastBlock
+  const lastElasticBlock = () => state.elastic.lastBlock
 
   const lastPostgresError = () => state.postgres.lastError
   const lastElasticError = () => state.elastic.lastError
-
-  const maybeSyncPostgresAt = parseInt(process.env.PROCESS_POSTGRES_AT_BLOCK)
-  const maybeSyncElasticAt = parseInt(process.env.START_ELASTIC_SYNC_AT)
 
   // Set default vals:
   let processPostgres = true
