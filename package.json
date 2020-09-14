@@ -6,7 +6,8 @@
     "node": ">= 10.13"
   },
   "resolutions": {
-    "@polkadot/types": "1.28.1"
+    "@polkadot/types": "1.28.1",
+    "@polkadot/api": "1.28.1"
   },
   "devDependencies": {
     "@types/axios": "^0.14.0",
@@ -47,7 +48,7 @@
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/dev": "^0.32.17",
     "@polkadot/types": "1.28.1",
-    "@subsocial/api": "0.4.5",
+    "@subsocial/api": "latest",
     "@subsocial/types": "0.4.3",
     "@subsocial/utils": "^0.1.23",
     "@types/request-promise": "^4.1.46",
