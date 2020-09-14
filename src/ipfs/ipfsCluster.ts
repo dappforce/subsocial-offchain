@@ -4,7 +4,7 @@ import * as request from 'request-promise'
 
 type IpfsCid = string
 type IpfsUrl = string
-type IpfsClusterEndpoint = 'version' | 'add' | 'unpin' | 'pin'
+type IpfsClusterEndpoint = 'version' | 'add' | 'pin' | 'unpin'
 type IpfsNodeEndpoint = 'dag/put'
 
 type IpfsEndpoint = IpfsClusterEndpoint | IpfsNodeEndpoint
@@ -65,13 +65,13 @@ export class IpfsClusterApi {
   
         break
       }
-      case 'unpin': {
-        options.method = 'DELETE'
+      case 'pin': {
+        options.method = 'POST'
         options.url = `${this.ipfsClusterUrl}/pins/${data}`
         break
       }
-      case 'pin': {
-        options.method = 'POST'
+      case 'unpin': {
+        options.method = 'DELETE'
         options.url = `${this.ipfsClusterUrl}/pins/${data}`
         break
       }
@@ -112,7 +112,7 @@ export class IpfsClusterApi {
       const body = JSON.parse(res)
       const cid = body.Cid['/'] as IpfsCid
       this.ipfsClusterRequest('pin', cid)
-      log.debug('Content added under CID: %s', cid)
+      log.debug('Content added and pinned under CID: %s', cid)
       return cid
     } catch (err) {
       log.error('Failed to add content to IPFS: %o', err)
@@ -128,7 +128,6 @@ export class IpfsClusterApi {
   }
 
   async addContent (content: CommonContent): Promise<IpfsCid | undefined> {
-    console.log('Start add')
     return this.add(JSON.stringify(content))
   }
 
