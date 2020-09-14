@@ -36,7 +36,6 @@ app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }));
 const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
 app.use(express.static('public'));
 
-
 // IPFS API
 
 const limitLog = (limit: number) =>
@@ -50,9 +49,15 @@ const getLimitFromRequest = (req: express.Request): number => {
 }
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
-  const cid = await ipfsCluster.addContent(req.body)
-  log.info('Content added to IPFS with CID:', cid)
-  res.json(cid)
+  const content = JSON.stringify(req.body)
+  if (content.length > maxFileSizeBytes) {
+    res.statusCode = 400
+    res.json({ status: 'error', message: `Loaded content should be less than ${maxFileSizeMB} MB` })
+  } else {
+    const cid = await ipfsCluster.addContent(content)
+    log.info('Content added to IPFS with CID:', cid)
+    res.json(cid)
+  } 
 })
 
 // TODO: add multiple files upload
