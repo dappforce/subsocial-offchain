@@ -1,4 +1,3 @@
-import { CommonContent } from '@subsocial/types/offchain'
 import { newLogger } from '@subsocial/utils'
 import * as request from 'request-promise'
 
@@ -27,7 +26,6 @@ export class IpfsClusterApi {
     const { ipfsClusterUrl, ipfsNodeUrl } = props;
     this.ipfsClusterUrl = ipfsClusterUrl
     this.ipfsNodeUrl = `${ipfsNodeUrl}/api/v0`
-    console.log('this.ipfsNodeUrl', this.ipfsNodeUrl)
     this.testConnection()
   }
 
@@ -89,12 +87,12 @@ export class IpfsClusterApi {
 
   private ipfsClusterRequest = (
     endpoint: IpfsClusterEndpoint,
-    data?: IpfsCid | Data
+    data?: Data
   ): Promise<request.RequestPromise> => this.ipfsRequest(this.ipfsClusterUrl, endpoint, data)
 
   private ipfsNodeRequset = (
     endpoint: IpfsNodeEndpoint,
-    data?: IpfsCid | Data
+    data?: Data
   ): Promise<request.RequestPromise> => this.ipfsRequest(this.ipfsNodeUrl, endpoint, data)
 
   async unpinContent (cid: IpfsCid) {
@@ -106,11 +104,12 @@ export class IpfsClusterApi {
     }
   }
 
-  async add (data: Data) {
+  async resovleIpfsRes (ipfsPromise: Promise<any>) {
     try {
-      const res = await this.ipfsNodeRequset('dag/put', data)
+      const res = await ipfsPromise
       const body = JSON.parse(res)
-      const cid = body.Cid['/'] as IpfsCid
+      const cidObj = body.Cid || body.cid
+      const cid = cidObj['/'] as IpfsCid
       this.ipfsClusterRequest('pin', cid)
       log.debug('Content added and pinned under CID: %s', cid)
       return cid
@@ -124,11 +123,11 @@ export class IpfsClusterApi {
     const data = { value: file.buffer,
       options: { filename: file.originalname, contentType: file.mimetype }
     }
-    return this.add(data)
+    return this.resovleIpfsRes(this.ipfsClusterRequest('add', data))
   }
 
-  async addContent (content: CommonContent): Promise<IpfsCid | undefined> {
-    return this.add(JSON.stringify(content))
+  async addContent (content: string): Promise<IpfsCid | undefined> {
+    return this.resovleIpfsRes(this.ipfsNodeRequset('dag/put', content))
   }
 
 }
