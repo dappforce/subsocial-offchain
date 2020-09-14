@@ -4,23 +4,30 @@ import * as request from 'request-promise'
 
 type IpfsCid = string
 type IpfsUrl = string
-type IpfsClusterEndpoint = 'version' | 'add' | 'unpin'
+type IpfsClusterEndpoint = 'version' | 'add' | 'pin' | 'unpin'
+type IpfsNodeEndpoint = 'dag/put'
+
+type IpfsEndpoint = IpfsClusterEndpoint | IpfsNodeEndpoint
 
 type FileContent = Express.Multer.File
 
 type Data = Record<string, object> | string
 
 export type IpfsClusterProps = {
-  ipfsClusterUrl: IpfsUrl
+  ipfsClusterUrl: IpfsUrl,
+  ipfsNodeUrl: IpfsUrl
 }
 
 export class IpfsClusterApi {
 
   private ipfsClusterUrl!: IpfsUrl // IPFS Cluster HTTP API
+  private ipfsNodeUrl!: IpfsUrl // IPFS Node HTTP API
 
   constructor (props: IpfsClusterProps) {
-    const { ipfsClusterUrl } = props;
+    const { ipfsClusterUrl, ipfsNodeUrl } = props;
     this.ipfsClusterUrl = ipfsClusterUrl
+    this.ipfsNodeUrl = `${ipfsNodeUrl}/api/v0`
+    console.log('this.ipfsNodeUrl', this.ipfsNodeUrl)
     this.testConnection()
   }
 
@@ -35,14 +42,14 @@ export class IpfsClusterApi {
     }
   }
 
-  private async ipfsClusterRequest(
-    endpoint: IpfsClusterEndpoint,
+  private async ipfsRequest(
+    url: IpfsUrl,
+    endpoint: IpfsEndpoint,
     data?: IpfsCid | Data
   ): Promise<request.RequestPromise> {
 
     const options: request.Options = {
-      url: `${this.ipfsClusterUrl}/${endpoint}`
-      
+      url: `${url}/${endpoint}`
     };
 
     switch (endpoint) {
@@ -50,6 +57,17 @@ export class IpfsClusterApi {
         options.method = 'POST'
         options.formData = { '': data }
   
+        break
+      }
+      case 'dag/put': {
+        options.method = 'POST'
+        options.formData = { '': data }
+  
+        break
+      }
+      case 'pin': {
+        options.method = 'POST'
+        options.url = `${this.ipfsClusterUrl}/pins/${data}`
         break
       }
       case 'unpin': {
@@ -69,6 +87,16 @@ export class IpfsClusterApi {
     return request(options)
   }
 
+  private ipfsClusterRequest = (
+    endpoint: IpfsClusterEndpoint,
+    data?: IpfsCid | Data
+  ): Promise<request.RequestPromise> => this.ipfsRequest(this.ipfsClusterUrl, endpoint, data)
+
+  private ipfsNodeRequset = (
+    endpoint: IpfsNodeEndpoint,
+    data?: IpfsCid | Data
+  ): Promise<request.RequestPromise> => this.ipfsRequest(this.ipfsNodeUrl, endpoint, data)
+
   async unpinContent (cid: IpfsCid) {
     try {
       await this.ipfsClusterRequest('unpin', cid);
@@ -80,10 +108,11 @@ export class IpfsClusterApi {
 
   async add (data: Data) {
     try {
-      const res = await this.ipfsClusterRequest('add', data)
+      const res = await this.ipfsNodeRequset('dag/put', data)
       const body = JSON.parse(res)
-      const cid = body.cid['/'] as IpfsCid
-      log.debug('Content added under CID: %s', cid)
+      const cid = body.Cid['/'] as IpfsCid
+      this.ipfsClusterRequest('pin', cid)
+      log.debug('Content added and pinned under CID: %s', cid)
       return cid
     } catch (err) {
       log.error('Failed to add content to IPFS: %o', err)
