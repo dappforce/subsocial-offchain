@@ -8,8 +8,8 @@ import { handleEventForPostgres } from './handle-postgres';
 
 require('dotenv').config()
 
-const maybeSyncPostgresAt = parseInt(process.env.PROCESS_POSTGRES_AT_BLOCK) || 0
-const maybeSyncElasticAt = parseInt(process.env.PROCESS_ELASTIC_AT_BLOCK) || 0
+const maybeSyncPostgresAt = parseInt(process.env.POSTGRES_INDEX_FROM_BLOCK) || 0
+const maybeSyncElasticAt = parseInt(process.env.ELASTIC_INDEX_FROM_BLOCK) || 0
 
 export let substrate: SubsocialSubstrateApi
 
