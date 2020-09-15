@@ -8,9 +8,6 @@ import { handleEventForPostgres } from './handle-postgres';
 
 require('dotenv').config()
 
-const maybeSyncPostgresAt = parseInt(process.env.POSTGRES_INDEX_FROM_BLOCK) || 0
-const maybeSyncElasticAt = parseInt(process.env.ELASTIC_INDEX_FROM_BLOCK) || 0
-
 export let substrate: SubsocialSubstrateApi
 
 async function main () {
@@ -28,20 +25,11 @@ async function main () {
 
   const state = await readOffchainState()
 
-  if (state.postgres.lastBlock < maybeSyncPostgresAt) {
-    state.postgres.lastBlock = maybeSyncPostgresAt
-  }
-
-  if (state.elastic.lastBlock < maybeSyncElasticAt) {
-    state.elastic.lastBlock = maybeSyncElasticAt
-  }
-
   // Clean up the state from the last errors:
   delete state.postgres.lastError
   delete state.elastic.lastError
 
   const lastPostgresBlock = () => state.postgres.lastBlock
-
   const lastElasticBlock = () => state.elastic.lastBlock
 
   const lastPostgresError = () => state.postgres.lastError
@@ -91,6 +79,8 @@ async function main () {
 
     const blockNumber = api.createType('BlockNumber', blockToProcess)
     const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
+
+    // TODO Improve performance: query events from multiple blocks at a time:
     const events = await api.query.system.events.at(blockHash)
 
     log.debug(`Best finalized block: ${bestFinalizedBlock.toString()}`)
