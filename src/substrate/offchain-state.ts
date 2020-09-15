@@ -5,7 +5,7 @@ import { promisify } from 'util'
 
 const asyncReadFile = promisify(readFile)
 const asyncWriteFile = promisify(writeFile)
-const stateFilePath = `${__dirname}/../state.json`
+const stateFilePath = `${__dirname}/../../state/state.json`
 
 const defaultOffchainState = (): OffchainState => ({
   postgres: { lastBlock: 0 },
