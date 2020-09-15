@@ -1,11 +1,15 @@
 import { substrateLog as log } from '../connections/loggers';
 import { OffchainState } from './types';
-import { readFile, writeFile } from 'fs';
+import { readFile, writeFile, mkdir } from 'fs';
+import { join } from 'path'
 import { promisify } from 'util'
 
 const asyncReadFile = promisify(readFile)
 const asyncWriteFile = promisify(writeFile)
-const stateFilePath = `${__dirname}/../../state/state.json`
+const asyncMkdir = promisify(mkdir)
+
+const stateDirPath = join(__dirname, '../../state')
+const stateFilePath = join(stateDirPath, 'state.json')
 
 const defaultOffchainState = (): OffchainState => ({
   postgres: { lastBlock: 0 },
@@ -27,5 +31,6 @@ export async function readOffchainState (): Promise<OffchainState> {
 export async function writeOffchainState (state: OffchainState) {
   log.debug('Write the offchain state to FS: %o', state)
   const json = JSON.stringify(state)
+  await asyncMkdir(stateDirPath, { recursive: true })
   return asyncWriteFile(stateFilePath, json, 'utf8')
 }
