@@ -60,8 +60,6 @@ export async function indexContentFromIpfs (
         spaceId = space_id.unwrapOr(undefined)  
       }
 
-      console.log('Space Id:', spaceId);
-
       indexData = {
         space_id: encodeStructId(spaceId),
         title,
