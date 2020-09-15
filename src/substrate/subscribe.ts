@@ -8,9 +8,13 @@ import { handleEventForPostgres } from './handle-postgres';
 
 require('dotenv').config()
 
+const maybeSyncPostgresAt = parseInt(process.env.POSTGRES_INDEX_FROM_BLOCK) || 0
+const maybeSyncElasticAt = parseInt(process.env.ELASTIC_INDEX_FROM_BLOCK) || 0
+
 export let substrate: SubsocialSubstrateApi
 
 async function main () {
+
   log.info(`Subscribe to Substrate events: ${Array.from(eventsFilterMethods)}`)
 
   // Connect to Subsocial's Substrate node:
@@ -23,11 +27,21 @@ async function main () {
     new Promise(resolve => setTimeout(resolve, blockTime))
 
   const state = await readOffchainState()
+
+  if (state.postgres.lastBlock < maybeSyncPostgresAt) {
+    state.postgres.lastBlock = maybeSyncPostgresAt
+  }
+
+  if (state.elastic.lastBlock < maybeSyncElasticAt) {
+    state.elastic.lastBlock = maybeSyncElasticAt
+  }
+
   // Clean up the state from the last errors:
   delete state.postgres.lastError
   delete state.elastic.lastError
 
   const lastPostgresBlock = () => state.postgres.lastBlock
+
   const lastElasticBlock = () => state.elastic.lastBlock
 
   const lastPostgresError = () => state.postgres.lastError

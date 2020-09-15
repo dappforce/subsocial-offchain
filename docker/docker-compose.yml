@@ -37,7 +37,7 @@ services:
 #################################################
 
   ipfs0:
-    image: ipfs/go-ipfs:master-latest
+    image: ipfs/go-ipfs:v0.5.1
     container_name: subsocial-ipfs0
     restart: on-failure
     ports:
@@ -70,7 +70,7 @@ services:
 #################################################
 
   ipfs1:
-    image: ipfs/go-ipfs:master-latest
+    image: ipfs/go-ipfs:v0.5.1
     container_name: subsocial-ipfs1
     restart: on-failure
     volumes:
