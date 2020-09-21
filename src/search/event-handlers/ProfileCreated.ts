@@ -1,9 +1,7 @@
-import { indexContentFromIpfs } from '../../search/indexer';
-import { ES_INDEX_PROFILES } from '../../search/config';
 import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import AccountId from '@polkadot/types/generic/AccountId';
-import { resolveCidOfContent } from '@subsocial/api/utils';
+import { indexProfileContent } from './utils';
 
 export const onProfileCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -15,5 +13,5 @@ export const onProfileCreated: EventHandlerFn = async (eventAction: SubstrateEve
   if (profileOpt.isNone) return;
 
   const profile = profileOpt.unwrapOr(undefined);
-  await indexContentFromIpfs(ES_INDEX_PROFILES, resolveCidOfContent(profile.content), accountId);
+  await indexProfileContent(profile);
 }
