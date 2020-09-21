@@ -3,6 +3,7 @@ import { ES_INDEX_SPACES } from '../../search/config';
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { resolveCidOfContent } from '@subsocial/api/utils';
 
 export const onSpaceUpdated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
@@ -10,5 +11,5 @@ export const onSpaceUpdated: EventHandlerFn = async (eventAction: SubstrateEvent
   const space = await substrate.findSpace({ id: spaceId });
   if (!space) return;
 
-  await indexContentFromIpfs(ES_INDEX_SPACES, space.content.asIpfs.toString(), spaceId);
+  await indexContentFromIpfs(ES_INDEX_SPACES, resolveCidOfContent(space.content), spaceId);
 }
