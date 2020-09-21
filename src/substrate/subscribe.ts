@@ -11,6 +11,7 @@ require('dotenv').config()
 export let substrate: SubsocialSubstrateApi
 
 async function main () {
+
   log.info(`Subscribe to Substrate events: ${Array.from(eventsFilterMethods)}`)
 
   // Connect to Subsocial's Substrate node:
@@ -23,6 +24,7 @@ async function main () {
     new Promise(resolve => setTimeout(resolve, blockTime))
 
   const state = await readOffchainState()
+
   // Clean up the state from the last errors:
   delete state.postgres.lastError
   delete state.elastic.lastError
@@ -77,6 +79,8 @@ async function main () {
 
     const blockNumber = api.createType('BlockNumber', blockToProcess)
     const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
+
+    // TODO Improve performance: query events from multiple blocks at a time:
     const events = await api.query.system.events.at(blockHash)
 
     log.debug(`Best finalized block: ${bestFinalizedBlock.toString()}`)

@@ -52,7 +52,7 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
   const content = JSON.stringify(req.body)
   if (content.length > maxFileSizeBytes) {
     res.statusCode = 400
-    res.json({ status: 'error', message: `Loaded content should be less than ${maxFileSizeMB} MB` })
+    res.json({ status: 'error', message: `Content should be less than ${maxFileSizeMB} MB` })
   } else {
     const cid = await ipfsCluster.addContent(content)
     log.info('Content added to IPFS with CID:', cid)
@@ -60,12 +60,13 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
   } 
 })
 
-// TODO: add multiple files upload
+// TODO: Support multi-file upload
 // app.use(upload.array());
+
 app.post('/v1/ipfs/addFile', upload.single('file'), async (req: express.Request, res: express.Response) => {
   if (req.file.size > maxFileSizeBytes) {
     res.statusCode = 400
-    res.json({ status: 'error', message: `Loaded file should be less than ${maxFileSizeMB} MB` })
+    res.json({ status: 'error', message: `Uploaded file should be less than ${maxFileSizeMB} MB` })
   } else {
     const cid = await ipfsCluster.addFile(req.file);
     log.info('File added to IPFS with CID:', cid);
@@ -108,12 +109,9 @@ app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Respo
   try {
     const data = await pg.query(query, params)
     logSuccess('get feed', `by account: ${account}`)
-
     res.json(data.rows);
-    // res.send(JSON.stringify(data));
   } catch (err) {
     logError('get feed', `by account: ${account}`, err.stack);
-
   }
 });
 
@@ -136,11 +134,9 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   try {
     const data = await pg.query(query, params)
     logSuccess('get notifications', `by account: ${account}`)
-
     res.json(data.rows);
   } catch (err) {
     logError('get notificatios', `by account: ${account}`, err.stack);
-
   }
 });
 
@@ -162,7 +158,6 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
     const data = await pg.query(query, params)
     informClientAboutUnreadNotifications(account, 0);
     logSuccess('mark all notifications as read', `by account: ${account}`)
-
     res.json(data.rows);
   } catch (err) {
     logError('mark all notifications as read', `by account: ${account}`, err.stack);
@@ -172,7 +167,6 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await parseSitePreview(req.body.url)
-
   res.send(data);
 });
 
