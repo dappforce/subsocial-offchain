@@ -1,6 +1,6 @@
 import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
-import { PostId, Post } from '@subsocial/types/substrate/interfaces';
+import { PostId, Post, Space } from '@subsocial/types/substrate/interfaces';
 import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { encodeStructId } from '../substrate/utils';
 import { substrate } from '../substrate/subscribe';
@@ -8,12 +8,13 @@ import { ipfs } from '../connections/connect-ipfs';
 import elastic from '../connections/connect-elasticsearch'
 import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
+import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 
 export async function indexContentFromIpfs (
   index: string,
   ipfsHash: string,
   id: SubstrateId | AccountId,
-  extData?: object
+  struct?: Space | Post
 ) {
 
   function getContent<T extends CommonContent> () {
@@ -26,9 +27,15 @@ export async function indexContentFromIpfs (
       const content = await getContent<SpaceContent>()
       if (!content) return;
 
+      let space = struct as Space
+      if (!space) {
+        space = await substrate.findSpace({ id: id as SpaceId });
+      }
+
       const { name, about, tags } = content
       indexData = {
         name,
+        handle: space.handle,
         about,
         tags
       };
@@ -42,7 +49,7 @@ export async function indexContentFromIpfs (
 
       const { title, body, tags } = content
 
-      let post = extData as Post;
+      let post = struct as Post;
 
       if (!post) {
         post = await substrate.findPost({ id: id as PostId });
@@ -76,7 +83,7 @@ export async function indexContentFromIpfs (
 
       const { name, about } = content
       indexData = {
-        handle: extData && extData.toString(),
+        handle: struct && struct.toString(),
         name,
         about
       }
@@ -88,10 +95,11 @@ export async function indexContentFromIpfs (
   }
 
   if (indexData) {
-    await elastic.index({
+    const res = await elastic.index({
       index,
       id: id instanceof GenericAccountId ? id.toString() : encodeStructId(id),
       body: indexData
     })
+    console.log(res)
   }
 }
