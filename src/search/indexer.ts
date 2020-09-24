@@ -83,7 +83,6 @@ export async function indexContentFromIpfs (
 
       const { name, about } = content
       indexData = {
-        handle: struct && struct.toString(),
         name,
         about
       }
@@ -100,6 +99,5 @@ export async function indexContentFromIpfs (
       id: id instanceof GenericAccountId ? id.toString() : encodeStructId(id),
       body: indexData
     })
-    console.log(res)
   }
 }
