@@ -94,7 +94,7 @@ export async function indexContentFromIpfs (
   }
 
   if (indexData) {
-    const res = await elastic.index({
+    await elastic.index({
       index,
       id: id instanceof GenericAccountId ? id.toString() : encodeStructId(id),
       body: indexData
