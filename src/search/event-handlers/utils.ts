@@ -4,10 +4,10 @@ import { indexContentFromIpfs } from '../indexer';
 import { resolveCidOfContent } from '@subsocial/api/utils';
 
 export const indexSpaceContent = (space: Space) => 
-    indexContentFromIpfs(ES_INDEX_SPACES, resolveCidOfContent(space.content), space.id, space)
+  indexContentFromIpfs(ES_INDEX_SPACES, resolveCidOfContent(space.content), space.id, space)
 
 export const indexProfileContent = (profile: Profile) => 
-    indexContentFromIpfs(ES_INDEX_PROFILES, resolveCidOfContent(profile.content), profile.created.account);
+  indexContentFromIpfs(ES_INDEX_PROFILES, resolveCidOfContent(profile.content), profile.created.account);
 
 export const indexPostContent = (post: Post) => 
-    indexContentFromIpfs(ES_INDEX_POSTS, resolveCidOfContent(post.content), post.id, post)
+  indexContentFromIpfs(ES_INDEX_POSTS, resolveCidOfContent(post.content), post.id, post)
