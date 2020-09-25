@@ -31,7 +31,7 @@
     "init-search": "node ./build/src/search/index.js",
     "init-offchain": "node ./build/src/sql/init.js",
     "clear-offchain": "node ./build/src/sql/clear-db.js",
-    "clear-state": "rm -rf ./build/src/state.json",
+    "clear-state": "rm -rf ./build/state/state.json",
     "ipfs": "yarn jsipfs daemon",
     "clean": "rimraf coverage build tmp",
     "copy-sql": "find ./src -name '*.sql' | cpio -pd ./build",
