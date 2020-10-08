@@ -17,8 +17,10 @@ const log = newLogger('ExpressOffchainApi')
 const app = express();
 const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || 'http://localhost';
 
-app.use(cors({
-  origin: allowedOrigin
+app.use(cors((req, callback) => {
+  const origin = req.method === 'GET' ? '*' : allowedOrigin
+
+  callback(null, { origin })
 }));
 
 const MB = 1024 ** 2
