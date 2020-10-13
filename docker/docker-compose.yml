@@ -36,13 +36,13 @@ services:
 ## IPFS Cluster #################################
 #################################################
 
-  ipfs0:
+  ipfs-node:
     image: ipfs/go-ipfs:v0.5.1
-    container_name: subsocial-ipfs0
+    container_name: subsocial-ipfs-node
     restart: on-failure
     ports:
       - "4001:4001"
-      - "127.0.0.1:5001:5001"
+      - "5001:5001"
       - "8080:8080"
     volumes:
       - ./ipfs-data/daemon/staging:/export
@@ -52,44 +52,19 @@ services:
     image: ipfs/ipfs-cluster:v0.13.0
     container_name: subsocial-ipfs-cluster
     depends_on:
-      - ipfs0
+      - ipfs-node
     environment:
       CLUSTER_PEERNAME: "Subsocial Cluster"
       CLUSTER_SECRET: ${CLUSTER_SECRET} # From shell variable if set
-      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs0/tcp/5001
+      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs-node/tcp/5001
       CLUSTER_CRDT_TRUSTERPEERS: '*' # Trust all peers in Cluster (initially)
       CLUSTER_RESTAPI_CORSALLOWEDORIGINS: '*'
       CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: /ip4/0.0.0.0/tcp/9094 # Expose API
-      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
+      CLUSTER_MONITORPINGINTERVAL: 1s # Speed up peer discovery
     ports:
-      - "127.0.0.1:9094:9094"
-      # - "9096:9096"
+      - "9094:9094"
     volumes:
       - ./ipfs-data/cluster:/data/ipfs-cluster
-
-#################################################
-
-  ipfs1:
-    image: ipfs/go-ipfs:v0.5.1
-    container_name: subsocial-ipfs1
-    restart: on-failure
-    volumes:
-      - peer_staging:/export
-      - peer_data:/data/ipfs
-
-  ipfs-peer:
-    image: ipfs/ipfs-cluster:v0.13.0
-    container_name: subsocial-ipfs-peer
-    depends_on:
-      - ipfs1
-    environment:
-      CLUSTER_PEERNAME: "Subsocial Peer"
-      CLUSTER_SECRET: ${CLUSTER_SECRET}
-      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs1/tcp/5001
-      CLUSTER_CRDT_TRUSTERPEERS: '*'
-      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
-    volumes:
-      - peer_cluster:/data/ipfs-cluster
 
 #################################################
 #################################################

@@ -38,46 +38,40 @@ case $1 in
     ;;
 esac
 
-UTILS=" postgres elasticsearch ipfs-cluster ipfs-peer"
+UTILS=" postgres elasticsearch ipfs-cluster"
 
 ES_NODE_URL='http://127.0.0.1:9200'
 IPFS_NODE_URL='http://127.0.0.1:8080'
 
-time (
-  printf "Starting offchain in background, hang on!\n\n"
+printf "Starting offchain in background, hang on!\n\n"
 
-  if $UTILS_ONLY; then
-    docker-compose up -d $UTILS
-  else
-    docker-compose up -d
-    eval docker stop subsocial-offchain &> /dev/null
+if $UTILS_ONLY; then
+  docker-compose up -d $UTILS
+else
+  docker-compose up -d
+  eval docker stop subsocial-offchain &> /dev/null
 
-    printf "\nStarting Elasticsearch...\n"
-    until curl -s $ES_NODE_URL > /dev/null; do
-      sleep 2
-    done
-    docker-compose up -d offchain
-  fi
-
-  printf "\nWaiting until IPFS is ready...\n"
-  until curl -s --X GET ${IPFS_NODE_URL}'/api/v0/version' > /dev/null
-  do
-    sleep 1
+  printf "\nStarting Elasticsearch...\n"
+  until curl -s $ES_NODE_URL > /dev/null; do
+    sleep 2
   done
-  for node in 0 1
-  do
-    docker exec subsocial-ipfs$node \
-      ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    docker exec subsocial-ipfs$node \
-      ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET"]'
-    docker exec subsocial-ipfs$node ipfs bootstrap rm --all &> /dev/null
+  docker-compose up -d offchain
+fi
 
-    printf "Restarting "
-    docker restart subsocial-ipfs$node
-  done
+printf "\nWaiting until IPFS is ready...\n"
+until curl -s "${IPFS_NODE_URL}/api/v0/version" > /dev/null
+do
+  sleep 1
+done
 
-  # TODO: Add initial peer as the only one trusted
-)
+docker exec subsocial-ipfs-node \
+  ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+docker exec subsocial-ipfs-node \
+  ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET", "PUT", "POST"]'
+docker exec subsocial-ipfs-node ipfs bootstrap rm --all &> /dev/null
+
+printf "Configuring IPFS node...\n\n"
+docker restart subsocial-ipfs-node > /dev/null
 
 echo "Containers are ready."
 
