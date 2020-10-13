@@ -22,7 +22,7 @@ services:
     network_mode: "host"
 
   postgres:
-    image: postgres
+    image: postgres:12.4
     container_name: subsocial-postgres
     restart: on-failure
     environment:
@@ -49,7 +49,7 @@ services:
       - ./ipfs-data/daemon/data:/data/ipfs
 
   ipfs-cluster:
-    image: ipfs/ipfs-cluster:latest
+    image: ipfs/ipfs-cluster:v0.13.0
     container_name: subsocial-ipfs-cluster
     depends_on:
       - ipfs0
@@ -78,7 +78,7 @@ services:
       - peer_data:/data/ipfs
 
   ipfs-peer:
-    image: ipfs/ipfs-cluster:latest
+    image: ipfs/ipfs-cluster:v0.13.0
     container_name: subsocial-ipfs-peer
     depends_on:
       - ipfs1
