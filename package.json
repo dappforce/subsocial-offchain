@@ -30,6 +30,7 @@
     "api": "node ./build/src/express-api/server.js",
     "init-search": "node ./build/src/search/index.js",
     "init-offchain": "node ./build/src/sql/init.js",
+    "insert-reserved-spaces": "node ./build/src/sql/insert-reserved-spaces.js",
     "clear-offchain": "node ./build/src/sql/clear-db.js",
     "clear-state": "rm -rf ./build/state/state.json",
     "ipfs": "yarn jsipfs daemon",
@@ -40,7 +41,7 @@
     "lint": "tsc --noEmit && eslint '*/**/*.{ts,tsx}' --quiet --fix",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "setup": "yarn init-offchain && yarn build"
+    "setup": "yarn init-offchain && yarn build && yarn insert-reserved-spaces"
   },
   "author": "DappForce contributors",
   "license": "GPL-3.0-only",

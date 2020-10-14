@@ -27,48 +27,45 @@ END$$;
 
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account_type') THEN
-        CREATE DOMAIN account_type as char(48);
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'account') THEN
+        CREATE DOMAIN account as char(48);
     END IF;
 END$$;
 
 DO $$
 BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ipfs_cid_type') THEN
-        CREATE DOMAIN ipfs_cid_type as varchar(59) CHECK (LENGTH(VALUE) >= 46);
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ipfs_cid') THEN
+        CREATE DOMAIN ipfs_cid as varchar(59) CHECK (LENGTH(VALUE) >= 46);
     END IF;
 END$$;
 
 DO $$
 BEGIN
-     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'comment_type') THEN
-        CREATE TYPE comment_type AS
-        (
-            parent_id bigint,
-            root_post_id bigint
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'post_type') THEN
+        CREATE TYPE post_type as ENUM (
+            'RegularPost',
+            'SharedPost',
+            'Comment'
         );
     END IF;
 END$$;
 
-
--- CREATE DOMAIN id as bigserial;
-
 CREATE TABLE IF NOT EXISTS df.spaces
 (
-    id bigserial NOT NULL primary key UNIQUE,
-    created_by_account account_type NOT NULL,
+    id bigint NOT NULL primary key UNIQUE,
+    created_by_account account NOT NULL,
     created_at_block bigint NOT NULL,
     created_at_time bigint NOT NULL,
 
-    updated_by_account account_type NULL,
+    updated_by_account account NULL,
     updated_at_block bigint NULL,
     updated_at_time bigint NULL,
 
-    owner account_type NOT NULL,
+    owner account NOT NULL,
 
-    parent_id bigserial,
+    parent_id bigint,
     handle varchar(48) NULL,
-    content ipfs_cid_type NULL,
+    content ipfs_cid NULL,
     hidden boolean NOT NULL DEFAULT false,
 
     posts_count integer NOT NULL DEFAULT 0,
@@ -82,22 +79,25 @@ CREATE TABLE IF NOT EXISTS df.spaces
 
 CREATE TABLE IF NOT EXISTS df.posts
 (
-    id bigserial NOT NULL primary key UNIQUE,
-    created_by_account account_type NOT NULL,
+    id bigint NOT NULL primary key UNIQUE,
+    created_by_account account NOT NULL,
     created_at_block bigint NOT NULL,
     created_at_time bigint NOT NULL,
 
-    updated_by_account account_type NULL,
+    updated_by_account account NULL,
     updated_at_block bigint NULL,
     updated_at_time bigint NULL,
 
-    owner account_type NOT NULL,
+    owner account NOT NULL,
 
-    comment comment_type NULL,
+    shared_post_id bigint,
 
-    shared_post_id bigserial,
-    space_id bigserial,
-    content ipfs_cid_type NULL,
+    parent_id bigint,
+    root_post_id bigint,
+
+    space_id bigint,
+    content ipfs_cid NULL,
+    type post_type NOT NULL,
     hidden boolean NOT NULL DEFAULT false,
 
     replies_count integer NOT NULL DEFAULT 0,
@@ -108,7 +108,9 @@ CREATE TABLE IF NOT EXISTS df.posts
 
     score integer NOT NULL DEFAULT 0,
     FOREIGN KEY (shared_post_id) REFERENCES df.posts(id),
-    FOREIGN KEY (space_id) REFERENCES df.spaces(id)
+    FOREIGN KEY (space_id) REFERENCES df.spaces(id),
+    FOREIGN KEY (parent_id) REFERENCES df.posts(id),
+    FOREIGN KEY (root_post_id) REFERENCES df.posts(id)
 );
 
 CREATE TABLE IF NOT EXISTS df.news_feed

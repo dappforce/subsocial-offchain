@@ -8,6 +8,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 eval cd $DIR
 
 UTILS_ONLY=false
+UTILS=" postgres elasticsearch ipfs-cluster ipfs-peer pgadmin"
 
 # Generated new IPFS Cluster secret in case the 'ipfs-data' directory was deleted
 export CLUSTER_SECRET=$(od  -vN 32 -An -tx1 /dev/urandom | tr -d ' \n')
@@ -24,6 +25,10 @@ case $1 in
   --utils)
     UTILS_ONLY=true
     ;;
+  --pgadmin)
+    UTILS_ONLY=true
+    UTILS=" pgadmin"
+    ;;
   -?*)
     printf "Invalid argument provided.\n\nExamples:\n"
     printf "Start all:\n./compose.sh\n\n"
@@ -37,8 +42,6 @@ case $1 in
     UTILS_ONLY=false
     ;;
 esac
-
-UTILS=" postgres elasticsearch ipfs-cluster ipfs-peer"
 
 ES_NODE_URL='http://127.0.0.1:9200'
 IPFS_NODE_URL='http://127.0.0.1:8080'

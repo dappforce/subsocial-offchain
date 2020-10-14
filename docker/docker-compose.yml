@@ -33,6 +33,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
     network_mode: "host"
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: on-failure
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "admin"
+    network_mode: "host"
+
 ## IPFS Cluster #################################
 #################################################
 
