@@ -7,7 +7,7 @@ import { substrateLog as log } from '../../connections/loggers';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
-import { insertPostOrComment } from '../insert-post';
+import { upsertPostOrComment } from '../insert-post';
 
 export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { author, commentId } = parseCommentEvent(eventAction)
@@ -38,6 +38,6 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
     await fillNotificationsWithPostFollowers(root_post_id, author, activityId);
     await fillNotificationsWithAccountFollowers(author, activityId);
 
-    await insertPostOrComment(post)
+    await upsertPostOrComment(post)
   }
 }

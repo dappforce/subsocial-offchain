@@ -10,6 +10,7 @@ BEGIN
             'AccountFollowed',
             'AccountUnfollowed',
             'PostCreated',
+            'PostMoved',
             'PostUpdated',
             'PostShared',
             'CommentCreated',

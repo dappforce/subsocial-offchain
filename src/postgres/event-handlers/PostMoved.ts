@@ -4,11 +4,15 @@ import { insertActivityForPost } from '../insert-activity';
 import { fillNewsFeedWithAccountFollowers, fillNewsFeedWithSpaceFollowers } from '../fill-activity';
 import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
-import { upsertPostOrComment } from '../insert-post';
+import { movePost } from '../move-post';
+import { substrate } from '../../substrate/subscribe';
 
 
-export const onRootCreated = async (eventAction: SubstrateEvent, post: Post) => {
+export const onPostMoved = async (eventAction: SubstrateEvent) => {
   const { author, postId } = parsePostEvent(eventAction)
+
+  const post = await substrate.findPost({ id: postId })
+  if (!post) return;
 
   await insertPostFollower(eventAction.data);
 
@@ -20,5 +24,5 @@ export const onRootCreated = async (eventAction: SubstrateEvent, post: Post) => 
   await fillNewsFeedWithSpaceFollowers(spaceId, author, activityId);
   await fillNewsFeedWithAccountFollowers(author, activityId);
 
-  await upsertPostOrComment(post);
+  await movePost(post);
 }

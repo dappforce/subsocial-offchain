@@ -2,7 +2,7 @@ import { pg } from '../connections/connect-postgres';
 import { Post, WhoAndWhen} from '@subsocial/types/substrate/interfaces/subsocial';
 import { resolveCidOfContent } from '@subsocial/api/utils';
 
-export const insertPostOrComment = async (post: Post) => {
+export const upsertPostOrComment = async (post: Post) => {
     const { id, created } = post
     const updated: WhoAndWhen | undefined = post.updated.unwrapOr(undefined)
     const space_id = post.space_id.unwrapOr(undefined)
@@ -35,10 +35,33 @@ export const insertPostOrComment = async (post: Post) => {
         post.score.toNumber()
     ]
 
+    const paramsJoined = params.map((_, i) => `$${i + 1}`).join(', ')
+
+        
     const query = `
         INSERT INTO df.posts
-            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21)
-        RETURNING *`;
+            VALUES(${paramsJoined})
+            ON CONFLICT (id) DO UPDATE SET
+                created_by_account = $2,
+                created_at_block = $3,
+                created_at_time = $4,
+                updated_by_account = $5,
+                updated_at_block = $6,
+                updated_at_time = $7,
+                owner = $8,
+                shared_post_id = $9,
+                parent_id = $10,
+                root_post_id = $11,
+                space_id = $12,
+                content = $13,
+                type = $14,
+                hidden = $15,
+                replies_count = $16,
+                hidden_replies_count = $17,
+                shares_count = $18,
+                upvotes_count = $19,
+                downvotes_count = $20,
+                score = $21`;
 
     await pg.query(query, params)
 }
