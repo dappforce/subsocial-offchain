@@ -11,22 +11,24 @@ type ActivitiesParams = {
   limit?: number
 }
 
-type FromDB = 'news_feed' | 'notifications'
+type Table = 'news_feed' | 'notifications'
 
 const getActivitiesOrCountFrom = async <T extends Activity[] | number>(
-  db: FromDB,
-  what: 'data' | 'count', { account, offset, limit }: ActivitiesParams): Promise<T> => {
+    table: Table,
+    what: 'data' | 'count',
+    { account, offset, limit }: ActivitiesParams
+  ): Promise<T> => {
   const isCountQuery = what === 'count'
-  const queryData = isCountQuery ? 'COUNT(id)' : 'DISTINCT *'
-  let otherQueryParams = isCountQuery ? '' : 'ORDER BY date DESC'
-  const details = db === 'notifications' ? 'AND aggregated = true' : ''
+  const queryData = isCountQuery ? 'COUNT(*)' : 'DISTINCT *'
+  let otherQueryParts = isCountQuery ? '' : 'ORDER BY date DESC'
+  const details = table === 'notifications' ? 'AND aggregated = true' : ''
 
   if (isDef(offset)) {
-    otherQueryParams += '\nOFFSET $2'
+    otherQueryParts += '\nOFFSET $2'
   }
 
   if (isDef(limit)) {
-    otherQueryParams += '\nLIMIT $3'
+    otherQueryParts += '\nLIMIT $3'
   }
 
   const query = `
@@ -34,14 +36,15 @@ const getActivitiesOrCountFrom = async <T extends Activity[] | number>(
     FROM df.activities
     WHERE id IN (
       SELECT activity_id
-      FROM df.${db}
-      WHERE account = $1 ${details})
-    ${otherQueryParams}`;
+      FROM df.${table}
+      WHERE account = $1 ${details}
+    )
+    ${otherQueryParts}`;
   
   const params = [ account, offset, limit ].filter(isDef);
   log.debug(`SQL params: ${params}`);
 
-  const msg = `${what} from ${db}`
+  const msg = `${what} from ${table}`
 
   try {
     const data = await pg.query(query, params)
@@ -54,9 +57,9 @@ const getActivitiesOrCountFrom = async <T extends Activity[] | number>(
   }
 }
 
-const getActivitiesFrom = (from: FromDB, params: ActivitiesParams) => getActivitiesOrCountFrom<Activity[]>(from, 'data', params)
+const getActivitiesFrom = (from: Table, params: ActivitiesParams) => getActivitiesOrCountFrom<Activity[]>(from, 'data', params)
 
-const getCountFrom = (from: FromDB, params: ActivitiesParams) => getActivitiesOrCountFrom<number>(from, 'count', params)
+const getCountFrom = (from: Table, params: ActivitiesParams) => getActivitiesOrCountFrom<number>(from, 'count', params)
 
 export const getFeedData = (params: ActivitiesParams) => getActivitiesFrom('news_feed', params)
 

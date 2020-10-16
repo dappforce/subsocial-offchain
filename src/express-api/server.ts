@@ -41,21 +41,14 @@ app.use(express.static('public'));
 
 // IPFS API
 
-const limitLog = (limit: number) =>
-  log.debug(`Limit db results to ${limit} items`);
-
 const getLimitFromRequest = (req: express.Request): number => {
   const reqLimit = req.query.limit
-  const limit = nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : RESULT_LIMIT
-  limitLog(limit)
-  return limit
+  return nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : RESULT_LIMIT
 }
 
 const getOffsetFromRequest = (req: express.Request): number => {
   const reqOffset = req.query.offset
-  const offset = nonEmptyStr(reqOffset) ? parseNumStr(reqOffset) : 0
-  limitLog(offset)
-  return offset
+  return nonEmptyStr(reqOffset) ? parseNumStr(reqOffset) : 0
 }
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
@@ -101,11 +94,10 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
 app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
   const limit = getLimitFromRequest(req);
   const account = req.params.id;
-  limitLog(limit)
   const offset = getOffsetFromRequest(req);
 
   try {
-    const data = await getFeedData({ account, limit, offset })
+    const data = await getFeedData({ account, offset, limit })
     res.json(data);
   } catch (err) {
     res
@@ -119,7 +111,7 @@ app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: expr
   const offset = getOffsetFromRequest(req);
   const account = req.params.id;
   try {
-    const data = await getNotificationsData({ account, limit, offset })
+    const data = await getNotificationsData({ account, offset, limit })
     res.json(data);
   } catch (err) {
     res
