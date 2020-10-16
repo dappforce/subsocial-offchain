@@ -9,7 +9,7 @@ import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
-import { feedHandle, notificationsHandle, notificationsCountHandle, feedCountHandle } from './handle';
+import { feedHandleR, notificationsHandleR, notificationsCountHandleR, feedCountHandleR } from './handle';
 
 require('dotenv').config();
 
@@ -80,11 +80,11 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
 
 // User feed and notifications API
 
-app.get('/v1/offchain/feed/:id', feedHandle);
-app.get('/v1/offchain/feed/:id/count', feedCountHandle)
+app.get('/v1/offchain/feed/:id', feedHandleR);
+app.get('/v1/offchain/feed/:id/count', feedCountHandleR)
 
-app.get('/v1/offchain/notifications/:id', notificationsHandle);
-app.get('/v1/offchain/notifications/:id/count', notificationsCountHandle)
+app.get('/v1/offchain/notifications/:id', notificationsHandleR);
+app.get('/v1/offchain/notifications/:id/count', notificationsCountHandleR)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;

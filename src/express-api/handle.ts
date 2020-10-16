@@ -13,7 +13,7 @@ const getLimitFromRequest = (req: express.Request): number => getNumberValueFrom
 
 const getOffsetFromRequest = (req: express.Request): number => getNumberValueFromRequest(req, 'offset')
 
-const innerHandle = async (_req: express.Request, res: express.Response, method: Promise<any>) => {
+const innerHandleR = async (_req: express.Request, res: express.Response, method: Promise<any>) => {
   try {
     const data = await method
     res.json(data);
@@ -24,22 +24,22 @@ const innerHandle = async (_req: express.Request, res: express.Response, method:
   }
 }
 
-const activityHandle = (req: express.Request, res: express.Response, method: GetActivityFn) => {
+const activityHandleR = (req: express.Request, res: express.Response, method: GetActivityFn) => {
   const limit = getLimitFromRequest(req);
   const offset = getOffsetFromRequest(req);
   const account = req.params.id;
 
-  return innerHandle(req, res, method({ account, limit, offset }))
+  return innerHandleR(req, res, method({ account, limit, offset }))
 }
 
-export const feedHandle = (req: express.Request, res: express.Response) => activityHandle(req, res, getFeedData)
-export const notificationsHandle = (req: express.Request, res: express.Response) => activityHandle(req, res, getNotificationsData)
+export const feedHandleR = (req: express.Request, res: express.Response) => activityHandleR(req, res, getFeedData)
+export const notificationsHandleR = (req: express.Request, res: express.Response) => activityHandleR(req, res, getNotificationsData)
 
-const countHandle = async  (req: express.Request, res: express.Response, method: GetCountFn) => {
+const countHandleR = async  (req: express.Request, res: express.Response, method: GetCountFn) => {
   const account = req.params.id;
 
-  return innerHandle(req, res, method(account))
+  return innerHandleR(req, res, method(account))
 }
 
-export const feedCountHandle = (req: express.Request, res: express.Response) => countHandle(req, res, getFeedCount)
-export const notificationsCountHandle = (req: express.Request, res: express.Response) => countHandle(req, res, getNotificationsCount)
+export const feedCountHandleR = (req: express.Request, res: express.Response) => countHandleR(req, res, getFeedCount)
+export const notificationsCountHandleR = (req: express.Request, res: express.Response) => countHandleR(req, res, getNotificationsCount)
