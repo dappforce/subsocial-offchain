@@ -114,6 +114,20 @@ CREATE TABLE IF NOT EXISTS df.posts
     FOREIGN KEY (root_post_id) REFERENCES df.posts(id)
 );
 
+CREATE TABLE IF NOT EXISTS df.profile
+(
+    id bigserial NOT NULL UNIQUE,
+    created_by_account account NOT NULL,
+    created_at_block bigint NOT NULL,
+    created_at_time bigint NOT NULL,
+
+    updated_by_account account NULL,
+    updated_at_block bigint NULL,
+    updated_at_time bigint NULL,
+
+    content ipfs_cid NULL    
+);
+
 CREATE TABLE IF NOT EXISTS df.news_feed
 (
     account varchar(48) NOT NULL,

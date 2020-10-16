@@ -1,4 +1,3 @@
-import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { insertPostFollower } from '../insert-follower';
 import { insertActivityForPost } from '../insert-activity';
 import { fillNewsFeedWithAccountFollowers, fillNewsFeedWithSpaceFollowers } from '../fill-activity';

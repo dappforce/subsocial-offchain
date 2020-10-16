@@ -12,3 +12,5 @@ export { onCommentDeleted } from './CommentDeleted';
 export { onPostReactionCreated } from './PostReactionCreated';
 export { onPostUpdated } from './PostUpdated';
 export { onCommentReactionCreated } from './CommentReactionCreated';
+export { onProfileCreated } from './ProfileCreated';
+export { onProfileUpdated } from './ProfileUpdated';

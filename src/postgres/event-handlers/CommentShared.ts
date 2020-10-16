@@ -5,7 +5,7 @@ import { fillNotificationsWithAccountFollowers, fillNotificationsWithCommentFoll
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
-import { upsertPostOrComment } from '../insert-post';
+import { upsertPostOrComment } from '../upsert-post';
 
 export const onCommentShared = async (eventAction: SubstrateEvent, comment: Post) => {
   const { author, commentId } = parseCommentEvent(eventAction)

@@ -4,7 +4,7 @@ import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers
 import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
-import { upsertPostOrComment } from '../insert-post';
+import { upsertPostOrComment } from '../upsert-post';
 
 export const onRootPostShared = async (eventAction: SubstrateEvent, post: Post) => {
   const { author, postId } = parsePostEvent(eventAction)

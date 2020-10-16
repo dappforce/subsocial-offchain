@@ -1,7 +1,7 @@
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../substrate/subscribe';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
-import { upsertSpace } from '../insert-space';
+import { upsertSpace } from '../upsert-space';
 
 export const onSpaceUpdated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;

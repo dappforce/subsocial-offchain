@@ -7,7 +7,7 @@ import { substrateLog as log } from '../../connections/loggers';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
-import { upsertPostOrComment } from '../insert-post';
+import { upsertPostOrComment } from '../upsert-post';
 
 export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { author, commentId } = parseCommentEvent(eventAction)

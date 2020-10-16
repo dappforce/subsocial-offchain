@@ -4,7 +4,7 @@ import { insertActivityForPost } from '../insert-activity';
 import { fillNewsFeedWithAccountFollowers, fillNewsFeedWithSpaceFollowers } from '../fill-activity';
 import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
-import { upsertPostOrComment } from '../insert-post';
+import { upsertPostOrComment } from '../upsert-post';
 
 
 export const onRootCreated = async (eventAction: SubstrateEvent, post: Post) => {
