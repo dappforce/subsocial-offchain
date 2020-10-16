@@ -4,15 +4,14 @@ import * as cors from 'cors';
 import { ipfsCluster } from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
-import { newLogger, nonEmptyStr, parseNumStr } from '@subsocial/utils';
+import { newLogger, nonEmptyStr } from '@subsocial/utils';
 import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
-import { getFeedData, getNotificationsData, getNotificationsCount, getFeedCount } from './query';
+import { feedHandle, notificationsHandle, notificationsCountHandle, feedCountHandle } from './handle';
 
 require('dotenv').config();
-const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
 const log = newLogger('ExpressOffchainApi')
 const app = express();
@@ -40,16 +39,6 @@ const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
 app.use(express.static('public'));
 
 // IPFS API
-
-const getLimitFromRequest = (req: express.Request): number => {
-  const reqLimit = req.query.limit
-  return nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : RESULT_LIMIT
-}
-
-const getOffsetFromRequest = (req: express.Request): number => {
-  const reqOffset = req.query.offset
-  return nonEmptyStr(reqOffset) ? parseNumStr(reqOffset) : 0
-}
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const content = JSON.stringify(req.body)
@@ -91,58 +80,13 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
 
 // User feed and notifications API
 
-app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
-  const limit = getLimitFromRequest(req);
-  const account = req.params.id;
-  const offset = getOffsetFromRequest(req);
+app.get('/v1/offchain/feed/:id', feedHandle);
 
-  try {
-    const data = await getFeedData({ account, offset, limit })
-    res.json(data);
-  } catch (err) {
-    res
-      .status(501)
-      .send(err)
-  }
-});
+app.get('/v1/offchain/notifications/:id', notificationsHandle);
 
-app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
-  const limit = getLimitFromRequest(req);
-  const offset = getOffsetFromRequest(req);
-  const account = req.params.id;
-  try {
-    const data = await getNotificationsData({ account, offset, limit })
-    res.json(data);
-  } catch (err) {
-    res
-      .status(501)
-      .send(err)
-  }
-});
+app.get('/v1/offchain/notifications/:id/count', notificationsCountHandle)
 
-app.get('/v1/offchain/notifications/:id/count', async (req: express.Request, res: express.Response) => {
-  const account = req.params.id;
-  try {
-    const data = await getNotificationsCount(account)
-    res.json(data);
-  } catch (err) {
-    res
-      .status(501)
-      .send(err)
-  }
-})
-
-app.get('/v1/offchain/feed/:id/count', async (req: express.Request, res: express.Response) => {
-  const account = req.params.id;
-  try {
-    const data = await getFeedCount(account)
-    res.json(data);
-  } catch (err) {
-    res
-      .status(501)
-      .send(err)
-  }
-})
+app.get('/v1/offchain/feed/:id/count', feedCountHandle)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;

@@ -58,13 +58,12 @@ const getActivitiesOrCountFrom = async <T extends Activity[] | number>(
 }
 
 const getActivitiesFrom = (from: Table, params: ActivitiesParams) => getActivitiesOrCountFrom<Activity[]>(from, 'data', params)
-
 const getCountFrom = (from: Table, params: ActivitiesParams) => getActivitiesOrCountFrom<number>(from, 'count', params)
 
-export const getFeedData = (params: ActivitiesParams) => getActivitiesFrom('news_feed', params)
+export type GetActivityFn = (params: ActivitiesParams) => Promise<Activity[]>
+export const getFeedData: GetActivityFn = (params) => getActivitiesFrom('news_feed', params)
+export const getNotificationsData: GetActivityFn = (params) => getActivitiesFrom('notifications', params)
 
-export const getNotificationsData = (params: ActivitiesParams) => getActivitiesFrom('notifications', params)
-
-export const getFeedCount = (account: string) => getCountFrom('news_feed', { account })
-
-export const getNotificationsCount = (account: string) => getCountFrom('notifications', { account })
+export type GetCountFn = (account: string) => Promise<number>
+export const getFeedCount: GetCountFn = (account) => getCountFrom('news_feed', { account })
+export const getNotificationsCount: GetCountFn = (account) => getCountFrom('notifications', { account })
