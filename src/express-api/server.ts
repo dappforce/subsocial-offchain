@@ -81,12 +81,10 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
 // User feed and notifications API
 
 app.get('/v1/offchain/feed/:id', feedHandle);
+app.get('/v1/offchain/feed/:id/count', feedCountHandle)
 
 app.get('/v1/offchain/notifications/:id', notificationsHandle);
-
 app.get('/v1/offchain/notifications/:id/count', notificationsCountHandle)
-
-app.get('/v1/offchain/feed/:id/count', feedCountHandle)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;
