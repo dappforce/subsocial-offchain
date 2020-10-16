@@ -4,14 +4,17 @@ import { GetActivityFn, GetCountFn, getFeedData, getNotificationsData, getFeedCo
 
 const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
-const getNumberValueFromRequest = (req: express.Request, value: 'limit' | 'offset'): number => {
+const getNumberValueFromRequest = (req: express.Request, value: 'limit' | 'offset', def: number): number => {
   const reqLimit = req.query[value]
-  return nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : RESULT_LIMIT
+  return nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : def
 }
 
-const getLimitFromRequest = (req: express.Request): number => getNumberValueFromRequest(req, 'limit')
+const getLimitFromRequest = (req: express.Request): number => { 
+  const limit = getNumberValueFromRequest(req, 'limit', RESULT_LIMIT)
+  return limit < RESULT_LIMIT ? limit : RESULT_LIMIT
+}
 
-const getOffsetFromRequest = (req: express.Request): number => getNumberValueFromRequest(req, 'offset')
+const getOffsetFromRequest = (req: express.Request): number => getNumberValueFromRequest(req, 'offset', 0)
 
 const innerHandleR = async (_req: express.Request, res: express.Response, method: Promise<any>) => {
   try {

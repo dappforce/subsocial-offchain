@@ -40,7 +40,7 @@ const getQuery = async (
   ): Promise<any> => {
   try {
     const data = await pg.query(query, params)
-    return data
+    return data.rows
   } catch (err) {
     log.error(errorMsg, err.stack);
     throw err.stack
@@ -52,10 +52,14 @@ const getActivitiesFrom = (table: Table, { account, offset, limit }: ActivitiesP
   [ account, offset, limit ],
   `Failed load to activities from ${table} by account ${account}`)
 
-const getCountFrom = (table: Table, account: string) => getQuery(
-  createCountQuery(table),
-  [ account ],
-  `Failed load to activities from ${table} by account ${account}`)
+const getCountFrom = async (table: Table, account: string) => {
+  const data = await getQuery(
+    createCountQuery(table),
+    [ account ],
+    `Failed load to activities from ${table} by account ${account}`)
+
+  return data.pop().count
+}
 
 export type GetActivityFn = (params: ActivitiesParams) => Promise<Activity[]>
 export const getFeedData: GetActivityFn = (params) => getActivitiesFrom('news_feed', params)
