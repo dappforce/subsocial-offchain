@@ -50,13 +50,13 @@ const getQuery = async (
 const getActivitiesFrom = (table: Table, { account, offset, limit }: ActivitiesParams): Promise<Activity[]> => getQuery(
   createActivityQuery(table),
   [ account, offset, limit ],
-  `Failed load to activities from ${table} by account ${account}`)
+  `Failed to load to activities from ${table} by account ${account}`)
 
 const getCountFrom = async (table: Table, account: string) => {
   const data = await getQuery(
     createCountQuery(table),
     [ account ],
-    `Failed load to activities from ${table} by account ${account}`)
+    `Failed to count activities from ${table} by account ${account}`)
 
   return data.pop().count
 }
