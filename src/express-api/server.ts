@@ -9,7 +9,14 @@ import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
-import { feedHandleR, notificationsHandleR, notificationsCountHandleR, feedCountHandleR } from './handle';
+
+import { feedHandler,
+  notificationsHandler,
+  notificationsCountHandler,
+  feedCountHandler,
+  activitiesHandler,
+  activitiesCountHandler
+} from './handle'; // TODO separate on different files
 
 require('dotenv').config();
 
@@ -80,11 +87,14 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
 
 // User feed and notifications API
 
-app.get('/v1/offchain/feed/:id', feedHandleR);
-app.get('/v1/offchain/feed/:id/count', feedCountHandleR)
+app.get('/v1/offchain/feed/:id', feedHandler);
+app.get('/v1/offchain/feed/:id/count', feedCountHandler)
 
-app.get('/v1/offchain/notifications/:id', notificationsHandleR);
-app.get('/v1/offchain/notifications/:id/count', notificationsCountHandleR)
+app.get('/v1/offchain/notifications/:id', notificationsHandler);
+app.get('/v1/offchain/notifications/:id/count', notificationsCountHandler)
+
+app.get('/v1/offchain/activity/:id', activitiesHandler)
+app.get('/v1/offchain/activity/:id/count', activitiesCountHandler)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;

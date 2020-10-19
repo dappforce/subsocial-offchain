@@ -10,9 +10,9 @@ type ActivitiesParams = {
   limit: number
 }
 
-type Table = 'news_feed' | 'notifications'
+type Table = 'news_feed' | 'notifications' | 'activities'
 
-const createActivityQuery = (table: Table) => 
+const createFeedOrNotifQuery = (table: Table) => 
   `SELECT DISTINCT * 
     FROM df.activities
     WHERE id IN (
@@ -24,7 +24,7 @@ const createActivityQuery = (table: Table) =>
     OFFSET $2
     LIMIT $3`
 
-const createCountQuery = (table: Table) => 
+const createFeedOrNotifCountQuery = (table: Table) => 
   `SELECT COUNT(*)
     FROM df.activities
     WHERE id IN (
@@ -32,6 +32,19 @@ const createCountQuery = (table: Table) =>
       FROM df.${table}
       WHERE account = $1
     )`
+
+const createActivityQuery = () => 
+  `SELECT DISTINCT * 
+    FROM df.activities
+    WHERE account = $1
+    ORDER BY date DESC
+    OFFSET $2
+    LIMIT $3`
+
+const createActivityCountQuery = () => 
+  `SELECT COUNT(*)
+    FROM df.activities
+    WHERE account = $1`
 
 const getQuery = async (
     query: string,
@@ -48,13 +61,17 @@ const getQuery = async (
 }
 
 const getActivitiesFrom = (table: Table, { account, offset, limit }: ActivitiesParams): Promise<Activity[]> => getQuery(
-  createActivityQuery(table),
+  table === 'activities'
+    ? createActivityQuery()
+    : createFeedOrNotifQuery(table),
   [ account, offset, limit ],
   `Failed to load to activities from ${table} by account ${account}`)
 
 const getCountFrom = async (table: Table, account: string) => {
   const data = await getQuery(
-    createCountQuery(table),
+    table === 'activities'
+      ? createActivityCountQuery()
+      : createFeedOrNotifCountQuery(table),
     [ account ],
     `Failed to count activities from ${table} by account ${account}`)
 
@@ -64,7 +81,9 @@ const getCountFrom = async (table: Table, account: string) => {
 export type GetActivityFn = (params: ActivitiesParams) => Promise<Activity[]>
 export const getFeedData: GetActivityFn = (params) => getActivitiesFrom('news_feed', params)
 export const getNotificationsData: GetActivityFn = (params) => getActivitiesFrom('notifications', params)
+export const getActivitiesData: GetActivityFn = (params) => getActivitiesFrom('activities', params)
 
 export type GetCountFn = (account: string) => Promise<number>
 export const getFeedCount: GetCountFn = (account) => getCountFrom('news_feed', account)
 export const getNotificationsCount: GetCountFn = (account) => getCountFrom('notifications', account)
+export const getActivitiesCount: GetCountFn = (params) => getCountFrom('activities', params)
