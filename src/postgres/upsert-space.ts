@@ -33,8 +33,6 @@ export const upsertSpace = async (space: Space) => {
 
 	const paramsForUpdate = sapceFields.map((value, i) => `${value} = $${i + 1}`).join(', ')
 
-	console.log(paramsForUpdate)
-
 	const query = `
 		INSERT INTO df.spaces
 			VALUES(${paramsJoined})
