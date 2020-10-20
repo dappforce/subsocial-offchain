@@ -15,7 +15,17 @@ import { feedHandler,
   notificationsCountHandler,
   feedCountHandler,
   activitiesHandler,
-  activitiesCountHandler
+  activitiesCountHandler,
+  commentActivitiesHandler,
+  commentActivitiesCountHandler,
+  postActivitiesHandler,
+  postActivitiesCountHandler,
+  followActivitiesHandler,
+  followActivitiesCountHandler,
+  reactionActivitiesHandler,
+  reactionActivitiesCountHandler,
+  spaceActivitiesHandler,
+  spaceActivitiesCountHandler
 } from './handle'; // TODO separate on different files
 
 require('dotenv').config();
@@ -93,8 +103,23 @@ app.get('/v1/offchain/feed/:id/count', feedCountHandler)
 app.get('/v1/offchain/notifications/:id', notificationsHandler);
 app.get('/v1/offchain/notifications/:id/count', notificationsCountHandler)
 
-app.get('/v1/offchain/activity/:id', activitiesHandler)
-app.get('/v1/offchain/activity/:id/count', activitiesCountHandler)
+app.get('/v1/offchain/activities/:id', activitiesHandler)
+app.get('/v1/offchain/activities/:id/count', activitiesCountHandler)
+
+app.get('/v1/offchain/activities/:id/comments', commentActivitiesHandler)
+app.get('/v1/offchain/activities/:id/comments/count', commentActivitiesCountHandler)
+
+app.get('/v1/offchain/activities/:id/posts', postActivitiesHandler)
+app.get('/v1/offchain/activities/:id/posts/count', postActivitiesCountHandler)
+
+app.get('/v1/offchain/activities/:id/follows', followActivitiesHandler)
+app.get('/v1/offchain/activities/:id/follows/count', followActivitiesCountHandler)
+
+app.get('/v1/offchain/activities/:id/reactions', reactionActivitiesHandler)
+app.get('/v1/offchain/activities/:id/reactions/count', reactionActivitiesCountHandler)
+
+app.get('/v1/offchain/activities/:id/spaces', spaceActivitiesHandler)
+app.get('/v1/offchain/activities/:id/spaces/count', spaceActivitiesCountHandler)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;
