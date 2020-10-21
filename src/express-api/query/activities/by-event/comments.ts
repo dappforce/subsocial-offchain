@@ -1,7 +1,8 @@
 import { GetActivityFn, GetCountFn } from '../../types'
-import { getActivitiesByEvent, getActivitiesCountByEvent, EventsName } from './common'
+import { getActivitiesByEvent, getActivitiesCountByEvent } from './common'
+import { EventsName } from '@subsocial/types'
 
-const commentEvents: EventsName[] = [ 'CommentCreated', 'CommentShared', 'CommentReplyCreated']
+const commentEvents: EventsName[] = [ 'CommentCreated', 'CommentReplyCreated']
 
 export const getCommentActivitiesData: GetActivityFn = (params) =>
   getActivitiesByEvent({ ...params, events: commentEvents })
