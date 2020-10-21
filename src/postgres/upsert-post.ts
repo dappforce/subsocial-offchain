@@ -1,7 +1,9 @@
 import { pg } from '../connections/connect-postgres';
-import { Post, WhoAndWhen} from '@subsocial/types/substrate/interfaces/subsocial';
+import { Post, SpaceId, WhoAndWhen} from '@subsocial/types/substrate/interfaces/subsocial';
 import { resolveCidOfContent } from '@subsocial/api/utils';
 import { postFields } from '../sql/TablesFields';
+import { substrate } from '../substrate/subscribe';
+import { upsertSpace } from './upsert-space';
 
 export const upsertPostOrComment = async (post: Post) => {
 	const { id, created } = post
@@ -11,6 +13,7 @@ export const upsertPostOrComment = async (post: Post) => {
 	const shared_post_id = post.extension.isSharedPost ? post.extension.asSharedPost : null
 	const comment = post.extension.isComment ? post.extension.asComment : null
 	const parent_id_unwrapd = comment?.parent_id.unwrapOr(undefined)
+	const root_post_id = comment?.root_post_id
 
 	const params = [
 		id.toNumber(),
@@ -23,7 +26,7 @@ export const upsertPostOrComment = async (post: Post) => {
 		post.owner.toString(),
 		shared_post_id?.toNumber(),
 		parent_id_unwrapd?.toNumber(),
-		comment?.root_post_id.toNumber(),
+		root_post_id.toNumber(),
 		space_id?.toNumber(),
 		content,
 		post.extension.type,
@@ -46,5 +49,18 @@ export const upsertPostOrComment = async (post: Post) => {
 				ON CONFLICT (id) DO UPDATE SET
 					${paramsForUpdate}`;
 
-    await pg.query(query, params)
+	try {
+		await pg.query(query, params)
+	}
+	catch {
+		if (space_id !== undefined) {
+			const space =	await substrate.findSpace({id: space_id as SpaceId})
+			await upsertSpace(space)
+		}
+		else if(root_post_id !== undefined) {
+			const post = await substrate.findPost({id: root_post_id})
+			await upsertPostOrComment(post)
+		}
+		await pg.query(query, params)
+	}
 }
