@@ -25,7 +25,8 @@ import { feedHandler,
   reactionActivitiesHandler,
   reactionActivitiesCountHandler,
   spaceActivitiesHandler,
-  spaceActivitiesCountHandler
+  spaceActivitiesCountHandler,
+  activityCountsHandler
 } from './handle'; // TODO separate on different files
 
 require('dotenv').config();
@@ -120,6 +121,8 @@ app.get('/v1/offchain/activities/:id/reactions/count', reactionActivitiesCountHa
 
 app.get('/v1/offchain/activities/:id/spaces', spaceActivitiesHandler)
 app.get('/v1/offchain/activities/:id/spaces/count', spaceActivitiesCountHandler)
+
+app.get('/v1/offchain/activities/:id/counts', activityCountsHandler)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;

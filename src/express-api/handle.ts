@@ -1,13 +1,14 @@
 import * as express from 'express'
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils';
 import { getCommentActivitiesData, getCommentActivitiesCount } from './query/activities/by-event/comments';
-import { GetActivityFn, GetCountFn } from './query/types';
+import { GetActivityFn, GetCountFn, GetCountsFn } from './query/types';
 import { getFeedData, getNotificationsData, getFeedCount, getNotificationsCount } from './query/feed-and-notifications';
 import { getActivitiesData, getActivitiesCount } from './query/activities/all';
 import { getFollowActivitiesData, getFollowActivitiesCount } from './query/activities/by-event/follows';
 import { getPostActivitiesData, getPostActivitiesCount } from './query/activities/by-event/posts';
 import { getReactionActivitiesData, getReactionActivitiesCount } from './query/activities/by-event/reactions';
 import { getSpaceActivitiesData, getSpaceActivitiesCount } from './query/activities/by-event/spaces';
+import { getActivityCounts } from './query/activities/counts'
 
 const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
@@ -44,7 +45,7 @@ const activityHandler = (req: express.Request, res: express.Response, method: Ge
   return innerHandler(req, res, method({ account, limit, offset }))
 }
 
-const countHandler = async  (req: express.Request, res: express.Response, method: GetCountFn) => {
+const countHandler = async (req: express.Request, res: express.Response, method: GetCountFn | GetCountsFn) => {
   const account = req.params.id;
 
   return innerHandler(req, res, method(account))
@@ -90,3 +91,5 @@ export const spaceActivitiesHandler: HandlerFn = (req, res) =>
 export const spaceActivitiesCountHandler: HandlerFn = (req, res) =>
   countHandler(req, res, getSpaceActivitiesCount)
 
+export const activityCountsHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getActivityCounts)
