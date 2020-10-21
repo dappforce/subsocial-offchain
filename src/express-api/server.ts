@@ -4,14 +4,14 @@ import * as cors from 'cors';
 import { ipfsCluster } from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
-import { newLogger, nonEmptyStr, parseNumStr } from '@subsocial/utils';
+import { newLogger, nonEmptyStr } from '@subsocial/utils';
 import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
+import { feedHandleR, notificationsHandleR, notificationsCountHandleR, feedCountHandleR } from './handle';
 
 require('dotenv').config();
-const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
 const log = newLogger('ExpressOffchainApi')
 const app = express();
@@ -39,16 +39,6 @@ const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
 app.use(express.static('public'));
 
 // IPFS API
-
-const limitLog = (limit: number) =>
-  log.debug(`Limit db results to ${limit} items`);
-
-const getLimitFromRequest = (req: express.Request): number => {
-  const reqLimit = req.query.limit
-  const limit = nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : RESULT_LIMIT
-  limitLog(limit)
-  return limit
-}
 
 app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => {
   const content = JSON.stringify(req.body)
@@ -90,57 +80,11 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
 
 // User feed and notifications API
 
-app.get('/v1/offchain/feed/:id', async (req: express.Request, res: express.Response) => {
-  const limit = getLimitFromRequest(req);
-  const account = req.params.id;
-  limitLog(limit)
-  const offset = req.query.offset;
-  const query = `
-    SELECT DISTINCT * 
-    FROM df.activities
-    WHERE id IN (
-      SELECT activity_id
-      FROM df.news_feed
-      WHERE account = $1)
-    ORDER BY date DESC
-    OFFSET $2
-    LIMIT $3`;
-  const params = [ account, offset, limit ];
-  log.debug(`SQL params: ${params}`);
+app.get('/v1/offchain/feed/:id', feedHandleR);
+app.get('/v1/offchain/feed/:id/count', feedCountHandleR)
 
-  try {
-    const data = await pg.query(query, params)
-    logSuccess('get feed', `by account: ${account}`)
-    res.json(data.rows);
-  } catch (err) {
-    logError('get feed', `by account: ${account}`, err.stack);
-  }
-});
-
-app.get('/v1/offchain/notifications/:id', async (req: express.Request, res: express.Response) => {
-  const limit = getLimitFromRequest(req);
-  const offset = req.query.offset;
-  const account = req.params.id;
-  const query = `
-    SELECT DISTINCT *
-    FROM df.activities
-    WHERE id IN ( 
-      SELECT activity_id
-      FROM df.notifications
-      WHERE account = $1) 
-      AND aggregated = true
-    ORDER BY date DESC
-    OFFSET $2
-    LIMIT $3`;
-  const params = [ account, offset, limit ];
-  try {
-    const data = await pg.query(query, params)
-    logSuccess('get notifications', `by account: ${account}`)
-    res.json(data.rows);
-  } catch (err) {
-    logError('get notificatios', `by account: ${account}`, err.stack);
-  }
-});
+app.get('/v1/offchain/notifications/:id', notificationsHandleR);
+app.get('/v1/offchain/notifications/:id/count', notificationsCountHandleR)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;
