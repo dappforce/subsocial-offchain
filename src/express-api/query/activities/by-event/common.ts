@@ -1,19 +1,7 @@
 import { ActivitiesParams } from '../../types'
-import { Activity } from '@subsocial/types'
+import { Activity, EventsName } from '@subsocial/types'
 import { getQuery } from '../../utils'
 import { nonEmptyStr } from '@subsocial/utils'
-
-export type EventsName =
-  'AccountFollowed' |
-  'SpaceFollowed' |
-  'SpaceCreated' |
-  'CommentCreated' |
-  'CommentReplyCreated' |
-  'PostCreated' |
-  'PostShared' |
-  'CommentShared' |
-  'PostReactionCreated' |
-  'CommentReactionCreated'
 
 export type ActivitiesByEventParams = ActivitiesParams & {
   events: EventsName[]
