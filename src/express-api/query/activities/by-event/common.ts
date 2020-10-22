@@ -17,7 +17,6 @@ const getEventsQueryDetails = (events: EventsName[]) => {
   return nonEmptyStr(eventsQuery) ? `(${eventsQuery}) AND` : ''
 }
   
-
 const createaAtivityByEventQuery = ({ events, account, offset, limit }: ActivitiesByEventParams) => {
   let lastIndex = events.length
 
