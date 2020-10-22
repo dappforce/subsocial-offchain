@@ -26,7 +26,7 @@ export const upsertPostOrComment = async (post: Post) => {
 		post.owner.toString(),
 		shared_post_id?.toNumber(),
 		parent_id_unwrapd?.toNumber(),
-		root_post_id.toNumber(),
+		root_post_id?.toNumber(),
 		space_id?.toNumber(),
 		content,
 		post.extension.type,

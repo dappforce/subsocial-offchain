@@ -15,5 +15,7 @@ export const onSpaceCreated: EventHandlerFn = async (eventAction: SubstrateEvent
   const spaceId = data[1] as SpaceId;
   const space = await substrate.findSpace({ id: spaceId });
 
+  if (!space) return;
+
   await upsertSpace(space);
 }
