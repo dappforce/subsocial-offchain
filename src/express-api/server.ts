@@ -9,52 +9,34 @@ import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
+import * as reqHandlers from './handlers';
 
-import { feedHandler,
-  notificationsHandler,
-  notificationsCountHandler,
-  feedCountHandler,
-  activitiesHandler,
-  activitiesCountHandler,
-  commentActivitiesHandler,
-  commentActivitiesCountHandler,
-  postActivitiesHandler,
-  postActivitiesCountHandler,
-  followActivitiesHandler,
-  followActivitiesCountHandler,
-  reactionActivitiesHandler,
-  reactionActivitiesCountHandler,
-  spaceActivitiesHandler,
-  spaceActivitiesCountHandler,
-  activityCountsHandler
-} from './handle'; // TODO separate on different files
-
-require('dotenv').config();
+require('dotenv').config()
 
 const log = newLogger('ExpressOffchainApi')
-const app = express();
-const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || 'http://localhost';
+const app = express()
+const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || 'http://localhost'
 
 app.use(cors((req, callback) => {
   const origin = req.method === 'GET' ? '*' : allowedOrigin
-
   callback(null, { origin })
-}));
+}))
 
 const MB = 1024 ** 2
 
 const maxFileSizeBytes = parseInt(process.env.IPFS_MAX_FILE_SIZE_BYTES) || 2 * MB
+
 const maxFileSizeMB = maxFileSizeBytes / MB
 
 // for parsing application/json
-app.use(bodyParser.json({ limit: maxFileSizeBytes }));
+app.use(bodyParser.json({ limit: maxFileSizeBytes }))
 
 // for parsing application/xwww-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }));
+app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }))
 
 // for parsing multipart/form-data
 const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
-app.use(express.static('public'));
+app.use(express.static('public'))
 
 // IPFS API
 
@@ -70,8 +52,8 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
   } 
 })
 
-// TODO: Support multi-file upload
-// app.use(upload.array());
+// Uncomment the next line to add support for multi-file upload:
+// app.use(upload.array())
 
 app.post('/v1/ipfs/addFile', upload.single('file'), async (req: express.Request, res: express.Response) => {
   if (req.file.size > maxFileSizeBytes) {
@@ -96,33 +78,33 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
   }
 })
 
-// User feed and notifications API
+// API endpoints for personal user feed, notifications and all types of activities.
 
-app.get('/v1/offchain/feed/:id', feedHandler);
-app.get('/v1/offchain/feed/:id/count', feedCountHandler)
+app.get('/v1/offchain/feed/:id', reqHandlers.feedHandler);
+app.get('/v1/offchain/feed/:id/count', reqHandlers.feedCountHandler)
 
-app.get('/v1/offchain/notifications/:id', notificationsHandler);
-app.get('/v1/offchain/notifications/:id/count', notificationsCountHandler)
+app.get('/v1/offchain/notifications/:id', reqHandlers.notificationsHandler);
+app.get('/v1/offchain/notifications/:id/count', reqHandlers.notificationsCountHandler)
 
-app.get('/v1/offchain/activities/:id', activitiesHandler)
-app.get('/v1/offchain/activities/:id/count', activitiesCountHandler)
+app.get('/v1/offchain/activities/:id', reqHandlers.activitiesHandler)
+app.get('/v1/offchain/activities/:id/count', reqHandlers.activitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/comments', commentActivitiesHandler)
-app.get('/v1/offchain/activities/:id/comments/count', commentActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/comments', reqHandlers.commentActivitiesHandler)
+app.get('/v1/offchain/activities/:id/comments/count', reqHandlers.commentActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/posts', postActivitiesHandler)
-app.get('/v1/offchain/activities/:id/posts/count', postActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/posts', reqHandlers.postActivitiesHandler)
+app.get('/v1/offchain/activities/:id/posts/count', reqHandlers.postActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/follows', followActivitiesHandler)
-app.get('/v1/offchain/activities/:id/follows/count', followActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/follows', reqHandlers.followActivitiesHandler)
+app.get('/v1/offchain/activities/:id/follows/count', reqHandlers.followActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/reactions', reactionActivitiesHandler)
-app.get('/v1/offchain/activities/:id/reactions/count', reactionActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/reactions', reqHandlers.reactionActivitiesHandler)
+app.get('/v1/offchain/activities/:id/reactions/count', reqHandlers.reactionActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/spaces', spaceActivitiesHandler)
-app.get('/v1/offchain/activities/:id/spaces/count', spaceActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/spaces', reqHandlers.spaceActivitiesHandler)
+app.get('/v1/offchain/activities/:id/spaces/count', reqHandlers.spaceActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/counts', activityCountsHandler)
+app.get('/v1/offchain/activities/:id/counts', reqHandlers.activityCountsHandler)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;
@@ -136,23 +118,23 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
         SELECT MAX(activity_id) FROM df.notifications
         WHERE account = $1
       )
-    WHERE account = $1`;
-  const params = [ account ];
+    WHERE account = $1`
+
   try {
-    const data = await pg.query(query, params)
+    const data = await pg.query(query, [ account ])
     informClientAboutUnreadNotifications(account, 0);
     logSuccess('mark all notifications as read', `by account: ${account}`)
     res.json(data.rows);
   } catch (err) {
     logError('mark all notifications as read', `by account: ${account}`, err.stack);
   }
-});
+})
 
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await parseSitePreview(req.body.url)
   res.send(data);
-});
+})
 
 // startNotificationsServer()
 

@@ -6,6 +6,8 @@ export type ActivitiesParams = {
   limit: number
 }
 
-export type GetActivityFn = (params: ActivitiesParams) => Promise<Activity[]>
+export type GetActivitiesFn = (params: ActivitiesParams) => Promise<Activity[]>
+
 export type GetCountFn = (account: string) => Promise<number>
+
 export type GetCountsFn = (account: string) => Promise<Counts>

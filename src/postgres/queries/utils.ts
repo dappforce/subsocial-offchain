@@ -3,7 +3,8 @@ import { pg } from '../../connections/connect-postgres'
 
 const log = newLogger('PgQuery')
 
-export const getQuery = async (
+/** Execute PostgreSQL query and return result data. */
+export const execPgQuery = async (
   query: string,
   params: any[],
   errorMsg: string
