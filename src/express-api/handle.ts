@@ -1,8 +1,18 @@
 import * as express from 'express'
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils';
-import { GetActivityFn, GetCountFn, getFeedData, getNotificationsData, getFeedCount, getNotificationsCount } from './query';
+import { getCommentActivitiesData, getCommentActivitiesCount } from './query/activities/by-event/comments';
+import { GetActivityFn, GetCountFn, GetCountsFn } from './query/types';
+import { getFeedData, getNotificationsData, getFeedCount, getNotificationsCount } from './query/feed-and-notifications';
+import { getActivitiesData, getActivitiesCount } from './query/activities/all';
+import { getFollowActivitiesData, getFollowActivitiesCount } from './query/activities/by-event/follows';
+import { getPostActivitiesData, getPostActivitiesCount } from './query/activities/by-event/posts';
+import { getReactionActivitiesData, getReactionActivitiesCount } from './query/activities/by-event/reactions';
+import { getSpaceActivitiesData, getSpaceActivitiesCount } from './query/activities/by-event/spaces';
+import { getActivityCounts } from './query/activities/counts'
 
 const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
+
+type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
 
 const getNumberValueFromRequest = (req: express.Request, value: 'limit' | 'offset', def: number): number => {
   const reqLimit = req.query[value]
@@ -16,7 +26,7 @@ const getLimitFromRequest = (req: express.Request): number => {
 
 const getOffsetFromRequest = (req: express.Request): number => getNumberValueFromRequest(req, 'offset', 0)
 
-const innerHandleR = async (_req: express.Request, res: express.Response, method: Promise<any>) => {
+const innerHandler = async (_req: express.Request, res: express.Response, method: Promise<any>) => {
   try {
     const data = await method
     res.json(data);
@@ -27,22 +37,59 @@ const innerHandleR = async (_req: express.Request, res: express.Response, method
   }
 }
 
-const activityHandleR = (req: express.Request, res: express.Response, method: GetActivityFn) => {
+const activityHandler = (req: express.Request, res: express.Response, method: GetActivityFn) => {
   const limit = getLimitFromRequest(req);
   const offset = getOffsetFromRequest(req);
   const account = req.params.id;
 
-  return innerHandleR(req, res, method({ account, limit, offset }))
+  return innerHandler(req, res, method({ account, limit, offset }))
 }
 
-export const feedHandleR = (req: express.Request, res: express.Response) => activityHandleR(req, res, getFeedData)
-export const notificationsHandleR = (req: express.Request, res: express.Response) => activityHandleR(req, res, getNotificationsData)
-
-const countHandleR = async  (req: express.Request, res: express.Response, method: GetCountFn) => {
+const countHandler = async (req: express.Request, res: express.Response, method: GetCountFn | GetCountsFn) => {
   const account = req.params.id;
 
-  return innerHandleR(req, res, method(account))
+  return innerHandler(req, res, method(account))
 }
 
-export const feedCountHandleR = (req: express.Request, res: express.Response) => countHandleR(req, res, getFeedCount)
-export const notificationsCountHandleR = (req: express.Request, res: express.Response) => countHandleR(req, res, getNotificationsCount)
+export const feedHandler: HandlerFn = (req, res) =>
+  activityHandler(req, res, getFeedData)
+export const feedCountHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getFeedCount)
+
+export const notificationsHandler: HandlerFn = (req, res) =>
+  activityHandler(req, res, getNotificationsData)
+export const notificationsCountHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getNotificationsCount)
+
+export const activitiesHandler: HandlerFn = (req, res) =>
+  activityHandler(req, res, getActivitiesData)
+export const activitiesCountHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getActivitiesCount)
+
+export const commentActivitiesHandler: HandlerFn = (req, res) =>
+  activityHandler(req, res, getCommentActivitiesData)
+export const commentActivitiesCountHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getCommentActivitiesCount)
+
+export const followActivitiesHandler: HandlerFn = (req, res) =>
+  activityHandler(req, res, getFollowActivitiesData)
+export const followActivitiesCountHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getFollowActivitiesCount)
+
+export const postActivitiesHandler: HandlerFn = (req, res) =>
+  activityHandler(req, res, getPostActivitiesData)
+export const postActivitiesCountHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getPostActivitiesCount)
+
+export const reactionActivitiesHandler: HandlerFn = (req, res) =>
+  activityHandler(req, res, getReactionActivitiesData)
+export const reactionActivitiesCountHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getReactionActivitiesCount)
+
+export const spaceActivitiesHandler: HandlerFn = (req, res) =>
+  activityHandler(req, res, getSpaceActivitiesData)
+export const spaceActivitiesCountHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getSpaceActivitiesCount)
+
+export const activityCountsHandler: HandlerFn = (req, res) =>
+  countHandler(req, res, getActivityCounts)
