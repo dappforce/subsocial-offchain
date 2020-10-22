@@ -1,7 +1,7 @@
 import * as express from 'express'
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils';
-import { GetActivitiesFn, GetCountFn, GetCountsFn } from './query/types';
-import * as pgQueries from './query';
+import { GetActivitiesFn, GetCountFn, GetCountsFn } from './queries/types';
+import * as pgQueries from './queries';
 
 const MAX_RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 

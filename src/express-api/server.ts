@@ -9,7 +9,7 @@ import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
-import * as reqHandlers from './handle';
+import * as reqHandlers from './handlers';
 
 require('dotenv').config()
 
