@@ -1,35 +1,37 @@
 import * as express from 'express'
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils';
-import { getCommentActivitiesData, getCommentActivitiesCount } from './query/activities/by-event/comments';
-import { GetActivityFn, GetCountFn, GetCountsFn } from './query/types';
-import { getFeedData, getNotificationsData, getFeedCount, getNotificationsCount } from './query/feed-and-notifications';
-import { getActivitiesData, getActivitiesCount } from './query/activities/all';
-import { getFollowActivitiesData, getFollowActivitiesCount } from './query/activities/by-event/follows';
-import { getPostActivitiesData, getPostActivitiesCount } from './query/activities/by-event/posts';
-import { getReactionActivitiesData, getReactionActivitiesCount } from './query/activities/by-event/reactions';
-import { getSpaceActivitiesData, getSpaceActivitiesCount } from './query/activities/by-event/spaces';
-import { getActivityCounts } from './query/activities/counts'
+import { GetActivitiesFn, GetCountFn, GetCountsFn } from './query/types';
+import * as pgQueries from './query';
 
-const RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
+const MAX_RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
 
 type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
 
-const getNumberValueFromRequest = (req: express.Request, value: 'limit' | 'offset', def: number): number => {
+const getNumberFromRequest = (
+  req: express.Request,
+  value: 'limit' | 'offset',
+  def: number
+): number => {
   const reqLimit = req.query[value]
   return nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : def
 }
 
-const getLimitFromRequest = (req: express.Request): number => { 
-  const limit = getNumberValueFromRequest(req, 'limit', RESULT_LIMIT)
-  return limit < RESULT_LIMIT ? limit : RESULT_LIMIT
+const getLimitFromRequest = (req: express.Request): number => {
+  const limit = getNumberFromRequest(req, 'limit', MAX_RESULT_LIMIT)
+  return limit < MAX_RESULT_LIMIT ? limit : MAX_RESULT_LIMIT
 }
 
-const getOffsetFromRequest = (req: express.Request): number => getNumberValueFromRequest(req, 'offset', 0)
+const getOffsetFromRequest = (req: express.Request): number =>
+  getNumberFromRequest(req, 'offset', 0)
 
-const innerHandler = async (_req: express.Request, res: express.Response, method: Promise<any>) => {
+const callMethodAndReturnJson = async (
+  _req: express.Request,
+  res: express.Response,
+  method: Promise<any>
+) => {
   try {
     const data = await method
-    res.json(data);
+    res.json(data)
   } catch (err) {
     res
       .status(501)
@@ -37,59 +39,73 @@ const innerHandler = async (_req: express.Request, res: express.Response, method
   }
 }
 
-const activityHandler = (req: express.Request, res: express.Response, method: GetActivityFn) => {
-  const limit = getLimitFromRequest(req);
-  const offset = getOffsetFromRequest(req);
-  const account = req.params.id;
-
-  return innerHandler(req, res, method({ account, limit, offset }))
+const activityHandler = (
+  req: express.Request,
+  res: express.Response,
+  method: GetActivitiesFn
+) => {
+  const offset = getOffsetFromRequest(req)
+  const limit = getLimitFromRequest(req)
+  const account = req.params.id
+  return callMethodAndReturnJson(req, res, method({ account, offset, limit }))
 }
 
-const countHandler = async (req: express.Request, res: express.Response, method: GetCountFn | GetCountsFn) => {
-  const account = req.params.id;
-
-  return innerHandler(req, res, method(account))
+const countHandler = async (
+  req: express.Request,
+  res: express.Response,
+  method: GetCountFn | GetCountsFn
+) => {
+  const account = req.params.id
+  return callMethodAndReturnJson(req, res, method(account))
 }
 
 export const feedHandler: HandlerFn = (req, res) =>
-  activityHandler(req, res, getFeedData)
+  activityHandler(req, res, pgQueries.getFeedData)
+
 export const feedCountHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getFeedCount)
+  countHandler(req, res, pgQueries.getFeedCount)
 
 export const notificationsHandler: HandlerFn = (req, res) =>
-  activityHandler(req, res, getNotificationsData)
+  activityHandler(req, res, pgQueries.getNotificationsData)
+
 export const notificationsCountHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getNotificationsCount)
+  countHandler(req, res, pgQueries.getNotificationsCount)
 
 export const activitiesHandler: HandlerFn = (req, res) =>
-  activityHandler(req, res, getActivitiesData)
+  activityHandler(req, res, pgQueries.getActivitiesData)
+
 export const activitiesCountHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getActivitiesCount)
+  countHandler(req, res, pgQueries.getActivitiesCount)
 
 export const commentActivitiesHandler: HandlerFn = (req, res) =>
-  activityHandler(req, res, getCommentActivitiesData)
+  activityHandler(req, res, pgQueries.getCommentActivitiesData)
+
 export const commentActivitiesCountHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getCommentActivitiesCount)
+  countHandler(req, res, pgQueries.getCommentActivitiesCount)
 
 export const followActivitiesHandler: HandlerFn = (req, res) =>
-  activityHandler(req, res, getFollowActivitiesData)
+  activityHandler(req, res, pgQueries.getFollowActivitiesData)
+
 export const followActivitiesCountHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getFollowActivitiesCount)
+  countHandler(req, res, pgQueries.getFollowActivitiesCount)
 
 export const postActivitiesHandler: HandlerFn = (req, res) =>
-  activityHandler(req, res, getPostActivitiesData)
+  activityHandler(req, res, pgQueries.getPostActivitiesData)
+
 export const postActivitiesCountHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getPostActivitiesCount)
+  countHandler(req, res, pgQueries.getPostActivitiesCount)
 
 export const reactionActivitiesHandler: HandlerFn = (req, res) =>
-  activityHandler(req, res, getReactionActivitiesData)
+  activityHandler(req, res, pgQueries.getReactionActivitiesData)
+
 export const reactionActivitiesCountHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getReactionActivitiesCount)
+  countHandler(req, res, pgQueries.getReactionActivitiesCount)
 
 export const spaceActivitiesHandler: HandlerFn = (req, res) =>
-  activityHandler(req, res, getSpaceActivitiesData)
+  activityHandler(req, res, pgQueries.getSpaceActivitiesData)
+
 export const spaceActivitiesCountHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getSpaceActivitiesCount)
+  countHandler(req, res, pgQueries.getSpaceActivitiesCount)
 
 export const activityCountsHandler: HandlerFn = (req, res) =>
-  countHandler(req, res, getActivityCounts)
+  countHandler(req, res, pgQueries.getActivityCounts)

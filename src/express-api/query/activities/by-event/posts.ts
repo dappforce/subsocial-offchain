@@ -1,11 +1,11 @@
-import { GetActivityFn, GetCountFn } from '../../types'
+import { GetActivitiesFn, GetCountFn } from '../../types'
 import { getActivitiesByEvent, getActivitiesCountByEvent } from './common'
 import { EventsName } from '@subsocial/types'
 
-const postEvents: EventsName[] = [ 'PostCreated' ]
+const events: EventsName[] = [ 'PostCreated' ]
 
-export const getPostActivitiesData: GetActivityFn = (params) =>
-  getActivitiesByEvent({ ...params, events: postEvents })
+export const getPostActivitiesData: GetActivitiesFn = (params) =>
+  getActivitiesByEvent({ ...params, events })
 
 export const getPostActivitiesCount: GetCountFn = (account) =>
-  getActivitiesCountByEvent({ account, events: postEvents })
+  getActivitiesCountByEvent({ account, events })

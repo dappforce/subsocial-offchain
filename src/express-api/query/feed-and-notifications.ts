@@ -1,10 +1,10 @@
 import { Activity } from '@subsocial/types'
-import { getQuery } from './utils'
-import { ActivitiesParams, GetActivityFn, GetCountFn } from './types'
+import { execPgQuery } from './utils'
+import { ActivitiesParams, GetActivitiesFn, GetCountFn } from './types'
 
 type Table = 'news_feed' | 'notifications'
 
-const createFeedOrNotifQuery = (table: Table) => 
+const buildPageQuery = (table: Table) => 
   `SELECT DISTINCT * 
     FROM df.activities
     WHERE id IN (
@@ -16,7 +16,7 @@ const createFeedOrNotifQuery = (table: Table) =>
     OFFSET $2
     LIMIT $3`
 
-const createFeedOrNotifCountQuery = (table: Table) => 
+const buildCountQuery = (table: Table) => 
   `SELECT COUNT(*)
     FROM df.activities
     WHERE id IN (
@@ -25,22 +25,28 @@ const createFeedOrNotifCountQuery = (table: Table) =>
       WHERE account = $1
     )`
 
-const getFeedOrNotifFrom = (table: Table, { account, offset, limit }: ActivitiesParams): Promise<Activity[]> => getQuery(
-  createFeedOrNotifQuery(table),
-  [ account, offset, limit ],
-  `Failed to load to activities from ${table} by account ${account}`)
+const queryPage = (table: Table, params: ActivitiesParams): Promise<Activity[]> => {
+  const { account, offset, limit } = params
+  return execPgQuery(
+    buildPageQuery(table),
+    [ account, offset, limit ],
+    `Failed to load to activities in ${table} by account ${account}`
+  )
+}
 
-const getFeedOrNotifCountFrom = async (table: Table, account: string) => {
-  const data = await getQuery(
-    createFeedOrNotifCountQuery(table),
+const queryCount = async (table: Table, account: string) => {
+  const data = await execPgQuery(
+    buildCountQuery(table),
     [ account ],
-    `Failed to count activities from ${table} by account ${account}`)
-
+    `Failed to count activities in ${table} by account ${account}`
+  )
   return data.pop().count
 }
 
-export const getFeedData: GetActivityFn = (params) => getFeedOrNotifFrom('news_feed', params)
-export const getNotificationsData: GetActivityFn = (params) => getFeedOrNotifFrom('notifications', params)
+export const getFeedData: GetActivitiesFn = (params) => queryPage('news_feed', params)
 
-export const getFeedCount: GetCountFn = (account) => getFeedOrNotifCountFrom('news_feed', account)
-export const getNotificationsCount: GetCountFn = (account) => getFeedOrNotifCountFrom('notifications', account)
+export const getFeedCount: GetCountFn = (account) => queryCount('news_feed', account)
+
+export const getNotificationsData: GetActivitiesFn = (params) => queryPage('notifications', params)
+
+export const getNotificationsCount: GetCountFn = (account) => queryCount('notifications', account)

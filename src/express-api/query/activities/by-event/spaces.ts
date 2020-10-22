@@ -1,11 +1,11 @@
-import { GetActivityFn, GetCountFn } from '../../types'
+import { GetActivitiesFn, GetCountFn } from '../../types'
 import { getActivitiesByEvent, getActivitiesCountByEvent } from './common'
 import { EventsName } from '@subsocial/types'
 
-const spaceEvents: EventsName[] = [ 'SpaceCreated' ]
+const events: EventsName[] = [ 'SpaceCreated' ]
 
-export const getSpaceActivitiesData: GetActivityFn = (params) =>
-  getActivitiesByEvent({ ...params, events: spaceEvents })
+export const getSpaceActivitiesData: GetActivitiesFn = (params) =>
+  getActivitiesByEvent({ ...params, events })
 
 export const getSpaceActivitiesCount: GetCountFn = (account) =>
-  getActivitiesCountByEvent({ account, events: spaceEvents })
+  getActivitiesCountByEvent({ account, events })

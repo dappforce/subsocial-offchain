@@ -1,11 +1,11 @@
-import { GetActivityFn, GetCountFn } from '../../types'
+import { GetActivitiesFn, GetCountFn } from '../../types'
 import { getActivitiesByEvent, getActivitiesCountByEvent } from './common'
 import { EventsName } from '@subsocial/types'
 
-const commentEvents: EventsName[] = [ 'CommentCreated', 'CommentReplyCreated']
+const events: EventsName[] = [ 'CommentCreated', 'CommentReplyCreated']
 
-export const getCommentActivitiesData: GetActivityFn = (params) =>
-  getActivitiesByEvent({ ...params, events: commentEvents })
+export const getCommentActivitiesData: GetActivitiesFn = (params) =>
+  getActivitiesByEvent({ ...params, events })
 
 export const getCommentActivitiesCount: GetCountFn = (account) =>
-  getActivitiesCountByEvent({ account, events: commentEvents })
+  getActivitiesCountByEvent({ account, events })
