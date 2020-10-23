@@ -41,7 +41,8 @@
     "lint": "tsc --noEmit && eslint '*/**/*.{ts,tsx}' --quiet --fix",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "setup": "yarn init-offchain && yarn build"
+    "setup": "yarn init-offchain && yarn build",
+    "reindex-content": "node ./build/src/search/reindexer.js"
   },
   "author": "DappForce contributors",
   "license": "GPL-3.0-only",
