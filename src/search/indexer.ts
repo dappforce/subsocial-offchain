@@ -9,6 +9,7 @@ import elastic from '../connections/connect-elasticsearch'
 import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { bnToHex } from '@polkadot/util'
 
 export async function indexContentFromIpfs (
   index: string,
@@ -96,7 +97,7 @@ export async function indexContentFromIpfs (
   if (indexData) {
     await elastic.index({
       index,
-      id: id instanceof GenericAccountId ? id.toString() : encodeStructId(id).toString(),
+      id: id instanceof GenericAccountId ? id.toString() : bnToHex(id).split('x')[1].replace(/(0+)/, ''),
       body: indexData
     })
   }
