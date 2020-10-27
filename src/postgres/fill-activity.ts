@@ -61,8 +61,8 @@ export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: 
           AND (df.space_followers.follower_account, df.activities.id)
             NOT IN (SELECT account,activity_id from df.news_feed))
       RETURNING *`;
-  const hexSpaceId = encodeStructId(spaceId);
-  const params = [ hexSpaceId, account, activityId ];
+  const encodedSpaceId = encodeStructId(spaceId);
+  const params = [ encodedSpaceId, account, activityId ];
   try {
     await pg.query(query, params)
     fillNewsFeedLog('space')
@@ -84,8 +84,8 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
           AND (df.post_followers.follower_account, df.activities.id)
           NOT IN (SELECT account,activity_id from df.notifications))
       RETURNING *`
-  const hexPostId = encodeStructId(postId);
-  const params = [ hexPostId, account, activityId ];
+  const encodedPostId = encodeStructId(postId);
+  const params = [ encodedPostId, account, activityId ];
   try {
     await pg.query(query, params)
     fillNotificationsLog('post')
@@ -106,8 +106,8 @@ export const fillNotificationsWithCommentFollowers = async (commentId: PostId, a
           AND (df.comment_followers.follower_account, df.activities.id)
           NOT IN (SELECT account,activity_id from df.notifications))
       RETURNING *`
-  const hexCommentId = encodeStructId(commentId);
-  const params = [ hexCommentId, account, activityId ];
+  const encodedCommentId = encodeStructId(commentId);
+  const params = [ encodedCommentId, account, activityId ];
   try {
     await pg.query(query, params)
     fillNotificationsLog('comment')

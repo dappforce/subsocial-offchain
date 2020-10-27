@@ -1,6 +1,5 @@
 import { Event } from '@polkadot/types/interfaces';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
-import { bnToHex } from '@polkadot/util'
 import { newLogger } from '@subsocial/utils';
 import { SubstrateEvent } from './types';
 import { PostId } from '@subsocial/types/substrate/interfaces';
@@ -43,12 +42,9 @@ export function encodeStructIds (ids: SubstrateId[]) {
   }
 }
 
-/**
- * Convert a number to its shortened hex representation.
- * Example: '0x000012ab' -> '12ab'
- */
-export function encodeStructId (id: SubstrateId): string {
-  return bnToHex(id).split('x')[1].replace(/(0+)/, '')
+
+export function encodeStructId (id: SubstrateId): number {
+  return id.toNumber()
 }
 
 export enum VirtualEvents {

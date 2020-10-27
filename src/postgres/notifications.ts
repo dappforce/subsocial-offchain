@@ -22,7 +22,7 @@ export const insertNotificationForOwner = async (id: number, account: string) =>
 export type AggCountProps = {
   eventName: string,
   account: string,
-  post_id: string
+  post_id: number
 }
 
 export const getAggregationCount = async (props: AggCountProps) => {
