@@ -2,6 +2,7 @@ import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { Api } from '@subsocial/api/substrateConnect';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
 import { indexPostContent, indexSpaceContent } from './event-handlers/utils';
+import { elasticLog as log } from '../connections/loggers';
 
 const BN = require('bn.js');
 const one = new BN(1)
