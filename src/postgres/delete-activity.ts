@@ -12,8 +12,8 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
           FROM df.activities
           LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_comment_id WHERE comment_id = $2)
       RETURNING *`
-  const hexCommentId = encodeStructId(commentId);
-  const params = [ userId, hexCommentId ];
+  const encodedCommentId = encodeStructId(commentId);
+  const params = [ userId, encodedCommentId ];
   try {
     await pg.query(query, params)
     deleteNotificationsLog('comment')
@@ -52,8 +52,8 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
         LEFT JOIN df.post_followers ON df.activities.account = df.post_followers.following_post_id
         WHERE post_id = $2)
       RETURNING *`
-  const hexPostId = encodeStructId(postId);
-  const params = [ userId, hexPostId ];
+  const encodedPostId = encodeStructId(postId);
+  const params = [ userId, encodedPostId ];
   try {
     await pg.query(query, params)
     deleteNotificationsLog('post')
@@ -73,8 +73,8 @@ export const deleteNotificationsAboutSpace = async (userId: string, spaceId: Spa
           LEFT JOIN df.space_followers ON df.activities.account = df.space_followers.following_space_id
           WHERE space_id = $2)
       RETURNING *`
-  const hexSpaceId = encodeStructId(spaceId);
-  const params = [ userId, hexSpaceId ];
+  const encodedSpaceId = encodeStructId(spaceId);
+  const params = [ userId, encodedSpaceId ];
   try {
     await pg.query(query, params)
     deleteNotificationsLog('space')

@@ -5,6 +5,8 @@ import { newLogger } from '@subsocial/utils';
 import { SubstrateEvent } from './types';
 import { PostId } from '@subsocial/types/substrate/interfaces';
 
+//import { types } from 'pg'
+
 require('dotenv').config()
 
 const log = newLogger('Substrate Utils')
@@ -48,6 +50,11 @@ export function encodeStructIds (ids: SubstrateId[]) {
  * Example: '0x000012ab' -> '12ab'
  */
 export function encodeStructId (id: SubstrateId): string {
+  //return bnToHex(id).split('x')[1].replace(/(0+)/, '')
+  return id.toString()
+}
+
+export function encodeStructHexId (id: SubstrateId): string {
   return bnToHex(id).split('x')[1].replace(/(0+)/, '')
 }
 
