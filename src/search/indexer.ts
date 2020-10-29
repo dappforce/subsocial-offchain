@@ -5,7 +5,7 @@ import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subso
 import { encodeStructId } from '../substrate/utils';
 import { substrate } from '../substrate/subscribe';
 import { ipfs } from '../connections/connect-ipfs';
-import elastic from '../connections/connect-elasticsearch'
+import { elasticIndexer } from '../connections/connect-elasticsearch'
 import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
@@ -94,7 +94,7 @@ export async function indexContentFromIpfs (
   }
 
   if (indexData) {
-    await elastic.index({
+    await elasticIndexer.index({
       index,
       id: id instanceof GenericAccountId ? id.toString() : encodeStructId(id),
       body: indexData

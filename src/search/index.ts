@@ -1,4 +1,4 @@
-import elastic from '../connections/connect-elasticsearch'
+import { elasticIndexer } from '../connections/connect-elasticsearch'
 import * as SpacesMapping from './mappings/spaces.json'
 import * as PostsMapping from './mappings/posts.json'
 import * as ProfilesMapping from './mappings/profiles.json'
@@ -12,13 +12,13 @@ async function maybeCreateIndices () {
 }
 
 async function createIndexIfNoFound (indexName: string, mapping: any) {
-  const result = await elastic.indices.exists(
+  const result = await elasticIndexer.indices.exists(
     { index: indexName },
     { ignore: [ 404 ] }
   )
 
   if (result.statusCode === 404) {
-    await elastic.indices.create({
+    await elasticIndexer.indices.create({
       index: indexName,
       body: mapping
     })
