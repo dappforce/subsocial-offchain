@@ -9,4 +9,10 @@ if (!greeted) {
   log.info(`Connecting to Elasticsearch at ${process.env.ES_NODE_URL}`)
 }
 
-export default new Client({ node: process.env.ES_NODE_URL })
+export default new Client({
+  node: process.env.ES_NODE_URL,
+  auth: {
+    username: process.env.ES_OFFCHAIN_USER,
+    password: process.env.ES_OFFCHAIN_PASSWORD
+  }
+})
