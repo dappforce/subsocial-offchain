@@ -87,14 +87,18 @@ async function main () {
     log.debug(`Block number to process: ${blockToProcess} with hash ${blockHash.toHex()}`)
 
     // Process all events of the current block
-    for (const { event } of events) {
+    // for (const { event } of events) {
+      for (let i = 0; i < events.length; i++) {
+      const { event } = events[i]
+
       if (shouldHandleEvent(event)) {
         log.debug(`Handle a new event: %o`, event.method)
-
+        // 773059
         const eventMeta = {
           eventName: event.method,
           data: event.data,
-          blockNumber: blockNumber
+          blockNumber: blockNumber,
+          eventIndex: i
         }
 
         if (processPostgres) {

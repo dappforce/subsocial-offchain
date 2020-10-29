@@ -1,12 +1,13 @@
 import { pg } from '../connections/connect-postgres';
 import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
+import BN from 'bn.js';
 
-export const insertNotificationForOwner = async (id: number, account: string) => {
-  const params = [ account, id ]
+export const insertNotificationForOwner = async (eventIndex: number, activityAccount: string, blockNumber: BN, account: string) => {
+  const params = [ account, eventIndex, activityAccount, blockNumber ]
   const query = `
     INSERT INTO df.notifications
-      VALUES($1, $2) 
+      VALUES($1, $2, $3, $4) 
     RETURNING *`
 
   try {
@@ -46,24 +47,28 @@ export const getAggregationCount = async (props: AggCountProps) => {
   }
 }
 
+const selectCount = (field: string) => {
+  return `( 
+    SELECT ${field}
+    FROM df.notifications
+    WHERE account = $1 AND ${field} > (
+      SELECT last_read_${field}
+      FROM df.notifications_counter
+      WHERE account = $1)
+    )`
+}
+
 export const updateCountOfUnreadNotifications = async (account: string) => {
   const query = `
     INSERT INTO df.notifications_counter 
-      (account, last_read_activity_id, unread_count)
-    VALUES ($1, 0, 1)
+      (account, last_read_event_index, last_read_account, last_read_block_number, unread_count)
+    VALUES ($1, NULL, NULL, NULL, 1)
     ON CONFLICT (account) DO UPDATE
     SET unread_count = (
       SELECT DISTINCT COUNT(*)
       FROM df.activities
-      WHERE aggregated = true AND id IN ( 
-        SELECT activity_id
-        FROM df.notifications
-        WHERE account = $1 AND activity_id > (
-          SELECT last_read_activity_id
-          FROM df.notifications_counter
-          WHERE account = $1
-        )
-      )
+      WHERE aggregated = true AND event_index IN ${selectCount("event_index")}
+      AND account IN ${selectCount("account")} AND block_number IN ${selectCount("block_number")}
     )`
 
   try {

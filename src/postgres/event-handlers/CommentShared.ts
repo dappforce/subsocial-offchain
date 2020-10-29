@@ -18,11 +18,11 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Post
   const ids = [ spaceId, rootPostId, commentId ];
   const account = comment.created.account.toString();
 
-  const activityId = await insertActivityForComment(eventAction, ids, account);
-  if (activityId === -1) return;
+  const insertResult = await insertActivityForComment(eventAction, ids, account);
+  if (insertResult === {}) return;
 
-  await fillNotificationsWithCommentFollowers(commentId, account, activityId);
-  await fillNotificationsWithAccountFollowers(account, activityId);
-  await fillNewsFeedWithSpaceFollowers(spaceId, author, activityId);
-  await fillNewsFeedWithAccountFollowers(author, activityId)
+  await fillNotificationsWithCommentFollowers(commentId, account, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber);
+  await fillNotificationsWithAccountFollowers(account, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber);
+  await fillNewsFeedWithSpaceFollowers(spaceId, author, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber);
+  await fillNewsFeedWithAccountFollowers(author, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber)
 }

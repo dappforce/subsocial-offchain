@@ -27,8 +27,9 @@ END$$;
 
 CREATE TABLE IF NOT EXISTS df.activities
 (
-    id bigserial not null primary key UNIQUE,
+    event_index integer NOT NULL,
     account varchar(48) NOT NULL,
+    block_number bigint NOT NULL,
     event df.action NOT NULL,
     following_id bigint NULL,
     space_id bigint NULL,
@@ -36,30 +37,37 @@ CREATE TABLE IF NOT EXISTS df.activities
     comment_id bigint NULL,
     parent_comment_id bigint NULL,
     date TIMESTAMP NOT NULL DEFAULT NOW(),
-    block_number bigint NOT NULL,
     aggregated boolean NOT NULL DEFAULT true,
-    agg_count bigint NOT NULL DEFAULT 0
+    agg_count bigint NOT NULL DEFAULT 0,
+    PRIMARY KEY (event_index, account, block_number)
 );
 
 CREATE TABLE IF NOT EXISTS df.news_feed
 (
     account varchar(48) NOT NULL,
-    activity_id bigint NOT NULL,
-    FOREIGN KEY (activity_id) REFERENCES df.activities(id)
+    event_index integer NOT NULL,
+    activity_account varchar(48) NOT NULL,
+    block_number bigint NOT NULL
+    -- FOREIGN KEY (event_index, activity_account, block_number ) REFERENCES df.activities(event_index, account, block_number)
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications
 (
     account varchar(48) NOT NULL,
-    activity_id bigint NOT NULL,
-    FOREIGN KEY (activity_id) REFERENCES df.activities(id)
+    event_index integer NOT NULL,
+    activity_account varchar(48) NOT NULL,
+    block_number bigint NOT NULL
+    -- FOREIGN KEY (event_index, activity_account, block_number ) REFERENCES df.activities(event_index, account, block_number)
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications_counter
 (
     account varchar(48) NOT NULL UNIQUE,
-    last_read_activity_id bigint DEFAULT NULL,
+    last_read_event_index integer NULL DEFAULT NULL,
+    last_read_account varchar(48) NULL DEFAULT NULL,
+    last_read_block_number bigint NULL DEFAULT NULL,
     unread_count bigint NOT NULL DEFAULT 0
+    -- FOREIGN KEY (last_read_event_index, last_read_account, last_read_block_number ) REFERENCES df.activities(event_index, account, block_number)
 );
 
 CREATE TABLE IF NOT EXISTS df.account_followers
@@ -110,8 +118,8 @@ ON df.space_followers(following_space_id);
 CREATE INDEX IF NOT EXISTS idx_following_comment_id 
 ON df.comment_followers(following_comment_id);
 
-CREATE INDEX IF NOT EXISTS idx_id
-ON df.activities(id);
+-- CREATE INDEX IF NOT EXISTS idx_id
+-- ON df.activities(id);
 
 CREATE INDEX IF NOT EXISTS idx_account
 ON df.activities(account);

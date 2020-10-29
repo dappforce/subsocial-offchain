@@ -7,8 +7,8 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1
-        AND activity_id IN
-          (SELECT df.activities.id
+        AND (event_index, activity_account, block_number) IN
+          (SELECT df.activities.event_index, account, block_number
           FROM df.activities
           LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_comment_id WHERE comment_id = $2)
       RETURNING *`
@@ -27,8 +27,8 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1
-        AND activity_id IN
-          (SELECT df.activities.id FROM df.activities
+        AND (event_index, activity_account, block_number) IN
+          (SELECT df.activities.event_index, account, block_number
           LEFT JOIN df.account_followers
           ON df.activities.account = df.account_followers.following_account
           WHERE account = $2)
@@ -46,11 +46,12 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
 export const deleteNotificationsAboutPost = async (userId: string, postId: PostId) => {
   const query = `
       DELETE FROM df.notifications
-      WHERE account = $1 AND activity_id IN
-        (SELECT df.activities.id
-        FROM df.activities
-        LEFT JOIN df.post_followers ON df.activities.account = df.post_followers.following_post_id
-        WHERE post_id = $2)
+      WHERE account = $1 
+        AND (event_index, activity_account, block_number) IN
+          (SELECT df.activities.event_index, account, block_number
+          FROM df.activities
+          LEFT JOIN df.post_followers ON df.activities.account = df.post_followers.following_post_id
+          WHERE post_id = $2)
       RETURNING *`
   const encodedPostId = encodeStructId(postId);
   const params = [ userId, encodedPostId ];
@@ -67,8 +68,8 @@ export const deleteNotificationsAboutSpace = async (userId: string, spaceId: Spa
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1
-        AND activity_id IN
-          (SELECT df.activities.id
+        AND (event_index, activity_account, block_number) IN
+          (SELECT df.activities.event_index, account, block_number
           FROM df.activities
           LEFT JOIN df.space_followers ON df.activities.account = df.space_followers.following_space_id
           WHERE space_id = $2)

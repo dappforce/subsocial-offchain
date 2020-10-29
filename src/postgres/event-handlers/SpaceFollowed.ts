@@ -14,11 +14,11 @@ export const onSpaceFollowed: EventHandlerFn = async (eventAction: SubstrateEven
 
   const count = space.followers_count.toNumber() - 1;
   const account = space.owner.toString();
-  const id = await insertActivityForSpace(eventAction, count, account);
-  if (id === -1) return;
+  const insertResult = await insertActivityForSpace(eventAction, count, account);
+  if (insertResult === {}) return;
 
   const follower = data[0].toString();
   if (follower === account) return;
 
-  await insertNotificationForOwner(id, account);
+  await insertNotificationForOwner(insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber, account);
 }
