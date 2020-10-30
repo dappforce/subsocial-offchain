@@ -9,7 +9,7 @@ export const insertNotificationForOwner = async (eventIndex: number, activityAcc
     INSERT INTO df.notifications
       VALUES($1, $2, $3, $4) 
     RETURNING *`
-
+    
   try {
     await pg.query(query, params)
     insertActivityLog('owner')

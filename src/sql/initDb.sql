@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS df.activities
     account varchar(48) NOT NULL,
     block_number bigint NOT NULL,
     event df.action NOT NULL,
-    following_id bigint NULL,
+    following_id varchar(48) NULL,
     space_id bigint NULL,
     post_id bigint NULL,
     comment_id bigint NULL,

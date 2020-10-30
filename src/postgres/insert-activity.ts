@@ -160,8 +160,6 @@ export const insertActivityForSpace = async (eventAction: SubstrateEvent, count:
       VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
   const params = [eventIndex, accountId, blockNumber, eventName, spaceId, count, aggregated];
-
-  console.log("pkey " + eventIndex + "   " + accountId + "   " + blockNumber)
   try {
     await pg.query(query, params)
     const paramsUpdate = [eventIndex, accountId, blockNumber, eventName, spaceId];
@@ -200,7 +198,7 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
   const accountId = data[0].toString();
   const query = `
     INSERT INTO df.activities(event_index, account, block_number, event, space_id, post_id, agg_count)
-      VALUES($1, $2, $3, $4, $5, $6)
+      VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
   const newCount = eventName === 'PostShared'
     ? await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId })
@@ -244,9 +242,9 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
         WHERE event_index <> $1
           AND account <> $2
           AND block_number <> $3
-          AND event = $2
+          AND event = $4
           AND aggregated = true
-          AND post_id = $3
+          AND post_id = $5
       RETURNING *`;
 
     const paramsUpdate = [eventIndex, accountId, blockNumber, eventName, postId];
@@ -285,10 +283,10 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
         WHERE event_index <> $1
           AND account <> $2
           AND block_number <> $3
-          AND event = $2
+          AND event = $4
           AND aggregated = true
-          AND post_id = $3
-          AND comment_id = $4
+          AND post_id = $5
+          AND comment_id = $6
       RETURNING *`;
 
     const paramsUpdate = [eventIndex, accountId, blockNumber, eventName, ...paramsIds];

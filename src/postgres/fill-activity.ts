@@ -69,6 +69,7 @@ export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: 
       RETURNING *`;
   const encodedSpaceId = encodeStructId(spaceId);
   const params = [ encodedSpaceId, account, eventIndex, activityAccount, blockNumber ];
+  console.log("Params for insert post: ", params)
   try {
     await pg.query(query, params)
     fillNewsFeedLog('space')
@@ -82,7 +83,7 @@ export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: 
 export const fillNotificationsWithPostFollowers = async (postId: PostId, account: string, eventIndex: number, activityAccount: string, blockNumber: BN) => {
   const query = `
       INSERT INTO df.notifications(account, event_index, activity_account, block_number)
-        (SELECT df.post_followers.follower_account, df.activities.event_index, df.activities.account, df.activities.block_number
+        SELECT df.post_followers.follower_account, df.activities.event_index, df.activities.account, df.activities.block_number
         FROM df.activities
         LEFT JOIN df.post_followers ON df.activities.post_id = df.post_followers.following_post_id
         WHERE post_id = $1
@@ -93,7 +94,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
           AND parent_comment_id IS NULL
           AND df.post_followers.follower_account <> $2
           AND (df.post_followers.follower_account, df.activities.event_index, df.activities.account, df.activities.block_number)
-          NOT IN (SELECT account, event_index, activity_account, block_number from df.notifications))
+          NOT IN (SELECT account, event_index, activity_account, block_number from df.notifications)
       RETURNING *`
   const encodedPostId = encodeStructId(postId);
   const params = [ encodedPostId, account, eventIndex, activityAccount, blockNumber ];
