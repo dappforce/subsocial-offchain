@@ -9,7 +9,7 @@ const one = new BN(1)
 
 async function reindexContentFromIpfs() {
   const api = await Api.connect(process.env.SUBSTRATE_URL)
-  const substrate = new SubsocialSubstrateApi(api)
+  const substrate = new SubsocialSubstrateApi({ api })
 
   const lastSpaceId = (await substrate.nextSpaceId()).sub(one)
   const lastPostId = (await substrate.nextPostId()).sub(one)

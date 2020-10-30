@@ -16,7 +16,7 @@ async function main () {
 
   // Connect to Subsocial's Substrate node:
   const api = await Api.connect(process.env.SUBSTRATE_URL)
-  substrate = new SubsocialSubstrateApi(api)
+  substrate = new SubsocialSubstrateApi({ api })
 
   const blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
 
