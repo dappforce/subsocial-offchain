@@ -49,7 +49,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/types": "1.28.1",
-    "@subsocial/api": "0.4.10-beta8",
+    "@subsocial/api": "0.4.10",
     "@subsocial/types": "0.4.7",
     "@subsocial/utils": "^0.1.23",
     "@types/connect-timeout": "^0.0.34",

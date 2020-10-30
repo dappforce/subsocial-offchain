@@ -2455,10 +2455,10 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@0.4.10-beta8":
-  version "0.4.10-beta8"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.10-beta8.tgz#cbe51ee24cf4e55c38abdba394812f4f2f827428"
-  integrity sha512-tu9q7oWZNUF7YBPYxgN38/qO1y9gedXGlRydAYqsGRD0pGS+42J7EJieh4hkAEIC13f2EgfwarEpOwnIYFyYUw==
+"@subsocial/api@0.4.10-beta9":
+  version "0.4.10-beta9"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.10-beta9.tgz#4273fe8f77a9c4231bced439481da333b0766f0f"
+  integrity sha512-dFmSqSCvAfJPI9y5ytlLSWDR+25y3Ghjcdprm7E2gGpk3ncuKLOKK5BaePxTCUNQlB8t+B+8IxkkTI/eAFYd5w==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@polkadot/api" "^1.28.1"
