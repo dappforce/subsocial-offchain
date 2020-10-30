@@ -1,7 +1,7 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import { ipfsCluster } from '../connections/connect-ipfs';
+import { ipfsCluster, ipfs } from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { newLogger, nonEmptyStr } from '@subsocial/utils';
@@ -10,6 +10,8 @@ import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
 import * as reqHandlers from './handlers';
+import * as timeout from 'connect-timeout';
+import { isArray } from 'util';
 
 require('dotenv').config()
 
@@ -28,12 +30,19 @@ const maxFileSizeBytes = parseInt(process.env.IPFS_MAX_FILE_SIZE_BYTES) || 2 * M
 
 const maxFileSizeMB = maxFileSizeBytes / MB
 
+function haltOnTimedout (req: express.Request, _res: express.Response, next) {
+  if (!req.timedout) next()
+}
+const maxTimeout = process.env.TIMEOUT || 2
+
+app.use(timeout(`${maxTimeout}s`))
+
 // for parsing application/json
 app.use(bodyParser.json({ limit: maxFileSizeBytes }))
-
+app.use(haltOnTimedout)
 // for parsing application/xwww-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }))
-
+app.use(haltOnTimedout)
 // for parsing multipart/form-data
 const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
 app.use(express.static('public'))
@@ -51,6 +60,23 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
     res.json(cid)
   } 
 })
+
+const getContentResponse = async (res: express.Response, cids: string[]) => {
+  try {
+    if (isArray(cids)) {
+      const contents = await ipfs.getContentArrayFromIpfs(cids)
+      log.info(`${contents.length} content items load from IPFS:`)
+      res.json(contents)
+    } else {
+      throw `Invalid format of cids: ${cids}`
+    }
+  } catch (err) {
+    res.status(400).json(err)
+  }
+}
+
+app.get('/v1/ipfs/get', async (req: express.Request, res: express.Response) => getContentResponse(res,req.query.cids as string[]))
+app.post('/v1/ipfs/get', async (req: express.Request, res: express.Response) => getContentResponse(res,req.body.cids))
 
 // Uncomment the next line to add support for multi-file upload:
 // app.use(upload.array())
