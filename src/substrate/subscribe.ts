@@ -5,10 +5,25 @@ import { shouldHandleEvent, eventsFilterMethods } from './utils';
 import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
+import BN from 'bn.js';
 
 require('dotenv').config()
 
+let lastBlockNumber: BN | undefined = undefined
+let blockTime = 6
+
 export let substrate: SubsocialSubstrateApi
+
+export const getValidDate = async (eventBlock: BN) => {
+  const api = await substrate.api
+  const currentTimestamp = await api.query.timestamp.now()
+  
+  const result = currentTimestamp.sub(lastBlockNumber.sub(eventBlock).muln(blockTime))
+
+  return new Date(result.toNumber())
+}
+
+//const noLastBlockNumber = () => !lastBlockNumber
 
 async function main () {
 
@@ -18,7 +33,7 @@ async function main () {
   const api = await Api.connect(process.env.SUBSTRATE_URL)
   substrate = new SubsocialSubstrateApi(api)
 
-  const blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
+  blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
 
   const waitNextBlock = async () =>
     new Promise(resolve => setTimeout(resolve, blockTime))
@@ -45,6 +60,14 @@ async function main () {
     await api.derive.chain.bestNumberFinalized()
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
+
+  api.rpc.chain.subscribeNewHeads(async (header) => {
+    lastBlockNumber = header.number.toBn()
+  })
+
+  if (!lastBlockNumber) {
+    await waitNextBlock()
+  } 
 
   while (true) {
 

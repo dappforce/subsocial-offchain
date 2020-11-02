@@ -2,7 +2,7 @@ import { pg } from '../connections/connect-postgres';
 import { encodeStructIds, encodeStructId } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
 import { Post, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../substrate/subscribe';
+import { substrate, getValidDate } from '../substrate/subscribe';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
@@ -68,11 +68,12 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, post_id, comment_id, parent_comment_id, agg_count, aggregated)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    INSERT INTO df.activities(event_index, account, block_number, event, post_id, comment_id, parent_comment_id, date, agg_count, aggregated)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING *`
+  const date = await getValidDate(blockNumber)
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
-  const params = [eventIndex, accountId, blockNumber, eventName, ...paramsIds, count, aggregated];
+  const params = [eventIndex, accountId, blockNumber, eventName, ...paramsIds, date, count, aggregated];
   try {
     await pg.query(query, params)
 
@@ -118,10 +119,12 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
   const objectId = data[1].toString();
 
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, following_id, agg_count)
-      VALUES($1, $2, $3, $4, $5, $6)
+    INSERT INTO df.activities(event_index, account, block_number, event, following_id, date, agg_count)
+      VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
-  const params = [eventIndex, accountId, blockNumber, eventName, objectId, count];
+  const date = await getValidDate(blockNumber)
+
+  const params = [eventIndex, accountId, blockNumber, eventName, objectId, date, count];
   try {
     await pg.query(query, params)
     const queryUpdate = `
@@ -154,12 +157,13 @@ export const insertActivityForSpace = async (eventAction: SubstrateEvent, count:
   const spaceId = encodeStructId(space_id);
   const aggregated = accountId !== creator;
 
-  console.log("Hi there")
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, space_id, agg_count, aggregated)
-      VALUES($1, $2, $3, $4, $5, $6, $7)
+    INSERT INTO df.activities(event_index, account, block_number, event, space_id, date, agg_count, aggregated)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
-  const params = [eventIndex, accountId, blockNumber, eventName, spaceId, count, aggregated];
+  const date = await getValidDate(blockNumber)
+  console.log(date)
+  const params = [eventIndex, accountId, blockNumber, eventName, spaceId, date, count, aggregated];
   try {
     await pg.query(query, params)
     const paramsUpdate = [eventIndex, accountId, blockNumber, eventName, spaceId];
@@ -197,14 +201,15 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
   const { eventName, data, eventIndex, blockNumber } = eventAction;
   const accountId = data[0].toString();
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, space_id, post_id, agg_count)
-      VALUES($1, $2, $3, $4, $5, $6, $7)
+    INSERT INTO df.activities(event_index, account, block_number, event, space_id, post_id, date, agg_count)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
+  const date = await getValidDate(blockNumber)
   const newCount = eventName === 'PostShared'
     ? await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId })
     : count;
 
-  const params = [eventIndex, accountId, blockNumber, eventName, ...paramsIds, newCount];
+  const params = [eventIndex, accountId, blockNumber, eventName, ...paramsIds, date, newCount];
   try {
     await pg.query(query, params)
     insertActivityLog('post')
@@ -228,10 +233,11 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
   const aggregated = accountId !== creator;
 
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, post_id, agg_count, aggregated)
-      VALUES($1, $2, $3, $4, $5, $6, $7)
+    INSERT INTO df.activities(event_index, account, block_number, event, post_id, date, agg_count, aggregated)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
-  const params = [eventIndex, accountId, blockNumber, eventName, ...paramsIds, count, aggregated];
+  const date = await getValidDate(blockNumber)
+  const params = [eventIndex, accountId, blockNumber, eventName, ...paramsIds, date, count, aggregated];
   try {
     await pg.query(query, params)
     insertActivityLog('post reaction')
@@ -270,10 +276,11 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, post_id, comment_id, agg_count, aggregated)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+    INSERT INTO df.activities(event_index, account, block_number, event, post_id, comment_id, date, agg_count, aggregated)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *`
-  const params = [eventIndex, accountId, blockNumber, eventName, ...paramsIds, count, aggregated];
+  const date = await getValidDate(blockNumber)
+  const params = [eventIndex, accountId, blockNumber, eventName, ...paramsIds, date, count, aggregated];
   try {
     await pg.query(query, params)
     insertActivityLog('comment reaction')
