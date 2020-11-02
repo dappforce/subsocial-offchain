@@ -1,4 +1,3 @@
-import { SubsocialIpfsApi } from '@subsocial/api/ipfs'
 import { IpfsClusterApi } from '../ipfs/ipfsCluster'
 
 require('dotenv').config()
@@ -9,14 +8,13 @@ const ipfsClusterUrl = process.env.IPFS_CLUSTER_URL || 'http://localhost:9094'
 const port = process.env.OFFCHAIN_SERVER_PORT || 3001
 
 // Connect to IPFS daemon API server
-export const ipfs = new SubsocialIpfsApi({
+export const ipfsConfig = {
   ipfsNodeUrl: ipfsReadOnlyNodeUrl,
   offchainUrl: `http://localhost:${port}`
-})
+}
 
 export const ipfsCluster = new IpfsClusterApi({
   ipfsClusterUrl,
   ipfsNodeUrl
 })
 
-export default ipfs

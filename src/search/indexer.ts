@@ -3,12 +3,11 @@ import { GenericAccountId } from '@polkadot/types';
 import { PostId, Post, Space } from '@subsocial/types/substrate/interfaces';
 import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { encodeStructId } from '../substrate/utils';
-import { substrate } from '../substrate/subscribe';
-import { ipfs } from '../connections/connect-ipfs';
 import { elasticIndexer } from '../connections/connect-elasticsearch'
 import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { ipfs, substrate } from '../connections/connect-subsocial';
 
 export async function indexContentFromIpfs (
   index: string,
@@ -64,7 +63,7 @@ export async function indexContentFromIpfs (
         const spaceIdOpt = rootPost.space_id;
         spaceId = spaceIdOpt.unwrapOr(undefined)
       } else {
-        spaceId = space_id.unwrapOr(undefined)  
+        spaceId = space_id.unwrapOr(undefined)
       }
 
       indexData = {

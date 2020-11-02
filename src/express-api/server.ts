@@ -4,12 +4,16 @@ import * as cors from 'cors';
 import { ipfsCluster } from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
-import { newLogger, nonEmptyStr } from '@subsocial/utils';
+import { newLogger, nonEmptyArr, nonEmptyStr } from '@subsocial/utils';
+import { elasticLog } from '../connections/loggers';
 import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
 import * as reqHandlers from './handlers';
+import { getLimitFromRequest, getOffsetFromRequest } from './utils';
+import { elasticReader } from '../connections/connect-elasticsearch';
+import { buildElasticSearchQuery, ElasticIndexTypes, loadSubsocialData } from '../search/reader';
 
 require('dotenv').config()
 
@@ -49,7 +53,7 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
     const cid = await ipfsCluster.addContent(content)
     log.info('Content added to IPFS with CID:', cid)
     res.json(cid)
-  } 
+  }
 })
 
 // Uncomment the next line to add support for multi-file upload:
@@ -73,9 +77,43 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
     log.info('Content unpinned from IPFS by CID:', cid)
   } else {
     log.warn('Cannot unpin content: No CID provided ')
+    // TODO. because of request will idle here, change to:
+    //  - res.status(400).json('Bad Request')
     res.statusCode = 400
     res.statusMessage = 'Bad Request'
   }
+})
+
+// ElasticSearch API
+
+const requestDataFromElastic = async (req: express.Request, res: express.Response) => {
+  const searchTerm = req.query['q']
+  const indexes = req.query.indexes
+  const indexesArray = nonEmptyStr(indexes) ? [ indexes ] : indexes
+
+  const builderParams = {
+    q: searchTerm ? searchTerm.toString() : null,
+    limit: getLimitFromRequest(req),
+    offset: getOffsetFromRequest(req),
+    indexes: nonEmptyArr(indexesArray) ? indexesArray as ElasticIndexTypes[] : undefined,
+  }
+  const esQuery = buildElasticSearchQuery(builderParams)
+
+  try {
+    return elasticReader.search(esQuery)
+  } catch (reason) {
+    elasticLog.warn('%s. Meta: %o', reason.message, reason.meta)
+    res.status(reason.statusCode).json(reason)
+    return null
+  }
+}
+
+// TODO: get suggestions for search
+
+app.get('/v1/offchain/search', async (req: express.Request, res: express.Response) => {
+  const { body: { hits: { hits } } } = await requestDataFromElastic(req, res)
+  const data = await loadSubsocialData(hits)
+  res.json(data)
 })
 
 // API endpoints for personal user feed, notifications and all types of activities.
@@ -112,7 +150,7 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
 
   const query = `
     UPDATE df.notifications_counter
-    SET 
+    SET
       unread_count = 0,
       last_read_activity_id = (
         SELECT MAX(activity_id) FROM df.notifications

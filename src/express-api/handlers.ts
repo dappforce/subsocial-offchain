@@ -1,28 +1,9 @@
 import * as express from 'express'
-import { nonEmptyStr, parseNumStr } from '@subsocial/utils';
 import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../postgres/queries/types';
 import * as pgQueries from '../postgres/queries';
-
-const MAX_RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
+import { getOffsetFromRequest, getLimitFromRequest, MAX_RESULT_LIMIT } from './utils';
 
 type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
-
-const getNumberFromRequest = (
-  req: express.Request,
-  value: 'limit' | 'offset',
-  def: number
-): number => {
-  const reqLimit = req.query[value]
-  return nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : def
-}
-
-const getLimitFromRequest = (req: express.Request): number => {
-  const limit = getNumberFromRequest(req, 'limit', MAX_RESULT_LIMIT)
-  return limit < MAX_RESULT_LIMIT ? limit : MAX_RESULT_LIMIT
-}
-
-const getOffsetFromRequest = (req: express.Request): number =>
-  getNumberFromRequest(req, 'offset', 0)
 
 const callMethodAndReturnJson = async (
   _req: express.Request,
@@ -45,7 +26,7 @@ const activityHandler = (
   method: GetActivitiesFn
 ) => {
   const offset = getOffsetFromRequest(req)
-  const limit = getLimitFromRequest(req)
+  const limit = getLimitFromRequest(req, MAX_RESULT_LIMIT)
   const account = req.params.id
   return callMethodAndReturnJson(req, res, method({ account, offset, limit }))
 }
