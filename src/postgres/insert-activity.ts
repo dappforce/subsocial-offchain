@@ -68,7 +68,7 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, post_id, comment_id, parent_comment_id, date, agg_count, aggregated)
+    INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, parent_comment_id, date, agg_count, aggregated)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING *`
   const date = await getValidDate(blockNumber)
@@ -119,7 +119,7 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
   const objectId = data[1].toString();
 
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, following_id, date, agg_count)
+    INSERT INTO df.activities(block_number, event_index, account, event, following_id, date, agg_count)
       VALUES($1, $2, $3, $4, $5, $6, $7)
     RETURNING *`
   const date = await getValidDate(blockNumber)
@@ -158,7 +158,7 @@ export const insertActivityForSpace = async (eventAction: SubstrateEvent, count:
   const aggregated = accountId !== creator;
 
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, space_id, date, agg_count, aggregated)
+    INSERT INTO df.activities(block_number, event_index, account, event, space_id, date, agg_count, aggregated)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
   const date = await getValidDate(blockNumber)
@@ -201,7 +201,7 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
   const { eventName, data, eventIndex, blockNumber } = eventAction;
   const accountId = data[0].toString();
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, space_id, post_id, date, agg_count)
+    INSERT INTO df.activities(block_number, event_index, account, event, space_id, post_id, date, agg_count)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
   const date = await getValidDate(blockNumber)
@@ -233,7 +233,7 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
   const aggregated = accountId !== creator;
 
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, post_id, date, agg_count, aggregated)
+    INSERT INTO df.activities(block_number, event_index, account, event, post_id, date, agg_count, aggregated)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *`
   const date = await getValidDate(blockNumber)
@@ -276,7 +276,7 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
-    INSERT INTO df.activities(event_index, account, block_number, event, post_id, comment_id, date, agg_count, aggregated)
+    INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, date, agg_count, aggregated)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *`
   const date = await getValidDate(blockNumber)

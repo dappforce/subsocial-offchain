@@ -7,8 +7,8 @@ type Table = 'news_feed' | 'notifications'
 const buildPageQuery = (table: Table) => 
   `SELECT DISTINCT * 
     FROM df.activities
-    WHERE id IN (
-      SELECT activity_id
+    WHERE (block_number, event_index) IN (
+      SELECT block_number, event_index
       FROM df.${table}
       WHERE account = $1 AND aggregated = true
     )
@@ -19,8 +19,8 @@ const buildPageQuery = (table: Table) =>
 const buildCountQuery = (table: Table) => 
   `SELECT COUNT(*)
     FROM df.activities
-    WHERE id IN (
-      SELECT activity_id
+    WHERE (block_number, event_index) IN (
+      SELECT block_number, event_index
       FROM df.${table}
       WHERE account = $1
     )`
