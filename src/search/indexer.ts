@@ -2,7 +2,7 @@ import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
 import { PostId, Post, Space } from '@subsocial/types/substrate/interfaces';
 import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
-import { encodeStructHexId, encodeStructId } from '../substrate/utils';
+import { encodeStructHexId } from '../substrate/utils';
 import { substrate } from '../substrate/subscribe';
 import { ipfs } from '../connections/connect-ipfs';
 import elastic from '../connections/connect-elasticsearch'
@@ -64,11 +64,11 @@ export async function indexContentFromIpfs (
         const spaceIdOpt = rootPost.space_id;
         spaceId = spaceIdOpt.unwrapOr(undefined)
       } else {
-        spaceId = space_id.unwrapOr(undefined)  
+        spaceId = space_id.unwrapOr(undefined) as SpaceId
       }
 
       indexData = {
-        space_id: encodeStructId(spaceId),
+        space_id: spaceId.toString(),
         title,
         body,
         tags,
