@@ -177,16 +177,16 @@ export const loadSubsocialData = async (
   const getFromMaps = ({ _id, _index }: DataResults) => {
     switch (_index) {
       case 'subsocial_profiles': return ownerById.get(_id)
-      case 'subsocial_spaces': return spaceById.get(_id)
-      case 'subsocial_posts': return postById.get(_id)
+      case 'subsocial_spaces': return spaceById.get(hexToBn(_id).toString())
+      case 'subsocial_posts': return postById.get(hexToBn(_id).toString())
     }
 
     return undefined
   }
 
   return results
-    .map((item) => ({ index: item._index, data: getFromMaps(item)}))
-    .filter(x => x !== undefined)
+    .map((item) => ({ index: item._index, id: item._id, data: getFromMaps(item)}))
+    .filter(x => x.data !== undefined)
 }
 
 const log = newLogger(buildElasticSearchQuery.name)
