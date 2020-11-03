@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS df.news_feed
     account varchar(48) NOT NULL,
     event_index integer NOT NULL,
     activity_account varchar(48) NOT NULL,
-    block_number bigint NOT NULL
-    -- FOREIGN KEY (event_index, activity_account, block_number ) REFERENCES df.activities(event_index, account, block_number)
+    block_number bigint NOT NULL,
+    FOREIGN KEY (event_index, activity_account, block_number) REFERENCES df.activities(event_index, account, block_number)
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications
@@ -56,8 +56,8 @@ CREATE TABLE IF NOT EXISTS df.notifications
     account varchar(48) NOT NULL,
     event_index integer NOT NULL,
     activity_account varchar(48) NOT NULL,
-    block_number bigint NOT NULL
-    -- FOREIGN KEY (event_index, activity_account, block_number ) REFERENCES df.activities(event_index, account, block_number)
+    block_number bigint NOT NULL,
+    FOREIGN KEY (event_index, activity_account, block_number) REFERENCES df.activities(event_index, account, block_number)
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications_counter
@@ -66,8 +66,8 @@ CREATE TABLE IF NOT EXISTS df.notifications_counter
     last_read_event_index integer NULL DEFAULT NULL,
     last_read_account varchar(48) NULL DEFAULT NULL,
     last_read_block_number bigint NULL DEFAULT NULL,
-    unread_count bigint NOT NULL DEFAULT 0
-    -- FOREIGN KEY (last_read_event_index, last_read_account, last_read_block_number ) REFERENCES df.activities(event_index, account, block_number)
+    unread_count bigint NOT NULL DEFAULT 0,
+    FOREIGN KEY (last_read_event_index, last_read_account, last_read_block_number) REFERENCES df.activities(event_index, account, block_number)
 );
 
 CREATE TABLE IF NOT EXISTS df.account_followers
