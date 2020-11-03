@@ -4,7 +4,6 @@ import { bnToHex } from '@polkadot/util'
 import { newLogger } from '@subsocial/utils';
 import { SubstrateEvent } from './types';
 import { PostId } from '@subsocial/types/substrate/interfaces';
-
 //import { types } from 'pg'
 
 require('dotenv').config()
@@ -49,9 +48,9 @@ export function encodeStructIds (ids: SubstrateId[]) {
  * Convert a number to its shortened hex representation.
  * Example: '0x000012ab' -> '12ab'
  */
-export function encodeStructId (id: SubstrateId): string {
+export function encodeStructId (id: SubstrateId) {
   //return bnToHex(id).split('x')[1].replace(/(0+)/, '')
-  return id.toString()
+  return BigInt(id.toString())
 }
 
 export function encodeStructHexId (id: SubstrateId): string {
