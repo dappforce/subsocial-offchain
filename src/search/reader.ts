@@ -3,7 +3,7 @@ import { newLogger } from '@subsocial/utils'
 import { MAX_RESULT_LIMIT } from '../express-api/utils'
 import BN from 'bn.js'
 import { hexToBn } from '@polkadot/util'
-import { subsocial } from '../substrate/subscribe'
+import { createSubsocialConnect } from '../connections/connect-subsocial';
 // TODO: export types
 export type ElasticIndexTypes = 'spaces' | 'posts' | 'profiles' | 'all'
 
@@ -132,6 +132,8 @@ export const loadSubsocialData = async (
       case 'subsocial_posts': return fillArray(hexToBn(_id), postIds, postById)
     }
   })
+
+  const subsocial = await createSubsocialConnect()
 
   const postsData = await subsocial.findPublicPostsWithAllDetails(postIds)
 

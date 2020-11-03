@@ -1,4 +1,4 @@
-import { substrate } from '../../substrate/subscribe';
+import { substrate } from '../../connections/connect-subsocial';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import AccountId from '@polkadot/types/generic/AccountId';
 import { indexProfileContent } from './utils';

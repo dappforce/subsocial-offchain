@@ -3,13 +3,10 @@ import { shouldHandleEvent, eventsFilterMethods } from './utils';
 import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
-import { SubsocialApi } from '@subsocial/api/subsocial';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { createSubsocialConnect } from '../connections/connect-subsocial';
 
 require('dotenv').config()
-
-export let subsocial = {} as SubsocialApi
 
 async function main (substrate: SubsocialSubstrateApi) {
 
