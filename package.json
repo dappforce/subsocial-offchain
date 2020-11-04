@@ -47,7 +47,7 @@
     "reindex-content": "node ./build/src/search/reindexer.js",
     "update": "yarn cache clean --force && yarn"
   },
-  "author": "DappForce contributorsupdate",
+  "author": "DappForce contributors",
   "license": "GPL-3.0-only",
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
