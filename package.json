@@ -24,7 +24,7 @@
     "nodemon": "^1.18.9",
     "typescript": "^3.8.3",
     "@polkadot/types": "1.28.1",
-    "@subsocial/types": "latest",
+    "@subsocial/types": "0.4.12",
     "@types/request-promise": "^4.1.46"
   },
   "scripts": {
@@ -45,9 +45,9 @@
     "test:watch": "jest --watch",
     "setup": "yarn init-offchain && yarn build",
     "reindex-content": "node ./build/src/search/reindexer.js",
-    "update": "yarn cache clean && yarn"
+    "update": "yarn cache clean --force && yarn"
   },
-  "author": "DappForce contributors",
+  "author": "DappForce contributorsupdate",
   "license": "GPL-3.0-only",
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",

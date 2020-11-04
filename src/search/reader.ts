@@ -191,4 +191,4 @@ export const loadSubsocialDataByESIndex = async (results: EsDataResults[]) => {
     .filter((x) => x.data !== undefined)
 }
 
-const log = newLogger(buildElasticSearchQuery.name)
+const log = newLogger('buildElasticSearchQuery')

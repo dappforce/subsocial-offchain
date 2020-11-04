@@ -580,10 +580,10 @@
     "@subsocial/utils" latest
     axios "^0.19.2"
 
-"@subsocial/types@latest":
-  version "0.4.11"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.11.tgz#4e0c9cab316ec1b26bb861c9feef66d204ad71d2"
-  integrity sha512-lexTAeCtjad3k458P1MMSe8ywOcak2YoajrFNCEOjN0Xlse/gBqdgjEn0vOdLV3L8KyhpOHR7NYD5jymc4E9ig==
+"@subsocial/types@0.4.12":
+  version "0.4.12"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.12.tgz#b5c1ab8d56a71fd0a4aa2c4feacee0142f0e0e08"
+  integrity sha512-A9T65BELtW6/MZzYXqivmAYyDFPQE6A1wRbE7q6aZr3y7neGxWq6Me9OBK+DcjlOWa2MBocQknGd4qnlvK7AIg==
   dependencies:
     "@subsocial/utils" latest
     cids "^0.7.1"
