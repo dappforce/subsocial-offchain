@@ -6,12 +6,12 @@ import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config'
 import { elasticLog as log } from '../connections/loggers';
 
 async function maybeCreateIndices () {
-  await createIndexIfNoFound(ES_INDEX_SPACES, SpacesMapping)
-  await createIndexIfNoFound(ES_INDEX_POSTS, PostsMapping)
-  await createIndexIfNoFound(ES_INDEX_PROFILES, ProfilesMapping)
+  await createIndexIfNotFound(ES_INDEX_SPACES, SpacesMapping)
+  await createIndexIfNotFound(ES_INDEX_POSTS, PostsMapping)
+  await createIndexIfNotFound(ES_INDEX_PROFILES, ProfilesMapping)
 }
 
-async function createIndexIfNoFound (indexName: string, mapping: any) {
+async function createIndexIfNotFound (indexName: string, mapping: any) {
   const result = await elasticIndexer.indices.exists(
     { index: indexName },
     { ignore: [ 404 ] }
