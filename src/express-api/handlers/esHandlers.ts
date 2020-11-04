@@ -1,5 +1,5 @@
 import * as express from 'express'
-import { getOffsetFromRequest, getLimitFromRequest, HandlerFn, callMethodAndReturnJson } from '../utils';
+import { getOffsetFromRequest, getLimitFromRequest, HandlerFn, resolvePromiseAndReturnJson } from '../utils';
 import { nonEmptyStr, nonEmptyArr } from '@subsocial/utils'
 import { buildElasticSearchQuery, loadSubsocialDataByESIndex } from '../../search/reader'
 import { ElasticIndexTypes } from '@subsocial/types/offchain/search'
@@ -37,6 +37,6 @@ export const searchHandler: HandlerFn = async (req, res) => {
   const result = await querySearch(req, res)
   if (result) {
     const { body: { hits: { hits } } } = result
-    return callMethodAndReturnJson(req, res, loadSubsocialDataByESIndex(hits))
+    return resolvePromiseAndReturnJson(res, loadSubsocialDataByESIndex(hits))
   }
 }

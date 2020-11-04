@@ -4,8 +4,7 @@ import * as pgQueries from '../../postgres/queries';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
-  MAX_RESULTS_LIMIT,
-  callMethodAndReturnJson,
+  resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
 
@@ -15,9 +14,9 @@ const activityHandler = (
   method: GetActivitiesFn
 ) => {
   const offset = getOffsetFromRequest(req)
-  const limit = getLimitFromRequest(req, MAX_RESULTS_LIMIT)
+  const limit = getLimitFromRequest(req)
   const account = req.params.id
-  return callMethodAndReturnJson(req, res, method({ account, offset, limit }))
+  return resolvePromiseAndReturnJson(res, method({ account, offset, limit }))
 }
 
 const countHandler = async (
@@ -26,7 +25,7 @@ const countHandler = async (
   method: GetCountFn | GetCountsFn
 ) => {
   const account = req.params.id
-  return callMethodAndReturnJson(req, res, method(account))
+  return resolvePromiseAndReturnJson(res, method(account))
 }
 
 export const feedHandler: HandlerFn = (req, res) =>

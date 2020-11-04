@@ -86,10 +86,10 @@ app.get('/v1/offchain/search', esReqHandlers.searchHandler)
 
 // API endpoints for personal user feed, notifications and all types of activities.
 
-app.get('/v1/offchain/feed/:id', pgReqHandlers.feedHandler);
+app.get('/v1/offchain/feed/:id', pgReqHandlers.feedHandler)
 app.get('/v1/offchain/feed/:id/count', pgReqHandlers.feedCountHandler)
 
-app.get('/v1/offchain/notifications/:id', pgReqHandlers.notificationsHandler);
+app.get('/v1/offchain/notifications/:id', pgReqHandlers.notificationsHandler)
 app.get('/v1/offchain/notifications/:id/count', pgReqHandlers.notificationsCountHandler)
 
 app.get('/v1/offchain/activities/:id', pgReqHandlers.activitiesHandler)

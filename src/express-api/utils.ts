@@ -15,13 +15,12 @@ const getNumberFromRequest = (
   return nonEmptyStr(reqParameter) ? parseNumStr(reqParameter) : def;
 };
 
-export const callMethodAndReturnJson = async (
-  _req: express.Request,
+export const resolvePromiseAndReturnJson = async (
   res: express.Response,
-  method: Promise<any>
+  promise: Promise<any>
 ) => {
   try {
-    const data = await method
+    const data = await promise
     res.json(data)
   } catch (err) {
     offchainApiLog.error(err)
@@ -29,7 +28,10 @@ export const callMethodAndReturnJson = async (
   }
 }
 
-export const getLimitFromRequest = (req: express.Request, maxLimit?: number): number => {
+export const getLimitFromRequest = (
+  req: express.Request,
+  maxLimit: number = MAX_RESULTS_LIMIT
+): number => {
   const limit = getNumberFromRequest(req, 'limit', maxLimit);
   return isNaN(maxLimit) || limit < maxLimit
     ? limit
