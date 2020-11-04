@@ -2,7 +2,7 @@ import * as express from 'express';
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils';
 import { offchainApiLog } from '../connections/loggers';
 
-export const MAX_RESULT_LIMIT = parseNumStr(process.env.RESULTS_LIMIT) || 20
+export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 20
 
 export type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
 

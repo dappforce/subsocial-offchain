@@ -4,7 +4,7 @@ import * as pgQueries from '../../postgres/queries';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
-  MAX_RESULT_LIMIT,
+  MAX_RESULTS_LIMIT,
   callMethodAndReturnJson,
   HandlerFn,
 } from '../utils'
@@ -15,7 +15,7 @@ const activityHandler = (
   method: GetActivitiesFn
 ) => {
   const offset = getOffsetFromRequest(req)
-  const limit = getLimitFromRequest(req, MAX_RESULT_LIMIT)
+  const limit = getLimitFromRequest(req, MAX_RESULTS_LIMIT)
   const account = req.params.id
   return callMethodAndReturnJson(req, res, method({ account, offset, limit }))
 }

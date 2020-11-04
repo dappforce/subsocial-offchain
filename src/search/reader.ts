@@ -1,6 +1,6 @@
 import { AnySubsocialData, PostWithAllDetails, ProfileData, SpaceData } from '@subsocial/types'
 import { newLogger, isEmptyArray } from '@subsocial/utils'
-import { MAX_RESULT_LIMIT } from '../express-api/utils'
+import { MAX_RESULTS_LIMIT } from '../express-api/utils'
 import BN from 'bn.js'
 import { hexToBn } from '@polkadot/util'
 import { createSubsocialConnect } from '../connections/connect-subsocial'
@@ -19,7 +19,7 @@ const resoloveElasticIndexes = (indexes: ElasticIndexTypes[]) =>
 
 export const buildElasticSearchQuery = (params: EsQueryParams) => {
   const from = params.offset || 0
-  const size = params.limit || MAX_RESULT_LIMIT
+  const size = params.limit || MAX_RESULTS_LIMIT
   const q = params.q || '*'
   const indexes = resoloveElasticIndexes(params.indexes)
   const tags = params.tagsFilter || []
