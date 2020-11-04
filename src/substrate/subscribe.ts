@@ -4,7 +4,7 @@ import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { createSubsocialConnect } from '../connections/subsocial';
+import { createSubsocialApi } from '../connections/subsocial';
 
 require('dotenv').config()
 
@@ -125,9 +125,9 @@ async function main (substrate: SubsocialSubstrateApi) {
   }
 }
 
-createSubsocialConnect()
+createSubsocialApi()
   .then(({ substrate }) => main(substrate))
   .catch((error) => {
-    log.error('Failed the event processing:', error)
+    log.error('Unexpected error during processing of Substrate events:', error)
     process.exit(-1)
   })
