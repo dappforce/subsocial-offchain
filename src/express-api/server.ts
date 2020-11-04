@@ -4,20 +4,17 @@ import * as cors from 'cors';
 import { ipfsCluster } from '../connections/connect-ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
-import { newLogger, nonEmptyArr, nonEmptyStr } from '@subsocial/utils';
-import { elasticLog } from '../connections/loggers';
+import { nonEmptyStr } from '@subsocial/utils';
 import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
-import * as reqHandlers from './handlers';
-import { getLimitFromRequest, getOffsetFromRequest } from './utils';
-import { elasticReader } from '../connections/connect-elasticsearch';
-import { buildElasticSearchQuery, ElasticIndexTypes, loadSubsocialData } from '../search/reader';
+import * as pgReqHandlers from './handlers/pgHandlers';
+import * as esReqHandlers from './handlers/esHandlers'
+import { offchainApiLog as log } from '../connections/loggers';
 
 require('dotenv').config()
 
-const log = newLogger('ExpressOffchainApi')
 const app = express()
 const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || 'http://localhost'
 
@@ -84,65 +81,38 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
   }
 })
 
-// ElasticSearch API
-
-const requestDataFromElastic = async (req: express.Request, res: express.Response) => {
-  const searchTerm = req.query['q']
-  const indexes = req.query.indexes
-  const indexesArray = nonEmptyStr(indexes) ? [ indexes ] : indexes
-
-  const builderParams = {
-    q: searchTerm ? searchTerm.toString() : null,
-    limit: getLimitFromRequest(req),
-    offset: getOffsetFromRequest(req),
-    indexes: nonEmptyArr(indexesArray) ? indexesArray as ElasticIndexTypes[] : undefined,
-  }
-  const esQuery = buildElasticSearchQuery(builderParams)
-
-  try {
-    return elasticReader.search(esQuery)
-  } catch (reason) {
-    elasticLog.warn('%s. Meta: %o', reason.message, reason.meta)
-    res.status(reason.statusCode).json(reason)
-    return null
-  }
-}
+// API endpoints for querying search results from Elasticsearch engine
 
 // TODO: get suggestions for search
-
-app.get('/v1/offchain/search', async (req: express.Request, res: express.Response) => {
-  const { body: { hits: { hits } } } = await requestDataFromElastic(req, res)
-  const data = await loadSubsocialData(hits)
-  res.json(data)
-})
+app.get('/v1/offchain/search', esReqHandlers.searchHandler)
 
 // API endpoints for personal user feed, notifications and all types of activities.
 
-app.get('/v1/offchain/feed/:id', reqHandlers.feedHandler);
-app.get('/v1/offchain/feed/:id/count', reqHandlers.feedCountHandler)
+app.get('/v1/offchain/feed/:id', pgReqHandlers.feedHandler);
+app.get('/v1/offchain/feed/:id/count', pgReqHandlers.feedCountHandler)
 
-app.get('/v1/offchain/notifications/:id', reqHandlers.notificationsHandler);
-app.get('/v1/offchain/notifications/:id/count', reqHandlers.notificationsCountHandler)
+app.get('/v1/offchain/notifications/:id', pgReqHandlers.notificationsHandler);
+app.get('/v1/offchain/notifications/:id/count', pgReqHandlers.notificationsCountHandler)
 
-app.get('/v1/offchain/activities/:id', reqHandlers.activitiesHandler)
-app.get('/v1/offchain/activities/:id/count', reqHandlers.activitiesCountHandler)
+app.get('/v1/offchain/activities/:id', pgReqHandlers.activitiesHandler)
+app.get('/v1/offchain/activities/:id/count', pgReqHandlers.activitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/comments', reqHandlers.commentActivitiesHandler)
-app.get('/v1/offchain/activities/:id/comments/count', reqHandlers.commentActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/comments', pgReqHandlers.commentActivitiesHandler)
+app.get('/v1/offchain/activities/:id/comments/count', pgReqHandlers.commentActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/posts', reqHandlers.postActivitiesHandler)
-app.get('/v1/offchain/activities/:id/posts/count', reqHandlers.postActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/posts', pgReqHandlers.postActivitiesHandler)
+app.get('/v1/offchain/activities/:id/posts/count', pgReqHandlers.postActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/follows', reqHandlers.followActivitiesHandler)
-app.get('/v1/offchain/activities/:id/follows/count', reqHandlers.followActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/follows', pgReqHandlers.followActivitiesHandler)
+app.get('/v1/offchain/activities/:id/follows/count', pgReqHandlers.followActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/reactions', reqHandlers.reactionActivitiesHandler)
-app.get('/v1/offchain/activities/:id/reactions/count', reqHandlers.reactionActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/reactions', pgReqHandlers.reactionActivitiesHandler)
+app.get('/v1/offchain/activities/:id/reactions/count', pgReqHandlers.reactionActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/spaces', reqHandlers.spaceActivitiesHandler)
-app.get('/v1/offchain/activities/:id/spaces/count', reqHandlers.spaceActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/spaces', pgReqHandlers.spaceActivitiesHandler)
+app.get('/v1/offchain/activities/:id/spaces/count', pgReqHandlers.spaceActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/counts', reqHandlers.activityCountsHandler)
+app.get('/v1/offchain/activities/:id/counts', pgReqHandlers.activityCountsHandler)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;

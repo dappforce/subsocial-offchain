@@ -1,24 +1,13 @@
 import * as express from 'express'
-import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../postgres/queries/types';
-import * as pgQueries from '../postgres/queries';
-import { getOffsetFromRequest, getLimitFromRequest, MAX_RESULT_LIMIT } from './utils';
-
-type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
-
-const callMethodAndReturnJson = async (
-  _req: express.Request,
-  res: express.Response,
-  method: Promise<any>
-) => {
-  try {
-    const data = await method
-    res.json(data)
-  } catch (err) {
-    res
-      .status(501)
-      .send(err)
-  }
-}
+import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
+import * as pgQueries from '../../postgres/queries';
+import {
+  getOffsetFromRequest,
+  getLimitFromRequest,
+  MAX_RESULT_LIMIT,
+  callMethodAndReturnJson,
+  HandlerFn,
+} from '../utils'
 
 const activityHandler = (
   req: express.Request,
