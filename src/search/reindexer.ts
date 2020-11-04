@@ -1,5 +1,5 @@
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { createSubsocialApi } from '../connections/subsocial';
+import { resolveSubsocialApi } from '../connections/subsocial';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
 import { indexPostContent, indexSpaceContent } from './event-handlers/utils';
 import { elasticLog as log } from '../connections/loggers';
@@ -33,7 +33,7 @@ async function reindexContentFromIpfs(substrate: SubsocialSubstrateApi) {
   exit(0);
 }
 
-createSubsocialApi()
+resolveSubsocialApi()
   .then(({ substrate }) => reindexContentFromIpfs(substrate))
   .catch((error) => {
     log.error('Failed to reindex spaces and posts in Elasticsearch:', error)

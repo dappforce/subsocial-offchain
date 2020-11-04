@@ -8,7 +8,11 @@ export let subsocial: SubsocialApi
 export let substrate: SubsocialSubstrateApi
 export let ipfs: SubsocialIpfsApi
 
-export const createSubsocialApi = async () => {
+/**
+ * Create a new or return existing connection to Subsocial API
+ * (includes Substrate and IPFS connections).
+ */
+export const resolveSubsocialApi = async () => {
   // Connect to Subsocial's Substrate node:
   if (!subsocial) {
     const api = await Api.connect(process.env.SUBSTRATE_URL)

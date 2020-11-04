@@ -3,7 +3,7 @@ import { newLogger, isEmptyArray } from '@subsocial/utils'
 import { MAX_RESULTS_LIMIT } from '../express-api/utils'
 import BN from 'bn.js'
 import { hexToBn } from '@polkadot/util'
-import { createSubsocialApi } from '../connections/subsocial'
+import { resolveSubsocialApi } from '../connections/subsocial'
 import {
   ElasticIndex,
   ElasticIndexTypes,
@@ -39,25 +39,29 @@ export const buildElasticSearchQuery = (params: EsQueryParams) => {
     `${ElasticFields.space.handle}^2`,
     `${ElasticFields.space.about}^1`,
     `${ElasticFields.space.tags}^2`,
+
     `${ElasticFields.post.title}^3`,
     `${ElasticFields.post.body}^1`,
     `${ElasticFields.post.tags}^2`,
+
     `${ElasticFields.comment.body}^2`,
+
     `${ElasticFields.profile.name}^3`,
     `${ElasticFields.profile.about}^1`,
   ]
 
-  const searchQueryPart =
-    q === '*' || q.trim() === ''
-      ? {
-          match_all: {},
-        }
-      : {
-          multi_match: {
-            query: q,
-            fields: searchFields,
-          },
-        }
+  const isEmptyQuery = q === '*' || q.trim() === ''
+
+  const searchQueryPart = isEmptyQuery
+    ? {
+        match_all: {},
+      }
+    : {
+        multi_match: {
+          query: q,
+          fields: searchFields,
+        },
+      }
 
   const tagFilterQueryPart = tags.map((tag) => ({
     multi_match: {
@@ -82,12 +86,12 @@ export const buildElasticSearchQuery = (params: EsQueryParams) => {
     },
   }
 
-  log.debug('Elastic request is: %o', searchReq)
+  log.debug('Final ElasticSearch query: %o', searchReq)
 
   return searchReq
 }
 
-export type DataResults = {
+type EsDataResults = {
   _id: string
   _index: string
 }
@@ -104,7 +108,7 @@ const fillArray = <T extends string | BN>(
   }
 }
 
-export const loadSubsocialDataByESIndex = async (results: DataResults[]) => {
+export const loadSubsocialDataByESIndex = async (results: EsDataResults[]) => {
   const spaceById = new Map<string, SpaceData>()
   const postById = new Map<string, PostWithAllDetails>()
   const ownerById = new Map<string, ProfileData>()
@@ -124,7 +128,7 @@ export const loadSubsocialDataByESIndex = async (results: DataResults[]) => {
     }
   })
 
-  const subsocial = await createSubsocialApi()
+  const subsocial = await resolveSubsocialApi()
 
   const postsData = await subsocial.findPublicPostsWithAllDetails(postIds)
 
@@ -161,16 +165,17 @@ export const loadSubsocialDataByESIndex = async (results: DataResults[]) => {
     })
   }
 
-  fillMap(postsData, postById, 'post'), fillMap(ownersData, ownerById, 'profile')
+  fillMap(postsData, postById, 'post')
+  fillMap(ownersData, ownerById, 'profile')
   fillMap(spacesData, spaceById)
 
-  const getFromMaps = ({ _id, _index }: DataResults) => {
+  const getFromMaps = ({ _id, _index }: EsDataResults) => {
     switch (_index) {
-      case 'subsocial_profiles':
+      case ElasticIndex.profiles:
         return ownerById.get(_id)
-      case 'subsocial_spaces':
+      case ElasticIndex.spaces:
         return spaceById.get(hexToBn(_id).toString())
-      case 'subsocial_posts':
+      case ElasticIndex.posts:
         return postById.get(hexToBn(_id).toString())
     }
 
@@ -178,7 +183,11 @@ export const loadSubsocialDataByESIndex = async (results: DataResults[]) => {
   }
 
   return results
-    .map((item) => ({ index: item._index, id: item._id, data: getFromMaps(item) }))
+    .map((item) => ({
+      index: item._index,
+      id: item._id,
+      data: getFromMaps(item)
+    }))
     .filter((x) => x.data !== undefined)
 }
 
