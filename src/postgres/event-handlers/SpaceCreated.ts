@@ -10,9 +10,7 @@ export const onSpaceCreated: EventHandlerFn = async (eventAction: SubstrateEvent
   const insertResult = await insertActivityForSpace(eventAction, 0);
   if(insertResult === undefined) return
 
-  const {blockNumber, eventIndex} = insertResult
-
-  await fillNotificationsWithAccountFollowers(account, eventIndex, blockNumber);
+  await fillNotificationsWithAccountFollowers({ account, ...insertResult });
 
   const spaceId = data[1] as SpaceId;
   const space = await substrate.findSpace({ id: spaceId });

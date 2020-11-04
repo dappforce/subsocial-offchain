@@ -7,9 +7,15 @@ export type ActivitiesParams = {
   limit: number
 }
 
-type InsertActivityResponse = {
-  eventIndex?: number
+export type ActivitiesParamsWithAccount = InsertActivityResponse & {
   blockNumber?: BN
+  eventIndex?: number
+  account: string
+}
+
+export type InsertActivityResponse = {
+  blockNumber?: BN
+  eventIndex?: number
 }
 
 export type InsertActivityPromise = Promise<InsertActivityResponse>

@@ -21,10 +21,8 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Post
   const insertResult = await insertActivityForComment(eventAction, ids, account);
   if (insertResult === undefined) return;
 
-  const {blockNumber, eventIndex} = insertResult
-
-  await fillNotificationsWithCommentFollowers(commentId, account, eventIndex, blockNumber);
-  await fillNotificationsWithAccountFollowers(account, eventIndex, blockNumber);
-  await fillNewsFeedWithSpaceFollowers(spaceId, author, eventIndex, blockNumber);
-  await fillNewsFeedWithAccountFollowers(author, eventIndex, blockNumber)
+  await fillNotificationsWithCommentFollowers(commentId, { account, ...insertResult });
+  await fillNotificationsWithAccountFollowers({ account, ...insertResult });
+  await fillNewsFeedWithSpaceFollowers(spaceId, { account: author, ...insertResult });
+  await fillNewsFeedWithAccountFollowers({ account: author, ...insertResult })
 }

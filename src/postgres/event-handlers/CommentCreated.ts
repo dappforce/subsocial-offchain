@@ -33,10 +33,8 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
     const insertResult = await insertActivityForComment(eventAction, ids, postCreator);
     if (insertResult === undefined) return;
 
-    const {blockNumber, eventIndex} = insertResult
-
     log.debug('Comment does not have a parent id');
-    await fillNotificationsWithPostFollowers(root_post_id, author, eventIndex, blockNumber);
-    await fillNotificationsWithAccountFollowers(author, eventIndex, blockNumber);
+    await fillNotificationsWithPostFollowers(root_post_id, { account: author, ...insertResult });
+    await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
   }
 }

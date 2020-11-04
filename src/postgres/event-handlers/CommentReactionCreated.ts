@@ -24,10 +24,8 @@ export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post
   const insertResult = await insertActivityForCommentReaction(eventAction, reactionCount, ids, commentAuthor);
   if (insertResult === undefined) return;
 
-  const {blockNumber, eventIndex} = insertResult
-
   if (voter === commentAuthor) return;
 
   // insertAggStream(eventAction, commentId);
-  await insertNotificationForOwner(eventIndex, blockNumber, commentAuthor);
+  await insertNotificationForOwner({ ...insertResult, account: commentAuthor });
 }

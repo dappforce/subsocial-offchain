@@ -14,11 +14,9 @@ export const onRootPostShared = async (eventAction: SubstrateEvent, post: Post) 
   const insertResult = await insertActivityForPost(eventAction, ids);
   if (insertResult === undefined) return;
 
-  const {blockNumber, eventIndex} = insertResult
-
   const account = post.created.account.toString();
-  await insertNotificationForOwner(eventIndex, blockNumber, account);
-  await fillNotificationsWithAccountFollowers(author, eventIndex, blockNumber);
-  await fillNewsFeedWithSpaceFollowers(spaceId, author, eventIndex, blockNumber);
-  await fillNewsFeedWithAccountFollowers(author, eventIndex, blockNumber)
+  await insertNotificationForOwner({ account, ...insertResult });
+  await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
+  await fillNewsFeedWithSpaceFollowers(spaceId, { account: author, ...insertResult });
+  await fillNewsFeedWithAccountFollowers({ account: author, ...insertResult })
 }

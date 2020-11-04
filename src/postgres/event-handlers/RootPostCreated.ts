@@ -16,8 +16,6 @@ export const onRootCreated = async (eventAction: SubstrateEvent, post: Post) => 
   const insertResult = await insertActivityForPost(eventAction, ids, 0);
   if (insertResult === undefined) return;
 
-  const {blockNumber, eventIndex} = insertResult
-
-  await fillNewsFeedWithSpaceFollowers(spaceId, author, eventIndex, blockNumber);
-  await fillNewsFeedWithAccountFollowers(author, eventIndex, blockNumber);
+  await fillNewsFeedWithSpaceFollowers(spaceId, { account: author, ...insertResult });
+  await fillNewsFeedWithAccountFollowers({ account: author, ...insertResult });
 }

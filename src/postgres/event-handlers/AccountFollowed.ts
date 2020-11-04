@@ -15,8 +15,6 @@ export const onAccountFollowed: EventHandlerFn = async (eventAction: SubstrateEv
   const insertResult = await insertActivityForAccount(eventAction, count);
   if (insertResult === undefined) return
 
-  const {blockNumber, eventIndex} = insertResult
-
   const following = data[1].toString();
-  await insertNotificationForOwner(eventIndex, blockNumber, following);
+  await insertNotificationForOwner( { ...insertResult, account: following });
 }

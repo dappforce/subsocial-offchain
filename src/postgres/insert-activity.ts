@@ -7,10 +7,9 @@ import { updateCountOfUnreadNotifications, getAggregationCount } from './notific
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { SubstrateEvent } from '../substrate/types';
-import { InsertActivityPromise } from './queries/types';
-import BN from 'bn.js';
+import { InsertActivityPromise, ActivitiesParamsWithAccount } from './queries/types';
 
-export const insertNotificationForOwner = async (eventIndex: number, blockNumber: BN, account: string) => {
+export const insertNotificationForOwner = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const params = [account, blockNumber, eventIndex]
   const query = `
     INSERT INTO df.notifications
@@ -43,10 +42,10 @@ export const insertActivityComments = async (eventAction: SubstrateEvent, ids: S
     }
 
     const account = comment.created.account.toString();
-    const {eventIndex, blockNumber} = await insertActivityForComment(eventAction, param, account);
+    const insertResult = await insertActivityForComment(eventAction, param, account);
 
     if (account === lastCommentAccount) return;
-    await insertNotificationForOwner(eventIndex, blockNumber, account);
+    await insertNotificationForOwner({ ...insertResult, account });
   }
 };
 
@@ -64,7 +63,7 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
   }
 
   const [postId] = paramsIds;
-  const { eventName, data, eventIndex, blockNumber } = eventAction;
+  const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
@@ -104,7 +103,7 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
 
-    return {eventIndex: eventIndex, blockNumber: blockNumber};
+    return {blockNumber: blockNumber, eventIndex: eventIndex};
   } catch (err) {
     insertActivityLogError('comment', err.stack);
     throw err
@@ -113,7 +112,7 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
 
 export const insertActivityForAccount = async (eventAction: SubstrateEvent, count: number): InsertActivityPromise => {
 
-  const { eventName, data, eventIndex, blockNumber } = eventAction;
+  const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const objectId = data[1].toString();
 
@@ -141,7 +140,7 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
     insertActivityLog('account')
-    return {eventIndex: eventIndex, blockNumber: blockNumber};
+    return {blockNumber: blockNumber, eventIndex: eventIndex};
   } catch (err) {
     insertActivityLogError('account', err.stack);
     throw err
@@ -150,7 +149,7 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
 
 export const insertActivityForSpace = async (eventAction: SubstrateEvent, count: number, creator?: string): InsertActivityPromise => {
 
-  const { eventName, data, eventIndex, blockNumber } = eventAction;
+  const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const space_id = data[1] as SpaceId
   const spaceId = encodeStructId(space_id);
@@ -178,7 +177,7 @@ export const insertActivityForSpace = async (eventAction: SubstrateEvent, count:
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
     insertActivityLog('space')
-    return {eventIndex: eventIndex, blockNumber: blockNumber};
+    return {blockNumber: blockNumber, eventIndex: eventIndex};
   } catch (err) {
     insertActivityLogError('space', err.stack);
     throw err
@@ -195,7 +194,7 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
   }
 
   const [, postId] = paramsIds;
-  const { eventName, data, eventIndex, blockNumber } = eventAction;
+  const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const query = `
     INSERT INTO df.activities(block_number, event_index, account, event, space_id, post_id, date, agg_count)
@@ -210,7 +209,7 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
   try {
     await pg.query(query, params)
     insertActivityLog('post')
-    return {eventIndex: eventIndex, blockNumber: blockNumber};
+    return {blockNumber: blockNumber, eventIndex: eventIndex};
   } catch (err) {
     insertActivityLogError('post', err.stack);
     throw err
@@ -225,7 +224,7 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
     return undefined
   }
 
-  const { eventName, data, eventIndex, blockNumber } = eventAction;
+  const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
 
@@ -253,7 +252,7 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
 
-    return {eventIndex: eventIndex, blockNumber: blockNumber};
+    return {blockNumber: blockNumber, eventIndex: eventIndex};
   } catch (err) {
     insertActivityLogError('post reaction', err.stack);
     throw err
@@ -268,7 +267,7 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
     return undefined
   }
 
-  const { eventName, data, eventIndex, blockNumber } = eventAction;
+  const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
   const query = `
@@ -295,7 +294,7 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.rowCount)
 
-    return {eventIndex: eventIndex, blockNumber: blockNumber};
+    return {blockNumber: blockNumber, eventIndex: eventIndex};
   } catch (err) {
     insertActivityLogError('comment reaction', err.stack);
     throw err

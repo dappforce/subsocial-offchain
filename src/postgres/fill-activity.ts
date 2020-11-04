@@ -3,7 +3,7 @@ import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';
 import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedLogError, fillNotificationsLogError } from './postges-logger';
-import BN from 'bn.js';
+import { ActivitiesParamsWithAccount } from './queries/types';
 
 const fillAccountFollowerQuery = (table: string) => {
   return `
@@ -14,8 +14,8 @@ const fillAccountFollowerQuery = (table: string) => {
     WHERE df.account_followers.follower_account <> $1
       AND block_number = $2
       AND event_index = $3
-      AND (df.account_followers.follower_account, df.activities.event_index, df.activities.block_number)
-      NOT IN (SELECT account, event_index, block_number from df.${table}))
+      AND (df.account_followers.follower_account, df.activities.block_number, df.activities.event_index)
+      NOT IN (SELECT account, block_number, event_index from df.${table}))
   RETURNING *`
 }
 
@@ -24,7 +24,7 @@ const fillTableWith = (table: string, object: string) => {
   if(object == "post") parent_comment_id = "AND parent_comment_id IS NULL"
 
   return `
-  INSERT INTO df.${table} (account, event_index, block_number)
+  INSERT INTO df.${table} (account, block_number, event_index)
     (SELECT df.${object}_followers.follower_account, df.activities.block_number, df.activities.event_index
     FROM df.activities
     LEFT JOIN df.${object}_followers ON df.activities.${object}_id = df.${object}_followers.following_${object}_id
@@ -34,13 +34,13 @@ const fillTableWith = (table: string, object: string) => {
       AND event_index = $4
       AND aggregated = true
       ${parent_comment_id}
-      AND (df.${object}_followers.follower_account, df.activities.event_index, df.activities.block_number)
-        NOT IN (SELECT account, event_index, block_number from df.${table}))
+      AND (df.${object}_followers.follower_account, df.activities.block_number, df.activities.event_index)
+        NOT IN (SELECT account, block_number, event_index from df.${table}))
   RETURNING *;
   `
 }
 
-export const fillNewsFeedWithAccountFollowers = async (account: string, eventIndex: number, blockNumber: BN ) => {
+export const fillNewsFeedWithAccountFollowers = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillAccountFollowerQuery("news_feed")
 
   const params = [ account, blockNumber, eventIndex];
@@ -53,7 +53,7 @@ export const fillNewsFeedWithAccountFollowers = async (account: string, eventInd
   }
 }
 
-export const fillNotificationsWithAccountFollowers = async (account: string, eventIndex: number, blockNumber: BN) => {
+export const fillNotificationsWithAccountFollowers = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillAccountFollowerQuery("notifications")
 
   const params = [ account, blockNumber, eventIndex ];
@@ -67,7 +67,7 @@ export const fillNotificationsWithAccountFollowers = async (account: string, eve
   }
 }
 
-export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: string, eventIndex: number, blockNumber: BN) => {
+export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillTableWith("news_feed", "space")
 
   const encodedSpaceId = encodeStructId(spaceId);
@@ -82,7 +82,7 @@ export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: 
   }
 }
 
-export const fillNotificationsWithPostFollowers = async (postId: PostId, account: string, eventIndex: number, blockNumber: BN) => {
+export const fillNotificationsWithPostFollowers = async (postId: PostId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillTableWith("notifications", "post")
 
   const encodedPostId = encodeStructId(postId);
@@ -97,7 +97,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
   }
 }
 
-export const fillNotificationsWithCommentFollowers = async (commentId: PostId, account: string, eventIndex: number, blockNumber: BN) => {
+export const fillNotificationsWithCommentFollowers = async (commentId: PostId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillTableWith("notifications", "comment")
 
   const encodedCommentId = encodeStructId(commentId);
