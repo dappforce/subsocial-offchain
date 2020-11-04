@@ -1,6 +1,6 @@
 import { SubstrateEvent } from '../../substrate/types';
 import { Post } from '@subsocial/types/substrate/interfaces';
-import { substrate } from '../../connections/connect-subsocial';
+import { substrate } from '../../connections/subsocial';
 import { parsePostEvent } from '../../substrate/utils';
 
 type PostHandler = (eventAction: SubstrateEvent, post?: Post) => Promise<void>

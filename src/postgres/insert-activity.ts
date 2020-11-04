@@ -1,4 +1,4 @@
-import { pg } from '../connections/connect-postgres';
+import { pg } from '../connections/postgres';
 import { encodeStructIds, encodeStructId } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
 import { Post, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
@@ -6,7 +6,7 @@ import { updateCountOfUnreadNotifications, getAggregationCount } from './notific
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { SubstrateEvent } from '../substrate/types';
-import { substrate } from '../connections/connect-subsocial';
+import { substrate } from '../connections/subsocial';
 
 export const insertNotificationForOwner = async (id: number, account: string) => {
   const params = [account, id]

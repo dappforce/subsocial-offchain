@@ -1,5 +1,5 @@
 import { EventData } from '@polkadot/types/generic/Event';
-import { pg } from '../connections/connect-postgres';
+import { pg } from '../connections/postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { insertFollowersLog, insertFollowersLogError } from './postges-logger';

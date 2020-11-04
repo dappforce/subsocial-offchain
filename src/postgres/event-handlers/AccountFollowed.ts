@@ -2,7 +2,7 @@ import { insertAccountFollower } from '../../postgres/insert-follower';
 import { insertActivityForAccount } from '../../postgres/insert-activity';
 import { insertNotificationForOwner } from '../../postgres/notifications';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
-import { substrate } from '../../connections/connect-subsocial';
+import { substrate } from '../../connections/subsocial';
 
 export const onAccountFollowed: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;

@@ -1,4 +1,4 @@
-import { elasticIndexer } from '../connections/connect-elasticsearch'
+import { elasticIndexer } from '../connections/elastic'
 import * as SpacesMapping from './mappings/spaces.json'
 import * as PostsMapping from './mappings/posts.json'
 import * as ProfilesMapping from './mappings/profiles.json'

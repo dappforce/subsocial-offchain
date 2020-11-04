@@ -1,5 +1,5 @@
 import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../connections/connect-subsocial';
+import { substrate } from '../../connections/subsocial';
 import { insertActivityForComment } from '../insert-activity';
 import { fillNotificationsWithAccountFollowers, fillNotificationsWithCommentFollowers, fillNewsFeedWithSpaceFollowers, fillNewsFeedWithAccountFollowers } from '../fill-activity';
 import { SubstrateEvent } from '../../substrate/types';

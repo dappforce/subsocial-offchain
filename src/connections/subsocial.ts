@@ -2,7 +2,7 @@ import { SubsocialIpfsApi } from '@subsocial/api/ipfs'
 import { SubsocialApi } from '@subsocial/api/subsocial'
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate'
 import { Api } from '@subsocial/api/substrateConnect'
-import { ipfsConfig } from './connect-ipfs'
+import { ipfsConfig } from './ipfs'
 
 export let subsocial: SubsocialApi
 export let substrate: SubsocialSubstrateApi

@@ -1,5 +1,5 @@
 
-import { pg } from '../connections/connect-postgres';
+import { pg } from '../connections/postgres';
 import { release } from 'os';
 import { postgesLog as log } from '../connections/loggers';
 

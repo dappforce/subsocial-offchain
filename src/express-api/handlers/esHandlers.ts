@@ -3,7 +3,7 @@ import { getOffsetFromRequest, getLimitFromRequest, HandlerFn, callMethodAndRetu
 import { nonEmptyStr, nonEmptyArr } from '@subsocial/utils'
 import { buildElasticSearchQuery, loadSubsocialDataByESIndex } from '../../search/reader'
 import { ElasticIndexTypes } from '@subsocial/types/offchain/search'
-import { elasticReader } from '../../connections/connect-elasticsearch'
+import { elasticReader } from '../../connections/elastic'
 import { elasticLog } from '../../connections/loggers'
 
 const querySearch = async (req: express.Request, res: express.Response) => {

@@ -1,5 +1,5 @@
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../connections/connect-subsocial';
+import { substrate } from '../../connections/subsocial';
 import { insertActivityForSpace } from '../insert-activity';
 import { fillNotificationsWithAccountFollowers } from '../fill-activity';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';

@@ -1,8 +1,8 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import { ipfsCluster } from '../connections/connect-ipfs';
-import { pg } from '../connections/connect-postgres';
+import { ipfsCluster } from '../connections/ipfs';
+import { pg } from '../connections/postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { nonEmptyStr } from '@subsocial/utils';
 import parseSitePreview from '../parser/parse-preview'
@@ -73,11 +73,9 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
     await ipfsCluster.unpinContent(cid)
     log.info('Content unpinned from IPFS by CID:', cid)
   } else {
-    log.warn('Cannot unpin content: No CID provided ')
-    // TODO. because of request will idle here, change to:
-    //  - res.status(400).json('Bad Request')
-    res.statusCode = 400
-    res.statusMessage = 'Bad Request'
+    const msg = 'Cannot unpin content: No CID provided'
+    log.warn(msg)
+    res.status(400).json(msg)
   }
 })
 

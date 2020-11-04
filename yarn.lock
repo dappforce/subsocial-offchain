@@ -2455,10 +2455,10 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@latest":
-  version "0.4.9"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.9.tgz#ad8a3f84ac93f4af56c0be6c8ecaead7d4ced470"
-  integrity sha512-nc2OmR6c+ZQt5LMszWI8cOs4f3BIMg9pYsg1H7s07zYibm9yp5o6Moye8n6TdQU4cps85Cgyew/d0qUKLUF78A==
+"@subsocial/api@0.4.10":
+  version "0.4.10"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.10.tgz#d4ee346790855b38b4ded955ad61b12952b35d60"
+  integrity sha512-ULsI4SS0w3cXBuppsCIEUU9an8ZYesentq4hELFuxNkGoMp41ap+18YD6XX1qulOAjucR9UigN1U5W3oEPMSvw==
   dependencies:
     "@babel/runtime" "^7.8.4"
     "@polkadot/api" "^1.28.1"
@@ -2467,7 +2467,16 @@
     "@types/axios" "^0.14.0"
     axios "^0.19.2"
 
-"@subsocial/types@0.4.7", "@subsocial/types@latest":
+"@subsocial/types@0.4.8-beta3":
+  version "0.4.8-beta3"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.8-beta3.tgz#10137d82e40c6af426597418386dd044ef6d7a3d"
+  integrity sha512-AY671RcwroblDHOne5I7Qbfcs/d1bHEgFj/V7oDQH6YPOsyQH4rYipIYWxfbOCSEhOWphhltsbuRS7ACM7GfXg==
+  dependencies:
+    "@babel/runtime" "^7.8.4"
+    "@subsocial/utils" "^0.1.23"
+    cids "^0.7.1"
+
+"@subsocial/types@latest":
   version "0.4.7"
   resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.7.tgz#a0d0fac3309d50fddd329c440787cb4443657421"
   integrity sha512-SaStQKv/hta+bu3DQlfCE0fujzDU0dnrqfMeH6gEr0eJuVaRirJgpxXAHmC3zMKfrcjUKcyFxT5r1b4YNvx0MQ==

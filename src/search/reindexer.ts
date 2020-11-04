@@ -1,5 +1,5 @@
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { createSubsocialConnect } from '../connections/connect-subsocial';
+import { createSubsocialConnect } from '../connections/subsocial';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
 import { indexPostContent, indexSpaceContent } from './event-handlers/utils';
 import { elasticLog as log } from '../connections/loggers';

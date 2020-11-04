@@ -3,7 +3,7 @@ import { newLogger, isEmptyArray } from '@subsocial/utils'
 import { MAX_RESULTS_LIMIT } from '../express-api/utils'
 import BN from 'bn.js'
 import { hexToBn } from '@polkadot/util'
-import { createSubsocialConnect } from '../connections/connect-subsocial'
+import { createSubsocialConnect } from '../connections/subsocial'
 import {
   ElasticIndex,
   ElasticIndexTypes,

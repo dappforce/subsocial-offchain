@@ -4,7 +4,7 @@ import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { createSubsocialConnect } from '../connections/connect-subsocial';
+import { createSubsocialConnect } from '../connections/subsocial';
 
 require('dotenv').config()
 
