@@ -2,7 +2,7 @@ import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';
-import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedLogError, fillNotificationsLogError } from './postges-logger';
+import { tryPgQeury } from './postges-logger';
 import { ActivitiesParamsWithAccount } from './queries/types';
 
 const fillAccountFollowerQuery = (table: string) => {
@@ -21,7 +21,7 @@ const fillAccountFollowerQuery = (table: string) => {
 
 const fillTableWith = (table: string, object: string) => {
   let parent_comment_id = "";
-  if(object == "post") parent_comment_id = "AND parent_comment_id IS NULL"
+  if (object == "post") parent_comment_id = "AND parent_comment_id IS NULL"
 
   return `
   INSERT INTO df.${table} (account, block_number, event_index)
@@ -43,71 +43,84 @@ const fillTableWith = (table: string, object: string) => {
 export const fillNewsFeedWithAccountFollowers = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillAccountFollowerQuery("news_feed")
 
-  const params = [ account, blockNumber, eventIndex];
-  try {
-    await pg.query(query, params)
-    fillNewsFeedLog('account')
-  } catch (err) {
-    fillNewsFeedLogError('account', err.stack);
-    throw err
-  }
+  const params = [account, blockNumber, eventIndex];
+
+  await tryPgQeury(
+    () => pg.query(query, params),
+    {
+      success: 'FillNewsFeedWithAccountFollowers function worked successfully',
+      error: 'FillNewsFeedWithAccountFollowers function failed: '
+    }
+  )
 }
 
 export const fillNotificationsWithAccountFollowers = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillAccountFollowerQuery("notifications")
 
-  const params = [ account, blockNumber, eventIndex ];
-  try {
-    await pg.query(query, params)
-    fillNotificationsLog('account')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    fillNotificationsLogError('account', err.stack);
-    throw err
-  }
+  const params = [account, blockNumber, eventIndex];
+  
+  await tryPgQeury(
+    async () => { 
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'FillNotificationsWithAccountFollowers function worked successfully',
+      error: 'FillNotificationsWithAccountFollowers function failed: '
+    }
+  )
 }
 
 export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillTableWith("news_feed", "space")
 
   const encodedSpaceId = encodeStructId(spaceId);
-  const params = [ encodedSpaceId, account, blockNumber, eventIndex ];
-  try {
-    await pg.query(query, params)
-    fillNewsFeedLog('space')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    fillNewsFeedLogError('space', err.stack);
-    throw err
-  }
+  const params = [encodedSpaceId, account, blockNumber, eventIndex];
+  
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'FillNewsFeedWithSpaceFollowers function worked successfully',
+      error: 'FillNewsFeedWithSpaceFollowers function failed: '
+    }
+  )
 }
 
 export const fillNotificationsWithPostFollowers = async (postId: PostId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillTableWith("notifications", "post")
 
   const encodedPostId = encodeStructId(postId);
-  const params = [ encodedPostId, account, blockNumber, eventIndex ];
-  try {
-    await pg.query(query, params)
-    fillNotificationsLog('post')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    fillNotificationsLogError('post', err.stack);
-    throw err
-  }
+  const params = [encodedPostId, account, blockNumber, eventIndex];
+  
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'FillNotificationsWithPostFollowers function worked successfully',
+      error: 'FillNotificationsWithPostFollowers function failed: '
+    }
+  )
 }
 
 export const fillNotificationsWithCommentFollowers = async (commentId: PostId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
   const query = fillTableWith("notifications", "comment")
 
   const encodedCommentId = encodeStructId(commentId);
-  const params = [ encodedCommentId, account, blockNumber, eventIndex ];
-  try {
-    await pg.query(query, params)
-    fillNotificationsLog('comment')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    fillNotificationsLogError('comment', err.stack);
-    throw err
-  }
+  const params = [encodedCommentId, account, blockNumber, eventIndex];
+  
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'FillNotificationsWithCommentFollowers function worked successfully',
+      error: 'FillNotificationsWithCommentFollowers function failed: '
+    }
+  )
 }

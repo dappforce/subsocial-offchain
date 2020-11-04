@@ -2494,6 +2494,21 @@
     lodash.truncate "^4.4.2"
     winston "^3.2.0"
 
+"@subsocial/utils@^0.4.11-beta5":
+  version "0.4.11-beta5"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.4.11-beta5.tgz#17689a1b491f2e1cb2674b2585981770d5f7e52f"
+  integrity sha512-piRv6q6nz/RtouPf8ftowEQyNE6sM40QxkBPufaanbLRXwDIkZs4TECEJEtPHIRi+GVYbKapoR0jfq+Fj2KidQ==
+  dependencies:
+    "@babel/runtime" "^7.8.4"
+    bn.js "^5.1.1"
+    chalk "^3.0.0"
+    circular-json "^0.5.9"
+    dotenv "^8.0.0"
+    lodash.isempty "^4.4.0"
+    lodash.truncate "^4.4.2"
+    loglevel "^1.7.0"
+    loglevel-plugin-prefix "^0.8.4"
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"
@@ -10637,7 +10652,12 @@ logform@^2.2.0:
     ms "^2.1.1"
     triple-beam "^1.3.0"
 
-loglevel@^1.6.8:
+loglevel-plugin-prefix@^0.8.4:
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/loglevel-plugin-prefix/-/loglevel-plugin-prefix-0.8.4.tgz#2fe0e05f1a820317d98d8c123e634c1bd84ff644"
+  integrity sha512-WpG9CcFAOjz/FtNht+QJeGpvVl/cdR6P0z6OcXSkr8wFJOsV2GRj2j10JLfjuA4aYkcKCNIEqRGCyTife9R8/g==
+
+loglevel@^1.6.8, loglevel@^1.7.0:
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/loglevel/-/loglevel-1.7.0.tgz#728166855a740d59d38db01cf46f042caa041bb0"
   integrity sha512-i2sY04nal5jDcagM3FMfG++T69GEEM8CYuOfeOIvmXzOIcwE9a/CJPR0MFM97pYMj/u10lzz7/zd7+qwhrBTqQ==

@@ -13,5 +13,4 @@ export const handleEventForElastic = async (event: SubstrateEvent): Promise<Erro
     }
   }
 }
-
-const log = newLogger(handleEventForElastic.name)
+const log = newLogger('handleEventForElastic')

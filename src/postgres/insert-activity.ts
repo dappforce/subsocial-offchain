@@ -4,7 +4,7 @@ import { isEmptyArray } from '@subsocial/utils/array'
 import { Post, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate, getValidDate } from '../substrate/subscribe';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
-import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
+import { log, updateCountLog, emptyParamsLogError, tryPgQeury } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { SubstrateEvent } from '../substrate/types';
 import { InsertActivityPromise, ActivitiesParamsWithAccount } from './queries/types';
@@ -16,14 +16,16 @@ export const insertNotificationForOwner = async ({ account, blockNumber, eventIn
       VALUES($1, $2, $3) 
     RETURNING *`
 
-  try {
-    await pg.query(query, params)
-    insertActivityLog('owner')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    insertActivityLogError('owner', err.stack)
-    throw err
-  }
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'InsertNotificationForOwner function worked successfully',
+      error: 'InsertNotificationForOwner function failed: '
+    }
+  )
 }
 
 export const insertActivityComments = async (eventAction: SubstrateEvent, ids: SubstrateId[], lastComment: Post) => {
@@ -73,41 +75,42 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
   const date = await getValidDate(blockNumber)
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
-  try {
-    await pg.query(query, params)
 
-    insertActivityLog('comment')
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
 
-    const [postId, , parentId] = paramsIds;
-    let parentEq = '';
-    const paramsIdsUpd = [postId];
-    if (!parentId) {
-      parentEq += 'AND parent_comment_id IS NULL'
-    } else {
-      parentEq = 'AND parent_comment_id = $5';
-      paramsIdsUpd.push(parentId);
+      const [postId, , parentId] = paramsIds;
+      let parentEq = '';
+      const paramsIdsUpd = [postId];
+      if (!parentId) {
+        parentEq += 'AND parent_comment_id IS NULL'
+      } else {
+        parentEq = 'AND parent_comment_id = $5';
+        paramsIdsUpd.push(parentId);
+      }
+      const queryUpdate = `
+        UPDATE df.activities
+          SET aggregated = false
+          WHERE block_number <> $1
+            AND event_index <> $2
+            AND event = $3
+            AND post_id = $4
+            ${parentEq}
+            AND aggregated = true
+        RETURNING *`;
+      log.debug('Params of update query:', [...paramsIdsUpd]);
+      log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
+      const paramsUpdate = [blockNumber, eventIndex, eventName, ...paramsIdsUpd];
+      const resUpdate = await pg.query(queryUpdate, paramsUpdate);
+      updateCountLog(resUpdate.rowCount)
+    },
+    {
+      success: 'InsertActivityForComment function worked successfully',
+      error: 'InsertActivityForComment function failed: '
     }
-    const queryUpdate = `
-      UPDATE df.activities
-        SET aggregated = false
-        WHERE block_number <> $1
-          AND event_index <> $2
-          AND event = $3
-          AND post_id = $4
-          ${parentEq}
-          AND aggregated = true
-      RETURNING *`;
-    log.debug('Params of update query:', [...paramsIdsUpd]);
-    log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
-    const paramsUpdate = [blockNumber, eventIndex, eventName, ...paramsIdsUpd];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
-
-    return {blockNumber: blockNumber, eventIndex: eventIndex};
-  } catch (err) {
-    insertActivityLogError('comment', err.stack);
-    throw err
-  }
+  )
+  return {blockNumber, eventIndex};
 };
 
 export const insertActivityForAccount = async (eventAction: SubstrateEvent, count: number): InsertActivityPromise => {
@@ -124,27 +127,29 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
 
   const params = [blockNumber, eventIndex, accountId, eventName, objectId, date, count];
 
-  try {
-    await pg.query(query, params)
-    const queryUpdate = `
-      UPDATE df.activities
-        SET aggregated = false
-        WHERE block_number <> $1
-          AND event_index <> $3
-          AND event = $4
-          AND aggregated = true
-          AND following_id = $2
-      RETURNING *`;
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      const queryUpdate = `
+        UPDATE df.activities
+          SET aggregated = false
+          WHERE block_number <> $1
+            AND event_index <> $3
+            AND event = $4
+            AND aggregated = true
+            AND following_id = $2
+        RETURNING *`;
 
-    const paramsUpdate = [blockNumber, accountId, eventIndex, eventName];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
-    insertActivityLog('account')
-    return {blockNumber: blockNumber, eventIndex: eventIndex};
-  } catch (err) {
-    insertActivityLogError('account', err.stack);
-    throw err
-  }
+      const paramsUpdate = [blockNumber, accountId, eventIndex, eventName];
+      const resUpdate = await pg.query(queryUpdate, paramsUpdate);
+      updateCountLog(resUpdate.rowCount)
+    },
+    {
+      success: 'InsertActivityForAccount function worked successfully',
+      error: 'InsertActivityForAccount function failed: '
+    }
+  )
+  return {blockNumber, eventIndex};
 };
 
 export const insertActivityForSpace = async (eventAction: SubstrateEvent, count: number, creator?: string): InsertActivityPromise => {
@@ -161,27 +166,30 @@ export const insertActivityForSpace = async (eventAction: SubstrateEvent, count:
     RETURNING *`
   const date = await getValidDate(blockNumber)
   const params = [blockNumber, eventIndex, accountId, eventName, spaceId, date, count, aggregated];
-  try {
-    await pg.query(query, params)
-    const paramsUpdate = [blockNumber, eventIndex, eventName, spaceId];
-    const queryUpdate = `
-      UPDATE df.activities
-        SET aggregated = false
-        WHERE block_number <> $1
-          AND event_index <> $2
-          AND event = $3
-          AND aggregated = true
-          AND space_id = $4
-      RETURNING *`;
+  
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      const paramsUpdate = [blockNumber, eventIndex, eventName, spaceId];
+      const queryUpdate = `
+        UPDATE df.activities
+          SET aggregated = false
+          WHERE block_number <> $1
+            AND event_index <> $2
+            AND event = $3
+            AND aggregated = true
+            AND space_id = $4
+        RETURNING *`;
 
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
-    insertActivityLog('space')
-    return {blockNumber: blockNumber, eventIndex: eventIndex};
-  } catch (err) {
-    insertActivityLogError('space', err.stack);
-    throw err
-  }
+      const resUpdate = await pg.query(queryUpdate, paramsUpdate);
+      updateCountLog(resUpdate.rowCount)
+    },
+    {
+      success: 'InsertActivityForSpace function worked successfully',
+      error: 'InsertActivityForSpace function failed: '
+    }
+  )
+  return {blockNumber, eventIndex};
 };
 
 export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: SubstrateId[], count?: number): InsertActivityPromise => {
@@ -206,14 +214,15 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
     : count;
 
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, newCount];
-  try {
-    await pg.query(query, params)
-    insertActivityLog('post')
-    return {blockNumber: blockNumber, eventIndex: eventIndex};
-  } catch (err) {
-    insertActivityLogError('post', err.stack);
-    throw err
-  }
+  
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'InsertActivityForPost function worked successfully',
+      error: 'InsertActivityForPost function failed: '
+    }
+  )
+  return {blockNumber, eventIndex};
 };
 
 export const insertActivityForPostReaction = async (eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): InsertActivityPromise => {
@@ -234,29 +243,31 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
     RETURNING *`
   const date = await getValidDate(blockNumber)
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
-  try {
-    await pg.query(query, params)
-    insertActivityLog('post reaction')
-    const postId = paramsIds.pop();
-    const queryUpdate = `
-      UPDATE df.activities
-        SET aggregated = false
-        WHERE block_number <> $1
-          AND event_index <> $2
-          AND event = $3
-          AND aggregated = true
-          AND post_id = $4
-      RETURNING *`;
 
-    const paramsUpdate = [blockNumber, eventIndex, eventName, postId];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      const postId = paramsIds.pop();
+      const queryUpdate = `
+        UPDATE df.activities
+          SET aggregated = false
+          WHERE block_number <> $1
+            AND event_index <> $2
+            AND event = $3
+            AND aggregated = true
+            AND post_id = $4
+        RETURNING *`;
 
-    return {blockNumber: blockNumber, eventIndex: eventIndex};
-  } catch (err) {
-    insertActivityLogError('post reaction', err.stack);
-    throw err
-  }
+      const paramsUpdate = [blockNumber, eventIndex, eventName, postId];
+      const resUpdate = await pg.query(queryUpdate, paramsUpdate);
+      updateCountLog(resUpdate.rowCount)
+    },
+    {
+      success: 'InsertActivityForPostReaction function worked successfully',
+      error: 'InsertActivityForPostReaction function failed: '
+    }
+  )
+  return {blockNumber, eventIndex};
 };
 
 export const insertActivityForCommentReaction = async (eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): InsertActivityPromise => {
@@ -276,27 +287,29 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
     RETURNING *`
   const date = await getValidDate(blockNumber)
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
-  try {
-    await pg.query(query, params)
-    insertActivityLog('comment reaction')
-    const queryUpdate = `
-      UPDATE df.activities
-        SET aggregated = false
-        WHERE block_number <> $1
-          AND event_index <> $2
-          AND event = $3
-          AND aggregated = true
-          AND post_id = $4
-          AND comment_id = $5
-      RETURNING *`;
+  
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      const queryUpdate = `
+        UPDATE df.activities
+          SET aggregated = false
+          WHERE block_number <> $1
+            AND event_index <> $2
+            AND event = $3
+            AND: eventIndex aggregated = true
+            AND post_id = $4
+            AND comment_id = $5
+        RETURNING *`;
 
-    const paramsUpdate = [blockNumber, eventIndex, eventName, ...paramsIds];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
-
-    return {blockNumber: blockNumber, eventIndex: eventIndex};
-  } catch (err) {
-    insertActivityLogError('comment reaction', err.stack);
-    throw err
-  }
+      const paramsUpdate = [blockNumber, eventIndex, eventName, ...paramsIds];
+      const resUpdate = await pg.query(queryUpdate, paramsUpdate);
+      updateCountLog(resUpdate.rowCount)
+    },
+    {
+      success: 'InsertActivityForCommentReaction function worked successfully',
+      error: 'InsertActivityForCommentReaction function failed: '
+    }
+  )
+  return {blockNumber, eventIndex};
 }

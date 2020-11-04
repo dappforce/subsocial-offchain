@@ -1,7 +1,7 @@
 import { pg } from '../connections/connect-postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { deleteNotificationsLog, deleteNotificationsLogError } from './postges-logger';
+import { tryPgQeury } from './postges-logger';
 
 export const deleteNotificationsAboutComment = async (userId: string, commentId: PostId) => {
   const query = `
@@ -14,13 +14,14 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
       RETURNING *`
   const encodedCommentId = encodeStructId(commentId);
   const params = [ userId, encodedCommentId ];
-  try {
-    await pg.query(query, params)
-    deleteNotificationsLog('comment')
-  } catch (err) {
-    deleteNotificationsLogError('comment', err.stack)
-    throw err
-  }
+
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'DeleteNotificationsAboutComment function worked successfully',
+      error: 'DeleteNotificationsAboutComment function failed: '
+    }
+  )
 }
 
 export const deleteNotificationsAboutAccount = async (userId: string, accountId: string) => {
@@ -34,13 +35,14 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
           WHERE account = $2)
       RETURNING *`
   const params = [ userId, accountId ];
-  try {
-    await pg.query(query, params)
-    deleteNotificationsLog('account')
-  } catch (err) {
-    deleteNotificationsLogError('account', err.stack)
-    throw err
-  }
+  
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'DeleteNotificationsAboutAccount function worked successfully',
+      error: 'DeleteNotificationsAboutAccount function failed: '
+    }
+  )
 }
 
 export const deleteNotificationsAboutPost = async (userId: string, postId: PostId) => {
@@ -55,13 +57,14 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
       RETURNING *`
   const encodedPostId = encodeStructId(postId);
   const params = [ userId, encodedPostId ];
-  try {
-    await pg.query(query, params)
-    deleteNotificationsLog('post')
-  } catch (err) {
-    deleteNotificationsLogError('post', err.stack)
-    throw err
-  }
+  
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'DeleteNotificationsAboutPost function worked successfully',
+      error: 'DeleteNotificationsAboutPost function failed: '
+    }
+  )
 }
 
 export const deleteNotificationsAboutSpace = async (userId: string, spaceId: SpaceId) => {
@@ -76,11 +79,12 @@ export const deleteNotificationsAboutSpace = async (userId: string, spaceId: Spa
       RETURNING *`
   const encodedSpaceId = encodeStructId(spaceId);
   const params = [ userId, encodedSpaceId ];
-  try {
-    await pg.query(query, params)
-    deleteNotificationsLog('space')
-  } catch (err) {
-    deleteNotificationsLogError('space', err.stack)
-    throw err
-  }
+  
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'DeleteNotificationsAboutSpace function worked successfully',
+      error: 'DeleteNotificationsAboutSpace function failed: '
+    }
+  )
 }

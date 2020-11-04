@@ -1,23 +1,26 @@
 import { pg } from '../connections/connect-postgres';
-import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
+import { log, tryPgQeury } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
-import BN from 'bn.js';
+import { ActivitiesParamsWithAccount } from './queries/types';
 
-export const insertNotificationForOwner = async (eventIndex: number, activityAccount: string, blockNumber: BN, account: string) => {
-  const params = [ account, eventIndex, activityAccount, blockNumber ]
+export const insertNotificationForOwner = async ({blockNumber, eventIndex, account }: ActivitiesParamsWithAccount) => {
+
+  const params = [ account, blockNumber, eventIndex ]
   const query = `
     INSERT INTO df.notifications
-      VALUES($1, $2, $3, $4) 
+      VALUES($1, $2, $3) 
     RETURNING *`
     
-  try {
-    await pg.query(query, params)
-    insertActivityLog('owner')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    insertActivityLogError('owner', err.stack)
-    throw insertActivityLogError
-  }
+    await tryPgQeury(
+      async () => {
+        await pg.query(query, params)
+        await updateCountOfUnreadNotifications(account)
+      },
+      {
+        success: 'InsertNotificationForOwner function worked successfully',
+        error: 'InsertNotificationForOwner function failed: '
+      }
+    )
 }
 
 export type AggCountProps = {
@@ -47,28 +50,24 @@ export const getAggregationCount = async (props: AggCountProps) => {
   }
 }
 
-const selectCount = (field: string) => {
-  return `( 
-    SELECT ${field}
-    FROM df.notifications
-    WHERE account = $1 AND ${field} > (
-      SELECT last_read_${field}
-      FROM df.notifications_counter
-      WHERE account = $1)
-    )`
-}
-
 export const updateCountOfUnreadNotifications = async (account: string) => {
   const query = `
     INSERT INTO df.notifications_counter 
-      (account, last_read_event_index, last_read_account, last_read_block_number, unread_count)
-    VALUES ($1, NULL, NULL, NULL, 1)
+      (account, last_read_event_index, last_read_block_number, unread_count)
+    VALUES ($1, NULL, NULL, 1)
     ON CONFLICT (account) DO UPDATE
     SET unread_count = (
       SELECT DISTINCT COUNT(*)
       FROM df.activities
-      WHERE aggregated = true AND event_index IN ${selectCount("event_index")}
-      AND account IN ${selectCount("account")} AND block_number IN ${selectCount("block_number")}
+      WHERE aggregated = true AND (event_index, block_number) IN ( 
+        SELECT event_index, block_number
+        FROM df.notifications
+        WHERE account = $1 AND block_number > (
+          SELECT last_read_block_number
+          FROM df.notifications_counter
+          WHERE account = $1
+        )
+      )
     )`
 
   try {
