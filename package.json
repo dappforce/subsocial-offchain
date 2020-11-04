@@ -50,7 +50,7 @@
     "@elastic/elasticsearch": "^7.4.0",
     "@polkadot/types": "1.28.1",
     "@subsocial/api": "latest",
-    "@subsocial/types": "0.4.7",
+    "@subsocial/types": "0.4.8-beta3",
     "@subsocial/utils": "^0.1.23",
     "@types/request-promise": "^4.1.46",
     "axios": "^0.19.0",
