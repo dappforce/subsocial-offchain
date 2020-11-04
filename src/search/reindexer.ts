@@ -1,16 +1,14 @@
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { Api } from '@subsocial/api/substrateConnect';
+import { resolveSubsocialApi } from '../connections/subsocial';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
 import { indexPostContent, indexSpaceContent } from './event-handlers/utils';
 import { elasticLog as log } from '../connections/loggers';
+import { exit } from 'process';
 
 const BN = require('bn.js');
 const one = new BN(1)
 
-async function reindexContentFromIpfs() {
-  const api = await Api.connect(process.env.SUBSTRATE_URL)
-  const substrate = new SubsocialSubstrateApi(api)
-
+async function reindexContentFromIpfs(substrate: SubsocialSubstrateApi) {
   const lastSpaceId = (await substrate.nextSpaceId()).sub(one)
   const lastPostId = (await substrate.nextPostId()).sub(one)
 
@@ -32,7 +30,12 @@ async function reindexContentFromIpfs() {
     log.info(`Index post # ${id.toString()} out of ${lastPostId.toString()}`)
   }
 
-  api.disconnect();
+  exit(0);
 }
 
-reindexContentFromIpfs()
+resolveSubsocialApi()
+  .then(({ substrate }) => reindexContentFromIpfs(substrate))
+  .catch((error) => {
+    log.error('Failed to reindex spaces and posts in Elasticsearch:', error)
+    exit(-1)
+  })

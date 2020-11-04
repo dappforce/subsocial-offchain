@@ -1,43 +1,12 @@
 import * as express from 'express'
-import { nonEmptyStr, parseNumStr } from '@subsocial/utils';
-import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../postgres/queries/types';
-import * as pgQueries from '../postgres/queries';
-
-const MAX_RESULT_LIMIT = parseNumStr(process.env.PGLIMIT) || 20
-
-type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
-
-const getNumberFromRequest = (
-  req: express.Request,
-  value: 'limit' | 'offset',
-  def: number
-): number => {
-  const reqLimit = req.query[value]
-  return nonEmptyStr(reqLimit) ? parseNumStr(reqLimit) : def
-}
-
-const getLimitFromRequest = (req: express.Request): number => {
-  const limit = getNumberFromRequest(req, 'limit', MAX_RESULT_LIMIT)
-  return limit < MAX_RESULT_LIMIT ? limit : MAX_RESULT_LIMIT
-}
-
-const getOffsetFromRequest = (req: express.Request): number =>
-  getNumberFromRequest(req, 'offset', 0)
-
-const callMethodAndReturnJson = async (
-  _req: express.Request,
-  res: express.Response,
-  method: Promise<any>
-) => {
-  try {
-    const data = await method
-    res.json(data)
-  } catch (err) {
-    res
-      .status(501)
-      .send(err)
-  }
-}
+import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
+import * as pgQueries from '../../postgres/queries';
+import {
+  getOffsetFromRequest,
+  getLimitFromRequest,
+  resolvePromiseAndReturnJson,
+  HandlerFn,
+} from '../utils'
 
 const activityHandler = (
   req: express.Request,
@@ -47,7 +16,7 @@ const activityHandler = (
   const offset = getOffsetFromRequest(req)
   const limit = getLimitFromRequest(req)
   const account = req.params.id
-  return callMethodAndReturnJson(req, res, method({ account, offset, limit }))
+  return resolvePromiseAndReturnJson(res, method({ account, offset, limit }))
 }
 
 const countHandler = async (
@@ -56,7 +25,7 @@ const countHandler = async (
   method: GetCountFn | GetCountsFn
 ) => {
   const account = req.params.id
-  return callMethodAndReturnJson(req, res, method(account))
+  return resolvePromiseAndReturnJson(res, method(account))
 }
 
 export const feedHandler: HandlerFn = (req, res) =>
