@@ -7,8 +7,8 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1
-        AND (event_index, activity_account, block_number) IN
-          (SELECT block_number, event_index, account
+        AND (block_number, event_index) IN
+          (SELECT block_number, event_index
           FROM df.activities
           LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_comment_id WHERE comment_id = $2)
       RETURNING *`
@@ -27,9 +27,9 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1
-        AND (event_index, activity_account, block_number) IN
-          (SELECT block_number, event_index, account
-          LEFT JOIN df.account_followers
+        AND (block_number, event_index) IN
+          (SELECT block_number, event_index
+          LEFT JOIN df.accountblock_number_followers
           ON df.activities.account = df.account_followers.following_account
           WHERE account = $2)
       RETURNING *`
@@ -47,8 +47,8 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1 
-        AND (event_index, activity_account, block_number) IN
-          (SELECT block_number, event_index, account
+        AND (block_number, event_index) IN
+          (SELECT block_number, event_index
           FROM df.activities
           LEFT JOIN df.post_followers ON df.activities.post_id = df.post_followers.following_post_id
           WHERE post_id = $2)
@@ -68,8 +68,8 @@ export const deleteNotificationsAboutSpace = async (userId: string, spaceId: Spa
   const query = `
       DELETE FROM df.notifications
       WHERE account = $1
-        AND (event_index, activity_account, block_number) IN
-          (SELECT block_number, event_index, account
+        AND (block_number, event_index) IN
+          (SELECT block_number, event_index
           FROM df.activities
           LEFT JOIN df.space_followers ON df.activities.space_id = df.space_followers.following_space_id
           WHERE space_id = $2)

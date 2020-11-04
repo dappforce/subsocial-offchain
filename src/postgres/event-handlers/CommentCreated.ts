@@ -31,10 +31,12 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
   } else {
     eventAction.eventName = VirtualEvents.CommentCreated
     const insertResult = await insertActivityForComment(eventAction, ids, postCreator);
-    if (insertResult === {}) return;
+    if (insertResult === undefined) return;
+
+    const {blockNumber, eventIndex} = insertResult
 
     log.debug('Comment does not have a parent id');
-    await fillNotificationsWithPostFollowers(root_post_id, author, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber);
-    await fillNotificationsWithAccountFollowers(author, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber);
+    await fillNotificationsWithPostFollowers(root_post_id, author, eventIndex, blockNumber);
+    await fillNotificationsWithAccountFollowers(author, eventIndex, blockNumber);
   }
 }

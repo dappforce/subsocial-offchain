@@ -14,8 +14,10 @@ export const onRootCreated = async (eventAction: SubstrateEvent, post: Post) => 
   const spaceId = post.space_id.unwrap()
   const ids = [spaceId, postId ];
   const insertResult = await insertActivityForPost(eventAction, ids, 0);
-  if (insertResult === {}) return;
+  if (insertResult === undefined) return;
 
-  await fillNewsFeedWithSpaceFollowers(spaceId, author, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber);
-  await fillNewsFeedWithAccountFollowers(author, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber);
+  const {blockNumber, eventIndex} = insertResult
+
+  await fillNewsFeedWithSpaceFollowers(spaceId, author, eventIndex, blockNumber);
+  await fillNewsFeedWithAccountFollowers(author, eventIndex, blockNumber);
 }

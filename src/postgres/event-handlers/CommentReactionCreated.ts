@@ -22,10 +22,12 @@ export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post
   const reactionCount = upvotes_count.add(downvotes_count).toNumber() - 1;
 
   const insertResult = await insertActivityForCommentReaction(eventAction, reactionCount, ids, commentAuthor);
-  if (insertResult === {}) return;
+  if (insertResult === undefined) return;
+
+  const {blockNumber, eventIndex} = insertResult
 
   if (voter === commentAuthor) return;
 
   // insertAggStream(eventAction, commentId);
-  await insertNotificationForOwner(insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber, commentAuthor);
+  await insertNotificationForOwner(eventIndex, blockNumber, commentAuthor);
 }

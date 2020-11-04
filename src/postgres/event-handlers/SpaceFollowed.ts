@@ -15,10 +15,12 @@ export const onSpaceFollowed: EventHandlerFn = async (eventAction: SubstrateEven
   const count = space.followers_count.toNumber() - 1;
   const account = space.owner.toString();
   const insertResult = await insertActivityForSpace(eventAction, count, account);
-  if (insertResult === {}) return;
+  if (insertResult === undefined) return;
+
+  const {blockNumber, eventIndex} = insertResult
 
   const follower = data[0].toString();
   if (follower === account) return;
 
-  await insertNotificationForOwner(insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber, account);
+  await insertNotificationForOwner(eventIndex, blockNumber, account);
 }

@@ -10,7 +10,6 @@ export type ActivitiesParams = {
 type InsertActivityResponse = {
   eventIndex?: number
   blockNumber?: BN
-  activityAccount?: string
 }
 
 export type InsertActivityPromise = Promise<InsertActivityResponse>

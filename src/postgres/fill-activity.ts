@@ -7,16 +7,15 @@ import BN from 'bn.js';
 
 const fillAccountFollowerQuery = (table: string) => {
   return `
-  INSERT INTO df.${table} (account, event_index, activity_account, block_number)
-    (SELECT df.account_followers.follower_account, df.activities.event_index, df.activities.account, df.activities.block_number
+  INSERT INTO df.${table} (account, block_number, event_index)
+    (SELECT df.account_followers.follower_account, df.activities.block_number, df.activities.event_index
     FROM df.activities
     LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
     WHERE df.account_followers.follower_account <> $1
-      AND event_index = $2
-      AND account = $3
-      AND block_number = $4
-      AND (df.account_followers.follower_account, df.activities.event_index, df.activities.account, df.activities.block_number)
-      NOT IN (SELECT account, event_index, activity_account, block_number from df.${table}))
+      AND block_number = $2
+      AND event_index = $3
+      AND (df.account_followers.follower_account, df.activities.event_index, df.activities.block_number)
+      NOT IN (SELECT account, event_index, block_number from df.${table}))
   RETURNING *`
 }
 
@@ -25,27 +24,26 @@ const fillTableWith = (table: string, object: string) => {
   if(object == "post") parent_comment_id = "AND parent_comment_id IS NULL"
 
   return `
-  INSERT INTO df.${table} (account, event_index, activity_account, block_number)
-    (SELECT df.${object}_followers.follower_account, df.activities.event_index, df.activities.account, df.activities.block_number
+  INSERT INTO df.${table} (account, event_index, block_number)
+    (SELECT df.${object}_followers.follower_account, df.activities.block_number, df.activities.event_index
     FROM df.activities
     LEFT JOIN df.${object}_followers ON df.activities.${object}_id = df.${object}_followers.following_${object}_id
     WHERE ${object}_id = $1
       AND df.${object}_followers.follower_account <> $2
-      AND event_index = $3
-      AND account = $4
-      AND block_number = $5
+      AND block_number = $3
+      AND event_index = $4
       AND aggregated = true
       ${parent_comment_id}
-      AND (df.${object}_followers.follower_account, df.activities.event_index, df.activities.account, df.activities.block_number)
-        NOT IN (SELECT account, event_index, activity_account, block_number from df.${table}))
+      AND (df.${object}_followers.follower_account, df.activities.event_index, df.activities.block_number)
+        NOT IN (SELECT account, event_index, block_number from df.${table}))
   RETURNING *;
   `
 }
 
-export const fillNewsFeedWithAccountFollowers = async (account: string, eventIndex: number, activityAccount: string, blockNumber: BN ) => {
+export const fillNewsFeedWithAccountFollowers = async (account: string, eventIndex: number, blockNumber: BN ) => {
   const query = fillAccountFollowerQuery("news_feed")
 
-  const params = [ account, eventIndex, activityAccount, blockNumber ];
+  const params = [ account, blockNumber, eventIndex];
   try {
     await pg.query(query, params)
     fillNewsFeedLog('account')
@@ -55,10 +53,10 @@ export const fillNewsFeedWithAccountFollowers = async (account: string, eventInd
   }
 }
 
-export const fillNotificationsWithAccountFollowers = async (account: string, eventIndex: number, activityAccount: string, blockNumber: BN) => {
+export const fillNotificationsWithAccountFollowers = async (account: string, eventIndex: number, blockNumber: BN) => {
   const query = fillAccountFollowerQuery("notifications")
 
-  const params = [ account, eventIndex, activityAccount, blockNumber ];
+  const params = [ account, blockNumber, eventIndex ];
   try {
     await pg.query(query, params)
     fillNotificationsLog('account')
@@ -69,12 +67,11 @@ export const fillNotificationsWithAccountFollowers = async (account: string, eve
   }
 }
 
-export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: string, eventIndex: number, activityAccount: string, blockNumber: BN) => {
+export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: string, eventIndex: number, blockNumber: BN) => {
   const query = fillTableWith("news_feed", "space")
 
   const encodedSpaceId = encodeStructId(spaceId);
-  const params = [ encodedSpaceId, account, eventIndex, activityAccount, blockNumber ];
-  console.log("Params for insert post: ", params)
+  const params = [ encodedSpaceId, account, blockNumber, eventIndex ];
   try {
     await pg.query(query, params)
     fillNewsFeedLog('space')
@@ -85,11 +82,11 @@ export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: 
   }
 }
 
-export const fillNotificationsWithPostFollowers = async (postId: PostId, account: string, eventIndex: number, activityAccount: string, blockNumber: BN) => {
+export const fillNotificationsWithPostFollowers = async (postId: PostId, account: string, eventIndex: number, blockNumber: BN) => {
   const query = fillTableWith("notifications", "post")
 
   const encodedPostId = encodeStructId(postId);
-  const params = [ encodedPostId, account, eventIndex, activityAccount, blockNumber ];
+  const params = [ encodedPostId, account, blockNumber, eventIndex ];
   try {
     await pg.query(query, params)
     fillNotificationsLog('post')
@@ -100,11 +97,11 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, account
   }
 }
 
-export const fillNotificationsWithCommentFollowers = async (commentId: PostId, account: string, eventIndex: number, activityAccount: string, blockNumber: BN) => {
+export const fillNotificationsWithCommentFollowers = async (commentId: PostId, account: string, eventIndex: number, blockNumber: BN) => {
   const query = fillTableWith("notifications", "comment")
 
   const encodedCommentId = encodeStructId(commentId);
-  const params = [ encodedCommentId, account, eventIndex, activityAccount, blockNumber ];
+  const params = [ encodedCommentId, account, blockNumber, eventIndex ];
   try {
     await pg.query(query, params)
     fillNotificationsLog('comment')

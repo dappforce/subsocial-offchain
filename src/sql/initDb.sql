@@ -27,9 +27,9 @@ END$$;
 
 CREATE TABLE IF NOT EXISTS df.activities
 (
+    block_number bigint NOT NULL,
     event_index integer NOT NULL,
     account varchar(48) NOT NULL,
-    block_number bigint NOT NULL,
     event df.action NOT NULL,
     following_id varchar(48) NULL,
     space_id bigint NULL,
@@ -39,35 +39,32 @@ CREATE TABLE IF NOT EXISTS df.activities
     date TIMESTAMP NOT NULL DEFAULT NOW(),
     aggregated boolean NOT NULL DEFAULT true,
     agg_count bigint NOT NULL DEFAULT 0,
-    PRIMARY KEY (event_index, account, block_number)
+    PRIMARY KEY (event_index, block_number)
 );
 
 CREATE TABLE IF NOT EXISTS df.news_feed
 (
     account varchar(48) NOT NULL,
-    event_index integer NOT NULL,
-    activity_account varchar(48) NOT NULL,
     block_number bigint NOT NULL,
-    FOREIGN KEY (event_index, activity_account, block_number) REFERENCES df.activities(event_index, account, block_number)
+    event_index integer NOT NULL,
+    FOREIGN KEY (block_number, event_index) REFERENCES df.activities(block_number, event_index)
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications
 (
     account varchar(48) NOT NULL,
-    event_index integer NOT NULL,
-    activity_account varchar(48) NOT NULL,
     block_number bigint NOT NULL,
-    FOREIGN KEY (event_index, activity_account, block_number) REFERENCES df.activities(event_index, account, block_number)
+    event_index integer NOT NULL,
+    FOREIGN KEY (block_number, event_index) REFERENCES df.activities(block_number, event_index)
 );
 
 CREATE TABLE IF NOT EXISTS df.notifications_counter
 (
     account varchar(48) NOT NULL UNIQUE,
-    last_read_event_index integer NULL DEFAULT NULL,
-    last_read_account varchar(48) NULL DEFAULT NULL,
     last_read_block_number bigint NULL DEFAULT NULL,
+    last_read_event_index integer NULL DEFAULT NULL,
     unread_count bigint NOT NULL DEFAULT 0,
-    FOREIGN KEY (last_read_event_index, last_read_account, last_read_block_number) REFERENCES df.activities(event_index, account, block_number)
+    FOREIGN KEY (last_read_block_number, last_read_event_index) REFERENCES df.activities(block_number, event_index)
 );
 
 CREATE TABLE IF NOT EXISTS df.account_followers

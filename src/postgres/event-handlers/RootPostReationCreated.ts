@@ -11,9 +11,11 @@ export const onRootPostReactionCreated = async (eventAction: SubstrateEvent, pos
   const reactionCount = post.upvotes_count.add(post.downvotes_count).toNumber() - 1;
   const postAuthor = post.created.account.toString();
   const insertResult = await insertActivityForPostReaction(eventAction, reactionCount, ids, postAuthor);
-  if (insertResult === {}) return;
+  if (insertResult === undefined) return;
 
+  const {blockNumber, eventIndex} = insertResult
+  
   if (voter === postAuthor) return;
 
-  await insertNotificationForOwner(insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber, postAuthor);
+  await insertNotificationForOwner(eventIndex, blockNumber, postAuthor);
 }

@@ -8,9 +8,11 @@ export const onSpaceCreated: EventHandlerFn = async (eventAction: SubstrateEvent
   const { data } = eventAction;
   const account = data[0].toString();
   const insertResult = await insertActivityForSpace(eventAction, 0);
-  if(insertResult === {}) return
+  if(insertResult === undefined) return
 
-  await fillNotificationsWithAccountFollowers(account, insertResult.eventIndex, insertResult.activityAccount, insertResult.blockNumber);
+  const {blockNumber, eventIndex} = insertResult
+
+  await fillNotificationsWithAccountFollowers(account, eventIndex, blockNumber);
 
   const spaceId = data[1] as SpaceId;
   const space = await substrate.findSpace({ id: spaceId });
