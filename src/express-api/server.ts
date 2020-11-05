@@ -1,21 +1,22 @@
 import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
-import { ipfsCluster, ipfs } from '../connections/connect-ipfs';
+import { ipfsCluster } from '../connections/ipfs';
 import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
-import { newLogger, nonEmptyStr } from '@subsocial/utils';
+import { nonEmptyStr } from '@subsocial/utils';
 import parseSitePreview from '../parser/parse-preview'
 import { informClientAboutUnreadNotifications } from './events';
 // import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
-import * as reqHandlers from './handlers';
-import * as timeout from 'connect-timeout';
+import * as pgReqHandlers from './handlers/pgHandlers';
+import * as esReqHandlers from './handlers/esHandlers'
+import { offchainApiLog as log } from '../connections/loggers';
 import { isArray } from 'util';
+import * as timeout from 'connect-timeout';
 
 require('dotenv').config()
 
-const log = newLogger('ExpressOffchainApi')
 const app = express()
 const allowedOrigin = process.env.CORS_ALLOWED_ORIGIN || 'http://localhost'
 
@@ -58,7 +59,7 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
     const cid = await ipfsCluster.addContent(content)
     log.info('Content added to IPFS with CID:', cid)
     res.json(cid)
-  } 
+  }
 })
 
 const getContentResponse = async (res: express.Response, cids: string[]) => {
@@ -98,39 +99,44 @@ app.delete('/v1/ipfs/pins/:cid', async (req: express.Request, res: express.Respo
     await ipfsCluster.unpinContent(cid)
     log.info('Content unpinned from IPFS by CID:', cid)
   } else {
-    log.warn('Cannot unpin content: No CID provided ')
-    res.statusCode = 400
-    res.statusMessage = 'Bad Request'
+    const msg = 'Cannot unpin content: No CID provided'
+    log.warn(msg)
+    res.status(400).json(msg)
   }
 })
 
+// API endpoints for querying search results from Elasticsearch engine
+
+// TODO: get suggestions for search
+app.get('/v1/offchain/search', esReqHandlers.searchHandler)
+
 // API endpoints for personal user feed, notifications and all types of activities.
 
-app.get('/v1/offchain/feed/:id', reqHandlers.feedHandler);
-app.get('/v1/offchain/feed/:id/count', reqHandlers.feedCountHandler)
+app.get('/v1/offchain/feed/:id', pgReqHandlers.feedHandler)
+app.get('/v1/offchain/feed/:id/count', pgReqHandlers.feedCountHandler)
 
-app.get('/v1/offchain/notifications/:id', reqHandlers.notificationsHandler);
-app.get('/v1/offchain/notifications/:id/count', reqHandlers.notificationsCountHandler)
+app.get('/v1/offchain/notifications/:id', pgReqHandlers.notificationsHandler)
+app.get('/v1/offchain/notifications/:id/count', pgReqHandlers.notificationsCountHandler)
 
-app.get('/v1/offchain/activities/:id', reqHandlers.activitiesHandler)
-app.get('/v1/offchain/activities/:id/count', reqHandlers.activitiesCountHandler)
+app.get('/v1/offchain/activities/:id', pgReqHandlers.activitiesHandler)
+app.get('/v1/offchain/activities/:id/count', pgReqHandlers.activitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/comments', reqHandlers.commentActivitiesHandler)
-app.get('/v1/offchain/activities/:id/comments/count', reqHandlers.commentActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/comments', pgReqHandlers.commentActivitiesHandler)
+app.get('/v1/offchain/activities/:id/comments/count', pgReqHandlers.commentActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/posts', reqHandlers.postActivitiesHandler)
-app.get('/v1/offchain/activities/:id/posts/count', reqHandlers.postActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/posts', pgReqHandlers.postActivitiesHandler)
+app.get('/v1/offchain/activities/:id/posts/count', pgReqHandlers.postActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/follows', reqHandlers.followActivitiesHandler)
-app.get('/v1/offchain/activities/:id/follows/count', reqHandlers.followActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/follows', pgReqHandlers.followActivitiesHandler)
+app.get('/v1/offchain/activities/:id/follows/count', pgReqHandlers.followActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/reactions', reqHandlers.reactionActivitiesHandler)
-app.get('/v1/offchain/activities/:id/reactions/count', reqHandlers.reactionActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/reactions', pgReqHandlers.reactionActivitiesHandler)
+app.get('/v1/offchain/activities/:id/reactions/count', pgReqHandlers.reactionActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/spaces', reqHandlers.spaceActivitiesHandler)
-app.get('/v1/offchain/activities/:id/spaces/count', reqHandlers.spaceActivitiesCountHandler)
+app.get('/v1/offchain/activities/:id/spaces', pgReqHandlers.spaceActivitiesHandler)
+app.get('/v1/offchain/activities/:id/spaces/count', pgReqHandlers.spaceActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/counts', reqHandlers.activityCountsHandler)
+app.get('/v1/offchain/activities/:id/counts', pgReqHandlers.activityCountsHandler)
 
 app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, res: express.Response) => {
   const account = req.params.id;
@@ -138,7 +144,7 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
 
   const query = `
     UPDATE df.notifications_counter
-    SET 
+    SET
       unread_count = 0,
       last_read_activity_id = (
         SELECT MAX(activity_id) FROM df.notifications

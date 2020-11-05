@@ -1,4 +1,4 @@
-import { substrate } from '../../substrate/subscribe';
+import { substrate } from '../../connections/subsocial';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
 import { indexPostContent } from './utils';

@@ -1,22 +1,18 @@
-import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { Api } from '@subsocial/api/substrateConnect';
 import { substrateLog as log } from '../connections/loggers';
 import { shouldHandleEvent, eventsFilterMethods } from './utils';
 import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
+import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
+import { resolveSubsocialApi } from '../connections/subsocial';
 
 require('dotenv').config()
 
-export let substrate: SubsocialSubstrateApi
-
-async function main () {
+async function main (substrate: SubsocialSubstrateApi) {
 
   log.info(`Subscribe to Substrate events: ${Array.from(eventsFilterMethods)}`)
 
-  // Connect to Subsocial's Substrate node:
-  const api = await Api.connect(process.env.SUBSTRATE_URL)
-  substrate = new SubsocialSubstrateApi({ api })
+  const api = await substrate.api
 
   const blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
 
@@ -56,7 +52,7 @@ async function main () {
     // Reset processing flags:
     processPostgres = !lastPostgresError()
     processElastic = !lastElasticError()
-    
+
     // Doesn't matter if both Postgres and Elastic have the same last block number:
     lastBlock = lastPostgresBlock()
 
@@ -129,7 +125,9 @@ async function main () {
   }
 }
 
-main().catch((error) => {
-  log.error('Failed the event processing:', error)
-  process.exit(-1)
-})
+resolveSubsocialApi()
+  .then(({ substrate }) => main(substrate))
+  .catch((error) => {
+    log.error('Unexpected error during processing of Substrate events:', error)
+    process.exit(-1)
+  })

@@ -1,4 +1,4 @@
-import { pg } from '../connections/connect-postgres';
+import { pg } from '../connections/postgres';
 import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
 

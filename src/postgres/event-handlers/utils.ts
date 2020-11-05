@@ -1,6 +1,6 @@
 import { SubstrateEvent } from '../../substrate/types';
 import { Post } from '@subsocial/types/substrate/interfaces';
-import { substrate } from '../../substrate/subscribe';
+import { substrate } from '../../connections/subsocial';
 import { parsePostEvent } from '../../substrate/utils';
 
 type PostHandler = (eventAction: SubstrateEvent, post?: Post) => Promise<void>
@@ -18,7 +18,7 @@ export const findPostAndProccess = async ({ eventAction, onRootPost, onComment }
 
   if (post.extension.isComment) {
     onComment(eventAction, post)
-  } else { 
+  } else {
     onRootPost(eventAction, post)
   }
 }

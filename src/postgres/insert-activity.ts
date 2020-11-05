@@ -1,18 +1,18 @@
-import { pg } from '../connections/connect-postgres';
+import { pg } from '../connections/postgres';
 import { encodeStructIds, encodeStructId } from '../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils/array'
 import { Post, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../substrate/subscribe';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
 import { insertActivityLog, insertActivityLogError, log, updateCountLog, emptyParamsLogError } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { SubstrateEvent } from '../substrate/types';
+import { substrate } from '../connections/subsocial';
 
 export const insertNotificationForOwner = async (id: number, account: string) => {
   const params = [account, id]
   const query = `
     INSERT INTO df.notifications
-      VALUES($1, $2) 
+      VALUES($1, $2)
     RETURNING *`
 
   try {

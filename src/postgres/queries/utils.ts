@@ -1,5 +1,5 @@
 import { newLogger } from "@subsocial/utils"
-import { pg } from '../../connections/connect-postgres'
+import { pg } from '../../connections/postgres'
 
 const log = newLogger('PgQuery')
 
