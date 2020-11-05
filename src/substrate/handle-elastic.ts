@@ -8,10 +8,9 @@ export const handleEventForElastic = async (event: SubstrateEvent): Promise<Erro
     try {
       await handle(event)
     } catch (err) {
-      log.error('Failed to handle a Substrate event for Elastic')
+      log.error('Failed to handle a Substrate event for Elastic ')
       return err
     }
   }
 }
-
-const log = newLogger(handleEventForElastic.name)
+const log = newLogger('handleEventForElastic')
