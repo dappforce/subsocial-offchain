@@ -1,9 +1,9 @@
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../connections/subsocial';
 import { insertSpaceFollower } from '../insert-follower';
-import { insertActivityForSpace } from '../insert-activity';
 import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { insertActivityForSpace } from '../inserts/insertActivityForSpace';
 
 export const onSpaceFollowed: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
