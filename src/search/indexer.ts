@@ -7,7 +7,7 @@ import { encodeStructHexId } from '../substrate/utils';
 import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { ipfs, substrate } from '../connections';
+import { resolveSubsocialApi } from '../connections';
 
 export async function indexContentFromIpfs (
   index: string,
@@ -16,7 +16,9 @@ export async function indexContentFromIpfs (
   struct?: Space | Post
 ) {
 
-  function getContent<T extends CommonContent> () {
+  const { ipfs, substrate } = await resolveSubsocialApi()
+
+  async function getContent<T extends CommonContent> () {
     return ipfs.getContent<T>(ipfsHash);
   }
 
