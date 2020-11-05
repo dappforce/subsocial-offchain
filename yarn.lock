@@ -156,7 +156,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.8.0"
 
-"@babel/runtime@^7.11.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.8.4":
+"@babel/runtime@^7.11.2", "@babel/runtime@^7.12.1":
   version "7.12.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.5.tgz#410e7e487441e1b360c29be715d870d9b985882e"
   integrity sha512-plcc+hbExy3McchJCEQG3knOsuh3HH+Prx1P6cLIkET/0dLuQDEnrT+s27Axgc9bqfsmNUNHfscgMUdBpC9xfg==
@@ -572,36 +572,34 @@
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
 "@subsocial/api@latest":
-  version "0.4.11"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.11.tgz#e9b1889379414c4870649139dfe65218a5b9e0ca"
-  integrity sha512-pDzuWJVRsW9RnkMv5SNidGxjzcUUkKYz2T2cZTv7JBB/upS+0m0YJjiNV2xKwSgYF5ATLTpptSIXlYQTEqT5Kw==
+  version "0.4.13"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.13.tgz#293dfb982227e541a47c4195417e463538db59b1"
+  integrity sha512-+f9h0D6+iczYEgByIqwD8LEa/W5y3b3tfylTAdh/QFxRYAsvfjDwgoW1rYjgP6B5m/wmFEnuTjRbLff9DEWwUQ==
   dependencies:
     "@polkadot/api" "1.28.1"
     "@subsocial/utils" latest
     axios "^0.19.2"
 
 "@subsocial/config@^0.4.12":
-  version "0.4.12"
-  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.12.tgz#7c9be7e31312c790771003186df9e828a21adc3e"
-  integrity sha512-f7glrTz+qKMy2G0dn3bOKh4VJd/xcHRz9jvLYI2kKOPNsEoKBKNPi8n7CMUQC3ElIOirpTGfwfjjfP0p3jVX+w==
+  version "0.4.13"
+  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.13.tgz#1e14bb5075fff9643e8a0471244a55d22066051c"
+  integrity sha512-503gEtAShauCsQD6Hp52htp89ugUj7fPx7BCJKwZqrvV0selNz28Q1rwAxxXcVoLc2NoqyDvMe1dJRcYLW5wXg==
 
 "@subsocial/types@latest":
-  version "0.4.12"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.12.tgz#b5c1ab8d56a71fd0a4aa2c4feacee0142f0e0e08"
-  integrity sha512-A9T65BELtW6/MZzYXqivmAYyDFPQE6A1wRbE7q6aZr3y7neGxWq6Me9OBK+DcjlOWa2MBocQknGd4qnlvK7AIg==
+  version "0.4.13"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.13.tgz#a6ea6e5529a2c7657ae43157315212560ab513f4"
+  integrity sha512-NfUZTM/NoNakO2wirFGYOozJSixxxeoJuGSkThmVihuVCJDAx1vV3Pf5AtSq+zs7/FebhR8Pp6aDIlqyXwHmxA==
   dependencies:
     "@subsocial/utils" latest
     cids "^0.7.1"
 
 "@subsocial/utils@latest":
-  version "0.4.11"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.4.11.tgz#862a25a50f200e1081b44a33526dd63a807b4f41"
-  integrity sha512-7gisPjRZo8HiouVFTZGXyiFtng3b5fZ37Rx0genhHnRtkCQBS3G8nIpCCNW4fx8ZsEAhYiqVsZrd+B4OYehKKg==
+  version "0.4.13"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.4.13.tgz#638898e8ac642eb89b5fdf594f5d08f95b70dfa7"
+  integrity sha512-j+CHLGBQK/Np6D8dpWWe46uq6uW38YyKG/CLXzJa7lNZz5XYLkBwy1jG3rcMGiyMw3oGP7gux6m27RrTUZbO4Q==
   dependencies:
-    "@babel/runtime" "^7.8.4"
     bn.js "^5.1.1"
     chalk "^3.0.0"
-    circular-json "^0.5.9"
     dotenv "^8.0.0"
     lodash.isempty "^4.4.0"
     lodash.truncate "^4.4.2"
@@ -775,9 +773,9 @@
   integrity sha512-L8ogeT6vDzT1vxlW3KITTCt+BVXXVkLXfZ/XNm6UqbcJgxf+KPO7yjWx7dQQE8RW07KopL10x2gNMs41+IkMGQ==
 
 "@types/pg@^7.14.3":
-  version "7.14.5"
-  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-7.14.5.tgz#07638c7aa69061abe4be31267028cc5c3fc35f98"
-  integrity sha512-wqTKZmqkqXd1YiVRBT2poRrMIojwEi2bKTAAjUX6nEbzr98jc3cfR/7o7ZtubhH5xT7YJ6LRdRr1GZOgs8OUjg==
+  version "7.14.6"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-7.14.6.tgz#10d2ab6ae8bdda38a77ef677f15d24e9a66d526e"
+  integrity sha512-mf6kYvuYS2CObDxtsw5imE4vOvq+XHJtiJNFXir/fn9nxZtIFQ3/ECpokm8fNkxKBh7nQhyegHwNg1NIW+yYJA==
   dependencies:
     "@types/node" "*"
     "@types/pg-types" "*"
@@ -1502,11 +1500,6 @@ cipher-base@^1.0.1, cipher-base@^1.0.3:
   dependencies:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
-
-circular-json@^0.5.9:
-  version "0.5.9"
-  resolved "https://registry.yarnpkg.com/circular-json/-/circular-json-0.5.9.tgz#932763ae88f4f7dead7a0d09c8a51a4743a53b1d"
-  integrity sha512-4ivwqHpIFJZBuhN3g/pEcdbnGUywkBblloGbkglyloVjjR3uT6tieI89MVOfbP2tHX5sgb01FuLgAOzebNlJNQ==
 
 class-is@^1.1.0:
   version "1.1.0"
