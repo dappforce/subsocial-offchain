@@ -1,26 +1,23 @@
 import { pg } from '../connections/postgres';
-import { log, tryPgQuery } from './postges-logger';
+import { log } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
 import { ActivitiesParamsWithAccount } from './queries/types';
+import { newPgError } from './utils';
 
 export const insertNotificationForOwner = async ({blockNumber, eventIndex, account }: ActivitiesParamsWithAccount) => {
-
-  const params = [ account, blockNumber, eventIndex ]
   const query = `
     INSERT INTO df.notifications
       VALUES($1, $2, $3) 
     RETURNING *`
-    
-    await tryPgQuery(
-      async () => {
-        await pg.query(query, params)
-        await updateCountOfUnreadNotifications(account)
-      },
-      {
-        success: 'InsertNotificationForOwner function worked successfully',
-        error: 'InsertNotificationForOwner function failed: '
-      }
-    )
+
+  const params = [ account, blockNumber, eventIndex ]
+
+  try {
+    await pg.query(query, params)
+    await updateCountOfUnreadNotifications(account)
+  } catch (err) {
+    throw newPgError(err, insertNotificationForOwner)
+  }
 }
 
 export type AggCountProps = {
@@ -32,6 +29,7 @@ export type AggCountProps = {
 export const getAggregationCount = async (props: AggCountProps) => {
   const { eventName, post_id, account } = props;
   const params = [ account, eventName, post_id ];
+
   const query = `
     SELECT count(distinct account)
     FROM df.activities
@@ -46,7 +44,6 @@ export const getAggregationCount = async (props: AggCountProps) => {
   } catch (err) {
     log.error('Failed to getAggregationCount:', err.stack)
     throw err
-    return 0;
   }
 }
 
@@ -85,8 +82,8 @@ export const getCountOfUnreadNotifications = async (account: string) => {
   const query = `
     SELECT unread_count
     FROM df.notifications_counter
-    WHERE account = $1
-  `
+    WHERE account = $1`
+
   try {
     const res = await pg.query(query, [ account ])
     log.debug(`Found ${res.rows[0].unread_count} unread notifications by account ${account}`)
