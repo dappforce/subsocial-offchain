@@ -122,7 +122,7 @@ async function main (substrate: SubsocialSubstrateApi) {
           const error = await handleEventForPostgres(eventMeta)
           if (error) {
             processPostgres = false
-            state.postgres.lastError = error.stack
+            state.postgres.lastError = error.toString()
             state.postgres.lastBlock = blockToProcess - 1
           }
         }
@@ -131,7 +131,7 @@ async function main (substrate: SubsocialSubstrateApi) {
           const error = await handleEventForElastic(eventMeta)
           if (error) {
             processElastic = false
-            state.elastic.lastError = error.stack
+            state.elastic.lastError = error.toString()
             state.elastic.lastBlock = blockToProcess - 1
           }
         }
