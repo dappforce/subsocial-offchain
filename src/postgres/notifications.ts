@@ -94,6 +94,32 @@ export const getCountOfUnreadNotifications = async (account: string) => {
   } catch (err) {
     log.error(`Failed to get a count of unread notifications by account ${account}. Error: %s`, err.stack);
     throw err
-    return 0
+  }
+}
+
+export const markAllNotifsAsRead = async (account: string) => {
+  const query = `
+    WITH last_activity AS (
+      SELECT event_index, block_number from df.notification
+      WHERE account = $1
+      ORDER BY block_number DESC 
+      ORDER BY event_index DESC
+      LIMIT 1
+    )
+    UPDATE df.notifications_counter
+    SET
+      unread_count = 0,
+      last_read_event_index = last_activity.event_index
+      last_read_block_number = last_activity.block_number
+    WHERE account = $1`
+
+  try {
+    const data = await pg.query(query, [ account ])
+    informClientAboutUnreadNotifications(account, 0)
+    log.debug(`Marked all notifications as read by account: ${account}`)
+    return data.rowCount
+  } catch (err) {
+    log.error(`Failed to mark all notifications as read by account: ${account}`, err.stack)
+    throw err
   }
 }
