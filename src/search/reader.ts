@@ -9,7 +9,7 @@ import {
   ElasticIndexTypes,
   AllElasticIndexes,
   ElasticFields,
-  EsQueryParams,
+  ElasticQueryParams,
 } from '@subsocial/types/offchain/search'
 
 const resoloveElasticIndexByType = (type: ElasticIndexTypes) => ElasticIndex[type]
@@ -17,7 +17,7 @@ const resoloveElasticIndexByType = (type: ElasticIndexTypes) => ElasticIndex[typ
 const resoloveElasticIndexes = (indexes: ElasticIndexTypes[]) =>
   indexes && indexes.includes('all') ? AllElasticIndexes : indexes?.map(resoloveElasticIndexByType)
 
-export const buildElasticSearchQuery = (params: EsQueryParams) => {
+export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
   const from = params.offset || 0
   const size = params.limit || MAX_RESULTS_LIMIT
   const q = params.q || '*'
