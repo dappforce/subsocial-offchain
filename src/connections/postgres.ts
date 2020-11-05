@@ -1,4 +1,4 @@
-import { Pool } from 'pg'
+import { Pool, types } from 'pg'
 import { postgesLog as log } from './loggers';
 
 require('dotenv').config();
@@ -16,5 +16,13 @@ if (!greeted) {
   greeted = true;
   log.info(`Connecting to Postgres at ${pgConf.host}:${pgConf.port} as a user '${pgConf.user}'`);
 }
+
+// Add method for serialize 
+(BigInt.prototype as any).toJSON = function() {
+  return this.toString() 
+}
+
+// Add BigInt parser for Postgres
+types.setTypeParser(20, BigInt) 
 
 export const pg = new Pool(pgConf);

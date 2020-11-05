@@ -142,13 +142,19 @@ app.post('/v1/offchain/notifications/:id/readAll', async (req: express.Request, 
   log.info(`Mark all notifications as read by account: ${account}`)
 
   const query = `
+    WITH last_activity AS (
+      SELECT event_index, block_number from df.notification
+      WHERE account = $1
+      ORDER BY block_number DESC 
+      ORDER BY event_index DESC
+      LIMIT 1
+    )
+
     UPDATE df.notifications_counter
     SET
       unread_count = 0,
-      last_read_activity_id = (
-        SELECT MAX(activity_id) FROM df.notifications
-        WHERE account = $1
-      )
+      last_read_event_index = last_activity.event_index
+      last_read_block_number = last_activity.block_number
     WHERE account = $1`
 
   try {

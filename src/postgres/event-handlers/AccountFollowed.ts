@@ -12,9 +12,9 @@ export const onAccountFollowed: EventHandlerFn = async (eventAction: SubstrateEv
   if (!socialAccount) return;
 
   const count = socialAccount.followers_count.toNumber() - 1;
-  const id = await insertActivityForAccount(eventAction, count);
-  if (id === -1) return;
+  const insertResult = await insertActivityForAccount(eventAction, count);
+  if (insertResult === undefined) return
 
   const following = data[1].toString();
-  await insertNotificationForOwner(id, following);
+  await insertNotificationForOwner( { ...insertResult, account: following });
 }

@@ -2,7 +2,7 @@ import { EventData } from '@polkadot/types/generic/Event';
 import { pg } from '../connections/postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { insertFollowersLog, insertFollowersLogError } from './postges-logger';
+import { tryPgQeury } from './postges-logger';
 
 export const insertAccountFollower = async (data: EventData) => {
   const query = `
@@ -10,13 +10,13 @@ export const insertAccountFollower = async (data: EventData) => {
         VALUES($1, $2)
       RETURNING *`;
   const params = [ data[0].toString(), data[1].toString() ];
-  try {
-    await pg.query(query, params)
-    insertFollowersLog('account')
-  } catch (err) {
-    insertFollowersLogError('account', err.stack)
-    throw err
-  }
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'InsertAccountFollower function worked successfully',
+      error: 'InsertAccountFollower function failed: '
+    }
+  )
 };
 
 export const insertPostFollower = async (data: EventData) => {
@@ -26,13 +26,14 @@ export const insertPostFollower = async (data: EventData) => {
         VALUES($1, $2)
       RETURNING *`
   const params = [ data[0].toString(), postId ];
-  try {
-    await pg.query(query, params)
-    insertFollowersLog('post')
-  } catch (err) {
-    insertFollowersLogError('post', err.stack)
-    throw err
-  }
+ 
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'InsertPostFollower function worked successfully',
+      error: 'InsertPostFollower function failed: '
+    }
+  )
 };
 
 export const insertCommentFollower = async (data: EventData) => {
@@ -42,13 +43,14 @@ export const insertCommentFollower = async (data: EventData) => {
         VALUES($1, $2)
       RETURNING *`
   const params = [ data[0].toString(), commentId ];
-  try {
-    await pg.query(query, params)
-    insertFollowersLog('comment')
-  } catch (err) {
-    insertFollowersLogError('comment', err.stack)
-    throw err
-  }
+
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'InsertCommentFollower function worked successfully',
+      error: 'InsertCommentFollower function failed: '
+    }
+  )
 };
 
 export const insertSpaceFollower = async (data: EventData) => {
@@ -58,11 +60,11 @@ export const insertSpaceFollower = async (data: EventData) => {
         VALUES($1, $2)
       RETURNING *`
   const params = [ data[0].toString(), spaceId ];
-  try {
-    await pg.query(query, params)
-    insertFollowersLog('space')
-  } catch (err) {
-    insertFollowersLogError('space', err.stack)
-    throw err
-  }
+  await tryPgQeury(
+    async () => await pg.query(query, params),
+    {
+      success: 'InsertSpaceFollower function worked successfully',
+      error: 'InsertSpaceFollower function failed: '
+    }
+  )
 };

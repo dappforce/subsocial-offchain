@@ -11,12 +11,12 @@ export const onRootPostShared = async (eventAction: SubstrateEvent, post: Post) 
   let spaceId = post.space_id.unwrapOr(undefined)
 
   const ids = [ spaceId, postId ];
-  const activityId = await insertActivityForPost(eventAction, ids);
-  if (activityId === -1) return;
+  const insertResult = await insertActivityForPost(eventAction, ids);
+  if (insertResult === undefined) return;
 
   const account = post.created.account.toString();
-  await insertNotificationForOwner(activityId, account);
-  await fillNotificationsWithAccountFollowers(author, activityId);
-  await fillNewsFeedWithSpaceFollowers(spaceId, author, activityId);
-  await fillNewsFeedWithAccountFollowers(author, activityId)
+  await insertNotificationForOwner({ account, ...insertResult });
+  await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
+  await fillNewsFeedWithSpaceFollowers(spaceId, { account: author, ...insertResult });
+  await fillNewsFeedWithAccountFollowers({ account: author, ...insertResult })
 }

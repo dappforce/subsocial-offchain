@@ -2,118 +2,125 @@ import { pg } from '../connections/postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';
-import { fillNotificationsLog, fillNewsFeedLog, fillNewsFeedLogError, fillNotificationsLogError } from './postges-logger';
+import { tryPgQeury } from './postges-logger';
+import { ActivitiesParamsWithAccount } from './queries/types';
 
-export const fillNewsFeedWithAccountFollowers = async (account: string, activityId: number) => {
-  const query = `
-      INSERT INTO df.news_feed (account, activity_id)
-        (SELECT df.account_followers.follower_account, df.activities.id
-        FROM df.activities
-        LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
-        WHERE df.account_followers.follower_account <> $1
-          AND id = $2
-          AND (df.account_followers.follower_account, df.activities.id)
-          NOT IN (SELECT account, activity_id from df.news_feed))
-      RETURNING *`
-  const params = [ account, activityId ];
-  try {
-    await pg.query(query, params)
-    fillNewsFeedLog('account')
-  } catch (err) {
-    fillNewsFeedLogError('account', err.stack);
-    throw err
-  }
+const fillAccountFollowerQuery = (table: string) => {
+  return `
+  INSERT INTO df.${table} (account, block_number, event_index)
+    (SELECT df.account_followers.follower_account, df.activities.block_number, df.activities.event_index
+    FROM df.activities
+    LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
+    WHERE df.account_followers.follower_account <> $1
+      AND block_number = $2
+      AND event_index = $3
+      AND (df.account_followers.follower_account, df.activities.block_number, df.activities.event_index)
+      NOT IN (SELECT account, block_number, event_index from df.${table}))
+  RETURNING *`
 }
 
-export const fillNotificationsWithAccountFollowers = async (account: string, activityId: number) => {
-  const query = `
-      INSERT INTO df.notifications (account, activity_id)
-        (SELECT df.account_followers.follower_account, df.activities.id
-        FROM df.activities
-        LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
-        WHERE df.account_followers.follower_account <> $1
-          AND id = $2
-          AND aggregated = true
-          AND (df.account_followers.follower_account, df.activities.id)
-          NOT IN (SELECT account, activity_id from df.notifications))
-      RETURNING *`
-  const params = [ account, activityId ];
-  try {
-    await pg.query(query, params)
-    fillNotificationsLog('account')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    fillNotificationsLogError('account', err.stack);
-    throw err
-  }
+const fillTableWith = (table: string, object: string) => {
+  let parent_comment_id = "";
+  if (object == "post") parent_comment_id = "AND parent_comment_id IS NULL"
+
+  return `
+  INSERT INTO df.${table} (account, block_number, event_index)
+    (SELECT df.${object}_followers.follower_account, df.activities.block_number, df.activities.event_index
+    FROM df.activities
+    LEFT JOIN df.${object}_followers ON df.activities.${object}_id = df.${object}_followers.following_${object}_id
+    WHERE ${object}_id = $1
+      AND df.${object}_followers.follower_account <> $2
+      AND block_number = $3
+      AND event_index = $4
+      AND aggregated = true
+      ${parent_comment_id}
+      AND (df.${object}_followers.follower_account, df.activities.block_number, df.activities.event_index)
+        NOT IN (SELECT account, block_number, event_index from df.${table}))
+  RETURNING *;
+  `
 }
 
-export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, account: string, activityId: number) => {
-  const query = `
-      INSERT INTO df.news_feed(account, activity_id)
-        (SELECT df.space_followers.follower_account, df.activities.id
-        FROM df.activities
-        LEFT JOIN df.space_followers ON df.activities.space_id = df.space_followers.following_space_id
-        WHERE space_id = $1
-          AND df.space_followers.follower_account <> $2
-          AND id = $3
-          AND aggregated = true
-          AND (df.space_followers.follower_account, df.activities.id)
-            NOT IN (SELECT account,activity_id from df.news_feed))
-      RETURNING *`;
-  const hexSpaceId = encodeStructId(spaceId);
-  const params = [ hexSpaceId, account, activityId ];
-  try {
-    await pg.query(query, params)
-    fillNewsFeedLog('space')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    fillNewsFeedLogError('space', err.stack);
-    throw err
-  }
+export const fillNewsFeedWithAccountFollowers = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
+  const query = fillAccountFollowerQuery("news_feed")
+
+  const params = [account, blockNumber, eventIndex];
+
+  await tryPgQeury(
+    () => pg.query(query, params),
+    {
+      success: 'FillNewsFeedWithAccountFollowers function worked successfully',
+      error: 'FillNewsFeedWithAccountFollowers function failed: '
+    }
+  )
 }
 
-export const fillNotificationsWithPostFollowers = async (postId: PostId, account: string, activityId: number) => {
-  const query = `
-      INSERT INTO df.notifications(account, activity_id)
-        (SELECT df.post_followers.follower_account, df.activities.id
-        FROM df.activities
-        LEFT JOIN df.post_followers ON df.activities.post_id = df.post_followers.following_post_id
-        WHERE post_id = $1 AND id = $3 AND aggregated = true AND parent_comment_id IS NULL
-          AND df.post_followers.follower_account <> $2
-          AND (df.post_followers.follower_account, df.activities.id)
-          NOT IN (SELECT account,activity_id from df.notifications))
-      RETURNING *`
-  const hexPostId = encodeStructId(postId);
-  const params = [ hexPostId, account, activityId ];
-  try {
-    await pg.query(query, params)
-    fillNotificationsLog('post')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    fillNotificationsLogError('post', err.stack);
-    throw err
-  }
+export const fillNotificationsWithAccountFollowers = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
+  const query = fillAccountFollowerQuery("notifications")
+
+  const params = [account, blockNumber, eventIndex];
+  
+  await tryPgQeury(
+    async () => { 
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'FillNotificationsWithAccountFollowers function worked successfully',
+      error: 'FillNotificationsWithAccountFollowers function failed: '
+    }
+  )
 }
 
-export const fillNotificationsWithCommentFollowers = async (commentId: PostId, account: string, activityId: number) => {
-  const query = `
-      INSERT INTO df.notifications(account, activity_id)
-        (SELECT df.comment_followers.follower_account, df.activities.id
-        FROM df.activities
-        LEFT JOIN df.comment_followers ON df.activities.comment_id = df.comment_followers.following_comment_id WHERE comment_id = $1 AND id = $3 AND aggregated = true
-          AND df.comment_followers.follower_account <> $2
-          AND (df.comment_followers.follower_account, df.activities.id)
-          NOT IN (SELECT account,activity_id from df.notifications))
-      RETURNING *`
-  const hexCommentId = encodeStructId(commentId);
-  const params = [ hexCommentId, account, activityId ];
-  try {
-    await pg.query(query, params)
-    fillNotificationsLog('comment')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    fillNotificationsLogError('comment', err.stack);
-    throw err
-  }
+export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
+  const query = fillTableWith("news_feed", "space")
+
+  const encodedSpaceId = encodeStructId(spaceId);
+  const params = [encodedSpaceId, account, blockNumber, eventIndex];
+  
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'FillNewsFeedWithSpaceFollowers function worked successfully',
+      error: 'FillNewsFeedWithSpaceFollowers function failed: '
+    }
+  )
+}
+
+export const fillNotificationsWithPostFollowers = async (postId: PostId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
+  const query = fillTableWith("notifications", "post")
+
+  const encodedPostId = encodeStructId(postId);
+  const params = [encodedPostId, account, blockNumber, eventIndex];
+  
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'FillNotificationsWithPostFollowers function worked successfully',
+      error: 'FillNotificationsWithPostFollowers function failed: '
+    }
+  )
+}
+
+export const fillNotificationsWithCommentFollowers = async (commentId: PostId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
+  const query = fillTableWith("notifications", "comment")
+
+  const encodedCommentId = encodeStructId(commentId);
+  const params = [encodedCommentId, account, blockNumber, eventIndex];
+  
+  await tryPgQeury(
+    async () => {
+      await pg.query(query, params)
+      await updateCountOfUnreadNotifications(account)
+    },
+    {
+      success: 'FillNotificationsWithCommentFollowers function worked successfully',
+      error: 'FillNotificationsWithCommentFollowers function failed: '
+    }
+  )
 }

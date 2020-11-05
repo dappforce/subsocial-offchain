@@ -7,8 +7,10 @@ import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 export const onSpaceCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
   const account = data[0].toString();
-  const activityId = await insertActivityForSpace(eventAction, 0);
-  await fillNotificationsWithAccountFollowers(account, activityId);
+  const insertResult = await insertActivityForSpace(eventAction, 0);
+  if(insertResult === undefined) return
+
+  await fillNotificationsWithAccountFollowers({ account, ...insertResult });
 
   const spaceId = data[1] as SpaceId;
   const space = await substrate.findSpace({ id: spaceId });

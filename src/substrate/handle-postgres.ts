@@ -14,4 +14,4 @@ export const handleEventForPostgres = async (event: SubstrateEvent): Promise<Err
   }
 }
 
-const log = newLogger(handleEventForPostgres.name)
+const log = newLogger('handleEventForPostgres')

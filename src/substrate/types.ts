@@ -15,6 +15,7 @@ export type SubstrateEvent = {
   eventName: string
   data: EventData
   blockNumber: BN
+  eventIndex: number
 }
 
 export type EventHandlerFn = (event: SubstrateEvent) => Promise<void>

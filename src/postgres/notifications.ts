@@ -1,28 +1,32 @@
 import { pg } from '../connections/postgres';
-import { log, insertActivityLog, insertActivityLogError } from './postges-logger';
+import { log, tryPgQeury } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
+import { ActivitiesParamsWithAccount } from './queries/types';
 
-export const insertNotificationForOwner = async (id: number, account: string) => {
-  const params = [ account, id ]
+export const insertNotificationForOwner = async ({blockNumber, eventIndex, account }: ActivitiesParamsWithAccount) => {
+
+  const params = [ account, blockNumber, eventIndex ]
   const query = `
     INSERT INTO df.notifications
-      VALUES($1, $2) 
+      VALUES($1, $2, $3) 
     RETURNING *`
-
-  try {
-    await pg.query(query, params)
-    insertActivityLog('owner')
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    insertActivityLogError('owner', err.stack)
-    throw insertActivityLogError
-  }
+    
+    await tryPgQeury(
+      async () => {
+        await pg.query(query, params)
+        await updateCountOfUnreadNotifications(account)
+      },
+      {
+        success: 'InsertNotificationForOwner function worked successfully',
+        error: 'InsertNotificationForOwner function failed: '
+      }
+    )
 }
 
 export type AggCountProps = {
   eventName: string,
   account: string,
-  post_id: string
+  post_id: bigint
 }
 
 export const getAggregationCount = async (props: AggCountProps) => {
@@ -49,17 +53,17 @@ export const getAggregationCount = async (props: AggCountProps) => {
 export const updateCountOfUnreadNotifications = async (account: string) => {
   const query = `
     INSERT INTO df.notifications_counter 
-      (account, last_read_activity_id, unread_count)
-    VALUES ($1, 0, 1)
+      (account, last_read_event_index, last_read_block_number, unread_count)
+    VALUES ($1, NULL, NULL, 1)
     ON CONFLICT (account) DO UPDATE
     SET unread_count = (
       SELECT DISTINCT COUNT(*)
       FROM df.activities
-      WHERE aggregated = true AND id IN ( 
-        SELECT activity_id
+      WHERE aggregated = true AND (event_index, block_number) IN ( 
+        SELECT event_index, block_number
         FROM df.notifications
-        WHERE account = $1 AND activity_id > (
-          SELECT last_read_activity_id
+        WHERE account = $1 AND block_number > (
+          SELECT last_read_block_number
           FROM df.notifications_counter
           WHERE account = $1
         )

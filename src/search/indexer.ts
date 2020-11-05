@@ -2,12 +2,12 @@ import { AccountId } from '@polkadot/types/interfaces';
 import { GenericAccountId } from '@polkadot/types';
 import { PostId, Post, Space } from '@subsocial/types/substrate/interfaces';
 import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
-import { encodeStructId } from '../substrate/utils';
 import { elasticIndexer } from '../connections/elastic'
+import { encodeStructHexId } from '../substrate/utils';
 import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { ipfs, substrate } from '../connections/subsocial';
+import { ipfs, substrate } from '../connections';
 
 export async function indexContentFromIpfs (
   index: string,
@@ -67,7 +67,7 @@ export async function indexContentFromIpfs (
       }
 
       indexData = {
-        space_id: encodeStructId(spaceId),
+        space_id: spaceId.toString(),
         title,
         body,
         tags,
@@ -95,7 +95,7 @@ export async function indexContentFromIpfs (
   if (indexData) {
     await elasticIndexer.index({
       index,
-      id: id instanceof GenericAccountId ? id.toString() : encodeStructId(id),
+      id: id instanceof GenericAccountId ? id.toString() : encodeStructHexId(id),
       body: indexData
     })
   }
