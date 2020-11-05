@@ -1,7 +1,7 @@
 import { pg } from '../connections/postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { tryPgQeury } from './postges-logger';
+import { tryPgQuery } from './postges-logger';
 
 export const deleteNotificationsAboutComment = async (userId: string, commentId: PostId) => {
   const query = `
@@ -15,7 +15,7 @@ export const deleteNotificationsAboutComment = async (userId: string, commentId:
   const encodedCommentId = encodeStructId(commentId);
   const params = [ userId, encodedCommentId ];
 
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'DeleteNotificationsAboutComment function worked successfully',
@@ -36,7 +36,7 @@ export const deleteNotificationsAboutAccount = async (userId: string, accountId:
       RETURNING *`
   const params = [ userId, accountId ];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'DeleteNotificationsAboutAccount function worked successfully',
@@ -58,7 +58,7 @@ export const deleteNotificationsAboutPost = async (userId: string, postId: PostI
   const encodedPostId = encodeStructId(postId);
   const params = [ userId, encodedPostId ];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'DeleteNotificationsAboutPost function worked successfully',
@@ -80,7 +80,7 @@ export const deleteNotificationsAboutSpace = async (userId: string, spaceId: Spa
   const encodedSpaceId = encodeStructId(spaceId);
   const params = [ userId, encodedSpaceId ];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'DeleteNotificationsAboutSpace function worked successfully',

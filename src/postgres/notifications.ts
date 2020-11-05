@@ -1,5 +1,5 @@
 import { pg } from '../connections/postgres';
-import { log, tryPgQeury } from './postges-logger';
+import { log, tryPgQuery } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
 import { ActivitiesParamsWithAccount } from './queries/types';
 
@@ -11,7 +11,7 @@ export const insertNotificationForOwner = async ({blockNumber, eventIndex, accou
       VALUES($1, $2, $3) 
     RETURNING *`
     
-    await tryPgQeury(
+    await tryPgQuery(
       async () => {
         await pg.query(query, params)
         await updateCountOfUnreadNotifications(account)

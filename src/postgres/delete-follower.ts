@@ -2,7 +2,7 @@ import { EventData } from '@polkadot/types/generic/Event';
 import { pg } from '../connections/postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { tryPgQeury } from './postges-logger';
+import { tryPgQuery } from './postges-logger';
 
 export const deletePostFollower = async (data: EventData) => {
   const postId = encodeStructId(data[1] as PostId);
@@ -13,7 +13,7 @@ export const deletePostFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), postId ];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'DeletePostFollower function worked successfully',
@@ -31,7 +31,7 @@ export const deleteCommentFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), commentId ];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'DeleteCommentFollower function worked successfully',
@@ -49,7 +49,7 @@ export const deleteSpaceFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), spaceId ];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'DeleteSpaceFollower function worked successfully',
@@ -66,7 +66,7 @@ export const deleteAccountFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), data[1].toString() ];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'DeleteAccountFollower function worked successfully',

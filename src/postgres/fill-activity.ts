@@ -2,7 +2,7 @@ import { pg } from '../connections/postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { updateCountOfUnreadNotifications } from './notifications';
-import { tryPgQeury } from './postges-logger';
+import { tryPgQuery } from './postges-logger';
 import { ActivitiesParamsWithAccount } from './queries/types';
 
 const fillAccountFollowerQuery = (table: string) => {
@@ -45,7 +45,7 @@ export const fillNewsFeedWithAccountFollowers = async ({ account, blockNumber, e
 
   const params = [account, blockNumber, eventIndex];
 
-  await tryPgQeury(
+  await tryPgQuery(
     () => pg.query(query, params),
     {
       success: 'FillNewsFeedWithAccountFollowers function worked successfully',
@@ -59,7 +59,7 @@ export const fillNotificationsWithAccountFollowers = async ({ account, blockNumb
 
   const params = [account, blockNumber, eventIndex];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => { 
       await pg.query(query, params)
       await updateCountOfUnreadNotifications(account)
@@ -77,7 +77,7 @@ export const fillNewsFeedWithSpaceFollowers = async (spaceId: SpaceId, { account
   const encodedSpaceId = encodeStructId(spaceId);
   const params = [encodedSpaceId, account, blockNumber, eventIndex];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
       await updateCountOfUnreadNotifications(account)
@@ -95,7 +95,7 @@ export const fillNotificationsWithPostFollowers = async (postId: PostId, { accou
   const encodedPostId = encodeStructId(postId);
   const params = [encodedPostId, account, blockNumber, eventIndex];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
       await updateCountOfUnreadNotifications(account)
@@ -113,7 +113,7 @@ export const fillNotificationsWithCommentFollowers = async (commentId: PostId, {
   const encodedCommentId = encodeStructId(commentId);
   const params = [encodedCommentId, account, blockNumber, eventIndex];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
       await updateCountOfUnreadNotifications(account)

@@ -34,7 +34,7 @@ const resolveMsg = (msg?: Msg) => {
   return typeof msg === 'function' ? msg() : msg
 } 
 
-export const tryPgQeury: TryFn = async (callback, { success, error }) => {
+export const tryPgQuery: TryFn = async (callback, { success, error }) => {
   try {
     await callback()
     log.debug(resolveMsg(success))

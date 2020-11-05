@@ -4,7 +4,7 @@ import { isEmptyArray } from '@subsocial/utils/array'
 import { Post, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { getValidDate } from '../substrate/subscribe';
 import { updateCountOfUnreadNotifications, getAggregationCount } from './notifications';
-import { log, updateCountLog, emptyParamsLogError, tryPgQeury } from './postges-logger';
+import { log, updateCountLog, emptyParamsLogError, tryPgQuery } from './postges-logger';
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { SubstrateEvent } from '../substrate/types';
 import { substrate } from '../connections/subsocial';
@@ -17,7 +17,7 @@ export const insertNotificationForOwner = async ({ account, blockNumber, eventIn
       VALUES($1, $2, $3) 
     RETURNING *`
 
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
       await updateCountOfUnreadNotifications(account)
@@ -77,7 +77,7 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
 
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
 
@@ -128,7 +128,7 @@ export const insertActivityForAccount = async (eventAction: SubstrateEvent, coun
 
   const params = [blockNumber, eventIndex, accountId, eventName, objectId, date, count];
 
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
       const queryUpdate = `
@@ -168,7 +168,7 @@ export const insertActivityForSpace = async (eventAction: SubstrateEvent, count:
   const date = await getValidDate(blockNumber)
   const params = [blockNumber, eventIndex, accountId, eventName, spaceId, date, count, aggregated];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
       const paramsUpdate = [blockNumber, eventIndex, eventName, spaceId];
@@ -216,7 +216,7 @@ export const insertActivityForPost = async (eventAction: SubstrateEvent, ids: Su
 
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, newCount];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'InsertActivityForPost function worked successfully',
@@ -245,7 +245,7 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
   const date = await getValidDate(blockNumber)
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
 
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
       const postId = paramsIds.pop();
@@ -289,7 +289,7 @@ export const insertActivityForCommentReaction = async (eventAction: SubstrateEve
   const date = await getValidDate(blockNumber)
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
   
-  await tryPgQeury(
+  await tryPgQuery(
     async () => {
       await pg.query(query, params)
       const queryUpdate = `

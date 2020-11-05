@@ -2,7 +2,7 @@ import { EventData } from '@polkadot/types/generic/Event';
 import { pg } from '../connections/postgres';
 import { encodeStructId } from '../substrate/utils';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { tryPgQeury } from './postges-logger';
+import { tryPgQuery } from './postges-logger';
 
 export const insertAccountFollower = async (data: EventData) => {
   const query = `
@@ -10,7 +10,7 @@ export const insertAccountFollower = async (data: EventData) => {
         VALUES($1, $2)
       RETURNING *`;
   const params = [ data[0].toString(), data[1].toString() ];
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'InsertAccountFollower function worked successfully',
@@ -27,7 +27,7 @@ export const insertPostFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), postId ];
  
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'InsertPostFollower function worked successfully',
@@ -44,7 +44,7 @@ export const insertCommentFollower = async (data: EventData) => {
       RETURNING *`
   const params = [ data[0].toString(), commentId ];
 
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'InsertCommentFollower function worked successfully',
@@ -60,7 +60,7 @@ export const insertSpaceFollower = async (data: EventData) => {
         VALUES($1, $2)
       RETURNING *`
   const params = [ data[0].toString(), spaceId ];
-  await tryPgQeury(
+  await tryPgQuery(
     async () => await pg.query(query, params),
     {
       success: 'InsertSpaceFollower function worked successfully',
