@@ -4,21 +4,21 @@ import { informClientAboutUnreadNotifications } from '../express-api/events';
 import { ActivitiesParamsWithAccount } from './queries/types';
 import { newPgError } from './utils';
 
-export const insertNotificationForOwner = async ({blockNumber, eventIndex, account }: ActivitiesParamsWithAccount) => {
-  const query = `
-    INSERT INTO df.notifications
-      VALUES($1, $2, $3) 
-    RETURNING *`
+// export const insertNotificationForOwner = async ({blockNumber, eventIndex, account }: ActivitiesParamsWithAccount) => {
+//   const query = `
+//     INSERT INTO df.notifications
+//       VALUES($1, $2, $3) 
+//     RETURNING *`
 
-  const params = [ account, blockNumber, eventIndex ]
+//   const params = [ account, blockNumber, eventIndex ]
 
-  try {
-    await pg.query(query, params)
-    await updateCountOfUnreadNotifications(account)
-  } catch (err) {
-    throw newPgError(err, insertNotificationForOwner)
-  }
-}
+//   try {
+//     await pg.query(query, params)
+//     await updateCountOfUnreadNotifications(account)
+//   } catch (err) {
+//     throw newPgError(err, insertNotificationForOwner)
+//   }
+// }
 
 export type AggCountProps = {
   eventName: string,
