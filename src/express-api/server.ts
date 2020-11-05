@@ -33,16 +33,19 @@ const maxFileSizeMB = maxFileSizeBytes / MB
 function haltOnTimedout (req: express.Request, _res: express.Response, next) {
   if (!req.timedout) next()
 }
-const maxTimeout = process.env.TIMEOUT || 2
 
-app.use(timeout(`${maxTimeout}s`))
+const reqTimeoutSecs = process.env.OFFCHAIN_REQ_TIMEOUT_SECS || 2
+
+app.use(timeout(`${reqTimeoutSecs}s`))
 
 // for parsing application/json
 app.use(bodyParser.json({ limit: maxFileSizeBytes }))
 app.use(haltOnTimedout)
+
 // for parsing application/xwww-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }))
 app.use(haltOnTimedout)
+
 // for parsing multipart/form-data
 const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
 app.use(express.static('public'))
