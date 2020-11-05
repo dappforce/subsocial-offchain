@@ -2,12 +2,12 @@ import * as express from 'express'
 import { getOffsetFromRequest, getLimitFromRequest, HandlerFn, resolvePromiseAndReturnJson } from '../utils'
 import { nonEmptyStr, nonEmptyArr } from '@subsocial/utils'
 import { buildElasticSearchQuery, loadSubsocialDataByESIndex } from '../../search/reader'
-import { ElasticIndexTypes, ElasticQueryParams } from '@subsocial/types/offchain/search'
+import { ElasticIndexTypes, EsQueryParams } from '@subsocial/types/offchain/search'
 import { elasticReader } from '../../connections/elastic'
 import { elasticLog } from '../../connections/loggers'
 
 const querySearch = async (req: express.Request, res: express.Response) => {
-  const { q: searchTerm, indexes, tagsFilter: tags } = req.query as ElasticQueryParams
+  const { q: searchTerm, indexes, tagsFilter: tags } = req.query as EsQueryParams
   const indexesArray = nonEmptyStr(indexes) ? [indexes] : indexes
   const tagsArray = nonEmptyStr(tags) ? [tags] : tags
 
