@@ -8,7 +8,22 @@ import { getValidDate } from '../../substrate/subscribe';
 import { pg } from '../../connections/postgres';
 import { newPgError } from '../utils';
 
-export const insertActivityForPostReaction = async (eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): InsertActivityPromise => {
+const query = `
+  INSERT INTO df.activities(block_number, event_index, account, event, post_id, date, agg_count, aggregated)
+    VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+  RETURNING *`
+
+const queryUpdate = `
+  UPDATE df.activities
+    SET aggregated = false
+    WHERE block_number <> $1
+      AND event_index <> $2
+      AND event = $3
+      AND aggregated = true
+      AND post_id = $4
+  RETURNING *`;
+
+export async function insertActivityForPostReaction(eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): InsertActivityPromise {
   const paramsIds = encodeStructIds(ids)
 
   if (isEmptyArray(paramsIds)) {
@@ -20,26 +35,12 @@ export const insertActivityForPostReaction = async (eventAction: SubstrateEvent,
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
 
-  const query = `
-    INSERT INTO df.activities(block_number, event_index, account, event, post_id, date, agg_count, aggregated)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-    RETURNING *`
-
   const date = await getValidDate(blockNumber)
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
 
   try {
     await pg.query(query, params)
     const postId = paramsIds.pop();
-    const queryUpdate = `
-      UPDATE df.activities
-        SET aggregated = false
-        WHERE block_number <> $1
-          AND event_index <> $2
-          AND event = $3
-          AND aggregated = true
-          AND post_id = $4
-      RETURNING *`;
 
     const paramsUpdate = [blockNumber, eventIndex, eventName, postId];
     const resUpdate = await pg.query(queryUpdate, paramsUpdate);

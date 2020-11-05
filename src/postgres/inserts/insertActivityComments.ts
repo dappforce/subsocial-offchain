@@ -6,7 +6,7 @@ import { log } from '../postges-logger';
 import { insertNotificationForOwner } from './insertNotificationForOwner';
 import { insertActivityForComment } from './insertActivityForComment';
 
-export const insertActivityComments = async (eventAction: SubstrateEvent, ids: SubstrateId[], lastComment: Post) => {
+export async function insertActivityComments(eventAction: SubstrateEvent, ids: SubstrateId[], lastComment: Post) {
   let comment = lastComment;
   const lastCommentAccount = lastComment.created.account.toString();
 

@@ -1,6 +1,6 @@
-import { deleteNotificationsAboutAccount } from '../delete-activity';
-import { deleteAccountFollower } from '../delete-follower';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { deleteAccountFollower } from '../deletes/deleteAccountFollower';
+import { deleteNotificationsAboutAccount } from '../deletes/deleteNotificationsAboutAccount';
 
 export const onAccountUnfollowed: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;

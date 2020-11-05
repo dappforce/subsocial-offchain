@@ -5,11 +5,16 @@ import { encodeStructIds } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { InsertActivityPromise } from '../queries/types';
 import { getValidDate } from '../../substrate/subscribe';
-import { getAggregationCount } from '../notifications';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
+import { getAggregationCount } from '../selects/getAggregationCount';
 
-export const insertActivityForComment = async (eventAction: SubstrateEvent, ids: SubstrateId[], creator: string): InsertActivityPromise => {
+const query = `
+  INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, parent_comment_id, date, agg_count, aggregated)
+    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+  RETURNING *`
+
+export async function insertActivityForComment(eventAction: SubstrateEvent, ids: SubstrateId[], creator: string): InsertActivityPromise {
 
   const paramsIds = encodeStructIds(ids)
 
@@ -26,11 +31,6 @@ export const insertActivityForComment = async (eventAction: SubstrateEvent, ids:
   const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
-
-  const query = `
-    INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, parent_comment_id, date, agg_count, aggregated)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    RETURNING *`
 
   const date = await getValidDate(blockNumber)
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });

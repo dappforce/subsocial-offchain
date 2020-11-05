@@ -4,13 +4,13 @@ import { encodeStructId } from '../../substrate/utils';
 import { pg } from '../../connections/postgres';
 import { newPgError } from '../utils';
 
-export const deleteSpaceFollower = async (data: EventData) => {
-  const query = `
-    DELETE from df.space_followers
-    WHERE follower_account = $1
-      AND following_space_id = $2
-    RETURNING *`
+const query = `
+  DELETE from df.space_followers
+  WHERE follower_account = $1
+    AND following_space_id = $2
+  RETURNING *`
 
+export async function deleteSpaceFollower (data: EventData) {
   const spaceId = encodeStructId(data[1] as SpaceId);
   const params = [ data[0].toString(), spaceId ];
 

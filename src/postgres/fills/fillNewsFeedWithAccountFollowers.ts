@@ -3,7 +3,7 @@ import { fillAccountFollowerQuery } from './fillTableQueries';
 import { ActivitiesParamsWithAccount } from '../queries/types';
 import { pg } from '../../connections/postgres';
 
-export const fillNewsFeedWithAccountFollowers = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
+export async function fillNewsFeedWithAccountFollowers({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
   const query = fillAccountFollowerQuery("news_feed")
   const params = [account, blockNumber, eventIndex];
 

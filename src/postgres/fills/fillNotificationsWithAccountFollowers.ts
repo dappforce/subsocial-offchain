@@ -1,10 +1,10 @@
 import { fillAccountFollowerQuery } from './fillTableQueries';
-import { updateCountOfUnreadNotifications } from '../notifications';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
 import { ActivitiesParamsWithAccount } from '../queries/types';
+import { updateCountOfUnreadNotifications } from '../updates/updateCountOfUnreadNotifications';
 
-export const fillNotificationsWithAccountFollowers = async ({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) => {
+export async function fillNotificationsWithAccountFollowers({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
   const query = fillAccountFollowerQuery("notifications")
   const params = [account, blockNumber, eventIndex];
 

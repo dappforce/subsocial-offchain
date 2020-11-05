@@ -4,12 +4,12 @@ import { encodeStructId } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
 
-export const insertSpaceFollower = async (data: EventData) => {
-  const query = `
-    INSERT INTO df.space_followers(follower_account, following_space_id)
-      VALUES($1, $2)
-    RETURNING *`
+const query = `
+  INSERT INTO df.space_followers(follower_account, following_space_id)
+    VALUES($1, $2)
+  RETURNING *`
 
+export async function insertSpaceFollower(data: EventData) {
   const spaceId = encodeStructId(data[1] as SpaceId);
   const params = [ data[0].toString(), spaceId ];
 
