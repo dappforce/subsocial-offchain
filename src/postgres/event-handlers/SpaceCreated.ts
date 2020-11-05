@@ -1,8 +1,8 @@
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../connections/subsocial';
-import { insertActivityForSpace } from '../insert-activity';
-import { fillNotificationsWithAccountFollowers } from '../fill-activity';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
+import { insertActivityForSpace } from '../inserts/insertActivityForSpace';
 
 export const onSpaceCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;

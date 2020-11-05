@@ -1,10 +1,13 @@
 import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../connections/subsocial';
-import { insertActivityForComment } from '../insert-activity';
-import { fillNotificationsWithAccountFollowers, fillNotificationsWithCommentFollowers, fillNewsFeedWithSpaceFollowers, fillNewsFeedWithAccountFollowers } from '../fill-activity';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
+import { fillNewsFeedWithAccountFollowers } from '../fills/fillNewsFeedWithAccountFollowers';
+import { fillNewsFeedWithSpaceFollowers } from '../fills/fillNewsFeedWithSpaceFollowers';
+import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
+import { fillNotificationsWithCommentFollowers } from '../fills/fillNotificationsWithCommentFollowers';
+import { insertActivityForComment } from '../inserts/insertActivityForComment';
 
 export const onCommentShared = async (eventAction: SubstrateEvent, comment: Post) => {
   const { author, commentId } = parseCommentEvent(eventAction)

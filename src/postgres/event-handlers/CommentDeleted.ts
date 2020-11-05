@@ -1,8 +1,8 @@
-import { deleteNotificationsAboutComment } from '../delete-activity';
-import { deleteCommentFollower } from '../delete-follower';
 import { EventHandlerFn } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
+import { deleteCommentFollower } from '../deletes/deleteCommentFollower';
+import { deleteNotificationsAboutComment } from '../deletes/deleteNotificationsAboutComment';
 
 export const onCommentDeleted: EventHandlerFn = async (eventAction) => {
   const { author, commentId } = parseCommentEvent(eventAction)

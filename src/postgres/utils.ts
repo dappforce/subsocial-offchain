@@ -1,2 +1,4 @@
-export const newPgError = (pgErr: Error, fn: Function) =>
-  new Error(`Function failed: ${fn.name} due to error: ${pgErr.stack}`)
+export const newPgError = (err: Error, fn: Function) =>
+  new Error(`${fn.name}: ${err.stack}\n${JSON.stringify(err, null, 4)}`)
+
+  

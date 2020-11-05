@@ -1,7 +1,7 @@
 import * as express from 'express'
 import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
 import * as pgQueries from '../../postgres/queries';
-import * as pgNotifs from '../../postgres/notifications';
+import * as pgNotifs from '../../postgres/updates/markAllNotifsAsRead';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,

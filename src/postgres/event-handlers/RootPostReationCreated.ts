@@ -1,8 +1,8 @@
 import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
-import { insertActivityForPostReaction } from '../insert-activity';
-import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
+import { insertActivityForPostReaction } from '../inserts/insertActivityForPostReaction';
+import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 
 export const onRootPostReactionCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { author: voter, postId } = parsePostEvent(eventAction)

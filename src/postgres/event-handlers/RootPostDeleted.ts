@@ -1,7 +1,7 @@
-import { deleteNotificationsAboutPost } from '../delete-activity';
-import { deletePostFollower } from '../delete-follower';
 import { EventHandlerFn } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
+import { deleteNotificationsAboutPost } from '../deletes/deleteNotificationsAboutPost';
+import { deletePostFollower } from '../deletes/deletePostFollower';
 
 export const onRootPostDeleted: EventHandlerFn = async (eventAction) => {
   const { author, postId } = parsePostEvent(eventAction)

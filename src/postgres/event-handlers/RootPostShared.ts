@@ -1,9 +1,11 @@
 import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
-import { insertActivityForPost } from '../insert-activity';
-import { fillNotificationsWithAccountFollowers, fillNewsFeedWithAccountFollowers, fillNewsFeedWithSpaceFollowers } from '../fill-activity';
-import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
+import { fillNewsFeedWithAccountFollowers } from '../fills/fillNewsFeedWithAccountFollowers';
+import { fillNewsFeedWithSpaceFollowers } from '../fills/fillNewsFeedWithSpaceFollowers';
+import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
+import { insertActivityForPost } from '../inserts/insertActivityForPost';
+import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 
 export const onRootPostShared = async (eventAction: SubstrateEvent, post: Post) => {
   const { author, postId } = parsePostEvent(eventAction)

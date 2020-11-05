@@ -1,9 +1,9 @@
 import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
-import { insertActivityForCommentReaction } from '../insert-activity';
-import { insertNotificationForOwner } from '../notifications';
 import { SubstrateEvent } from '../../substrate/types';
 import { parseCommentEvent } from '../../substrate/utils';
 import { VirtualEvents } from '../../substrate/utils';
+import { insertActivityForCommentReaction } from '../inserts/insertActivityForCommentReaction';
+import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 
 export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { author: voter, commentId } = parseCommentEvent(eventAction)

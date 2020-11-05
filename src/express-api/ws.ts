@@ -1,7 +1,7 @@
 import * as WebSocket from 'ws'
 import { newLogger } from '@subsocial/utils'
 import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from './events'
-import { getCountOfUnreadNotifications } from '../postgres/notifications'
+import { getCountOfUnreadNotifications } from '../postgres/selects/getCountOfUnreadNotifications'
 
 require('dotenv').config()
 
