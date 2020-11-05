@@ -1,26 +1,23 @@
 import { pg } from '../connections/postgres';
-import { log, tryPgQeury } from './postges-logger';
+import { log } from './postges-logger';
 import { informClientAboutUnreadNotifications } from '../express-api/events';
 import { ActivitiesParamsWithAccount } from './queries/types';
+import { newPgError } from './utils';
 
 export const insertNotificationForOwner = async ({blockNumber, eventIndex, account }: ActivitiesParamsWithAccount) => {
-
-  const params = [ account, blockNumber, eventIndex ]
   const query = `
     INSERT INTO df.notifications
       VALUES($1, $2, $3) 
     RETURNING *`
-    
-    await tryPgQeury(
-      async () => {
-        await pg.query(query, params)
-        await updateCountOfUnreadNotifications(account)
-      },
-      {
-        success: 'InsertNotificationForOwner function worked successfully',
-        error: 'InsertNotificationForOwner function failed: '
-      }
-    )
+
+  const params = [ account, blockNumber, eventIndex ]
+
+  try {
+    await pg.query(query, params)
+    await updateCountOfUnreadNotifications(account)
+  } catch (err) {
+    throw newPgError(err, insertNotificationForOwner)
+  }
 }
 
 export type AggCountProps = {
@@ -32,6 +29,7 @@ export type AggCountProps = {
 export const getAggregationCount = async (props: AggCountProps) => {
   const { eventName, post_id, account } = props;
   const params = [ account, eventName, post_id ];
+
   const query = `
     SELECT count(distinct account)
     FROM df.activities
@@ -46,7 +44,6 @@ export const getAggregationCount = async (props: AggCountProps) => {
   } catch (err) {
     log.error('Failed to getAggregationCount:', err.stack)
     throw err
-    return 0;
   }
 }
 
@@ -59,8 +56,8 @@ export const updateCountOfUnreadNotifications = async (account: string) => {
     SET unread_count = (
       SELECT DISTINCT COUNT(*)
       FROM df.activities
-      WHERE aggregated = true AND (event_index, block_number) IN ( 
-        SELECT event_index, block_number
+      WHERE aggregated = true AND (block_number, event_index) IN ( 
+        SELECT block_number, event_index
         FROM df.notifications
         WHERE account = $1 AND block_number > (
           SELECT last_read_block_number
@@ -85,8 +82,8 @@ export const getCountOfUnreadNotifications = async (account: string) => {
   const query = `
     SELECT unread_count
     FROM df.notifications_counter
-    WHERE account = $1
-  `
+    WHERE account = $1`
+
   try {
     const res = await pg.query(query, [ account ])
     log.debug(`Found ${res.rows[0].unread_count} unread notifications by account ${account}`)
@@ -94,6 +91,34 @@ export const getCountOfUnreadNotifications = async (account: string) => {
   } catch (err) {
     log.error(`Failed to get a count of unread notifications by account ${account}. Error: %s`, err.stack);
     throw err
-    return 0
+  }
+}
+
+export const markAllNotifsAsRead = async (account: string) => {
+  const query = `
+    WITH last_activity AS (
+      SELECT block_number, event_index
+      FROM df.notification
+      WHERE account = $1
+      ORDER BY
+        block_number DESC,
+        event_index DESC
+      LIMIT 1
+    )
+    UPDATE df.notifications_counter
+    SET
+      unread_count = 0,
+      last_read_block_number = last_activity.block_number,
+      last_read_event_index = last_activity.event_index
+    WHERE account = $1`
+
+  try {
+    const data = await pg.query(query, [ account ])
+    informClientAboutUnreadNotifications(account, 0)
+    log.debug(`Marked all notifications as read by account: ${account}`)
+    return data.rowCount
+  } catch (err) {
+    log.error(`Failed to mark all notifications as read by account: ${account}`, err.stack)
+    throw err
   }
 }

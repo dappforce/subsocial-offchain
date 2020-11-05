@@ -1,6 +1,7 @@
 import * as express from 'express'
 import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
 import * as pgQueries from '../../postgres/queries';
+import * as pgNotifs from '../../postgres/notifications';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
@@ -78,3 +79,8 @@ export const spaceActivitiesCountHandler: HandlerFn = (req, res) =>
 
 export const activityCountsHandler: HandlerFn = (req, res) =>
   countHandler(req, res, pgQueries.getActivityCounts)
+
+export const markAllNotifsAsRead: HandlerFn = (req, res) => {
+  const account = req.params.id
+  return resolvePromiseAndReturnJson(res, pgNotifs.markAllNotifsAsRead(account))
+} 

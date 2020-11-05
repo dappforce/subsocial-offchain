@@ -1,4 +1,4 @@
-import { Pool, types } from 'pg'
+import { Pool/* , types */ } from 'pg'
 import { postgesLog as log } from './loggers';
 
 require('dotenv').config();
@@ -22,7 +22,11 @@ if (!greeted) {
   return this.toString() 
 }
 
-// Add BigInt parser for Postgres
-types.setTypeParser(20, BigInt) 
+// Type Id 20 = BIGINT | BIGSERIAL
+// types.setTypeParser(20, BigInt)
+
+// 1016 = Type Id for arrays of BigInt values
+// const parseBigIntArray = types.getTypeParser(1016)
+// types.setTypeParser(1016, a => parseBigIntArray(a).map(BigInt))
 
 export const pg = new Pool(pgConf);

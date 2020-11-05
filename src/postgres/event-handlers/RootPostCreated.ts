@@ -5,7 +5,6 @@ import { fillNewsFeedWithAccountFollowers, fillNewsFeedWithSpaceFollowers } from
 import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
 
-
 export const onRootCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { author, postId } = parsePostEvent(eventAction)
 
