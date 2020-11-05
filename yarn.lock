@@ -589,9 +589,9 @@
     cids "^0.7.1"
 
 "@subsocial/utils@latest":
-  version "0.4.11-beta5"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.4.11-beta5.tgz#17689a1b491f2e1cb2674b2585981770d5f7e52f"
-  integrity sha512-piRv6q6nz/RtouPf8ftowEQyNE6sM40QxkBPufaanbLRXwDIkZs4TECEJEtPHIRi+GVYbKapoR0jfq+Fj2KidQ==
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.4.11.tgz#862a25a50f200e1081b44a33526dd63a807b4f41"
+  integrity sha512-7gisPjRZo8HiouVFTZGXyiFtng3b5fZ37Rx0genhHnRtkCQBS3G8nIpCCNW4fx8ZsEAhYiqVsZrd+B4OYehKKg==
   dependencies:
     "@babel/runtime" "^7.8.4"
     bn.js "^5.1.1"
@@ -674,6 +674,13 @@
   version "0.12.2"
   resolved "https://registry.yarnpkg.com/@types/caseless/-/caseless-0.12.2.tgz#f65d3d6389e01eeb458bd54dc8f52b95a9463bc8"
   integrity sha512-6ckxMjBBD8URvjB6J3NcnuAn5Pkl7t3TizAg+xdlzzQGSPSmBcXf8KoIH0ua/i+tio+ZRUHEXp0HEmvaR4kt0w==
+
+"@types/connect-timeout@^0.0.34":
+  version "0.0.34"
+  resolved "https://registry.yarnpkg.com/@types/connect-timeout/-/connect-timeout-0.0.34.tgz#16639efcc65b5b887f3b6738f8d9ee4acf556f04"
+  integrity sha512-ZadN0ttd64Wg5suotSRqJTn/QSw6gO1OqFY3GVgzY9WC5Efo2fxsSt5Scd5IOC6eXPbA7N4VlK17/oRpGSmOzA==
+  dependencies:
+    "@types/express" "*"
 
 "@types/connect@*":
   version "3.4.33"
@@ -810,11 +817,6 @@
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
   integrity sha512-l42BggppR6zLmpfU6fq9HEa2oGPEI8yrSPL3GITjfRInppYFahObbIQOQK3UGxEnyQpltZLaPe75046NOZQikw==
-
-"@types/timeout@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@types/timeout/-/timeout-0.2.0.tgz#f3bd30adb31489082daa31091f3bb6ac476c1b05"
-  integrity sha512-dCEZVRdWV8UOP80OjESAHPN/QANuTbC5Iu7ureYfm07UaJDjdpg/ShSMnA4QpVKAghzKybK7nUvwz2Qq/OP7AA==
 
 "@types/tough-cookie@*":
   version "4.0.0"
@@ -1304,9 +1306,9 @@ buffer-writer@2.0.0:
   integrity sha512-a7ZpuTZU1TRtnwyCNW3I5dc0wWNC3VR9S++Ewyk2HHZdrO3CQJqSpd+95Us590V6AL7JqUAH2IwZ/398PmNFgw==
 
 buffer@^5.2.1, buffer@^5.4.3, buffer@^5.5.0, buffer@^5.6.0:
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.7.0.tgz#88afbd29fc89fa7b58e82b39206f31f2cf34feed"
-  integrity sha512-cd+5r1VLBwUqTrmnzW+D7ABkJUM6mr7uv1dv+6jRw4Rcl7tFIFHDqHPL98LhpGFn3dbAt3gtLxtrWp4m1kFrqg==
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.7.1.tgz#ba62e7c13133053582197160851a8f648e99eed0"
+  integrity sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
@@ -3010,9 +3012,9 @@ is-ci@^2.0.0:
     ci-info "^2.0.0"
 
 is-core-module@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.0.0.tgz#58531b70aed1db7c0e8d4eb1a0a2d1ddd64bd12d"
-  integrity sha512-jq1AH6C8MuteOoBPwkxHafmByhL9j5q4OaPGdbuD+ZtQJVzH+i6E3BJDQcBA09k57i2Hh2yQbEG8yObZ0jdlWw==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.1.0.tgz#a4cc031d9b1aca63eecbd18a650e13cb4eeab946"
+  integrity sha512-YcV7BgVMRFRua2FqQzKtTDMz8iCuLEyGKjr70q8Zm1yy2qKcurbFEd79PAdHV77oL3NrAaOVQIbMmiHQCHB7ZA==
   dependencies:
     has "^1.0.3"
 
@@ -6053,11 +6055,6 @@ timeout-abort-controller@^1.0.0:
   dependencies:
     abort-controller "^3.0.0"
     retimer "^2.0.0"
-
-timeout@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/timeout/-/timeout-0.2.1.tgz#3156353dc7089de33eba6356b648e71a68e82758"
-  integrity sha1-MVY1PccIneM+umNWtkjnGmjoJ1g=
 
 timers-ext@^0.1.5:
   version "0.1.7"
