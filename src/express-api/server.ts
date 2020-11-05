@@ -2,7 +2,6 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
 import { ipfsCluster } from '../connections/ipfs';
-import { pg } from '../connections/connect-postgres';
 import { logSuccess, logError } from '../postgres/postges-logger';
 import { nonEmptyStr } from '@subsocial/utils';
 import parseSitePreview from '../parser/parse-preview'
@@ -12,8 +11,8 @@ import * as multer from 'multer';
 import * as pgReqHandlers from './handlers/pgHandlers';
 import * as esReqHandlers from './handlers/esHandlers'
 import { offchainApiLog as log } from '../connections/loggers';
-import { isArray } from 'util';
 import * as timeout from 'connect-timeout';
+import { ipfs, pg } from '../connections';
 
 require('dotenv').config()
 
@@ -64,7 +63,7 @@ app.post('/v1/ipfs/add', async (req: express.Request, res: express.Response) => 
 
 const getContentResponse = async (res: express.Response, cids: string[]) => {
   try {
-    if (isArray(cids)) {
+    if (Array.isArray(cids)) {
       const contents = await ipfs.getContentArrayFromIpfs(cids)
       log.info(`${contents.length} content items load from IPFS:`)
       res.json(contents)
