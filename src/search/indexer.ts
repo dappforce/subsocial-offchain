@@ -16,8 +16,6 @@ export async function indexContentFromIpfs(
 ) {
   const { ipfs, substrate } = await resolveSubsocialApi()
 
-  log.warn(`ipfsHash: ${ipfsHash}       id: ${id}`)
-
   function getContent<T extends CommonContent>() {
     return ipfs.getContent<T>(ipfsHash)
       .catch(err => {
@@ -72,14 +70,12 @@ export async function indexContentFromIpfs(
       } else {
         spaceId = space_id.unwrapOr(undefined)
       }
-      log.error("Hi there")
       indexData = {
         space_id: spaceId.toString(),
         title,
         body,
         tags,
       };
-      log.error(indexData)
       break;
     }
 
