@@ -1,31 +1,36 @@
 import { AccountId } from '@polkadot/types/interfaces';
-import { GenericAccountId } from '@polkadot/types';
 import { PostId, Post, Space } from '@subsocial/types/substrate/interfaces';
 import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
 import { elasticIndexer } from '../connections/elastic'
-import { encodeStructHexId } from '../substrate/utils';
 import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
 import { SubstrateId } from '@subsocial/types';
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { resolveSubsocialApi } from '../connections';
+import { elasticLog as log } from '../connections/loggers';
 
-export async function indexContentFromIpfs (
+export async function indexContentFromIpfs(
   index: string,
   ipfsHash: string,
   id: SubstrateId | AccountId,
   struct?: Space | Post
 ) {
-
   const { ipfs, substrate } = await resolveSubsocialApi()
 
-  async function getContent<T extends CommonContent> () {
-    return ipfs.getContent<T>(ipfsHash);
+  log.warn(`ipfsHash: ${ipfsHash}       id: ${id}`)
+
+  function getContent<T extends CommonContent>() {
+    return ipfs.getContent<T>(ipfsHash)
+      .catch(err => {
+        log.warn(err)
+        return undefined
+      })
   }
 
   let indexData;
   switch (index) {
     case ES_INDEX_SPACES: {
       const content = await getContent<SpaceContent>()
+
       if (!content) return;
 
       let space = struct as Space
@@ -67,13 +72,14 @@ export async function indexContentFromIpfs (
       } else {
         spaceId = space_id.unwrapOr(undefined)
       }
-
+      log.error("Hi there")
       indexData = {
         space_id: spaceId.toString(),
         title,
         body,
         tags,
       };
+      log.error(indexData)
       break;
     }
 
@@ -97,7 +103,7 @@ export async function indexContentFromIpfs (
   if (indexData) {
     await elasticIndexer.index({
       index,
-      id: id instanceof GenericAccountId ? id.toString() : encodeStructHexId(id),
+      id: id?.toString(),
       body: indexData
     })
   }
