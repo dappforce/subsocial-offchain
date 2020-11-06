@@ -19,7 +19,7 @@ const queryUpdate = `
     WHERE block_number <> $1
       AND event_index <> $2
       AND event = $3
-      AND eventIndex aggregated = true
+      AND aggregated = true
       AND post_id = $4
       AND comment_id = $5
   RETURNING *`;

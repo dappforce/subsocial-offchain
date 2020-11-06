@@ -19,7 +19,7 @@ const buildPageQuery = (table: Table) =>
 const buildCountQuery = (table: Table) => 
   `SELECT COUNT(*)
     FROM df.activities
-    WHERE (block_number, event_index) IN (
+    WHERE aggregated = true AND (block_number, event_index) IN (
       SELECT block_number, event_index
       FROM df.${table}
       WHERE account = $1
