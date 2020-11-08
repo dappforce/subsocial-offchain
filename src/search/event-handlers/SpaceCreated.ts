@@ -1,7 +1,7 @@
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrate } from '../../connections/subsocial';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
-import { indexSpaceContent } from './utils';
+import { indexSpaceContent } from '../indexer';
 
 export const onSpaceCreated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;

@@ -1,106 +1,104 @@
-import { AccountId } from '@polkadot/types/interfaces';
-import { PostId, Post, Space } from '@subsocial/types/substrate/interfaces';
-import { SpaceContent, CommonContent, PostContent, ProfileContent } from '@subsocial/types/offchain'
+
+import { AccountId } from '@polkadot/types/interfaces'
+import { PostContent, ProfileContent, SpaceContent } from '@subsocial/types/offchain'
+import { ElasticIndex, ElasticIndexName, ElasticPostDoc, ElasticProfileDoc, ElasticSpaceDoc } from '@subsocial/types/offchain/search'
+import { Post, PostId, Profile, Space, SpaceId } from '@subsocial/types/substrate/interfaces'
+import { resolveSubsocialApi } from '../connections'
 import { elasticIndexer } from '../connections/elastic'
-import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config';
-import { SubstrateId } from '@subsocial/types';
-import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { resolveSubsocialApi } from '../connections';
-import { elasticLog as log } from '../connections/loggers';
+import { getContentFromIpfs } from '../ipfs'
+import { stringifyOption } from '../substrate/utils'
 
-export async function indexContentFromIpfs(
-  index: string,
-  ipfsHash: string,
-  id: SubstrateId | AccountId,
-  struct?: Space | Post
-) {
-  const { ipfs, substrate } = await resolveSubsocialApi()
+async function getProfileDoc(profile: Profile): Promise<ElasticProfileDoc | undefined> {
+  const content = await getContentFromIpfs<ProfileContent>(profile)
+  if (!content) return undefined
 
-  function getContent<T extends CommonContent>() {
-    return ipfs.getContent<T>(ipfsHash)
-      .catch(err => {
-        log.warn(`Failed to get content from IPFS by CID:`, ipfsHash?.toString(), err)
-        return undefined
-      })
+  const { name, about } = content
+  return {
+    name,
+    about,
+  }
+}
+
+async function getSpaceDoc(space: Space): Promise<ElasticSpaceDoc | undefined> {
+  const content = await getContentFromIpfs<SpaceContent>(space)
+  if (!content) return undefined
+
+  const { name, about, tags } = content
+  const handle = stringifyOption(space.handle)
+
+  return {
+    name,
+    handle,
+    about,
+    tags,
+  }
+}
+
+async function getPostDoc(post: Post): Promise<ElasticPostDoc | undefined> {
+  const content = await getContentFromIpfs<PostContent>(post)
+  if (!content) return undefined
+
+  const { substrate } = await resolveSubsocialApi()
+  const { space_id, extension } = post
+  const { title, body, tags } = content
+
+  let spaceId: string
+
+  if (extension.isComment) {
+    const rootPostId = extension.asComment.root_post_id
+    const rootPost = await substrate.findPost({ id: rootPostId })
+    spaceId = stringifyOption(rootPost.space_id)
+  } else {
+    spaceId = stringifyOption(space_id)
   }
 
-  let indexData;
-  switch (index) {
-    case ES_INDEX_SPACES: {
-      const content = await getContent<SpaceContent>()
-
-      if (!content) return;
-
-      let space = struct as Space
-      if (!space) {
-        space = await substrate.findSpace({ id: id as SpaceId });
-      }
-
-      const { name, about, tags } = content
-      indexData = {
-        name,
-        handle: space.handle,
-        about,
-        tags
-      };
-      break;
-    }
-
-    // Index posts and comments:
-    case ES_INDEX_POSTS: {
-      const content = await getContent<PostContent>()
-      if (!content) return;
-
-      const { title, body, tags } = content
-
-      let post = struct as Post;
-
-      if (!post) {
-        post = await substrate.findPost({ id: id as PostId });
-      }
-
-      const { space_id, extension } = post
-
-      let spaceId;
-
-      if (extension.isComment) {
-        const rootPost = await substrate.findPost({ id: extension.asComment.root_post_id });
-        const spaceIdOpt = rootPost.space_id;
-        spaceId = spaceIdOpt.unwrapOr(undefined)
-      } else {
-        spaceId = space_id.unwrapOr(undefined)
-      }
-      indexData = {
-        space_id: spaceId.toString(),
-        title,
-        body,
-        tags,
-      };
-      break;
-    }
-
-    // Index account profiles:
-    case ES_INDEX_PROFILES: {
-      const content = await getContent<ProfileContent>()
-      if (!content) return;
-
-      const { name, about } = content
-      indexData = {
-        name,
-        about
-      }
-      break;
-    }
-
-    default:
-      break;
+  return {
+    spaceId,
+    title,
+    body,
+    tags,
   }
+}
 
-  if (indexData) {
-    await elasticIndexer.index({
-      index,
-      id: id?.toString(),
-      body: indexData
-    })
-  }
+type AnyElasticDoc =
+  ElasticProfileDoc | 
+  ElasticSpaceDoc | 
+  ElasticPostDoc
+
+type IndexContentProps = {
+  index: ElasticIndexName
+  id: AccountId | SpaceId | PostId
+  doc: AnyElasticDoc
+}
+
+async function indexContent({ index, id, doc }: IndexContentProps) {
+  return elasticIndexer.index({
+    index,
+    id: id?.toString(),
+    body: doc
+  })
+}
+
+export async function indexProfileContent(profile: Profile) {
+  return indexContent({
+    index: ElasticIndex.profiles,
+    id: profile.created.account,
+    doc: await getProfileDoc(profile)
+  })
+}
+
+export async function indexSpaceContent(space: Space) {
+  return indexContent({
+    index: ElasticIndex.spaces,
+    id: space.id,
+    doc: await getSpaceDoc(space)
+  })
+}
+
+export async function indexPostContent(post: Post) {
+  return indexContent({
+    index: ElasticIndex.posts,
+    id: post.id,
+    doc: await getPostDoc(post)
+  })
 }

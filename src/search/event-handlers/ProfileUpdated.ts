@@ -1,7 +1,7 @@
 import { substrate } from '../../connections/subsocial';
 import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
 import AccountId from '@polkadot/types/generic/AccountId';
-import { indexProfileContent } from './utils';
+import { indexProfileContent } from '../indexer';
 
 export const onProfileUpdated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
   const { data } = eventAction;
