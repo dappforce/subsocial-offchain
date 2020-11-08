@@ -1,9 +1,9 @@
 import { substrate } from '../../connections/subsocial';
-import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { EventHandlerFn } from '../../substrate/types';
 import AccountId from '@polkadot/types/generic/AccountId';
 import { indexProfileContent } from '../indexer';
 
-export const onProfileUpdated: EventHandlerFn = async (eventAction: SubstrateEvent) => {
+export const onProfileUpdated: EventHandlerFn = async (eventAction) => {
   const { data } = eventAction;
   const accountId = data[0] as AccountId;
   const socialAccount = await substrate.findSocialAccount(accountId)

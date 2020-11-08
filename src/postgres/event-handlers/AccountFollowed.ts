@@ -1,10 +1,10 @@
-import { SubstrateEvent, EventHandlerFn } from '../../substrate/types';
+import { EventHandlerFn } from '../../substrate/types';
 import { substrate } from '../../connections/subsocial';
 import { insertAccountFollower } from '../inserts/insertAccountFollower';
 import { insertActivityForAccount } from '../inserts/insertActivityForAccount';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 
-export const onAccountFollowed: EventHandlerFn = async (eventAction: SubstrateEvent) => {
+export const onAccountFollowed: EventHandlerFn = async (eventAction) => {
   const { data } = eventAction;
   await insertAccountFollower(data);
   const account = data[1].toString()
