@@ -7,7 +7,7 @@ import * as multer from 'multer';
 import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
-import { offchainApiLog as log } from '../connections/loggers';
+import { expressApiLog as log } from '../connections/loggers';
 import * as timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
 
