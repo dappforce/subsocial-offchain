@@ -29,7 +29,6 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
   if (parent_id.isSome) {
     eventAction.eventName = VirtualEvents.CommentReplyCreated
     log.debug('Comment has a parent id');
-    log.debug('parent_id is defined')
     const parentId = parent_id.unwrap();
     const param = [...ids, parentId];
     const parentComment = await substrate.findPost({ id: parentId });

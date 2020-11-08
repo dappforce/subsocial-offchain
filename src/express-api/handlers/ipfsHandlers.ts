@@ -20,24 +20,23 @@ export const addContent = async (req: express.Request, res: express.Response) =>
 }
 
 const getContentResponse = async (res: express.Response, cids: string[]) => {
-  console.log('cids', cids)
   try {
     const ipfsCids = (Array.isArray(cids) ? cids : [ cids ]).map(asIpfsCid)
     const { ipfs } = await resolveSubsocialApi()
     const contents = await ipfs.getContentArrayFromIpfs(ipfsCids)
-    log.info(`${contents.length} content items load from IPFS:`)
+    log.info(`${contents.length} content items loaded from IPFS`)
     res.json(contents)
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     res.json(err)
   }
 }
 
 export const getContentAsGetRequest = async (req: express.Request, res: express.Response) =>
-  getContentResponse(res,req.query.cids as string[])
+  getContentResponse(res, req.query.cids as string[])
 
 export const getContentAsPostRequest = async (req: express.Request, res: express.Response) =>
-  getContentResponse(res,req.body.cids)
+  getContentResponse(res, req.body.cids)
 
 export const addFile = async (req: express.Request, res: express.Response) => {
   if (req.file.size > maxFileSizeBytes) {

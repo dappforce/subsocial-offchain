@@ -19,7 +19,7 @@ export async function indexContentFromIpfs(
   function getContent<T extends CommonContent>() {
     return ipfs.getContent<T>(ipfsHash)
       .catch(err => {
-        log.warn(err)
+        log.warn(`Failed to get content from IPFS by CID:`, ipfsHash?.toString(), err)
         return undefined
       })
   }
