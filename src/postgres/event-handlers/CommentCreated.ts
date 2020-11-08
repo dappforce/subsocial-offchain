@@ -5,10 +5,10 @@ import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
 import { substrate } from '../../connections/subsocial';
 import { insertCommentFollower } from '../inserts/insertCommentFollower';
-import { insertActivityComments } from '../inserts/insertActivityComments';
 import { insertActivityForComment } from '../inserts/insertActivityForComment';
 import { fillNotificationsWithPostFollowers } from '../fills/fillNotificationsWithPostFollowers';
 import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
+import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 
 export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) => {
   const { author, commentId } = parseCommentEvent(eventAction)
@@ -29,7 +29,15 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
   if (parent_id.isSome) {
     eventAction.eventName = VirtualEvents.CommentReplyCreated
     log.debug('Comment has a parent id');
-    await insertActivityComments(eventAction, ids, post);
+    const parentId = parent_id.unwrap();
+    const param = [...ids, parentId];
+    const parentComment = await substrate.findPost({ id: parentId });
+
+    const parentOwner = parentComment.owner.toString();
+    const insertResult = await insertActivityForComment(eventAction, param, author);
+
+    if (author === parentOwner || insertResult === undefined) return;
+    await insertNotificationForOwner({ ...insertResult, account: parentOwner });
   } else {
     eventAction.eventName = VirtualEvents.CommentCreated
     const insertResult = await insertActivityForComment(eventAction, ids, postCreator);

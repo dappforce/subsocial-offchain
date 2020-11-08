@@ -1,7 +1,7 @@
 import { substrate } from '../../connections/subsocial';
 import { EventHandlerFn } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
-import { indexPostContent } from './utils';
+import { indexPostContent } from '../indexer';
 
 export const onPostCreated: EventHandlerFn = async (eventAction) => {
   const { postId } = parsePostEvent(eventAction)

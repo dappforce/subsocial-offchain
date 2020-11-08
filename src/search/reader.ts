@@ -12,19 +12,24 @@ import {
   ElasticQueryParams,
 } from '@subsocial/types/offchain/search'
 
-const resoloveElasticIndexByType = (type: ElasticIndexTypes) => ElasticIndex[type]
+const log = newLogger('Elastic Reader')
+
+const resoloveElasticIndexByType = (type: ElasticIndexTypes) =>
+  ElasticIndex[type]
 
 const resoloveElasticIndexes = (indexes: ElasticIndexTypes[]) =>
-  indexes && indexes.includes('all') ? AllElasticIndexes : indexes?.map(resoloveElasticIndexByType)
+  indexes && indexes.includes('all')
+    ? AllElasticIndexes
+    : indexes?.map(resoloveElasticIndexByType)
 
 export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
+  const indexes = resoloveElasticIndexes(params.indexes)
+  const q = params.q || '*'
+  const tags = params.tags || []
   const from = params.offset || 0
   const size = params.limit || MAX_RESULTS_LIMIT
-  const q = params.q || '*'
-  const indexes = resoloveElasticIndexes(params.indexes)
-  const tags = params.tagsFilter || []
 
-  // TODO: add sort
+  // TODO: support sorting of results
 
   const baseSearchProps = {
     index: indexes,
@@ -32,7 +37,10 @@ export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
     size: size,
   }
 
-  const tagFilterFields = [ElasticFields.space.tags, ElasticFields.post.tags]
+  const tagFields = [
+    ElasticFields.space.tags,
+    ElasticFields.post.tags
+  ]
 
   const searchFields = [
     `${ElasticFields.space.name}^3`,
@@ -66,7 +74,7 @@ export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
   const tagFilterQueryPart = tags.map((tag) => ({
     multi_match: {
       query: tag,
-      fields: tagFilterFields,
+      fields: tagFields,
     },
   }))
 
@@ -86,7 +94,7 @@ export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
     },
   }
 
-  log.debug('Final ElasticSearch query: %o', searchReq)
+  log.debug('Final ElasticSearch query:', searchReq)
 
   return searchReq
 }
@@ -190,5 +198,3 @@ export const loadSubsocialDataByESIndex = async (results: EsDataResults[]) => {
     }))
     .filter((x) => x.data !== undefined)
 }
-
-const log = newLogger('buildElasticSearchQuery')

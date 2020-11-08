@@ -1,10 +1,9 @@
-import { Event } from '@polkadot/types/interfaces';
+import { Option } from '@polkadot/types'
+import { Event } from '@polkadot/types/interfaces'
+import { PostId } from '@subsocial/types/substrate/interfaces'
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
-import { bnToHex } from '@polkadot/util'
-import { newLogger } from '@subsocial/utils';
-import { SubstrateEvent } from './types';
-import { PostId } from '@subsocial/types/substrate/interfaces';
-//import { types } from 'pg'
+import { newLogger } from '@subsocial/utils'
+import { SubstrateEvent } from './types'
 
 require('dotenv').config()
 
@@ -35,26 +34,19 @@ export function shouldHandleEvent (event: Event): boolean {
   )
 }
 
-export function encodeStructIds (ids: SubstrateId[]) {
+/** Convert id of Substrate struct to `bigint`. */
+export function encodeStructId (id: SubstrateId): bigint {
+  return BigInt(id.toString())
+}
+
+/** Convert ids of Substrate structs to `bigint`s. */
+export function encodeStructIds (ids: SubstrateId[]): bigint[] {
   try {
     return ids.map(encodeStructId)
   } catch (err) {
     log.error('Failed to encode struct ids:', err)
     return []
   }
-}
-
-/**
- * Convert a number to its shortened hex representation.
- * Example: '0x000012ab' -> '12ab'
- */
-export function encodeStructId (id: SubstrateId) {
-  //return bnToHex(id).split('x')[1].replace(/(0+)/, '')
-  return BigInt(id.toString())
-}
-
-export function encodeStructHexId (id: SubstrateId): string {
-  return bnToHex(id).split('x')[1].replace(/(0+)/, '')
 }
 
 export enum VirtualEvents {
@@ -75,4 +67,8 @@ export const parsePostEvent = ({ data }: SubstrateEvent) => {
 export const parseCommentEvent = (eventAction: SubstrateEvent) => {
   const { author, postId: commentId } = parsePostEvent(eventAction)
   return { author, commentId }
+}
+
+export function stringifyOption(opt: Option<any>): string {
+  return opt.unwrapOr(undefined)?.toString()
 }

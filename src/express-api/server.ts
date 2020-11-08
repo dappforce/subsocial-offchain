@@ -7,7 +7,7 @@ import * as multer from 'multer';
 import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
-import { offchainApiLog as log } from '../connections/loggers';
+import { expressApiLog as log } from '../connections/loggers';
 import * as timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
 
@@ -46,8 +46,8 @@ app.use(express.static('public'))
 app.post('/v1/ipfs/addFile', upload.single('file'), ipfsReqHandlers.addFile)
 
 app.post('/v1/ipfs/add', ipfsReqHandlers.addContent)
-app.get('/v1/ipfs/get', ipfsReqHandlers.getContent)
-app.post('/v1/ipfs/get', ipfsReqHandlers.getContent)
+app.get('/v1/ipfs/get', ipfsReqHandlers.getContentAsGetRequest)
+app.post('/v1/ipfs/get', ipfsReqHandlers.getContentAsPostRequest)
 app.delete('/v1/ipfs/pins/:cid', ipfsReqHandlers.deleteContent)
 
 // API endpoints for querying search results from Elasticsearch engine

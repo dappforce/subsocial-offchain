@@ -2,39 +2,53 @@ import * as express from 'express'
 import { getOffsetFromRequest, getLimitFromRequest, HandlerFn, resolvePromiseAndReturnJson } from '../utils'
 import { nonEmptyStr, nonEmptyArr } from '@subsocial/utils'
 import { buildElasticSearchQuery, loadSubsocialDataByESIndex } from '../../search/reader'
-import { ElasticIndexTypes, ElasticQueryParams } from '@subsocial/types/offchain/search'
+import { ElasticQueryParams } from '@subsocial/types/offchain/search'
 import { elasticReader } from '../../connections/elastic'
 import { elasticLog } from '../../connections/loggers'
 
-const querySearch = async (req: express.Request, res: express.Response) => {
-  const { q: searchTerm, indexes, tagsFilter: tags } = req.query as ElasticQueryParams
-  const indexesArray = nonEmptyStr(indexes) ? [indexes] : indexes
-  const tagsArray = nonEmptyStr(tags) ? [tags] : tags
+function toArray<T extends string>(maybeArr: T | Array<T>): Array<T> {
+  if (nonEmptyArr(maybeArr)) {
+    return maybeArr
+  } else if (nonEmptyStr(maybeArr)) {
+    return [ maybeArr ]
+  } else {
+    return undefined
+  }
+}
 
-  const esParams = {
-    q: searchTerm ? searchTerm.toString() : null,
-    limit: getLimitFromRequest(req),
+function reqToElasticQueryParams(req: express.Request): ElasticQueryParams {
+  const { indexes, q, tags } = req.query as ElasticQueryParams
+
+  return {
+    indexes: toArray(indexes),
+    q: q ? q.toString() : null,
+    tags: toArray(tags),
     offset: getOffsetFromRequest(req),
-    indexes: nonEmptyArr(indexesArray) ? (indexesArray as ElasticIndexTypes[]) : undefined,
-    tagsFilter: nonEmptyArr(tagsArray) ? (tagsArray as string[]) : undefined,
+    limit: getLimitFromRequest(req),
   }
+}
 
-  const esQuery = buildElasticSearchQuery(esParams)
-
+const queryElastic = async (req: express.Request, res: express.Response) => {
   try {
-    return await elasticReader.search(esQuery)
-  } catch (reason) {
-    elasticLog.warn('%s', reason.message)
-    res.status(reason.statusCode).send(reason.meta)
+    const esParams = reqToElasticQueryParams(req)
+    const esQuery = buildElasticSearchQuery(esParams)
+    const result = await elasticReader.search(esQuery)
+    if (result) {
+      const { body: { hits: { hits } } } = result
+      return hits
+    }
+  } catch (err) {
+    elasticLog.warn('Failed to query ElasticSearch:', err.message)
+    res.status(err.statusCode).send(err.meta)
   }
-
   return null
 }
 
 export const searchHandler: HandlerFn = async (req, res) => {
-  const result = await querySearch(req, res)
-  if (result) {
-    const { body: { hits: { hits } } } = result
-    return resolvePromiseAndReturnJson(res, loadSubsocialDataByESIndex(hits))
+  const searchResults = await queryElastic(req, res)
+  if (searchResults) {
+    return resolvePromiseAndReturnJson(res, loadSubsocialDataByESIndex(searchResults))
+  } else {
+    res.json([])
   }
 }

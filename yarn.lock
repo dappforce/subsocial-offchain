@@ -580,15 +580,15 @@
     "@subsocial/utils" latest
     axios "^0.19.2"
 
-"@subsocial/config@^0.4.12":
-  version "0.4.12"
-  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.12.tgz#7c9be7e31312c790771003186df9e828a21adc3e"
-  integrity sha512-f7glrTz+qKMy2G0dn3bOKh4VJd/xcHRz9jvLYI2kKOPNsEoKBKNPi8n7CMUQC3ElIOirpTGfwfjjfP0p3jVX+w==
-
-"@subsocial/types@^0.4.13":
+"@subsocial/config@^0.4.13":
   version "0.4.13"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.13.tgz#a6ea6e5529a2c7657ae43157315212560ab513f4"
-  integrity sha512-NfUZTM/NoNakO2wirFGYOozJSixxxeoJuGSkThmVihuVCJDAx1vV3Pf5AtSq+zs7/FebhR8Pp6aDIlqyXwHmxA==
+  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.13.tgz#1e14bb5075fff9643e8a0471244a55d22066051c"
+  integrity sha512-503gEtAShauCsQD6Hp52htp89ugUj7fPx7BCJKwZqrvV0selNz28Q1rwAxxXcVoLc2NoqyDvMe1dJRcYLW5wXg==
+
+"@subsocial/types@^0.4.15":
+  version "0.4.15"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.15.tgz#c9eb307917347e9462ad7d59522e204ffe89e3aa"
+  integrity sha512-SrcXFiCUWea4aThY0xwsBekplHG5Dr2b738qT/DJ/o/Fyd50le7//4CFlbfyIKKRG//5Z8+1dZYDcjUbPAVu3g==
   dependencies:
     "@subsocial/utils" latest
     cids "^0.7.1"
