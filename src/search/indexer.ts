@@ -3,6 +3,7 @@ import { AccountId } from '@polkadot/types/interfaces'
 import { PostContent, ProfileContent, SpaceContent } from '@subsocial/types/offchain'
 import { ElasticIndex, ElasticIndexName, ElasticPostDoc, ElasticProfileDoc, ElasticSpaceDoc } from '@subsocial/types/offchain/search'
 import { Post, PostId, Profile, Space, SpaceId } from '@subsocial/types/substrate/interfaces'
+import { isEmptyObj } from '@subsocial/utils'
 import { resolveSubsocialApi } from '../connections'
 import { elasticIndexer } from '../connections/elastic'
 import { getContentFromIpfs } from '../ipfs'
@@ -72,6 +73,8 @@ type IndexContentProps = {
 }
 
 async function indexContent({ index, id, doc }: IndexContentProps) {
+  if (isEmptyObj(doc)) return undefined
+
   return elasticIndexer.index({
     index,
     id: id?.toString(),
