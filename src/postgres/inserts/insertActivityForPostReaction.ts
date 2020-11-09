@@ -16,11 +16,10 @@ const query = `
 const queryUpdate = `
   UPDATE df.activities
     SET aggregated = false
-    WHERE block_number <> $1
-      AND event_index <> $2
-      AND event = $3
-      AND aggregated = true
-      AND post_id = $4
+      WHERE aggregated = true
+        AND NOT (block_number = $1 AND event_index = $2)
+        AND event = $3
+        AND post_id = $4
   RETURNING *`;
 
 export async function insertActivityForPostReaction(eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): InsertActivityPromise {
