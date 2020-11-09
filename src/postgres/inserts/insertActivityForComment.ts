@@ -14,6 +14,16 @@ const query = `
     VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
   RETURNING *`
 
+const buildQueryUpdate = (parentEq?: string) => `
+  UPDATE df.activities
+    SET aggregated = false
+      WHERE aggregated = true
+        AND NOT (block_number = $1 AND event_index = $2)
+        AND event = $3
+        AND post_id = $4
+        ${parentEq}
+  RETURNING *`;
+
 export async function insertActivityForComment(eventAction: SubstrateEvent, ids: SubstrateId[], creator: string): InsertActivityPromise {
 
   const paramsIds = encodeStructIds(ids)
@@ -48,21 +58,12 @@ export async function insertActivityForComment(eventAction: SubstrateEvent, ids:
       parentEq = 'AND parent_comment_id = $5';
       paramsIdsUpd.push(parentId);
     }
-    const queryUpdate = `
-      UPDATE df.activities
-        SET aggregated = false
-        WHERE block_number <> $1
-          AND event_index <> $2
-          AND event = $3
-          AND post_id = $4
-          ${parentEq}
-          AND aggregated = true
-      RETURNING *`;
+
 
     log.debug('Params of update query:', [...paramsIdsUpd]);
     log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
     const paramsUpdate = [blockNumber, eventIndex, eventName, ...paramsIdsUpd];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
+    const resUpdate = await pg.query(buildQueryUpdate(parentEq), paramsUpdate);
     updateCountLog(resUpdate.rowCount)
   } catch (err) {
     throw newPgError(err, insertActivityForComment)

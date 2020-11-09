@@ -13,13 +13,11 @@ const query = `
 const queryUpdate = `
   UPDATE df.activities
     SET aggregated = false
-    WHERE block_number <> $1
-      AND event_index <> $3
-      AND event = $4
-      AND aggregated = true
-      AND following_id = $2
+      WHERE aggregated = true
+        AND NOT (block_number = $1 AND event_index = $3)
+        AND event = $4
+        AND following_id = $2
   RETURNING *`;
-
 
 export async function insertActivityForAccount(eventAction: SubstrateEvent, count: number): InsertActivityPromise {
   const { eventName, data, blockNumber, eventIndex } = eventAction;
