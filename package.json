@@ -11,9 +11,9 @@
   },
   "devDependencies": {
     "@polkadot/types": "1.28.1",
-    "@subsocial/config": "^0.4.13",
-    "@subsocial/types": "^0.4.15",
-    "@subsocial/utils": "^0.4.13",
+    "@subsocial/config": "^0.4.23",
+    "@subsocial/types": "^0.4.23",
+    "@subsocial/utils": "^0.4.23",
     "@types/axios": "^0.14.0",
     "@types/bn.js": "^4.11.5",
     "@types/connect-timeout": "^0.0.34",
@@ -53,7 +53,7 @@
   "license": "GPL-3.0-only",
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
-    "@subsocial/api": "^0.4.13",
+    "@subsocial/api": "^0.4.24",
     "axios": "^0.19.0",
     "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
