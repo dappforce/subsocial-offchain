@@ -571,32 +571,32 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@^0.4.13":
-  version "0.4.13"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.13.tgz#293dfb982227e541a47c4195417e463538db59b1"
-  integrity sha512-+f9h0D6+iczYEgByIqwD8LEa/W5y3b3tfylTAdh/QFxRYAsvfjDwgoW1rYjgP6B5m/wmFEnuTjRbLff9DEWwUQ==
+"@subsocial/api@^0.4.24":
+  version "0.4.24"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.24.tgz#6a1b5f776718d0bb71f8bcfc314ef977d76b839b"
+  integrity sha512-JjObSsQywqPJAWrw+d5sQEDwzgdYLjs1dhp2l81jTrPMI0Vof/1jNYzRKcFz9WN/RMnHVXGLY0K6Yr6DAc0D3Q==
   dependencies:
     "@polkadot/api" "1.28.1"
     "@subsocial/utils" latest
     axios "^0.19.2"
 
-"@subsocial/config@^0.4.13":
-  version "0.4.13"
-  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.13.tgz#1e14bb5075fff9643e8a0471244a55d22066051c"
-  integrity sha512-503gEtAShauCsQD6Hp52htp89ugUj7fPx7BCJKwZqrvV0selNz28Q1rwAxxXcVoLc2NoqyDvMe1dJRcYLW5wXg==
+"@subsocial/config@^0.4.23":
+  version "0.4.23"
+  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.23.tgz#5e0291502de146d6c0254cc55ce38c53663162fb"
+  integrity sha512-VbcpuM8rHdIWBc/MmE4ZaUI8TkjD36w/WJgd1fu3u8Jh54T4ZnhbMobOTpo98QQxxpi/rfid4665sGGuUKXw3g==
 
-"@subsocial/types@^0.4.15":
-  version "0.4.15"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.15.tgz#c9eb307917347e9462ad7d59522e204ffe89e3aa"
-  integrity sha512-SrcXFiCUWea4aThY0xwsBekplHG5Dr2b738qT/DJ/o/Fyd50le7//4CFlbfyIKKRG//5Z8+1dZYDcjUbPAVu3g==
+"@subsocial/types@^0.4.23":
+  version "0.4.23"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.23.tgz#c1a5a5628e991fd91e74e5f20297cad63b8c5b84"
+  integrity sha512-O4rZP4rzznnEOtbgpQlTqcN/NJtYGFymPV/0pTladW471nawELuLlzxImP4ytH5/XWOXl4bdWJ1lcuukzkfOVQ==
   dependencies:
     "@subsocial/utils" latest
     cids "^0.7.1"
 
-"@subsocial/utils@^0.4.13":
-  version "0.4.13"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.4.13.tgz#638898e8ac642eb89b5fdf594f5d08f95b70dfa7"
-  integrity sha512-j+CHLGBQK/Np6D8dpWWe46uq6uW38YyKG/CLXzJa7lNZz5XYLkBwy1jG3rcMGiyMw3oGP7gux6m27RrTUZbO4Q==
+"@subsocial/utils@^0.4.23":
+  version "0.4.23"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.4.23.tgz#592714cc3cfb81c7ec38fe0ad15c69ae5b9f1de0"
+  integrity sha512-53PSVvyjDdP3cxgbXscQ8n85PWMD96V7zel+p3o6Qj1hl7Ad+jxwpJNsR35sat63NnbJWeUwvG+y7NZG6vJOmg==
   dependencies:
     bn.js "^5.1.1"
     chalk "^3.0.0"
