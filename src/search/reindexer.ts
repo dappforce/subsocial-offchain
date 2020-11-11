@@ -12,17 +12,19 @@ const reindexProfiles = async (substrate: SubsocialSubstrateApi) => {
   const api = await substrate.api
   const storageKeys = await api.query.profiles.socialAccountById.keys()
 
-  for (let key of storageKeys) {
+  const profileIndexators = storageKeys.map(async key => {
     const addressEncoded = '0x' + key.toHex().substr(-64)
     const account = new GenericAccountId(key.registry, addressEncoded)
 
     const res = await substrate.findSocialAccount(account)
     const { profile } = res
     if (profile.isSome) {
-      // log.info(`Index profile of account ${account.toString()}`)
+      log.info(`Index profile of account ${account.toString()}`)
       indexProfileContent(profile.unwrap())
     }
-  }
+  })
+
+  await Promise.all(profileIndexators)
 }
 
 const reindexSpaces = async (substrate: SubsocialSubstrateApi) => {
@@ -35,11 +37,11 @@ const reindexSpaces = async (substrate: SubsocialSubstrateApi) => {
   const spaceIndexators = spaceIds.map(async spaceId => {
     const id = new BN(spaceId)
     const space = await substrate.findSpace({ id })
+    log.info(`Index space # ${spaceId} out of ${lastSpaceIdStr}`)
     indexSpaceContent(space)
   })
 
   await Promise.all(spaceIndexators)
-  log.info(`Indexed ${lastSpaceIdStr} spaces`)
 }
 
 const reindexPosts = async (substrate: SubsocialSubstrateApi) => {
@@ -52,11 +54,11 @@ const reindexPosts = async (substrate: SubsocialSubstrateApi) => {
   const postIndexators = postIds.map(async postId => {
     const id = new BN(postId)
     const post = await substrate.findPost({ id })
+    log.info(`Index post # ${postId} out of ${lastPostIdStr}`)
     indexPostContent(post)
   })
 
   await Promise.all(postIndexators)
-  log.info(`Indexed ${lastPostIdStr} posts`)
 }
 
 async function reindexContentFromIpfs(substrate: SubsocialSubstrateApi) {
