@@ -48,8 +48,7 @@
     "test:watch": "jest --watch",
     "setup": "yarn init-offchain && yarn build",
     "reindex-content": "node ./build/src/search/reindexer.js",
-    "copy-block-numbers": "find ./src -name '*.txt' | cpio -pd ./build",
-    "block-indexer": "yarn copy-block-numbers && node ./build/src/sql/block-indexer.js"
+    "block-indexer": "node ./build/src/sql/block-indexer.js"
   },
   "author": "DappForce contributors",
   "license": "GPL-3.0-only",
