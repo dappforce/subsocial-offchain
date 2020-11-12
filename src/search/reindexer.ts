@@ -24,7 +24,7 @@ const reindexProfiles: ReindexerFn = async (substrate) => {
     const { profile } = res
     if (profile.isSome) {
       log.info(`Index profile of account ${account.toString()}`)
-      indexProfileContent(profile.unwrap())
+      await indexProfileContent(profile.unwrap())
     }
   })
 
@@ -42,7 +42,7 @@ const reindexSpaces: ReindexerFn = async (substrate) => {
     const id = new BN(spaceId)
     const space = await substrate.findSpace({ id })
     log.info(`Index space # ${spaceId} out of ${lastSpaceIdStr}`)
-    indexSpaceContent(space)
+    await indexSpaceContent(space)
   })
 
   await Promise.all(spaceIndexators)
@@ -59,29 +59,30 @@ const reindexPosts: ReindexerFn = async (substrate) => {
     const id = new BN(postId)
     const post = await substrate.findPost({ id })
     log.info(`Index post # ${postId} out of ${lastPostIdStr}`)
-    indexPostContent(post)
+    await indexPostContent(post)
   })
 
   await Promise.all(postIndexators)
 }
 
 type IReindexerFunction = Record<string, ReindexerFn>
-const AllReindexerFunctions = [reindexProfiles, reindexSpaces, reindexPosts]
 const ReindexerFunction: IReindexerFunction = {
   profiles: reindexProfiles,
   spaces: reindexSpaces,
   posts: reindexPosts,
 }
+const AllReindexerFunctions = Object.values(ReindexerFunction)
 
 async function reindexContentFromIpfs(substrate: SubsocialSubstrateApi) {
-  let reindexPromises = getUniqueIds(argv.filter(arg => !!ReindexerFunction[arg]))
+  const uniqueArguments = getUniqueIds(argv)
+  let reindexPromises = uniqueArguments.filter(arg => ReindexerFunction[arg])
     .map(async argument => {
       const func = ReindexerFunction[argument]
       await func(substrate)
     })
 
   if (isEmptyArray(reindexPromises) || argv.includes('all'))
-    reindexPromises = AllReindexerFunctions.map(async fn => fn(substrate))
+    reindexPromises = AllReindexerFunctions.map(fn => fn(substrate))
 
   await Promise.all(reindexPromises)
 
