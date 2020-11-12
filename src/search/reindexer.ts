@@ -3,16 +3,20 @@ import { resolveSubsocialApi } from '../connections/subsocial'
 import { indexPostContent, indexProfileContent, indexSpaceContent } from './indexer'
 import { elasticLog as log } from '../connections/loggers'
 import * as BN from 'bn.js'
-import { exit } from 'process'
+import { argv, exit } from 'process'
 import { GenericAccountId } from '@polkadot/types'
+import { isEmptyArray } from '@subsocial/utils';
+import { getUniqueIds } from '@subsocial/api'
 
 const one = new BN(1)
 
-const reindexProfiles = async (substrate: SubsocialSubstrateApi) => {
+type ReindexerFn = (substrate: SubsocialSubstrateApi) => Promise<void>
+
+const reindexProfiles: ReindexerFn = async (substrate) => {
   const api = await substrate.api
   const storageKeys = await api.query.profiles.socialAccountById.keys()
 
-  const profileIndexators = storageKeys.map(async key => {
+  const profileIndexators = storageKeys.map(async (key) => {
     const addressEncoded = '0x' + key.toHex().substr(-64)
     const account = new GenericAccountId(key.registry, addressEncoded)
 
@@ -27,14 +31,14 @@ const reindexProfiles = async (substrate: SubsocialSubstrateApi) => {
   await Promise.all(profileIndexators)
 }
 
-const reindexSpaces = async (substrate: SubsocialSubstrateApi) => {
+const reindexSpaces: ReindexerFn = async (substrate) => {
   const lastSpaceId = (await substrate.nextSpaceId()).sub(one)
   const lastSpaceIdStr = lastSpaceId.toString()
 
   // Create an array with space ids from 1 to lastSpaceId
-  const spaceIds = Array.from({length: lastSpaceId.toNumber()}, (_, i) => i + 1)
+  const spaceIds = Array.from({ length: lastSpaceId.toNumber() }, (_, i) => i + 1)
 
-  const spaceIndexators = spaceIds.map(async spaceId => {
+  const spaceIndexators = spaceIds.map(async (spaceId) => {
     const id = new BN(spaceId)
     const space = await substrate.findSpace({ id })
     log.info(`Index space # ${spaceId} out of ${lastSpaceIdStr}`)
@@ -44,14 +48,14 @@ const reindexSpaces = async (substrate: SubsocialSubstrateApi) => {
   await Promise.all(spaceIndexators)
 }
 
-const reindexPosts = async (substrate: SubsocialSubstrateApi) => {
+const reindexPosts: ReindexerFn = async (substrate) => {
   const lastPostId = (await substrate.nextPostId()).sub(one)
   const lastPostIdStr = lastPostId.toString()
 
   // Create an array with space ids from 1 to lastSpaceId
-  const postIds = Array.from({length: lastPostId.toNumber()}, (_, i) => i + 1)
+  const postIds = Array.from({ length: lastPostId.toNumber() }, (_, i) => i + 1)
 
-  const postIndexators = postIds.map(async postId => {
+  const postIndexators = postIds.map(async (postId) => {
     const id = new BN(postId)
     const post = await substrate.findPost({ id })
     log.info(`Index post # ${postId} out of ${lastPostIdStr}`)
@@ -61,10 +65,25 @@ const reindexPosts = async (substrate: SubsocialSubstrateApi) => {
   await Promise.all(postIndexators)
 }
 
+type IReindexerFunction = Record<string, ReindexerFn>
+const AllReindexerFunctions = [reindexProfiles, reindexSpaces, reindexPosts]
+const ReindexerFunction: IReindexerFunction = {
+  profiles: reindexProfiles,
+  spaces: reindexSpaces,
+  posts: reindexPosts,
+}
+
 async function reindexContentFromIpfs(substrate: SubsocialSubstrateApi) {
-  await reindexSpaces(substrate)
-  await reindexPosts(substrate)
-  await reindexProfiles(substrate)
+  let reindexPromises = getUniqueIds(argv.filter(arg => !!ReindexerFunction[arg]))
+    .map(async argument => {
+      const func = ReindexerFunction[argument]
+      await func(substrate)
+    })
+
+  if (isEmptyArray(reindexPromises) || argv.includes('all'))
+    reindexPromises = AllReindexerFunctions.map(async fn => fn(substrate))
+
+  await Promise.all(reindexPromises)
 
   exit(0)
 }
