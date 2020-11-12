@@ -1,8 +1,7 @@
 import { AnySubsocialData, PostWithAllDetails, ProfileData, SpaceData } from '@subsocial/types'
 import { newLogger, isEmptyArray } from '@subsocial/utils'
 import { MAX_RESULTS_LIMIT } from '../express-api/utils'
-import BN from 'bn.js'
-import { hexToBn } from '@polkadot/util'
+import * as BN from 'bn.js'
 import { resolveSubsocialApi } from '../connections/subsocial'
 import {
   ElasticIndex,
@@ -130,9 +129,9 @@ export const loadSubsocialDataByESIndex = async (results: EsDataResults[]) => {
       case ElasticIndex.profiles:
         return fillArray(_id, ownerIds, ownerById)
       case ElasticIndex.spaces:
-        return fillArray(hexToBn(_id), spaceIds, spaceById)
+        return fillArray(new BN(_id), spaceIds, spaceById)
       case ElasticIndex.posts:
-        return fillArray(hexToBn(_id), postIds, postById)
+        return fillArray(new BN(_id), postIds, postById)
     }
   })
 
@@ -182,9 +181,9 @@ export const loadSubsocialDataByESIndex = async (results: EsDataResults[]) => {
       case ElasticIndex.profiles:
         return ownerById.get(_id)
       case ElasticIndex.spaces:
-        return spaceById.get(hexToBn(_id).toString())
+        return spaceById.get(new BN(_id).toString())
       case ElasticIndex.posts:
-        return postById.get(hexToBn(_id).toString())
+        return postById.get(new BN(_id).toString())
     }
 
     return undefined
