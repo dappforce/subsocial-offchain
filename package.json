@@ -25,7 +25,8 @@
     "build:watch": "yarn copy-sql && tsc -w -p tsconfig.release.json",
     "lint": "tsc --noEmit && eslint '*/**/*.{ts,tsx}' --quiet --fix",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "block-indexer": "node ./build/src/substrate/block-indexer.js"
   },
   "resolutions": {
     "@polkadot/types": "1.28.1",

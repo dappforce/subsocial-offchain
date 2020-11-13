@@ -15,15 +15,6 @@ require('dotenv').config()
 let lastBlockNumber: BN | undefined = undefined
 let blockTime = 6
 
-export const getValidDate = async (eventBlock: BN) => {
-  const api = await substrate.api
-  const currentTimestamp = await api.query.timestamp.now()
-  
-  const result = currentTimestamp.sub(lastBlockNumber.sub(eventBlock).muln(blockTime))
-
-  return new Date(result.toNumber())
-}
-
 async function main (substrate: SubsocialSubstrateApi) {
 
   log.info(`Subscribe to Substrate events: ${Array.from(eventsFilterMethods)}`)
@@ -57,14 +48,6 @@ async function main (substrate: SubsocialSubstrateApi) {
     await api.derive.chain.bestNumberFinalized()
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
-
-  api.rpc.chain.subscribeNewHeads(async (header) => {
-    lastBlockNumber = header.number.toBn()
-  })
-
-  if (!lastBlockNumber) {
-    await waitNextBlock()
-  } 
 
   while (true) {
 
@@ -107,7 +90,6 @@ async function main (substrate: SubsocialSubstrateApi) {
     log.debug(`Block number to process: ${blockToProcess} with hash ${blockHash.toHex()}`)
 
     // Process all events of the current block
-    // for (const { event } of events) {
       for (let i = 0; i < events.length; i++) {
       const { event } = events[i]
 

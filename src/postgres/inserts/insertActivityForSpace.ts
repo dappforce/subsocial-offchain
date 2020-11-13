@@ -2,7 +2,7 @@ import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries';
 import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { encodeStructId } from '../../substrate/utils';
-import { getValidDate } from '../../substrate/subscribe';
+import { getValidDate } from '../../substrate/utils';
 import { pg } from '../../connections';
 import { updateCountLog } from '../postges-logger';
 import { newPgError } from '../utils';

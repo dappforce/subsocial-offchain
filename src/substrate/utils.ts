@@ -1,9 +1,11 @@
 import { Option } from '@polkadot/types'
-import { Event } from '@polkadot/types/interfaces'
+import { Event } from '@polkadot/types/interfaces';
 import { PostId } from '@subsocial/types/substrate/interfaces'
 import { SubstrateId } from '@subsocial/types/substrate/interfaces/utils'
 import { newLogger } from '@subsocial/utils'
 import { SubstrateEvent } from './types'
+import BN from 'bn.js';
+import { resolveSubsocialApi } from '../connections/subsocial';
 
 require('dotenv').config()
 
@@ -71,4 +73,19 @@ export const parseCommentEvent = (eventAction: SubstrateEvent) => {
 
 export function stringifyOption(opt: Option<any>): string {
   return opt.unwrapOr(undefined)?.toString()
+}
+
+export const getValidDate = async (eventBlock: BN) => {
+  const { substrate } = await resolveSubsocialApi()
+  const api = await substrate.api
+
+  const blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
+  const currentTimestamp = await api.query.timestamp.now()
+  const block = await api.rpc.chain.getBlock()
+
+  const lastBlockNumber = block.block.header.number.unwrap()
+  
+  const result = currentTimestamp.sub(lastBlockNumber.sub(eventBlock).muln(blockTime))
+
+  return new Date(result.toNumber())
 }

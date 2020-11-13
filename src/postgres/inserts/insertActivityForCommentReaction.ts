@@ -4,7 +4,7 @@ import { InsertActivityPromise } from '../queries/types';
 import { encodeStructIds } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { emptyParamsLogError, updateCountLog } from '../postges-logger';
-import { getValidDate } from '../../substrate/subscribe';
+import { getValidDate } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
 

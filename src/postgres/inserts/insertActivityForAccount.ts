@@ -2,8 +2,8 @@ import { updateCountLog } from '../postges-logger';
 import { newPgError } from '../utils';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
-import { getValidDate } from '../../substrate/subscribe';
 import { pg } from '../../connections/postgres';
+import { getValidDate } from '../../substrate/utils';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, following_id, date, agg_count)
