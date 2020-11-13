@@ -1,26 +1,5 @@
-[
-  {
-    "id": 1002,
-    "created": {
-      "account": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
-      "block": 71,
-      "time": 1605267180000
-    },
-    "updated": null,
-    "owner": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
-    "parent_id": null,
-    "handle": "space_2",
-    "content": {
-      "IPFS": "bafyreiccay5xpt4kqf4f2conlcgn7lxqdxol4q73r4mv2rgbrkfjlqlwsa"
-    },
-    "hidden": false,
-    "posts_count": 1,
-    "hidden_posts_count": 0,
-    "followers_count": 2,
-    "score": "0x00000055",
-    "permissions": null
-  },
-  {
+{
+  "1001": {
     "id": 1001,
     "created": {
       "account": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
@@ -41,28 +20,28 @@
     "score": "0x00000086",
     "permissions": null
   },
-  {
-    "id": 1004,
+  "1002": {
+    "id": 1002,
     "created": {
-      "account": "3rPbHZmheHUMtQhajAm5ZuJ3zJ7fW5EdsBiouQ2gMbxneFkh",
-      "block": 198,
-      "time": 1605267942000
+      "account": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
+      "block": 71,
+      "time": 1605267180000
     },
     "updated": null,
-    "owner": "3rPbHZmheHUMtQhajAm5ZuJ3zJ7fW5EdsBiouQ2gMbxneFkh",
+    "owner": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
     "parent_id": null,
-    "handle": "space_bob",
+    "handle": "space_2",
     "content": {
-      "IPFS": "bafyreiedzuqa4r7wpspdhrg6lc2lmtjgbu7so2szxtdjqwfpbshhblqs2y"
+      "IPFS": "bafyreiccay5xpt4kqf4f2conlcgn7lxqdxol4q73r4mv2rgbrkfjlqlwsa"
     },
     "hidden": false,
-    "posts_count": 4,
+    "posts_count": 1,
     "hidden_posts_count": 0,
-    "followers_count": 4,
-    "score": "0x00000074",
+    "followers_count": 2,
+    "score": "0x00000055",
     "permissions": null
   },
-  {
+  "1003": {
     "id": 1003,
     "created": {
       "account": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
@@ -82,5 +61,26 @@
     "followers_count": 2,
     "score": "0x0000004e",
     "permissions": null
+  },
+  "1004": {
+    "id": 1004,
+    "created": {
+      "account": "3rPbHZmheHUMtQhajAm5ZuJ3zJ7fW5EdsBiouQ2gMbxneFkh",
+      "block": 198,
+      "time": 1605267942000
+    },
+    "updated": null,
+    "owner": "3rPbHZmheHUMtQhajAm5ZuJ3zJ7fW5EdsBiouQ2gMbxneFkh",
+    "parent_id": null,
+    "handle": "space_bob",
+    "content": {
+      "IPFS": "bafyreiedzuqa4r7wpspdhrg6lc2lmtjgbu7so2szxtdjqwfpbshhblqs2y"
+    },
+    "hidden": false,
+    "posts_count": 4,
+    "hidden_posts_count": 0,
+    "followers_count": 4,
+    "score": "0x00000074",
+    "permissions": null
   }
-]
+}
