@@ -6,8 +6,11 @@ import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { resolveSubsocialApi, substrate } from '../connections/subsocial';
 import BN from 'bn.js';
+// import { writeFileSync } from 'fs'
 
 require('dotenv').config()
+
+// const eventsJson = [] 
 
 let lastBlockNumber: BN | undefined = undefined
 let blockTime = 6
@@ -117,6 +120,10 @@ async function main (substrate: SubsocialSubstrateApi) {
           blockNumber: blockNumber,
           eventIndex: i
         }
+
+        // For create events.json for testing
+        // eventsJson.push(eventMeta)
+        // writeFileSync('./events.json', JSON.stringify(eventsJson))
 
         if (processPostgres) {
           const error = await handleEventForPostgres(eventMeta)

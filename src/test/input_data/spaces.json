@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1002,
+    "created": {
+      "account": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
+      "block": 71,
+      "time": 1605267180000
+    },
+    "updated": null,
+    "owner": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
+    "parent_id": null,
+    "handle": "space_2",
+    "content": {
+      "IPFS": "bafyreiccay5xpt4kqf4f2conlcgn7lxqdxol4q73r4mv2rgbrkfjlqlwsa"
+    },
+    "hidden": false,
+    "posts_count": 1,
+    "hidden_posts_count": 0,
+    "followers_count": 2,
+    "score": "0x00000055",
+    "permissions": null
+  },
+  {
+    "id": 1001,
+    "created": {
+      "account": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
+      "block": 54,
+      "time": 1605267078000
+    },
+    "updated": null,
+    "owner": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
+    "parent_id": null,
+    "handle": "space_1",
+    "content": {
+      "IPFS": "bafyreibrbxxiqceh4eg5r76am6pju4geagspemxye2m4p7x6o3i5okcosu"
+    },
+    "hidden": false,
+    "posts_count": 2,
+    "hidden_posts_count": 0,
+    "followers_count": 2,
+    "score": "0x00000086",
+    "permissions": null
+  },
+  {
+    "id": 1004,
+    "created": {
+      "account": "3rPbHZmheHUMtQhajAm5ZuJ3zJ7fW5EdsBiouQ2gMbxneFkh",
+      "block": 198,
+      "time": 1605267942000
+    },
+    "updated": null,
+    "owner": "3rPbHZmheHUMtQhajAm5ZuJ3zJ7fW5EdsBiouQ2gMbxneFkh",
+    "parent_id": null,
+    "handle": "space_bob",
+    "content": {
+      "IPFS": "bafyreiedzuqa4r7wpspdhrg6lc2lmtjgbu7so2szxtdjqwfpbshhblqs2y"
+    },
+    "hidden": false,
+    "posts_count": 4,
+    "hidden_posts_count": 0,
+    "followers_count": 4,
+    "score": "0x00000074",
+    "permissions": null
+  },
+  {
+    "id": 1003,
+    "created": {
+      "account": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
+      "block": 109,
+      "time": 1605267408000
+    },
+    "updated": null,
+    "owner": "3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM",
+    "parent_id": null,
+    "handle": "space_3",
+    "content": {
+      "IPFS": "bafyreiduv7swu2t2b65a7vcpvwrfjnmuxvojkhtlsgm2enf4lglisztn4a"
+    },
+    "hidden": false,
+    "posts_count": 2,
+    "hidden_posts_count": 0,
+    "followers_count": 2,
+    "score": "0x0000004e",
+    "permissions": null
+  }
+]
