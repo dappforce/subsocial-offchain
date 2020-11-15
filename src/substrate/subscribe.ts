@@ -4,15 +4,13 @@ import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { resolveSubsocialApi, substrate } from '../connections/subsocial';
-import BN from 'bn.js';
+import { resolveSubsocialApi } from '../connections/subsocial';
 // import { writeFileSync } from 'fs'
 
 require('dotenv').config()
 
 // const eventsJson = [] 
 
-let lastBlockNumber: BN | undefined = undefined
 let blockTime = 6
 
 async function main (substrate: SubsocialSubstrateApi) {
