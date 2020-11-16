@@ -11,10 +11,9 @@ export let substrate: SubsocialSubstrateApi
 export let ipfs: SubsocialIpfsApi
 
 const createMockSubstrate = (): SubsocialSubstrateApi => {
-  const postById: Record<string, Post> = JSON.parse(readFileSync('../test/input_data/posts.json', 'utf-8'))
-  const spaceById: Record<string, Space> = JSON.parse(readFileSync('../test/input_data/spaces.json.json', 'utf-8'))
-  const profileByAccount: Record<string, SocialAccount> = JSON.parse(readFileSync('../test/input_data/profiles.json.json', 'utf-8'))
-
+  const postById: Record<string, Post> = JSON.parse(readFileSync('./test/input_data/posts.json', 'utf-8'))
+  const spaceById: Record<string, Space> = JSON.parse(readFileSync('./test/input_data/spaces.json', 'utf-8'))
+  const profileByAccount: Record<string, SocialAccount> = JSON.parse(readFileSync('./test/input_data/profiles.json', 'utf-8'))
   return {
     findPost: async ({ id }) => postById[id.toString()],
     findSpace: async ({ id }) => spaceById[id.toString()],
@@ -28,9 +27,12 @@ const createMockSubstrate = (): SubsocialSubstrateApi => {
 export const resolveSubsocialApi = async () => {
   // Connect to Subsocial's Substrate node:
   if (process.env.TEST_MODE?.toLocaleLowerCase() === 'true') {
-    return {
+    subsocial = {
       substrate: createMockSubstrate()
-    }
+    } as SubsocialApi
+
+    substrate = subsocial.substrate
+    return subsocial
   }
 
   if (!subsocial) {
