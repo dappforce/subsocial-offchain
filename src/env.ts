@@ -1,0 +1,1 @@
+export const TEST_MODE = process.env.TEST_MODE?.toLocaleLowerCase() === 'true'

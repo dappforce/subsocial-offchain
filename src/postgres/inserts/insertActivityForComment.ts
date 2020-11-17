@@ -1,4 +1,3 @@
-import { SubstrateId } from '@subsocial/types';
 import { SubstrateEvent } from '../../substrate/types';
 import { log, emptyParamsLogError, updateCountLog } from '../postges-logger';
 import { encodeStructIds } from '../../substrate/utils';
@@ -24,7 +23,7 @@ const buildQueryUpdate = (parentEq?: string) => `
         ${parentEq}
   RETURNING *`;
 
-export async function insertActivityForComment(eventAction: SubstrateEvent, ids: SubstrateId[], creator: string): InsertActivityPromise {
+export async function insertActivityForComment(eventAction: SubstrateEvent, ids: string[], creator: string): InsertActivityPromise {
 
   const paramsIds = encodeStructIds(ids)
 

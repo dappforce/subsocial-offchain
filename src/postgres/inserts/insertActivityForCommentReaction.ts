@@ -1,4 +1,3 @@
-import { SubstrateId } from '@subsocial/types';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
 import { encodeStructIds } from '../../substrate/utils';
@@ -23,7 +22,7 @@ const queryUpdate = `
       AND comment_id = $5
   RETURNING *`;
 
-export async function insertActivityForCommentReaction(eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): InsertActivityPromise {
+export async function insertActivityForCommentReaction(eventAction: SubstrateEvent, count: number, ids: string[], creator: string): InsertActivityPromise {
   const paramsIds = encodeStructIds(ids)
 
   if (isEmptyArray(paramsIds)) {

@@ -1,4 +1,3 @@
-import { PostId } from '@subsocial/types/substrate/interfaces';
 import { encodeStructId } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
@@ -14,8 +13,8 @@ const query = `
   )
   RETURNING *`
 
-export async function deleteNotificationsAboutComment (userId: string, commentId: PostId) {
-  const encodedCommentId = encodeStructId(commentId);
+export async function deleteNotificationsAboutComment (userId: string, commentId: string) {
+  const encodedCommentId = encodeStructId(commentId.toString());
   const params = [ userId, encodedCommentId ];
 
   try {

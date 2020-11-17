@@ -1,37 +1,36 @@
-import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
 import { substrateLog as log } from '../../connections/loggers';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
-import { substrate } from '../../connections/subsocial';
 import { insertCommentFollower } from '../inserts/insertCommentFollower';
 import { insertActivityForComment } from '../inserts/insertActivityForComment';
 import { fillNotificationsWithPostFollowers } from '../fills/fillNotificationsWithPostFollowers';
 import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
+import { NormalizedPost, asNormalizedComment } from '../../substrate/normalizers';
+import { findPost } from '../../substrate/api-wrappers';
+import { isEmptyStr } from '@subsocial/utils';
 
-export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) => {
+export const onCommentCreated = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
   const { author, commentId } = parseCommentEvent(eventAction)
 
-  const {
-    extension: { asComment: { root_post_id, parent_id } },
-  } = post
+  const { parentId, rootPostId } = asNormalizedComment(post)
 
-  const rootPost = await substrate.findPost({ id: root_post_id });
+  const rootPost = await findPost(rootPostId);
 
   if (!rootPost) return;
 
   await insertCommentFollower(eventAction.data);
 
-  const postCreator = rootPost.created.account.toString();
-  const ids = [ root_post_id, commentId ];
+  const postCreator = rootPost.createdByAccount;
+  const ids = [ rootPostId, commentId ];
 
-  if (parent_id.isSome) {
+  if (!isEmptyStr(parentId)) {
     eventAction.eventName = VirtualEvents.CommentReplyCreated
     log.debug('Comment has a parent id');
-    const parentId = parent_id.unwrap();
+    // const parentId = parentId.unwrap();
     const param = [...ids, parentId];
-    const parentComment = await substrate.findPost({ id: parentId });
+    const parentComment = await findPost(parentId);
 
     const parentOwner = parentComment.owner.toString();
     const insertResult = await insertActivityForComment(eventAction, param, author);
@@ -44,7 +43,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Post) 
     if (insertResult === undefined) return;
 
     log.debug('Comment does not have a parent id');
-    await fillNotificationsWithPostFollowers(root_post_id, { account: author, ...insertResult });
+    await fillNotificationsWithPostFollowers(rootPostId, { account: author, ...insertResult });
     await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
   }
 }

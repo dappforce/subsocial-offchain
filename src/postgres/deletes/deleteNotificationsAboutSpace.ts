@@ -1,7 +1,6 @@
 import { encodeStructId } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
-import { SpaceId } from '@subsocial/types/substrate/interfaces';
 
 const query = `
   DELETE FROM df.notifications
@@ -15,7 +14,7 @@ const query = `
     )
   RETURNING *`
 
-export async function deleteNotificationsAboutSpace (userId: string, spaceId: SpaceId) {
+export async function deleteNotificationsAboutSpace (userId: string, spaceId: string) {
   const encodedSpaceId = encodeStructId(spaceId);
   const params = [ userId, encodedSpaceId ];
   

@@ -1,31 +1,32 @@
-import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
+import { isEmptyStr } from '@subsocial/utils';
+import { NormalizedPost, asNormalizedComment } from '../../substrate/normalizers';
 import { SubstrateEvent } from '../../substrate/types';
 import { parseCommentEvent } from '../../substrate/utils';
 import { VirtualEvents } from '../../substrate/utils';
 import { insertActivityForCommentReaction } from '../inserts/insertActivityForCommentReaction';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 
-export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post: Post) => {
+export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
   const { author: voter, commentId } = parseCommentEvent(eventAction)
 
-  const { 
-    extension: { asComment: { parent_id, root_post_id } },
-    created: { account },
-    upvotes_count,
-    downvotes_count
-  } = post;
+  const {
+    parentId,
+    rootPostId,
+    createdByAccount,
+    upvotesCount,
+    downvotesCount
+  } = asNormalizedComment(post)
   
   eventAction.eventName = VirtualEvents.CommentReactionCreated
-  const commentAuthor = account.toString()
-  const parentId = parent_id.unwrapOr(root_post_id)
-  const ids = [ parentId, commentId ];
-  const reactionCount = upvotes_count.add(downvotes_count).toNumber() - 1;
+  const parent = !isEmptyStr(parentId) ? parentId : rootPostId
+  const ids = [ parent, commentId ];
+  const reactionCount = upvotesCount + downvotesCount - 1;
 
-  const insertResult = await insertActivityForCommentReaction(eventAction, reactionCount, ids, commentAuthor);
+  const insertResult = await insertActivityForCommentReaction(eventAction, reactionCount, ids, createdByAccount);
   if (insertResult === undefined) return;
 
-  if (voter === commentAuthor) return;
+  if (voter === createdByAccount) return;
 
   // insertAggStream(eventAction, commentId);
-  await insertNotificationForOwner({ ...insertResult, account: commentAuthor });
+  await insertNotificationForOwner({ ...insertResult, account: createdByAccount });
 }

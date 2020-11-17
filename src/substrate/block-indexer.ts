@@ -14,6 +14,7 @@ import { OffchainState, CommonDbState, SubstrateEvent } from './types';
 import { writeOffchainState } from '../substrate/offchain-state';
 import { getUniqueIds } from '@subsocial/api';
 import { Vec } from '@polkadot/types';
+import { TEST_MODE } from '../env';
 
 const log = newLogger('Events')
 
@@ -46,7 +47,7 @@ async function processEventsForTest(eventsMeta: SubstrateEvent[]) {
 async function indexingFromFile(substrate: SubsocialSubstrateApi) {
   const api = await substrate.api
 
-  if (process.env.TEST_MODE?.toLocaleLowerCase() === 'true') {
+  if (TEST_MODE) {
     const eventsMeta: SubstrateEvent[] = JSON.parse(readFileSync('./test/input_data/events.json', 'utf-8'))
     await processEventsForTest(eventsMeta)
     exit(0)

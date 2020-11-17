@@ -1,5 +1,4 @@
 import { EventData } from '@polkadot/types/generic/Event';
-import { PostId } from '@subsocial/types/substrate/interfaces';
 import { encodeStructId } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
@@ -10,7 +9,7 @@ const query = `
   RETURNING *`
 
 export async function insertCommentFollower(data: EventData) {
-  const commentId = encodeStructId(data[1] as PostId);
+  const commentId = encodeStructId(data[1].toString());
   const params = [ data[0].toString(), commentId ];
 
   try {

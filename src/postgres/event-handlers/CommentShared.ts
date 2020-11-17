@@ -1,5 +1,6 @@
-import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../connections/subsocial';
+import { isEmptyStr } from '@subsocial/utils';
+import { findPost } from '../../substrate/api-wrappers';
+import { NormalizedPost, asNormalizedComment } from '../../substrate/normalizers';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
@@ -9,17 +10,17 @@ import { fillNotificationsWithAccountFollowers } from '../fills/fillNotification
 import { fillNotificationsWithCommentFollowers } from '../fills/fillNotificationsWithCommentFollowers';
 import { insertActivityForComment } from '../inserts/insertActivityForComment';
 
-export const onCommentShared = async (eventAction: SubstrateEvent, comment: Post) => {
+export const onCommentShared = async (eventAction: SubstrateEvent, comment: NormalizedPost) => {
   const { author, commentId } = parseCommentEvent(eventAction)
 
-  const rootPostId = comment.extension.asComment.root_post_id;
-  const rootPost = await substrate.findPost({ id: rootPostId });
+  const { rootPostId } = asNormalizedComment(comment)
+  const rootPost = await findPost(rootPostId);
   if (!rootPost) return;
 
   eventAction.eventName = VirtualEvents.CommentShared
-  const spaceId = rootPost.space_id.unwrapOr(null);
+  const spaceId = !isEmptyStr(rootPost.spaceId) ? rootPost.spaceId : null;
   const ids = [ spaceId, rootPostId, commentId ];
-  const account = comment.created.account.toString();
+  const account = comment.createdByAccount;
 
   const insertResult = await insertActivityForComment(eventAction, ids, account);
   if (insertResult === undefined) return;

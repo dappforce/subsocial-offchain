@@ -1,7 +1,6 @@
 import { newPgError } from '../utils';
 import { encodeStructId } from '../../substrate/utils';
 import { pg } from '../../connections/postgres';
-import { PostId } from '@subsocial/types/substrate/interfaces';
 
 const query = `
   DELETE FROM df.notifications
@@ -14,7 +13,7 @@ const query = `
   )
   RETURNING *`
 
-export async function deleteNotificationsAboutPost (userId: string, postId: PostId) {
+export async function deleteNotificationsAboutPost (userId: string, postId: string) {
   const encodedPostId = encodeStructId(postId);
   const params = [ userId, encodedPostId ];
 

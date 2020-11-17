@@ -1,4 +1,3 @@
-import { SubstrateId } from '@subsocial/types';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
 import { encodeStructIds } from '../../substrate/utils';
@@ -14,7 +13,7 @@ const query = `
     VALUES($1, $2, $3, $4, $5, $6, $7, $8)
   RETURNING *`
 
-export async function insertActivityForPost(eventAction: SubstrateEvent, ids: SubstrateId[], count?: number): InsertActivityPromise {
+export async function insertActivityForPost(eventAction: SubstrateEvent, ids: string[], count?: number): InsertActivityPromise {
 
   const paramsIds = encodeStructIds(ids)
 

@@ -1,6 +1,5 @@
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries';
-import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { encodeStructId } from '../../substrate/utils';
 import { getValidDate } from '../../substrate/utils';
 import { pg } from '../../connections';
@@ -24,7 +23,7 @@ const queryUpdate = `
 export async function insertActivityForSpace (eventAction: SubstrateEvent, count: number, creator?: string): InsertActivityPromise {
   const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
-  const space_id = data[1] as SpaceId
+  const space_id = data[1].toString()
   const spaceId = encodeStructId(space_id);
   const aggregated = accountId !== creator;
 
