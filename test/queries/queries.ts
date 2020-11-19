@@ -27,7 +27,7 @@ export const selectFromNotifications: SelectFromTableFn = async () => {
       block_number,
       event_index
     FROM df.notifications
-    ORDER BY block_number, event_index
+    ORDER BY account, block_number, event_index ASC
   `
 
   return (await pg.query(query)).rows
@@ -38,7 +38,7 @@ export const selectFromNewsFeed: SelectFromTableFn = async () => {
       block_number,
       event_index
     FROM df.news_feed
-    ORDER BY block_number, event_index
+    ORDER BY account, block_number, event_index ASC
   `
 
   return (await pg.query(query)).rows
@@ -48,6 +48,7 @@ export const selectFromAccountFollowers: SelectFromTableFn = async () => {
     SELECT follower_account,
       following_account
     FROM df.account_followers
+    ORDER BY follower_account, following_account
   `
 
   return (await pg.query(query)).rows
@@ -57,6 +58,7 @@ export const selectFromPostFollowers: SelectFromTableFn = async () => {
     SELECT follower_account,
       following_post_id
     FROM df.post_followers
+    ORDER BY follower_account, following_post_id
   `
   
   return (await pg.query(query)).rows
@@ -66,6 +68,7 @@ export const selectFromCommentFollowers: SelectFromTableFn = async () => {
     SELECT follower_account,
       following_comment_id
     FROM df.comment_followers
+    ORDER BY follower_account, following_comment_id
   `
 
   return (await pg.query(query)).rows
@@ -76,6 +79,7 @@ export const selectFromSpaceFollowers: SelectFromTableFn = async () => {
     SELECT follower_account,
       following_space_id
     FROM df.space_followers
+    ORDER BY follower_account, following_space_id
   `
 
   return (await pg.query(query)).rows

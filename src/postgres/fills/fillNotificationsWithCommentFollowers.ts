@@ -7,7 +7,7 @@ import { updateCountOfUnreadNotifications } from '../updates/updateCountOfUnread
 
 export async function fillNotificationsWithCommentFollowers(commentId: string, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
   const query = fillTableWith("notifications", "comment")
-  const encodedCommentId = encodeStructId(commentId.toString());
+  const encodedCommentId = encodeStructId(commentId);
   const params = [encodedCommentId, account, blockNumber, eventIndex];
 
   try {

@@ -1,4 +1,3 @@
-import { isEmptyStr } from '@subsocial/utils';
 import { NormalizedPost, asNormalizedComment } from '../../substrate/normalizers';
 import { SubstrateEvent } from '../../substrate/types';
 import { parseCommentEvent } from '../../substrate/utils';
@@ -18,7 +17,7 @@ export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post
   } = asNormalizedComment(post)
   
   eventAction.eventName = VirtualEvents.CommentReactionCreated
-  const parent = !isEmptyStr(parentId) ? parentId : rootPostId
+  const parent = parentId ? parentId : rootPostId
   const ids = [ parent, commentId ];
   const reactionCount = upvotesCount + downvotesCount - 1;
 

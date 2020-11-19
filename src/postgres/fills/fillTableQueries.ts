@@ -1,14 +1,14 @@
 export const fillAccountFollowerQuery = (table: string) => {
   return `
     INSERT INTO df.${table} (account, block_number, event_index)
-      (SELECT df.account_followers.follower_account, df.activities.block_number, df.activities.event_index
-      FROM df.activities
-      LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
-      WHERE df.account_followers.follower_account <> $1
-        AND block_number = $2
-        AND event_index = $3
-        AND (df.account_followers.follower_account, df.activities.block_number, df.activities.event_index)
-        NOT IN (SELECT account, block_number, event_index from df.${table}))
+    (SELECT df.account_followers.follower_account, df.activities.block_number, df.activities.event_index
+    FROM df.activities
+    LEFT JOIN df.account_followers ON df.activities.account = df.account_followers.following_account
+    WHERE df.account_followers.follower_account <> $1
+      AND block_number = $2
+      AND event_index = $3
+      AND (df.account_followers.follower_account, df.activities.block_number, df.activities.event_index)
+      NOT IN (SELECT account, block_number, event_index from df.${table}))
     RETURNING *`
 }
 

@@ -14,7 +14,7 @@ const getEventsStruct = async () => {
 
   await Promise.all(blockNumbers.map(async (blockNumber) => {
     const blockEvents = await getBlockEventsFromSubstrate(api, blockNumber)
-    eventsJson.push(blockEvents)
+    blockEvents.map((event) =>  eventsJson.push(event))
   }))
   
   writeFileSync(join(__dirname, '../../../test/input_data/events.json'), JSON.stringify(eventsJson, null, 2))

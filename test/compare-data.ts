@@ -43,12 +43,14 @@ const compareParsedSting = (inputData: string, outputData: string) => {
   let parsedInputData = inputData.split('\n') 
   let parsedOutputData = outputData.split('\n')
 
+  console.log(parsedInputData.length, parsedOutputData.length)
+
   let message = ''
   if(parsedInputData.length == 1 || parsedOutputData.length == 1)
     return chalk.red('Input or output data is empty')
 
   for(let [i, value] of parsedInputData.entries()) {
-    if(!parsedOutputData.includes(value)) {
+    if(parsedOutputData[i] !== value) {
       message = chalk.green(`Expected: `) + parsedOutputData[i] + chalk.red(`\nActual: `) + value
       break
     }

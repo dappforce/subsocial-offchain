@@ -9,7 +9,6 @@ import { fillNotificationsWithAccountFollowers } from '../fills/fillNotification
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { asNormalizedComment, NormalizedComment } from '../../substrate/normalizers';
 import { findPost } from '../../substrate/api-wrappers';
-import { isEmptyStr } from '@subsocial/utils';
 
 export const onCommentCreated = async (eventAction: SubstrateEvent, post: NormalizedComment) => {
   const { author, commentId } = parseCommentEvent(eventAction)
@@ -25,7 +24,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Normal
   const postCreator = rootPost.createdByAccount;
   const ids = [ rootPostId, commentId ];
 
-  if (!isEmptyStr(parentId)) {
+  if (parentId) {
     eventAction.eventName = VirtualEvents.CommentReplyCreated
     log.debug('Comment has a parent id');
     // const parentId = parentId.unwrap();

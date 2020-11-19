@@ -1,4 +1,3 @@
-import { isEmptyStr } from '@subsocial/utils';
 import { findPost } from '../../substrate/api-wrappers';
 import { asNormalizedComment, NormalizedComment } from '../../substrate/normalizers';
 import { SubstrateEvent } from '../../substrate/types';
@@ -18,7 +17,7 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Norm
   if (!rootPost) return;
 
   eventAction.eventName = VirtualEvents.CommentShared
-  const spaceId = !isEmptyStr(rootPost.spaceId) ? rootPost.spaceId : null;
+  const spaceId = rootPost.spaceId;
   const ids = [ spaceId, rootPostId, commentId ];
   const account = comment.createdByAccount;
 

@@ -36,7 +36,7 @@ test("Test for account_followers table sould be successful", async () => {
   expect(inputData).ToBeMatch(outputData, msg);
 });
 
-test("Test for comment_followers table sould fail with 'Input or output data is empty'", async () => {
+test("Test for comment_followers table sould be successful", async () => {
   const {inputData, outputData, msg} = await compareData("comment_followers.csv", queries.selectFromCommentFollowers)
   expect(inputData).ToBeMatch(outputData, msg);
 });

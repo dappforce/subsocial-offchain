@@ -21,10 +21,8 @@ async function processBlockEvents(events: SubstrateEvent[]) {
   for (let i = 0; i < events.length; i++) {
     const event = events[i]
 
-    await Promise.all([
       handleEventForPostgres(event),
       handleEventForElastic(event)
-    ])
   }
 }
 
@@ -65,13 +63,15 @@ export async function indexBlocksFromFile(substrate: SubsocialSubstrateApi) {
 
   log.debug(`${blockNumbers.length} blocks will be reindexed`)
 
-  let eventsMeta: SubstrateEvent[] = JSON.parse(readFileSync('./test/input_data/events.json', 'utf-8'))
+  let eventsMeta: SubstrateEvent[] = JSON.parse(readFileSync(join(__dirname, '../../../test/input_data/events.json'), 'utf-8'))
 
   for (let i = 0; i < blockNumbers.length; i++) {
     const blockNumber = blockNumbers[i];
 
     if (TEST_MODE) {
-      let blockEvents = eventsMeta.filter(x => x.blockNumber == blockNumber)
+      let blockEvents = eventsMeta
+        .filter(x => x.blockNumber == blockNumber)
+        .sort((a, b) => a.eventIndex - b.eventIndex)
       for (let i = 0; i < blockEvents.length; i++) {
         const event = blockEvents[i]
 
@@ -80,7 +80,7 @@ export async function indexBlocksFromFile(substrate: SubsocialSubstrateApi) {
     }
     else {
       const blockEvents = await getBlockEventsFromSubstrate(api, blockNumber)
-      await processBlockEvents(blockEvents)
+      await processBlockEvents(blockEvents.sort((a, b) => a.eventIndex - b.eventIndex))
     }
   }
 
@@ -89,4 +89,5 @@ export async function indexBlocksFromFile(substrate: SubsocialSubstrateApi) {
   let state: OffchainState = { postgres: lastBlock, elastic: lastBlock }
   await writeOffchainState(state)
   log.debug('State is:', lastBlock)
+  process.exit(0)
 }
