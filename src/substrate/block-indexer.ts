@@ -1,8 +1,8 @@
-import { resolveSubsocialApi } from '../connections/subsocial';
+import { ApiPromise as SubstrateApi } from '@polkadot/api';
 import { shouldHandleEvent } from '../substrate/utils';
 import { handleEventForPostgres } from '../substrate/handle-postgres';
 import { handleEventForElastic } from '../substrate/handle-elastic';
-import { BlockNumber, EventRecord } from '@polkadot/types/interfaces';
+import { BlockNumber } from '@polkadot/types/interfaces';
 import { u32 } from '@polkadot/types/primitive'
 import registry from '@subsocial/types/substrate/registry'
 import { readFileSync } from 'fs';
@@ -12,42 +12,56 @@ import { join } from 'path';
 import { OffchainState, CommonDbState, SubstrateEvent } from './types';
 import { writeOffchainState } from '../substrate/offchain-state';
 import { getUniqueIds } from '@subsocial/api';
-import { Vec } from '@polkadot/types';
 import { TEST_MODE } from '../env';
-const log = newLogger('Events')
+import { stateDirPath } from './offchain-state';
 
-async function processEvents(blockNumber: BlockNumber, events: Vec<EventRecord>) {
-  
+const log = newLogger('BlockIndexer')
+
+async function processBlockEvents(events: SubstrateEvent[]) {
   for (let i = 0; i < events.length; i++) {
-    const { event } = events[i]
+    const event = events[i]
 
+    await Promise.all([
+      handleEventForPostgres(event),
+      handleEventForElastic(event)
+    ])
+  }
+}
+
+export function getBlockNumbersFromFile(): BlockNumber[] {
+  const strBlockNumbers = readFileSync(join(stateDirPath, 'block-numbers.csv'), 'utf-8').split('\n')
+
+  return getUniqueIds(strBlockNumbers)
+    .map(x => new u32(registry, x))
+    .sort((a, b) => a.sub(b).toNumber())
+}
+
+export async function getBlockEventsFromSubstrate(api: SubstrateApi, blockNumber: BlockNumber): Promise<SubstrateEvent[]> {
+  const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
+  const substrateEvents = await api.query.system.events.at(blockHash)
+
+  const events: SubstrateEvent[] = []
+
+  substrateEvents.map(({ event }, i) => {
     if (shouldHandleEvent(event)) {
-      log.debug(`Handle a new event: %o`, event.method)
+      // log.debug(`Handle a new event: %o`, event.method)
 
-      const eventMeta = {
+      events.push({
         eventName: event.method,
         data: event.data,
         blockNumber: blockNumber,
         eventIndex: i
-      }
-      console.log(JSON.stringify(eventMeta))
-      await handleEventForPostgres(eventMeta)
-      await handleEventForElastic(eventMeta)
+      })
     }
-  }
+  })
+
+  return events
 }
 
-async function indexingFromFile(substrate: SubsocialSubstrateApi) {
+export async function indexBlocksFromFile(substrate: SubsocialSubstrateApi) {
   const api = await substrate.api
 
-  const stateDirPath = join(__dirname, '../../state/')
-  
-  const content = readFileSync(stateDirPath + 'Blocks.csv', 'utf-8')
-
-  const blockNumbersArr = content.replace(/"/g, '').split('\n')
-  const blockNumbers = getUniqueIds(blockNumbersArr)
-    .map(x => new u32(registry, x))
-    .sort((a, b) => a.sub(b).toNumber())
+  const blockNumbers = getBlockNumbersFromFile()
 
   log.debug(`${blockNumbers.length} blocks will be reindexed`)
 
@@ -56,31 +70,23 @@ async function indexingFromFile(substrate: SubsocialSubstrateApi) {
   for (let i = 0; i < blockNumbers.length; i++) {
     const blockNumber = blockNumbers[i];
 
-    if (TEST_MODE) { 
-      let events = eventsMeta.filter(x => x.blockNumber == blockNumber)
-      for (let i = 0; i < events.length; i++) {
-        const event = events[i]
+    if (TEST_MODE) {
+      let blockEvents = eventsMeta.filter(x => x.blockNumber == blockNumber)
+      for (let i = 0; i < blockEvents.length; i++) {
+        const event = blockEvents[i]
 
         await handleEventForPostgres(event)
       }
     }
     else {
-      const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
-      let events = await api.query.system.events.at(blockHash)
-      processEvents(blockNumber, events)
+      const blockEvents = await getBlockEventsFromSubstrate(api, blockNumber)
+      await processBlockEvents(blockEvents)
     }
-  }  
+  }
 
   let lastBlock: CommonDbState = { lastBlock: blockNumbers.pop()?.toNumber() }
 
   let state: OffchainState = { postgres: lastBlock, elastic: lastBlock }
   await writeOffchainState(state)
-  log.debug('State is:', lastBlock)  
+  log.debug('State is:', lastBlock)
 }
-
-resolveSubsocialApi()
-  .then(({ substrate }) => indexingFromFile(substrate))
-  .catch((error) => {
-    log.error('Unexpected error during processing of Substrate events:', error)
-    process.exit(-1)
-  })
