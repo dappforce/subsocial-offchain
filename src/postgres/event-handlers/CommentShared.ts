@@ -1,6 +1,6 @@
 import { isEmptyStr } from '@subsocial/utils';
 import { findPost } from '../../substrate/api-wrappers';
-import { NormalizedPost, asNormalizedComment } from '../../substrate/normalizers';
+import { asNormalizedComment, NormalizedComment } from '../../substrate/normalizers';
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
@@ -10,7 +10,7 @@ import { fillNotificationsWithAccountFollowers } from '../fills/fillNotification
 import { fillNotificationsWithCommentFollowers } from '../fills/fillNotificationsWithCommentFollowers';
 import { insertActivityForComment } from '../inserts/insertActivityForComment';
 
-export const onCommentShared = async (eventAction: SubstrateEvent, comment: NormalizedPost) => {
+export const onCommentShared = async (eventAction: SubstrateEvent, comment: NormalizedComment) => {
   const { author, commentId } = parseCommentEvent(eventAction)
 
   const { rootPostId } = asNormalizedComment(comment)

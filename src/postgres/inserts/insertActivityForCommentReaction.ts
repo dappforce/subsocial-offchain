@@ -3,7 +3,7 @@ import { InsertActivityPromise } from '../queries/types';
 import { encodeStructIds } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { emptyParamsLogError, updateCountLog } from '../postges-logger';
-import { getValidDate } from '../../substrate/utils';
+import { blockNumberToApproxDate } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
 
@@ -14,12 +14,12 @@ const query = `
 
 const queryUpdate = `
   UPDATE df.activities
-    SET aggregated = false
-    WHERE aggregated = true
-      AND NOT (block_number = $1 AND event_index = $2)
-      AND event = $3
-      AND post_id = $4
-      AND comment_id = $5
+  SET aggregated = false
+  WHERE aggregated = true
+    AND NOT (block_number = $1 AND event_index = $2)
+    AND event = $3
+    AND post_id = $4
+    AND comment_id = $5
   RETURNING *`;
 
 export async function insertActivityForCommentReaction(eventAction: SubstrateEvent, count: number, ids: string[], creator: string): InsertActivityPromise {
@@ -34,7 +34,7 @@ export async function insertActivityForCommentReaction(eventAction: SubstrateEve
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
 
-  const date = await getValidDate(blockNumber)
+  const date = await blockNumberToApproxDate(blockNumber)
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
   
   try {

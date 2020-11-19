@@ -73,7 +73,7 @@ export function stringifyOption(opt: Option<any>): string {
   return opt.unwrapOr(undefined)?.toString()
 }
 
-export const getValidDate = async (eventBlock: BN) => {
+export const blockNumberToApproxDate = async (eventBlock: BN) => {
   const { substrate } = await resolveSubsocialApi()
   const api = await substrate.api
 

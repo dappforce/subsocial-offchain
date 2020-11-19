@@ -5,11 +5,8 @@ import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { resolveSubsocialApi } from '../connections/subsocial';
-// import { writeFileSync } from 'fs'
 
 require('dotenv').config()
-
-// const eventsJson = [] 
 
 let blockTime = 6
 
@@ -93,17 +90,13 @@ async function main (substrate: SubsocialSubstrateApi) {
 
       if (shouldHandleEvent(event)) {
         log.debug(`Handle a new event: %o`, event.method)
-        // 773059
+
         const eventMeta = {
           eventName: event.method,
           data: event.data,
           blockNumber: blockNumber,
           eventIndex: i
         }
-
-        // For create events.json for testing
-        // eventsJson.push(eventMeta)
-        // writeFileSync('./events.json', JSON.stringify(eventsJson))
 
         if (processPostgres) {
           const error = await handleEventForPostgres(eventMeta)

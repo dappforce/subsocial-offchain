@@ -26,7 +26,7 @@
     "lint": "tsc --noEmit && eslint '*/**/*.{ts,tsx}' --quiet --fix",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "block-indexer": "node ./build/src/substrate/block-indexer.js"
+    "indexing": "node ./build/src/substrate/block-indexer.js"
   },
   "resolutions": {
     "@polkadot/types": "1.28.1",

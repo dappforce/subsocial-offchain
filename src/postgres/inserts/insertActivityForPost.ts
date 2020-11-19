@@ -3,7 +3,7 @@ import { InsertActivityPromise } from '../queries/types';
 import { encodeStructIds } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { emptyParamsLogError } from '../postges-logger';
-import { getValidDate } from '../../substrate/utils';
+import { blockNumberToApproxDate } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
 import { getAggregationCount } from '../selects/getAggregationCount';
@@ -26,7 +26,7 @@ export async function insertActivityForPost(eventAction: SubstrateEvent, ids: st
   const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
 
-  const date = await getValidDate(blockNumber)
+  const date = await blockNumberToApproxDate(blockNumber)
   const newCount = eventName === 'PostShared'
     ? await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId })
     : count;

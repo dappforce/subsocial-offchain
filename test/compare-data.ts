@@ -39,14 +39,17 @@ export const compareData = async(resultFileName: string, getQueryDataFn: SelectF
   return { inputData: parsedInputData, outputData, msg } 
 }
 
-const compareParsedSting = (firstString: string, secondString: string) => {
-  let parsedFirstString = firstString.split('\n') 
-  let parsedSecondString = secondString.split('\n')
-  let message = chalk.red('Input or output data is empty')
+const compareParsedSting = (inputData: string, outputData: string) => {
+  let parsedInputData = inputData.split('\n') 
+  let parsedOutputData = outputData.split('\n')
 
-  for(let [i, value] of parsedFirstString.entries()) {
-    if(!parsedSecondString.includes(value)) {
-      message = chalk.green(`Expected: `) + value + chalk.red(`\nReceived: `) + parsedSecondString[i]
+  let message = ''
+  if(parsedInputData.length == 1 || parsedOutputData.length == 1)
+    return chalk.red('Input or output data is empty')
+
+  for(let [i, value] of parsedInputData.entries()) {
+    if(!parsedOutputData.includes(value)) {
+      message = chalk.green(`Expected: `) + parsedOutputData[i] + chalk.red(`\nActual: `) + value
       break
     }
   }  

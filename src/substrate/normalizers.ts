@@ -98,7 +98,7 @@ type NormalizedPostExtension = {} | CommentExtension | SharedPostExtension
 
 type NormalizedSharedPost = NormalizedPost & SharedPostExtension
 
-type NormalizedComment = NormalizedPost & CommentExtension
+export type NormalizedComment = NormalizedPost & CommentExtension
 
 export type NormalizedProfile =
   NormalizedSocialAccount &

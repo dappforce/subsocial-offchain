@@ -6,11 +6,11 @@ const query = `
   DELETE FROM df.notifications
   WHERE account = $1
     AND (block_number, event_index) IN (
-      SELECT block_number, event_index
-      FROM df.activities
-      LEFT JOIN df.space_followers
-      ON df.activities.space_id = df.space_followers.following_space_id
-      WHERE space_id = $2
+  SELECT block_number, event_index
+  FROM df.activities
+  LEFT JOIN df.space_followers
+    ON df.activities.space_id = df.space_followers.following_space_id
+  WHERE space_id = $2
     )
   RETURNING *`
 

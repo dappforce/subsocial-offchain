@@ -7,11 +7,11 @@ import { insertActivityForComment } from '../inserts/insertActivityForComment';
 import { fillNotificationsWithPostFollowers } from '../fills/fillNotificationsWithPostFollowers';
 import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
-import { NormalizedPost, asNormalizedComment } from '../../substrate/normalizers';
+import { asNormalizedComment, NormalizedComment } from '../../substrate/normalizers';
 import { findPost } from '../../substrate/api-wrappers';
 import { isEmptyStr } from '@subsocial/utils';
 
-export const onCommentCreated = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
+export const onCommentCreated = async (eventAction: SubstrateEvent, post: NormalizedComment) => {
   const { author, commentId } = parseCommentEvent(eventAction)
 
   const { parentId, rootPostId } = asNormalizedComment(post)

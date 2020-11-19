@@ -5,7 +5,6 @@ import { handleEventForElastic } from '../substrate/handle-elastic';
 import { BlockNumber, EventRecord } from '@polkadot/types/interfaces';
 import { u32 } from '@polkadot/types/primitive'
 import registry from '@subsocial/types/substrate/registry'
-import { exit } from 'process'
 import { readFileSync } from 'fs';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { newLogger } from '@subsocial/utils';
@@ -15,7 +14,6 @@ import { writeOffchainState } from '../substrate/offchain-state';
 import { getUniqueIds } from '@subsocial/api';
 import { Vec } from '@polkadot/types';
 import { TEST_MODE } from '../env';
-
 const log = newLogger('Events')
 
 async function processEvents(blockNumber: BlockNumber, events: Vec<EventRecord>) {
@@ -32,26 +30,15 @@ async function processEvents(blockNumber: BlockNumber, events: Vec<EventRecord>)
         blockNumber: blockNumber,
         eventIndex: i
       }
+      console.log(JSON.stringify(eventMeta))
       await handleEventForPostgres(eventMeta)
       await handleEventForElastic(eventMeta)
     }
   }
 }
 
-async function processEventsForTest(eventsMeta: SubstrateEvent[]) {
-  for (let i = 0; i < eventsMeta.length / 2; i++) {
-    await handleEventForPostgres(eventsMeta[i])
-  }
-}
-  
 async function indexingFromFile(substrate: SubsocialSubstrateApi) {
   const api = await substrate.api
-
-  if (TEST_MODE) {
-    const eventsMeta: SubstrateEvent[] = JSON.parse(readFileSync('./test/input_data/events.json', 'utf-8'))
-    await processEventsForTest(eventsMeta)
-    exit(0)
-  }
 
   const stateDirPath = join(__dirname, '../../state/')
   
@@ -64,23 +51,31 @@ async function indexingFromFile(substrate: SubsocialSubstrateApi) {
 
   log.debug(`${blockNumbers.length} blocks will be reindexed`)
 
-  const eventsPromise = blockNumbers.map(async blockNumber => {
-    const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
-    let events: Vec<EventRecord>
+  let eventsMeta: SubstrateEvent[] = JSON.parse(readFileSync('./test/input_data/events.json', 'utf-8'))
 
-    events = await api.query.system.events.at(blockHash)
-  
-    processEvents(blockNumber, events)
-  })
-  await Promise.all(eventsPromise)
+  for (let i = 0; i < blockNumbers.length; i++) {
+    const blockNumber = blockNumbers[i];
 
-  let lastBlock: CommonDbState = { lastBlock: blockNumbers.pop()?.toNumber()}
+    if (TEST_MODE) { 
+      let events = eventsMeta.filter(x => x.blockNumber == blockNumber)
+      for (let i = 0; i < events.length; i++) {
+        const event = events[i]
+
+        await handleEventForPostgres(event)
+      }
+    }
+    else {
+      const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
+      let events = await api.query.system.events.at(blockHash)
+      processEvents(blockNumber, events)
+    }
+  }  
+
+  let lastBlock: CommonDbState = { lastBlock: blockNumbers.pop()?.toNumber() }
 
   let state: OffchainState = { postgres: lastBlock, elastic: lastBlock }
   await writeOffchainState(state)
-  log.debug('State is:', lastBlock)
-
-  exit(0)
+  log.debug('State is:', lastBlock)  
 }
 
 resolveSubsocialApi()
