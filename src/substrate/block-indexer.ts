@@ -1,7 +1,6 @@
 import { ApiPromise as SubstrateApi } from '@polkadot/api';
 import { shouldHandleEvent } from '../substrate/utils';
 import { handleEventForPostgres } from '../substrate/handle-postgres';
-import { handleEventForElastic } from '../substrate/handle-elastic';
 import { BlockNumber } from '@polkadot/types/interfaces';
 import { u32 } from '@polkadot/types/primitive'
 import registry from '@subsocial/types/substrate/registry'
@@ -18,11 +17,8 @@ import { stateDirPath } from './offchain-state';
 const log = newLogger('BlockIndexer')
 
 async function processBlockEvents(events: SubstrateEvent[]) {
-  for (let i = 0; i < events.length; i++) {
-    const event = events[i]
-
-      handleEventForPostgres(event),
-      handleEventForElastic(event)
+  for (const event of events) {
+    await handleEventForPostgres(event)
   }
 }
 
@@ -65,16 +61,13 @@ export async function indexBlocksFromFile(substrate: SubsocialSubstrateApi) {
 
   let eventsMeta: SubstrateEvent[] = JSON.parse(readFileSync(join(__dirname, '../../../test/input_data/events.json'), 'utf-8'))
 
-  for (let i = 0; i < blockNumbers.length; i++) {
-    const blockNumber = blockNumbers[i];
-
+  for (const blockNumber of blockNumbers) {
     if (TEST_MODE) {
       let blockEvents = eventsMeta
         .filter(x => x.blockNumber == blockNumber)
         .sort((a, b) => a.eventIndex - b.eventIndex)
-      for (let i = 0; i < blockEvents.length; i++) {
-        const event = blockEvents[i]
 
+      for (const event of blockEvents) {
         await handleEventForPostgres(event)
       }
     }

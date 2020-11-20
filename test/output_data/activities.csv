@@ -813,7 +813,7 @@ account,block_number,event_index,event,following_id,space_id,post_id,comment_id,
 3pELbVx9S51dFXXnvrCp5jByRLWHvagrDTc17xVFyuXgsHmr,730641,2,SpaceFollowed,,1257,,,,false,0
 3pELbVx9S51dFXXnvrCp5jByRLWHvagrDTc17xVFyuXgsHmr,730641,3,SpaceCreated,,1257,,,,true,0
 3pELbVx9S51dFXXnvrCp5jByRLWHvagrDTc17xVFyuXgsHmr,730667,2,CommentCreated,,,54,61,,false,2
-3ppGhkgLtLVV8fsjAWunahiAaGBfoyJGkGnk8RxKNfxRcHsb,730772,2,CommentCreated,,,54,62,,false,2
+3ppGhkgLtLVV8fsjAWunahiAaGBfoyJGkGnk8RxKNfxRcHsb,730772,2,CommentCreated,,,54,62,,false,3
 3qETgAWAJ2MfRAhN3A4Bx9T3Xqq1WQoYd1m3WE3JmXfRwQgZ,730830,2,SpaceFollowed,,1258,,,,false,0
 3qETgAWAJ2MfRAhN3A4Bx9T3Xqq1WQoYd1m3WE3JmXfRwQgZ,730830,3,SpaceCreated,,1258,,,,true,0
 3rGdZ6SwQrT2abpvGLW9vZ4LF5C7KZbKhtSRkwKkP1X4kBpY,730835,2,SpaceFollowed,,1218,,,,false,24
@@ -1282,11 +1282,11 @@ account,block_number,event_index,event,following_id,space_id,post_id,comment_id,
 3qMepy6sNyik8qGjsHSPJsChC5hf5K26gAhuS7gbFP53Jd7p,788037,2,SpaceFollowed,,1173,,,,false,3
 3qMepy6sNyik8qGjsHSPJsChC5hf5K26gAhuS7gbFP53Jd7p,788040,2,SpaceFollowed,,1125,,,,false,6
 3qMepy6sNyik8qGjsHSPJsChC5hf5K26gAhuS7gbFP53Jd7p,788042,2,SpaceFollowed,,1115,,,,false,10
-3oHtb8HfzrzsvEH7Dj4m6HyTcbaPi656ELiXYbzHTVM8uEur,788347,1,CommentReplyCreated,,,117,131,126,false,4
+3oHtb8HfzrzsvEH7Dj4m6HyTcbaPi656ELiXYbzHTVM8uEur,788347,1,CommentReplyCreated,,,117,131,126,false,3
 3rzUVFzuvGeMHyD4bkH5dCk8GP8TCpCUhSiPowzUe1tuCZUk,788817,1,PostCreated,,1275,132,,,true,0
 3sqhXRqfbEK8VdDjqtkAaWLRWQ2XptAw4kW5NisFVShutmrf,789543,2,CommentReplyCreated,,,117,133,130,false,4
 3sqhXRqfbEK8VdDjqtkAaWLRWQ2XptAw4kW5NisFVShutmrf,789556,2,PostReactionCreated,,,117,,,false,5
-3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8,790055,2,CommentReplyCreated,,,117,134,133,false,4
+3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8,790055,2,CommentReplyCreated,,,117,134,133,false,3
 3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8,790078,2,AccountFollowed,3sqhXRqfbEK8VdDjqtkAaWLRWQ2XptAw4kW5NisFVShutmrf,,,,,true,0
 3sVNxDYZuZdVjWG4zvLNT5EPDCGrA4u1xAxG2Ubk6pWmx1SD,790349,2,SpaceFollowed,,1314,,,,false,0
 3sVNxDYZuZdVjWG4zvLNT5EPDCGrA4u1xAxG2Ubk6pWmx1SD,790349,3,SpaceCreated,,1314,,,,true,0
@@ -2237,7 +2237,7 @@ account,block_number,event_index,event,following_id,space_id,post_id,comment_id,
 3rw3HwbEsyqJrhiRFhu1pBYcuuMYTP3iAJ9p7hjuu2XSjKPr,1284000,2,SpaceFollowed,,1375,,,,false,0
 3rw3HwbEsyqJrhiRFhu1pBYcuuMYTP3iAJ9p7hjuu2XSjKPr,1284000,3,SpaceCreated,,1375,,,,true,0
 3oHFZEmEdCzLY9dCbHXQNzD2Yni51qtroBGvuRcqKvv6ZTr1,1284324,2,PostReactionCreated,,,330,,,true,3
-3oHFZEmEdCzLY9dCbHXQNzD2Yni51qtroBGvuRcqKvv6ZTr1,1284333,2,AccountFollowed,3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8,,,,,true,26
+3oHFZEmEdCzLY9dCbHXQNzD2Yni51qtroBGvuRcqKvv6ZTr1,1284333,2,AccountFollowed,3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8,,,,,false,26
 3oHFZEmEdCzLY9dCbHXQNzD2Yni51qtroBGvuRcqKvv6ZTr1,1284354,2,AccountFollowed,3rokFtEKZRbB4uN6EngEBKUpLtDF49w1v2sUbKpPPLS53WBa,,,,,true,0
 3sm2NgcgyVRm6J1pqi88XBiRDmSDcTjTsMeTuJqzRi4EsaSZ,1286098,2,SpaceFollowed,,1376,,,,false,2
 3sm2NgcgyVRm6J1pqi88XBiRDmSDcTjTsMeTuJqzRi4EsaSZ,1286098,3,SpaceCreated,,1376,,,,true,0
@@ -2258,7 +2258,7 @@ account,block_number,event_index,event,following_id,space_id,post_id,comment_id,
 3rVME4b4CVMianiUn12vf1qrgwbFvkRChgqeondacEHFkdAV,1318901,1,PostCreated,,1273,338,,,true,0
 3sqqiTDouNTryKhmWMrK3ovqQQhvYJY6uaiUtQiXsJ6ZpT9K,1322761,2,SpaceFollowed,,1378,,,,false,3
 3sqqiTDouNTryKhmWMrK3ovqQQhvYJY6uaiUtQiXsJ6ZpT9K,1322761,3,SpaceCreated,,1378,,,,true,0
-3srYA8iem62KDcY487HcS9Ksvz92i3szHARcibDYiH3CS7EZ,1322933,2,SpaceFollowed,,1378,,,,false,3
+3srYA8iem62KDcY487HcS9Ksvz92i3szHARcibDYiH3CS7EZ,1322933,2,SpaceFollowed,,1378,,,,true,3
 3p5s1p6r2T2Yrs2k4juHxYgUAmiqrwbBGmqgjMTNb9RPc4qd,1331361,2,PostReactionCreated,,,338,,,true,0
 3p5s1p6r2T2Yrs2k4juHxYgUAmiqrwbBGmqgjMTNb9RPc4qd,1331370,2,SpaceFollowed,,1273,,,,true,17
 3tiKakuy6RaHWThsHts23De8XwpaNdvw8PwwXcJqeVSN6w8w,1332514,1,PostCreated,,1354,339,,,true,0
@@ -2281,3 +2281,5 @@ account,block_number,event_index,event,following_id,space_id,post_id,comment_id,
 3steLNDpuA2qUeSR3APzhxC52cP2b4PGTj9TZhpB3uC9if64,1337743,3,SpaceCreated,,1382,,,,true,0
 3steLNDpuA2qUeSR3APzhxC52cP2b4PGTj9TZhpB3uC9if64,1337751,2,SpaceFollowed,,1002,,,,true,20
 3steLNDpuA2qUeSR3APzhxC52cP2b4PGTj9TZhpB3uC9if64,1337755,2,PostReactionCreated,,,170,,,true,3
+3orosF2xAc4YHyjv263egtUkHHYpYDjnLQzGjkeTtnVZtA9V,1337774,1,PostCreated,,1355,342,,,true,0
+3omeLMCdtrojRPf7KyvTg78EvLxyJMo7mb2bqM28EEvxmXFM,1338172,2,AccountFollowed,3osmnRNnrcScHsgkTJH1xyBF5kGjpbWHsGrqM31BJpy4vwn8,,,,,true,26
