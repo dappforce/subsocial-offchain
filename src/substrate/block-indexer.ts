@@ -60,7 +60,7 @@ export async function indexBlocksFromFile(substrate: SubsocialSubstrateApi) {
   log.debug(`${blockNumbers.length} blocks will be reindexed`)
 
   let eventsMeta: SubstrateEvent[] = JSON.parse(readFileSync(join(__dirname, '../../../test/input_data/events.json'), 'utf-8'))
-
+  // TODO: remove sort?
   for (const blockNumber of blockNumbers) {
     if (TEST_MODE) {
       let blockEvents = eventsMeta

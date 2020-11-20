@@ -15,10 +15,10 @@ export const findPostAndProccess = async ({ eventAction, onRootPost, onComment }
   const { postId } = parsePostEvent(eventAction)
   const post = await findPost(postId)
   if (!post) return;
-  
+
   if (post.isComment) {
-    onComment(eventAction, post)
+    await onComment(eventAction, post)
   } else {
-    onRootPost(eventAction, post)
+    await onRootPost(eventAction, post)
   }
 }

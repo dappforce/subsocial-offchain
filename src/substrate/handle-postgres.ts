@@ -7,6 +7,7 @@ export const handleEventForPostgres = async (event: SubstrateEvent): Promise<Err
   if (typeof handle === 'function') {
     try {
       await handle(event)
+      log.debug(`Successfully pocessed event ${event.eventName} at block ${event.blockNumber.toNumber()}, event index ${event.eventIndex}`)
     } catch (err) {
       log.error('Failed to handle a Substrate event for Postgres:', err)
       return err
