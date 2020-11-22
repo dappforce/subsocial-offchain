@@ -4,9 +4,10 @@ import { resolveSubsocialApi } from '../connections/subsocial';
 import { normalizeSpaceStruct, normalizePostStruct, normalizeProfileStruct } from './normalizers';
 import { Space, Post, SocialAccount } from '@subsocial/types/substrate/interfaces';
 import { Option } from '@polkadot/types/codec';
+import { join } from 'path';
 
-function writeStorageInFile(storageName, storage) { 
-  writeFileSync(`../../../test/input_data/${storageName}.json`, JSON.stringify(storage, null, 2))
+function writeStorageInFile(storageName, storage) {
+  writeFileSync(join(__dirname ,`../../../test/input_data/${storageName}.json`), JSON.stringify(storage, null, 2))
 }
 
 const getData = async () => {
@@ -52,7 +53,7 @@ const getData = async () => {
     profileStore[profile.id] = profile
   })
   writeStorageInFile("profiles", profileStore)
-  
+
   process.exit(0)
 }
 

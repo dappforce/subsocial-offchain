@@ -27,8 +27,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch",
     "index-blocks": "node ./build/src/substrate/indexBlocksFromFile.js",
-    "export-events": "node ./build/src/substrate/exportEventsToFile.js"
-
+    "export-events": "node ./build/src/substrate/exportEventsToFile.js",
+    "export-storages": "node ./build/src/substrate/exportSubstrateStoragesToFiles.js"
   },
   "resolutions": {
     "@polkadot/types": "1.28.1",
