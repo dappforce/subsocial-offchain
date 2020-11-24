@@ -1,27 +1,39 @@
 import { SubstrateEvent } from '../../substrate/types';
-import { log, emptyParamsLogError, updateCountLog } from '../postges-logger';
+import { emptyParamsLogError, updateCountLog } from '../postges-logger';
 import { encodeStructIds } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { InsertActivityPromise } from '../queries/types';
 import { blockNumberToApproxDate } from '../../substrate/utils';
-import { newPgError } from '../utils';
-import { pg } from '../../connections/postgres';
+import { newPgError, runQuery } from '../utils';
 import { getAggregationCount } from '../selects/getAggregationCount';
+import { sql } from '@pgtyped/query';
+import { IQueryQuery, IQueryParams, IQueryUpdateIfParentIdQuery, IQueryUpdateIfNotParentIdQuery, IQueryUpdateIfParentIdParams, IQueryUpdateIfParentIdResult } from '../types/insertActivityForComment.queries';
 
-const query = `
+const query = sql<IQueryQuery>`
   INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, parent_comment_id, date, agg_count, aggregated)
-    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    VALUES($blockNumber, $eventIndex, $account, $event, $postId, $commentId, $parentCommentId, $date, $aggCount, $aggregated)
   RETURNING *`
 
-const buildQueryUpdate = (parentEq?: string) => `
+const queryUpdateIfParentId = sql<IQueryUpdateIfParentIdQuery>`
   UPDATE df.activities
   SET aggregated = false
   WHERE aggregated = true
-    AND NOT (block_number = $1 AND event_index = $2)
-    AND event = $3
-    AND post_id = $4
-    ${parentEq}
+    AND NOT (block_number = $blockNumber AND event_index = $eventIndex)
+    AND event = $event
+    AND post_id = $postId
+    AND parent_comment_id IS NULL
   RETURNING *`;
+
+  const queryUpdateIfNotParentId = sql<IQueryUpdateIfNotParentIdQuery>`
+  UPDATE df.activities
+  SET aggregated = false
+  WHERE aggregated = true
+    AND NOT (block_number = $blockNumber AND event_index = $eventIndex)
+    AND event = $event
+    AND post_id = $postId
+    AND parent_comment_id = $parentCommentId
+  RETURNING *`;
+
 
 export async function insertActivityForComment(eventAction: SubstrateEvent, ids: string[], creator: string): InsertActivityPromise {
 
@@ -36,34 +48,45 @@ export async function insertActivityForComment(eventAction: SubstrateEvent, ids:
     paramsIds.push(null);
   }
 
-  const [postId] = paramsIds;
+  const [postId, commentId, parentCommentId] = paramsIds;
   const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
+  console.log(accountId)
 
   const date = await blockNumberToApproxDate(blockNumber)
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
-  const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
+  const params: IQueryParams = {
+    blockNumber,
+    eventIndex,
+    account: accountId,
+    event: eventName,
+    postId,
+    commentId,
+    parentCommentId,
+    date,
+    aggCount: count,
+    aggregated
+  };
 
   try {
-    await pg.query(query, params)
+    await runQuery(query, params)
 
     const [postId, , parentId] = paramsIds;
-    let parentEq = '';
-    const paramsIdsUpd = [postId];
+    let queryUpdate;
+    const paramsIdsUpd = { postId, parentId };
     if (!parentId) {
-      parentEq += 'AND parent_comment_id IS NULL'
+      queryUpdate = queryUpdateIfParentId
     } else {
-      parentEq = 'AND parent_comment_id = $5';
-      paramsIdsUpd.push(parentId);
+      queryUpdate = queryUpdateIfNotParentId;
+      paramsIdsUpd.parentId = parentId;
     }
 
-
-    log.debug('Params of update query:', [...paramsIdsUpd]);
-    log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
-    const paramsUpdate = [blockNumber, eventIndex, eventName, ...paramsIdsUpd];
-    const resUpdate = await pg.query(buildQueryUpdate(parentEq), paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
+    // log.debug('Params of update query:', paramsIdsUpd);
+    // log.debug(`parentId query: ${parentEq}, value: ${parentId}`);
+    const paramsUpdate: IQueryUpdateIfParentIdParams = { blockNumber, eventIndex, event: eventName, postId: paramsIdsUpd.postId, parentCommentId: paramsIdsUpd.parentId } ;
+    const resUpdate: IQueryUpdateIfParentIdResult[] = await runQuery(queryUpdate, paramsUpdate);
+    updateCountLog(resUpdate.length)
   } catch (err) {
     throw newPgError(err, insertActivityForComment)
   }

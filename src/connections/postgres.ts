@@ -1,4 +1,4 @@
-import { Pool/* , types */ } from 'pg'
+import { Client/* , types */ } from 'pg'
 import { postgesLog as log } from './loggers';
 
 require('dotenv').config();
@@ -17,9 +17,9 @@ if (!greeted) {
   log.info(`Connecting to Postgres at ${pgConf.host}:${pgConf.port} as a user '${pgConf.user}'`);
 }
 
-// Add method for serialize 
+// Add method for serialize
 (BigInt.prototype as any).toJSON = function() {
-  return this.toString() 
+  return this.toString()
 }
 
 // Type Id 20 = BIGINT | BIGSERIAL
@@ -29,4 +29,7 @@ if (!greeted) {
 // const parseBigIntArray = types.getTypeParser(1016)
 // types.setTypeParser(1016, a => parseBigIntArray(a).map(BigInt))
 
-export const pg = new Pool(pgConf);
+export const pg = new Client(pgConf);
+pg.connect()
+
+

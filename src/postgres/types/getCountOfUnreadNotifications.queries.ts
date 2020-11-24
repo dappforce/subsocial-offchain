@@ -1,17 +1,13 @@
-import * as BN from 'bn.js';
-/** Types generated for queries found in "src/postgres/deletes/deleteNotificationsAboutSpace.ts" */
+/** Types generated for queries found in "src/postgres/selects/getCountOfUnreadNotifications.ts" */
 
 /** 'Query' parameters type */
 export interface IQueryParams {
   account: string | null | void;
-  spaceId: bigint | null | void;
 }
 
 /** 'Query' return type */
 export interface IQueryResult {
-  account: string;
-  block_number: BN;
-  event_index: number;
+  unread_count: string;
 }
 
 /** 'Query' query type */

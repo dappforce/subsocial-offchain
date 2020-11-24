@@ -4,21 +4,22 @@ import { encodeStructIds } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { emptyParamsLogError, updateCountLog } from '../postges-logger';
 import { blockNumberToApproxDate } from '../../substrate/utils';
-import { pg } from '../../connections/postgres';
-import { newPgError } from '../utils';
+import { newPgError, runQuery } from '../utils';
+import { sql } from '@pgtyped/query';
+import { IQueryQuery, IQueryUpdateQuery, IQueryParams, IQueryUpdateParams } from '../types/insertActivityForPostReaction.queries';
 
-const query = `
+const query = sql<IQueryQuery>`
   INSERT INTO df.activities(block_number, event_index, account, event, post_id, date, agg_count, aggregated)
-    VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+    VALUES($blockNumber, $eventIndex, $account, $event, $postId, $date, $aggCount, $aggregated)
   RETURNING *`
 
-const queryUpdate = `
+const queryUpdate = sql<IQueryUpdateQuery>`
   UPDATE df.activities
   SET aggregated = false
   WHERE aggregated = true
-    AND NOT (block_number = $1 AND event_index = $2)
-    AND event = $3
-    AND post_id = $4
+    AND NOT (block_number = $blockNumber AND event_index = $eventIndex)
+    AND event = $event
+    AND post_id = $postId
   RETURNING *`;
 
 export async function insertActivityForPostReaction(eventAction: SubstrateEvent, count: number, ids: string[], creator: string): InsertActivityPromise {
@@ -29,20 +30,21 @@ export async function insertActivityForPostReaction(eventAction: SubstrateEvent,
     return undefined
   }
 
+  const [postId] = paramsIds
   const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
 
   const date = await blockNumberToApproxDate(blockNumber)
-  const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
+  const params: IQueryParams = { blockNumber, eventIndex, account: accountId, event: eventName, postId, date, aggCount: count, aggregated };
 
   try {
-    await pg.query(query, params)
+    await runQuery(query, params)
     const postId = paramsIds.pop();
 
-    const paramsUpdate = [blockNumber, eventIndex, eventName, postId];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
+    const paramsUpdate: IQueryUpdateParams  = { blockNumber, eventIndex, event: eventName, postId };
+    const resUpdate = await runQuery(queryUpdate, paramsUpdate);
+    updateCountLog(resUpdate.length)
   } catch (err) {
     throw newPgError(err, insertActivityForPostReaction)
   }

@@ -1,10 +1,12 @@
 import * as BN from 'bn.js';
-/** Types generated for queries found in "src/postgres/deletes/deleteNotificationsAboutSpace.ts" */
+/** Types generated for queries found in "src/postgres/fills/fillNotificationsWithPostFollowers.ts" */
 
 /** 'Query' parameters type */
 export interface IQueryParams {
+  postId: bigint | null | void;
   account: string | null | void;
-  spaceId: bigint | null | void;
+  blockNumber: BN | null | void;
+  eventIndex: number | null | void;
 }
 
 /** 'Query' return type */

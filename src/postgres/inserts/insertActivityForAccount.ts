@@ -1,22 +1,23 @@
 import { updateCountLog } from '../postges-logger';
-import { newPgError } from '../utils';
+import { newPgError, runQuery } from '../utils';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
-import { pg } from '../../connections/postgres';
 import { blockNumberToApproxDate } from '../../substrate/utils';
+import { sql } from '@pgtyped/query';
+import { IQueryQuery, IQueryParams, IQueryUpdateQuery, IQueryUpdateParams, IQueryUpdateResult } from '../types/insertActivityForAccount.queries';
 
-const query = `
+const query = sql<IQueryQuery>`
   INSERT INTO df.activities(block_number, event_index, account, event, following_id, date, agg_count)
-    VALUES($1, $2, $3, $4, $5, $6, $7)
+    VALUES($blockNumber, $eventIndex, $account, $event, $followingId, $date, $aggCount)
   RETURNING *`
 
-const queryUpdate = `
+const queryUpdate = sql<IQueryUpdateQuery>`
   UPDATE df.activities
   SET aggregated = false
   WHERE aggregated = true
-    AND NOT (block_number = $1 AND event_index = $2)
-    AND event = $3
-    AND following_id = $4
+    AND NOT (block_number = $blockNumber AND event_index = $eventIndex)
+    AND event = $event
+    AND following_id = $followingId
   RETURNING *`;
 
 export async function insertActivityForAccount(eventAction: SubstrateEvent, count: number): InsertActivityPromise {
@@ -26,14 +27,14 @@ export async function insertActivityForAccount(eventAction: SubstrateEvent, coun
 
   const date = await blockNumberToApproxDate(blockNumber)
 
-  const params = [blockNumber, eventIndex, accountId, eventName, followingId, date, count];
+  const params: IQueryParams = { blockNumber, eventIndex, account: accountId, event: eventName, followingId, date, aggCount: count };
 
   try {
-    await pg.query(query, params)
+    await runQuery(query, params)
 
-    const paramsUpdate = [ blockNumber, eventIndex, eventName, followingId ];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
+    const paramsUpdate: IQueryUpdateParams = { blockNumber, eventIndex, event: eventName, followingId };
+    const resUpdate: IQueryUpdateResult[] = await runQuery(queryUpdate, paramsUpdate);
+    updateCountLog(resUpdate.length)
   } catch (err) {
     throw newPgError(err, insertActivityForAccount)
   }

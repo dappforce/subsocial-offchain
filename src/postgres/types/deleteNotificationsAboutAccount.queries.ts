@@ -1,3 +1,4 @@
+import * as BN from 'bn.js';
 /** Types generated for queries found in "src/postgres/deletes/deleteNotificationsAboutAccount.ts" */
 
 /** 'Query' parameters type */
@@ -9,7 +10,7 @@ export interface IQueryParams {
 /** 'Query' return type */
 export interface IQueryResult {
   account: string;
-  block_number: string;
+  block_number: BN;
   event_index: number;
 }
 
