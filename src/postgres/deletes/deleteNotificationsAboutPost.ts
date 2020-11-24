@@ -1,24 +1,25 @@
-import { newPgError } from '../utils';
+import { newPgError, runQuery } from '../utils';
 import { encodeStructId } from '../../substrate/utils';
-import { pg } from '../../connections/postgres';
+import { sql } from '@pgtyped/query';
+import { IQueryQuery, IQueryParams } from '../types/deleteNotificationsAboutPost.queries';
 
-const query = `
+const query = sql<IQueryQuery>`
   DELETE FROM df.notifications
-  WHERE account = $1 AND (block_number, event_index) IN (
+  WHERE account = $account AND (block_number, event_index) IN (
     SELECT block_number, event_index
     FROM df.activities
     LEFT JOIN df.post_followers
       ON df.activities.post_id = df.post_followers.following_post_id
-    WHERE post_id = $2
+    WHERE post_id = $postId
   )
   RETURNING *`
 
 export async function deleteNotificationsAboutPost (userId: string, postId: string) {
   const encodedPostId = encodeStructId(postId);
-  const params = [ userId, encodedPostId ];
+  const params: IQueryParams = { account: userId, postId: encodedPostId };
 
   try {
-    await pg.query(query, params)
+    await runQuery(query, params)
   } catch (err) {
     throw newPgError(err, deleteNotificationsAboutPost)
   }

@@ -1,0 +1,18 @@
+{
+  "transforms": [
+    {
+      "mode": "ts",
+      "include": "**/*.ts",
+      "emitTemplate": "./src/postgres/types/{{name}}.queries.ts"
+    }
+  ],
+  "srcDir": "./src",
+  "failOnError": false,
+  "db": {
+    "host": "localhost",
+    "port": 5432,
+    "user": "dev",
+    "dbName": "subsocial",
+    "password": "1986"
+  }
+}

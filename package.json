@@ -53,10 +53,12 @@
     "jest": "~24.8.0",
     "moment-timezone": "^0.5.26",
     "nodemon": "^1.18.9",
-    "typescript": "^3.8.3"
+    "typescript": "^4.1.2"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
+    "@pgtyped/cli": "^0.9.0",
+    "@pgtyped/query": "^0.9.0",
     "@subsocial/api": "^0.4.24",
     "axios": "^0.19.0",
     "bn.js": "^4.11.8",
