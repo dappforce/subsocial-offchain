@@ -4,21 +4,20 @@ import { encodeStructId } from '../../substrate/utils';
 import { blockNumberToApproxDate } from '../../substrate/utils';
 import { updateCountLog } from '../postges-logger';
 import { newPgError, runQuery } from '../utils';
-import { sql } from '@pgtyped/query';
-import { IQueryQuery, IQueryUpdateQuery, IQueryParams, IQueryUpdateParams, IQueryUpdateResult } from '../types/insertActivityForSpace.queries';
+import { IQueryParams, IQueryUpdateParams, action } from '../types/insertActivityForSpace.queries';
 
-const query = sql<IQueryQuery>`
+const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, space_id, date, agg_count, aggregated)
-    VALUES($blockNumber, $eventIndex, $account, $event, $spaceId, $date, $aggCount, $aggregated)
+    VALUES(:blockNumber, :eventIndex, :account, :event, :spaceId, :date, :aggCount, :aggregated)
   RETURNING *`
 
-const queryUpdate = sql<IQueryUpdateQuery>`
+const queryUpdate = `
   UPDATE df.activities
   SET aggregated = false
   WHERE aggregated = true
-    AND NOT (block_number = $blockNumber AND event_index = $eventIndex)
-    AND event = $event
-    AND space_id = $spaceId
+    AND NOT (block_number = :blockNumber AND event_index = :eventIndex)
+    AND event = :event
+    AND space_id = :spaceId
   RETURNING *`;
 
 export async function insertActivityForSpace (eventAction: SubstrateEvent, count: number, creator?: string): InsertActivityPromise {
@@ -29,14 +28,24 @@ export async function insertActivityForSpace (eventAction: SubstrateEvent, count
   const aggregated = accountId !== creator;
 
   const date = await blockNumberToApproxDate(blockNumber)
-  const params: IQueryParams = { blockNumber, eventIndex, account: accountId, event: eventName, spaceId, date, aggCount: count, aggregated };
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
+  const params: IQueryParams = {
+    blockNumber: encodedBlockNumber,
+    eventIndex,
+    account: accountId,
+    event: eventName as action,
+    spaceId,
+    date,
+    aggCount: count,
+    aggregated
+  };
 
   try {
     await runQuery(query, params)
-    const paramsUpdate: IQueryUpdateParams = { blockNumber, eventIndex, event: eventName, spaceId };
+    const paramsUpdate: IQueryUpdateParams = { blockNumber: encodedBlockNumber, eventIndex, event: eventName as action, spaceId };
 
-    const resUpdate: IQueryUpdateResult[] = await runQuery(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.length)
+    const resUpdate = await runQuery<IQueryUpdateParams>(queryUpdate, paramsUpdate);
+    updateCountLog(resUpdate.rowsCount)
   } catch (err) {
     throw newPgError(err, insertActivityForSpace)
   }

@@ -1,21 +1,20 @@
 import { EventData } from '@polkadot/types/generic/Event';
 import { encodeStructId } from '../../substrate/utils';
 import { newPgError, runQuery } from '../utils';
-import { sql } from '@pgtyped/query';
-import { IQueryQuery, IQueryParams } from '../types/deleteSpaceFollower.queries';
+import { IQueryParams } from '../types/deleteSpaceFollower.queries';
 
-const query = sql<IQueryQuery>`
+const query = `
   DELETE from df.space_followers
-  WHERE follower_account = $followerAccount
-    AND following_space_id = $followingSpaceId
+  WHERE follower_account = :followerAccount
+    AND following_space_id = :followingSpaceId
   RETURNING *`
 
 export async function deleteSpaceFollower (data: EventData) {
   const spaceId = encodeStructId(data[1].toString());
-  const params: IQueryParams = { followerAccount: data[0].toString(), followingSpaceId: spaceId };
+  const params = { followerAccount: data[0].toString(), followingSpaceId: spaceId };
 
   try {
-    await runQuery(query, params)
+    await runQuery<IQueryParams>(query, params)
   } catch (err) {
     throw newPgError(err, deleteSpaceFollower)
   }

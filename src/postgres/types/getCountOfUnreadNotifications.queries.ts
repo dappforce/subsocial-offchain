@@ -4,15 +4,3 @@
 export interface IQueryParams {
   account: string | null | void;
 }
-
-/** 'Query' return type */
-export interface IQueryResult {
-  unread_count: string;
-}
-
-/** 'Query' query type */
-export interface IQueryQuery {
-  params: IQueryParams;
-  result: IQueryResult;
-}
-

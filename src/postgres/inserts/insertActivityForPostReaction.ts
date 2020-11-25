@@ -1,25 +1,24 @@
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
-import { encodeStructIds } from '../../substrate/utils';
+import { encodeStructIds, encodeStructId } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { emptyParamsLogError, updateCountLog } from '../postges-logger';
 import { blockNumberToApproxDate } from '../../substrate/utils';
 import { newPgError, runQuery } from '../utils';
-import { sql } from '@pgtyped/query';
-import { IQueryQuery, IQueryUpdateQuery, IQueryParams, IQueryUpdateParams } from '../types/insertActivityForPostReaction.queries';
+import { IQueryParams, IQueryUpdateParams, action } from '../types/insertActivityForPostReaction.queries';
 
-const query = sql<IQueryQuery>`
+const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, post_id, date, agg_count, aggregated)
-    VALUES($blockNumber, $eventIndex, $account, $event, $postId, $date, $aggCount, $aggregated)
+    VALUES(:blockNumber, :eventIndex, :account, :event, :postId, :date, :aggCount, :aggregated)
   RETURNING *`
 
-const queryUpdate = sql<IQueryUpdateQuery>`
+const queryUpdate = `
   UPDATE df.activities
   SET aggregated = false
   WHERE aggregated = true
-    AND NOT (block_number = $blockNumber AND event_index = $eventIndex)
-    AND event = $event
-    AND post_id = $postId
+    AND NOT (block_number = :blockNumber AND event_index = :eventIndex)
+    AND event = :event
+    AND post_id = :postId
   RETURNING *`;
 
 export async function insertActivityForPostReaction(eventAction: SubstrateEvent, count: number, ids: string[], creator: string): InsertActivityPromise {
@@ -34,16 +33,26 @@ export async function insertActivityForPostReaction(eventAction: SubstrateEvent,
   const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
 
   const date = await blockNumberToApproxDate(blockNumber)
-  const params: IQueryParams = { blockNumber, eventIndex, account: accountId, event: eventName, postId, date, aggCount: count, aggregated };
+  const params = {
+    blockNumber: encodedBlockNumber,
+    eventIndex,
+    account: accountId,
+    event: eventName as action,
+    postId,
+    date,
+    aggCount: count,
+    aggregated
+  };
 
   try {
-    await runQuery(query, params)
+    await runQuery<IQueryParams>(query, params)
     const postId = paramsIds.pop();
 
-    const paramsUpdate: IQueryUpdateParams  = { blockNumber, eventIndex, event: eventName, postId };
-    const resUpdate = await runQuery(queryUpdate, paramsUpdate);
+    const paramsUpdate  = { blockNumber: encodedBlockNumber, eventIndex, event: eventName as action, postId };
+    const resUpdate = await runQuery<IQueryUpdateParams>(queryUpdate, paramsUpdate);
     updateCountLog(resUpdate.length)
   } catch (err) {
     throw newPgError(err, insertActivityForPostReaction)

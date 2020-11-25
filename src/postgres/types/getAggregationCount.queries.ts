@@ -4,18 +4,6 @@ export type action = 'SpaceCreated' | 'SpaceUpdated' | 'SpaceFollowed' | 'SpaceU
 /** 'Query' parameters type */
 export interface IQueryParams {
   account: string | null | void;
-  event: string | null | void;
+  event: action | null | void;
   postId: bigint | null | void;
 }
-
-/** 'Query' return type */
-export interface IQueryResult {
-  count: string | null;
-}
-
-/** 'Query' query type */
-export interface IQueryQuery {
-  params: IQueryParams;
-  result: IQueryResult;
-}
-

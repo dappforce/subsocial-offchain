@@ -50,6 +50,7 @@
     "@types/pg": "^7.14.3",
     "@types/request-promise": "^4.1.46",
     "@types/ws": "^7.2.3",
+    "@types/yesql": "^4.1.0",
     "jest": "~24.8.0",
     "moment-timezone": "^0.5.26",
     "nodemon": "^1.18.9",
@@ -77,6 +78,7 @@
     "multer": "^1.4.2",
     "pg": "^7.12.1",
     "request-promise": "^4.2.5",
-    "ts-jest": "^26.4.4"
+    "ts-jest": "^26.4.4",
+    "yesql": "^4.1.3"
   }
 }

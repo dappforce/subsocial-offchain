@@ -2,22 +2,21 @@ import { updateCountLog } from '../postges-logger';
 import { newPgError, runQuery } from '../utils';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
-import { blockNumberToApproxDate } from '../../substrate/utils';
-import { sql } from '@pgtyped/query';
-import { IQueryQuery, IQueryParams, IQueryUpdateQuery, IQueryUpdateParams, IQueryUpdateResult } from '../types/insertActivityForAccount.queries';
+import { blockNumberToApproxDate, encodeStructId } from '../../substrate/utils';
+import { IQueryParams, IQueryUpdateParams, action } from '../types/insertActivityForAccount.queries';
 
-const query = sql<IQueryQuery>`
+const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, following_id, date, agg_count)
-    VALUES($blockNumber, $eventIndex, $account, $event, $followingId, $date, $aggCount)
+    VALUES(:blockNumber, :eventIndex, :account, :event, :followingId, :date, :aggCount)
   RETURNING *`
 
-const queryUpdate = sql<IQueryUpdateQuery>`
+const queryUpdate = `
   UPDATE df.activities
   SET aggregated = false
   WHERE aggregated = true
-    AND NOT (block_number = $blockNumber AND event_index = $eventIndex)
-    AND event = $event
-    AND following_id = $followingId
+    AND NOT (block_number = :blockNumber AND event_index = :eventIndex)
+    AND event = :event
+    AND following_id = :followingId
   RETURNING *`;
 
 export async function insertActivityForAccount(eventAction: SubstrateEvent, count: number): InsertActivityPromise {
@@ -26,15 +25,24 @@ export async function insertActivityForAccount(eventAction: SubstrateEvent, coun
   const followingId = data[1].toString();
 
   const date = await blockNumberToApproxDate(blockNumber)
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
 
-  const params: IQueryParams = { blockNumber, eventIndex, account: accountId, event: eventName, followingId, date, aggCount: count };
+  const params = {
+    blockNumber: encodedBlockNumber,
+    eventIndex,
+    account: accountId,
+    event: eventName as action,
+    followingId,
+    date,
+    aggCount: count
+  };
 
   try {
-    await runQuery(query, params)
+    await runQuery<IQueryParams>(query, params)
 
-    const paramsUpdate: IQueryUpdateParams = { blockNumber, eventIndex, event: eventName, followingId };
-    const resUpdate: IQueryUpdateResult[] = await runQuery(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.length)
+    const paramsUpdate = { blockNumber: encodedBlockNumber, eventIndex, event: eventName as action, followingId };
+    const resUpdate = await runQuery<IQueryUpdateParams>(queryUpdate, paramsUpdate);
+    updateCountLog(resUpdate.rowsCount)
   } catch (err) {
     throw newPgError(err, insertActivityForAccount)
   }

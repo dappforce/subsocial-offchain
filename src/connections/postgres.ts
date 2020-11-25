@@ -1,4 +1,4 @@
-import { Client/* , types */ } from 'pg'
+import { Pool} from 'pg'
 import { postgesLog as log } from './loggers';
 
 require('dotenv').config();
@@ -29,7 +29,7 @@ if (!greeted) {
 // const parseBigIntArray = types.getTypeParser(1016)
 // types.setTypeParser(1016, a => parseBigIntArray(a).map(BigInt))
 
-export const pg = new Client(pgConf);
-pg.connect()
+export const pg = new Pool(pgConf);
+
 
 
