@@ -1,9 +1,9 @@
 import { updateCountLog } from '../postges-logger';
-import { newPgError, runQuery } from '../utils';
+import { newPgError, runQuery, action } from '../utils';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
 import { blockNumberToApproxDate, encodeStructId } from '../../substrate/utils';
-import { IQueryParams, IQueryUpdateParams, action } from '../types/insertActivityForAccount.queries';
+import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForAccount.queries';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, following_id, date, agg_count)

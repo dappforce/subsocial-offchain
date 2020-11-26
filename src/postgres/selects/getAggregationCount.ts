@@ -1,6 +1,6 @@
 import { log } from '../postges-logger';
-import { runQuery } from '../utils';
-import { IQueryParams, action } from '../types/getAggregationCount.queries';
+import { runQuery,action } from '../utils';
+import { IQueryParams } from '../types/getAggregationCount.queries';
 
 export type AggCountProps = {
   eventName: string,

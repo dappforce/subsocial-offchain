@@ -4,9 +4,9 @@ import { encodeStructIds, encodeStructId } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { InsertActivityPromise } from '../queries/types';
 import { blockNumberToApproxDate } from '../../substrate/utils';
-import { newPgError, runQuery } from '../utils';
+import { newPgError, runQuery, action } from '../utils';
 import { getAggregationCount } from '../selects/getAggregationCount';
-import { IQueryParams, IQueryUpdateParams, action } from '../types/insertActivityForComment.queries';
+import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForComment.queries';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, parent_comment_id, date, agg_count, aggregated)

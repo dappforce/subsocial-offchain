@@ -2,6 +2,8 @@ import { pg } from '../connections/postgres';
 
 const named = require('yesql').pg
 
+export type action = 'SpaceCreated' | 'SpaceUpdated' | 'SpaceFollowed' | 'SpaceUnfollowed' | 'AccountFollowed' | 'AccountUnfollowed' | 'PostCreated' | 'PostUpdated' | 'PostShared' | 'CommentCreated' | 'CommentUpdated' | 'CommentShared' | 'CommentDeleted' | 'CommentReplyCreated' | 'PostReactionCreated' | 'PostReactionUpdated' | 'CommentReactionCreated' | 'CommentReactionUpdated';
+
 export const newPgError = (err: Error, fn: Function) =>
   new Error(`${fn.name}: ${err.stack}\n${JSON.stringify(err, null, 4)}`)
 

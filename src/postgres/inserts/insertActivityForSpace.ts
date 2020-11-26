@@ -3,8 +3,8 @@ import { InsertActivityPromise } from '../queries';
 import { encodeStructId } from '../../substrate/utils';
 import { blockNumberToApproxDate } from '../../substrate/utils';
 import { updateCountLog } from '../postges-logger';
-import { newPgError, runQuery } from '../utils';
-import { IQueryParams, IQueryUpdateParams, action } from '../types/insertActivityForSpace.queries';
+import { newPgError, runQuery, action } from '../utils';
+import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForSpace.queries';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, space_id, date, agg_count, aggregated)

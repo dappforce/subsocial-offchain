@@ -4,8 +4,8 @@ import { encodeStructIds, encodeStructId } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { emptyParamsLogError, updateCountLog } from '../postges-logger';
 import { blockNumberToApproxDate } from '../../substrate/utils';
-import { newPgError, runQuery } from '../utils';
-import { IQueryParams, IQueryUpdateParams, action } from '../types/insertActivityForCommentReaction.queries';
+import { newPgError, runQuery, action } from '../utils';
+import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForCommentReaction.queries';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, date, agg_count, aggregated)
