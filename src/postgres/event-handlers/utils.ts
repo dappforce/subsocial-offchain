@@ -1,9 +1,9 @@
 import { SubstrateEvent } from '../../substrate/types';
-import { Post } from '@subsocial/types/substrate/interfaces';
-import { substrate } from '../../connections/subsocial';
 import { parsePostEvent } from '../../substrate/utils';
+import { findPost } from '../../substrate/api-wrappers';
+import { NormalizedPost } from '../../substrate/normalizers';
 
-type PostHandler = (eventAction: SubstrateEvent, post?: Post) => Promise<void>
+type PostHandler = (eventAction: SubstrateEvent, post?: NormalizedPost) => Promise<void>
 
 type PostHandlers = {
   eventAction: SubstrateEvent
@@ -13,12 +13,12 @@ type PostHandlers = {
 
 export const findPostAndProccess = async ({ eventAction, onRootPost, onComment }: PostHandlers) => {
   const { postId } = parsePostEvent(eventAction)
-  const post = await substrate.findPost({ id: postId })
+  const post = await findPost(postId)
   if (!post) return;
 
-  if (post.extension.isComment) {
-    onComment(eventAction, post)
+  if (post.isComment) {
+    await onComment(eventAction, post)
   } else {
-    onRootPost(eventAction, post)
+    await onRootPost(eventAction, post)
   }
 }

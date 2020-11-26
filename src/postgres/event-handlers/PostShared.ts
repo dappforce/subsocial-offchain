@@ -4,7 +4,7 @@ import { onRootPostShared } from './RootPostShared';
 import { findPostAndProccess } from './utils';
 
 export const onPostShared: EventHandlerFn = async (eventAction) => {
-  findPostAndProccess({
+  await findPostAndProccess({
     onRootPost: onRootPostShared,
     onComment: onCommentShared,
     eventAction

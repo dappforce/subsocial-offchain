@@ -1,7 +1,7 @@
 import { EventData } from '@polkadot/types/generic/Event'
 import BN from 'bn.js';
 
-type CommonDbState = {
+export type CommonDbState = {
   lastBlock: number
   lastError?: string
 }

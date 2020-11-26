@@ -1,15 +1,15 @@
-import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
+import { NormalizedPost } from '../../substrate/normalizers';
 import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
 import { insertActivityForPostReaction } from '../inserts/insertActivityForPostReaction';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 
-export const onRootPostReactionCreated = async (eventAction: SubstrateEvent, post: Post) => {
+export const onRootPostReactionCreated = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
   const { author: voter, postId } = parsePostEvent(eventAction)
 
   const ids = [ postId ];
-  const reactionCount = post.upvotes_count.add(post.downvotes_count).toNumber() - 1;
-  const postAuthor = post.created.account.toString();
+  const reactionCount = post.upvotesCount + post.downvotesCount - 1;
+  const postAuthor = post.createdByAccount;
   const insertResult = await insertActivityForPostReaction(eventAction, reactionCount, ids, postAuthor);
   if (insertResult === undefined) return
   

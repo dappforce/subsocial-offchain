@@ -1,5 +1,5 @@
 import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { substrate } from '../../connections/subsocial';
+import { findSpace } from '../../substrate/api-wrappers';
 import { EventHandlerFn } from '../../substrate/types';
 import { insertActivityForSpace } from '../inserts/insertActivityForSpace';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
@@ -9,11 +9,11 @@ export const onSpaceFollowed: EventHandlerFn = async (eventAction) => {
   const { data } = eventAction;
   await insertSpaceFollower(data);
   const spaceId = data[1] as SpaceId;
-  const space = await substrate.findSpace({ id: spaceId });
+  const space = await findSpace(spaceId);
   if (!space) return;
 
-  const count = space.followers_count.toNumber() - 1;
-  const account = space.owner.toString();
+  const count = space.followersCount - 1;
+  const account = space.owner;
   const insertResult = await insertActivityForSpace(eventAction, count, account);
   if (insertResult === undefined) return;
 

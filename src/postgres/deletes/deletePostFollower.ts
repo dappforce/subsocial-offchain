@@ -2,7 +2,6 @@ import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
 import { encodeStructId } from '../../substrate/utils';
 import { EventData } from '@polkadot/types/generic/Event';
-import { PostId } from '@subsocial/types/substrate/interfaces';
 
 const query = `
   DELETE from df.post_followers
@@ -11,7 +10,7 @@ const query = `
   RETURNING *`
 
 export async function deletePostFollower (data: EventData) {
-  const postId = encodeStructId(data[1] as PostId);
+  const postId = encodeStructId(data[1].toString());
   const params = [ data[0].toString(), postId ];
 
   try {

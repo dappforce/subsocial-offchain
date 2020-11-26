@@ -4,22 +4,11 @@ import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { resolveSubsocialApi, substrate } from '../connections/subsocial';
-import BN from 'bn.js';
+import { resolveSubsocialApi } from '../connections/subsocial';
 
 require('dotenv').config()
 
-let lastBlockNumber: BN | undefined = undefined
 let blockTime = 6
-
-export const getValidDate = async (eventBlock: BN) => {
-  const api = await substrate.api
-  const currentTimestamp = await api.query.timestamp.now()
-  
-  const result = currentTimestamp.sub(lastBlockNumber.sub(eventBlock).muln(blockTime))
-
-  return new Date(result.toNumber())
-}
 
 async function main (substrate: SubsocialSubstrateApi) {
 
@@ -54,14 +43,6 @@ async function main (substrate: SubsocialSubstrateApi) {
     await api.derive.chain.bestNumberFinalized()
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
-
-  api.rpc.chain.subscribeNewHeads(async (header) => {
-    lastBlockNumber = header.number.toBn()
-  })
-
-  if (!lastBlockNumber) {
-    await waitNextBlock()
-  } 
 
   while (true) {
 
@@ -104,13 +85,12 @@ async function main (substrate: SubsocialSubstrateApi) {
     log.debug(`Block number to process: ${blockToProcess} with hash ${blockHash.toHex()}`)
 
     // Process all events of the current block
-    // for (const { event } of events) {
       for (let i = 0; i < events.length; i++) {
       const { event } = events[i]
 
       if (shouldHandleEvent(event)) {
         log.debug(`Handle a new event: %o`, event.method)
-        // 773059
+
         const eventMeta = {
           eventName: event.method,
           data: event.data,

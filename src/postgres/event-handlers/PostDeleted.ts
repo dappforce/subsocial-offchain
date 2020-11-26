@@ -4,7 +4,7 @@ import { onRootPostDeleted } from './RootPostDeleted';
 import { findPostAndProccess } from './utils';
 
 export const onPostDeleted: EventHandlerFn = async (eventAction) => {
-  findPostAndProccess({
+  await findPostAndProccess({
     onRootPost: onRootPostDeleted,
     onComment: onCommentDeleted,
     eventAction

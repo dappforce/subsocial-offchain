@@ -14,6 +14,7 @@ export let ipfs: SubsocialIpfsApi
  */
 export const resolveSubsocialApi = async () => {
   // Connect to Subsocial's Substrate node:
+
   if (!subsocial) {
     const api = await Api.connect(process.env.SUBSTRATE_URL)
     subsocial = new SubsocialApi({

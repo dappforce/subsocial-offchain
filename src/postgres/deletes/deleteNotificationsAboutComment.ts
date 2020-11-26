@@ -1,4 +1,3 @@
-import { PostId } from '@subsocial/types/substrate/interfaces';
 import { encodeStructId } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
@@ -9,12 +8,12 @@ const query = `
     SELECT block_number, event_index
     FROM df.activities
     LEFT JOIN df.account_followers
-    ON df.activities.account = df.account_followers.following_comment_id
+      ON df.activities.account = df.account_followers.following_comment_id
     WHERE comment_id = $2
   )
   RETURNING *`
 
-export async function deleteNotificationsAboutComment (userId: string, commentId: PostId) {
+export async function deleteNotificationsAboutComment (userId: string, commentId: string) {
   const encodedCommentId = encodeStructId(commentId);
   const params = [ userId, encodedCommentId ];
 

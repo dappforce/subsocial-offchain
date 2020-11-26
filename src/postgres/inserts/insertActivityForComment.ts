@@ -1,10 +1,9 @@
-import { SubstrateId } from '@subsocial/types';
 import { SubstrateEvent } from '../../substrate/types';
 import { log, emptyParamsLogError, updateCountLog } from '../postges-logger';
 import { encodeStructIds } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { InsertActivityPromise } from '../queries/types';
-import { getValidDate } from '../../substrate/subscribe';
+import { blockNumberToApproxDate } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
 import { getAggregationCount } from '../selects/getAggregationCount';
@@ -16,15 +15,15 @@ const query = `
 
 const buildQueryUpdate = (parentEq?: string) => `
   UPDATE df.activities
-    SET aggregated = false
-      WHERE aggregated = true
-        AND NOT (block_number = $1 AND event_index = $2)
-        AND event = $3
-        AND post_id = $4
-        ${parentEq}
+  SET aggregated = false
+  WHERE aggregated = true
+    AND NOT (block_number = $1 AND event_index = $2)
+    AND event = $3
+    AND post_id = $4
+    ${parentEq}
   RETURNING *`;
 
-export async function insertActivityForComment(eventAction: SubstrateEvent, ids: SubstrateId[], creator: string): InsertActivityPromise {
+export async function insertActivityForComment(eventAction: SubstrateEvent, ids: string[], creator: string): InsertActivityPromise {
 
   const paramsIds = encodeStructIds(ids)
 
@@ -42,7 +41,7 @@ export async function insertActivityForComment(eventAction: SubstrateEvent, ids:
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
 
-  const date = await getValidDate(blockNumber)
+  const date = await blockNumberToApproxDate(blockNumber)
   const count = await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId });
   const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
 

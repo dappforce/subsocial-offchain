@@ -1,5 +1,4 @@
 import { EventData } from '@polkadot/types/generic/Event';
-import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { encodeStructId } from '../../substrate/utils';
 import { pg } from '../../connections/postgres';
 import { newPgError } from '../utils';
@@ -11,7 +10,7 @@ const query = `
   RETURNING *`
 
 export async function deleteSpaceFollower (data: EventData) {
-  const spaceId = encodeStructId(data[1] as SpaceId);
+  const spaceId = encodeStructId(data[1].toString());
   const params = [ data[0].toString(), spaceId ];
 
   try {

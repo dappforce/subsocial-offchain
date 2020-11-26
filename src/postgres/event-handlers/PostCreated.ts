@@ -4,7 +4,7 @@ import { onRootCreated } from './RootPostCreated';
 import { findPostAndProccess } from './utils';
 
 export const onPostCreated: EventHandlerFn = async (eventAction) => {
-  findPostAndProccess({
+  await findPostAndProccess({
     onRootPost: onRootCreated,
     onComment: onCommentCreated,
     eventAction

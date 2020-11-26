@@ -1,5 +1,4 @@
 import { EventData } from '@polkadot/types/generic/Event';
-import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { encodeStructId } from '../../substrate/utils';
 import { newPgError } from '../utils';
 import { pg } from '../../connections/postgres';
@@ -10,7 +9,7 @@ const query = `
   RETURNING *`
 
 export async function insertSpaceFollower(data: EventData) {
-  const spaceId = encodeStructId(data[1] as SpaceId);
+  const spaceId = encodeStructId(data[1].toString());
   const params = [ data[0].toString(), spaceId ];
 
   try {

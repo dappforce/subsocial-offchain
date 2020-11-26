@@ -2,8 +2,8 @@ import { updateCountLog } from '../postges-logger';
 import { newPgError } from '../utils';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
-import { getValidDate } from '../../substrate/subscribe';
 import { pg } from '../../connections/postgres';
+import { blockNumberToApproxDate } from '../../substrate/utils';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, following_id, date, agg_count)
@@ -12,11 +12,11 @@ const query = `
 
 const queryUpdate = `
   UPDATE df.activities
-    SET aggregated = false
-      WHERE aggregated = true
-        AND NOT (block_number = $1 AND event_index = $2)
-        AND event = $3
-        AND following_id = $4
+  SET aggregated = false
+  WHERE aggregated = true
+    AND NOT (block_number = $1 AND event_index = $2)
+    AND event = $3
+    AND following_id = $4
   RETURNING *`;
 
 export async function insertActivityForAccount(eventAction: SubstrateEvent, count: number): InsertActivityPromise {
@@ -24,7 +24,7 @@ export async function insertActivityForAccount(eventAction: SubstrateEvent, coun
   const accountId = data[0].toString();
   const followingId = data[1].toString();
 
-  const date = await getValidDate(blockNumber)
+  const date = await blockNumberToApproxDate(blockNumber)
 
   const params = [blockNumber, eventIndex, accountId, eventName, followingId, date, count];
 
