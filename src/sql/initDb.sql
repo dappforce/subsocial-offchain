@@ -94,28 +94,34 @@ CREATE TABLE IF NOT EXISTS df.comment_followers
     following_comment_id bigint NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_follower_account 
+CREATE TABLE IF NOT EXISTS df.session_keys
+(
+    main_key varchar(48) NOT NULL,
+    session_key varchar(48) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_follower_account
 ON df.account_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_following_account 
+CREATE INDEX IF NOT EXISTS idx_following_account
 ON df.account_followers(following_account);
 
-CREATE INDEX IF NOT EXISTS idx_post_follower_account 
+CREATE INDEX IF NOT EXISTS idx_post_follower_account
 ON df.post_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_space_follower_account 
+CREATE INDEX IF NOT EXISTS idx_space_follower_account
 ON df.space_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_comment_follower_account 
+CREATE INDEX IF NOT EXISTS idx_comment_follower_account
 ON df.comment_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_following_post_id 
+CREATE INDEX IF NOT EXISTS idx_following_post_id
 ON df.post_followers(following_post_id);
 
-CREATE INDEX IF NOT EXISTS idx_following_space_id 
+CREATE INDEX IF NOT EXISTS idx_following_space_id
 ON df.space_followers(following_space_id);
 
-CREATE INDEX IF NOT EXISTS idx_following_comment_id 
+CREATE INDEX IF NOT EXISTS idx_following_comment_id
 ON df.comment_followers(following_comment_id);
 
 CREATE INDEX IF NOT EXISTS idx_account

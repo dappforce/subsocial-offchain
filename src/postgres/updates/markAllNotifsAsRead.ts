@@ -1,25 +1,44 @@
 import { informClientAboutUnreadNotifications } from '../../express-api/events';
 import { log } from '../postges-logger';
-import { runQuery } from '../utils';
+import { runQuery, isValidSignature } from '../utils';
+import { BlockNumber } from '@polkadot/types/interfaces';
+
+type ReadAllMessage = {
+  sessionKey: string,
+  blockNumber: BlockNumber,
+  eventIndex: number
+}
 
 const query = `
   WITH last_activity AS (
     SELECT block_number, event_index
-    FROM df.notification
+    FROM df.notifications
     WHERE account = :account
     ORDER BY
       block_number DESC,
       event_index DESC
     LIMIT 1
   )
+
   UPDATE df.notifications_counter
   SET
     unread_count = 0,
-    last_read_block_number = last_activity.block_number,
-    last_read_event_index = last_activity.event_index
+    last_read_block_number = (select block_number from last_activity),
+    last_read_event_index = (select event_index from last_activity)
   WHERE account = :account`
 
-export async function markAllNotifsAsRead(account: string) {
+export async function markAllNotifsAsRead(account: string, signature: string, message: ReadAllMessage) {
+  const isValid = isValidSignature(
+    message,
+    signature,
+    message.sessionKey
+  )
+  if (!isValid) {
+    console.log("invalid")
+    return
+  }
+  log.info(`Message confirmed successfully`)
+
   try {
     const data = await runQuery(query, { account })
     informClientAboutUnreadNotifications(account, 0)
@@ -30,3 +49,4 @@ export async function markAllNotifsAsRead(account: string) {
     throw err
   }
 }
+

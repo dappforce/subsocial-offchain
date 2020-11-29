@@ -33,7 +33,7 @@ export function startNotificationsServer() {
     eventEmitter.on(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, unreadCount: number) => {
       const client = wsClients[account]
       if (!client) return
-    
+
       if (client.readyState !== WebSocket.OPEN) {
         delete wsClients[account]
         return
