@@ -1,13 +1,8 @@
 import { informClientAboutUnreadNotifications } from '../../express-api/events';
 import { log } from '../postges-logger';
 import { runQuery, isValidSignature } from '../utils';
-import { BlockNumber } from '@polkadot/types/interfaces';
-
-type ReadAllMessage = {
-  sessionKey: string,
-  blockNumber: BlockNumber,
-  eventIndex: number
-}
+import { SessionCall, ReadAllMessage } from '../types/sessionKey';
+import { isOwner } from '../selects/getSessionKey';
 
 const query = `
   WITH last_activity AS (
@@ -27,26 +22,27 @@ const query = `
     last_read_event_index = (select event_index from last_activity)
   WHERE account = :account`
 
-export async function markAllNotifsAsRead(account: string, signature: string, message: ReadAllMessage) {
-  const isValid = isValidSignature(
-    message,
-    signature,
-    message.sessionKey
-  )
-  if (!isValid) {
-    console.log("invalid")
-    return
-  }
-  log.info(`Message confirmed successfully`)
+export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessage>) {
+  const { account, signature, message } = sessionCall
 
-  try {
-    const data = await runQuery(query, { account })
-    informClientAboutUnreadNotifications(account, 0)
-    log.debug(`Marked all notifications as read by account: ${account}`)
-    return data.rowCount
-  } catch (err) {
-    log.error(`Failed to mark all notifications as read by account: ${account}`, err.stack)
-    throw err
+  if(isOwner(account, message.args.sessionKey)) {
+    const isValid = isValidSignature({account: message.args.sessionKey, signature, message } as SessionCall<ReadAllMessage>)
+    if (!isValid) {
+      log.error("Signature is not valid: function markAllNotifsAsRead ")
+      return
+    }
+    log.info(`Message confirmed successfully`)
+
+    try {
+      const data = await runQuery(query, { account })
+      informClientAboutUnreadNotifications(account, 0)
+      log.debug(`Marked all notifications as read by account: ${account}`)
+      return data.rowCount
+    } catch (err) {
+      log.error(`Failed to mark all notifications as read by account: ${account}`, err.stack)
+      throw err
+    }
   }
+  log.error(`The session key does not belong to the account ${account}`)
 }
 

@@ -3,6 +3,7 @@ import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries
 import * as pgQueries from '../../postgres/queries';
 import * as pgNotifs from '../../postgres/updates/markAllNotifsAsRead';
 import * as pgSessionKey from '../../postgres/inserts/insertSessionKey'
+import { SessionCall, SessionKeyMessage, ReadAllMessage } from '../../postgres/types/sessionKey';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
@@ -81,14 +82,8 @@ export const spaceActivitiesCountHandler: HandlerFn = (req, res) =>
 export const activityCountsHandler: HandlerFn = (req, res) =>
   countHandler(req, res, pgQueries.getActivityCounts)
 
-export const markAllNotifsAsRead: HandlerFn = (req, res) => {
-  const { myAddress, signature, message } = req.body
+export const markAllNotifsAsRead: HandlerFn = (req, res) =>
+  resolvePromiseAndReturnJson(res, pgNotifs.markAllNotifsAsRead(req.body.sessionCall as SessionCall<ReadAllMessage>))
 
-  return resolvePromiseAndReturnJson(res, pgNotifs.markAllNotifsAsRead(myAddress, signature, message))
-}
-
-export const addSessionKey: HandlerFn = (req, res) => {
-  const {message, signature} = req.body
-
-  return resolvePromiseAndReturnJson(res, pgSessionKey.addSessionKey(message, signature))
-}
+export const addSessionKey: HandlerFn = (req, res) =>
+  resolvePromiseAndReturnJson(res, pgSessionKey.addSessionKey(req.body.sessionCall as SessionCall<SessionKeyMessage>))

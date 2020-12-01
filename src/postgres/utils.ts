@@ -1,5 +1,6 @@
 import { pg } from '../connections/postgres';
 import { signatureVerify } from '@polkadot/util-crypto';
+import { SessionCall, MessageGenericExtends } from './types/sessionKey';
 
 const named = require('yesql').pg
 
@@ -13,7 +14,8 @@ export const runQuery = async <T>(query: string, params: T) => {
   return result
 }
 
-export const isValidSignature = (signedMessage: any, signature: string, address: string) => {
-  const message = JSON.stringify(signedMessage)
-  return signatureVerify(message, signature, address).isValid;
+export const isValidSignature = (sessionCall: SessionCall<MessageGenericExtends>) => {
+  const {message, signature, account} = sessionCall
+  const signedMessage = JSON.stringify(message)
+  return signatureVerify(signedMessage, signature, account).isValid;
 };

@@ -25,6 +25,18 @@ BEGIN
     END IF;
 END$$;
 
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'protocol') THEN
+        CREATE TYPE df.protocol as ENUM (
+            'WebApp',
+            'Telegram',
+            'Email'
+        );
+    END IF;
+END$$;
+
 CREATE TABLE IF NOT EXISTS df.activities
 (
     account varchar(48) NOT NULL,
@@ -97,7 +109,8 @@ CREATE TABLE IF NOT EXISTS df.comment_followers
 CREATE TABLE IF NOT EXISTS df.session_keys
 (
     main_key varchar(48) NOT NULL,
-    session_key varchar(48) NOT NULL
+    session_key varchar(48) NOT NULL,
+    protocol df.protocol NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_follower_account
