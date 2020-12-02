@@ -109,8 +109,13 @@ CREATE TABLE IF NOT EXISTS df.comment_followers
 CREATE TABLE IF NOT EXISTS df.session_keys
 (
     main_key varchar(48) NOT NULL,
-    session_key varchar(48) NOT NULL,
-    protocol df.protocol NOT NULL
+    session_key varchar(48) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS df.nonces
+(
+    main_key varchar(48) NOT NULL UNIQUE,
+    nonce bigint NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_follower_account

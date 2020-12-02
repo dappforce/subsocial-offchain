@@ -87,6 +87,8 @@ app.post('/v1/offchain/notifications/readAll', pgReqHandlers.markAllNotifsAsRead
 
 app.post('/v1/offchain/notifications/addSessionKey', pgReqHandlers.addSessionKey)
 
+app.post('/v1/offchain/notifications/getNonce', pgReqHandlers.getNonce)
+
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await parseSitePreview(req.body.url)

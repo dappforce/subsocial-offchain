@@ -2,18 +2,17 @@ import { BlockNumber } from '@polkadot/types/interfaces';
 
 type Action = 'readAll' | 'addSessionKey'
 
-export type Protocol = 'WebApp' | 'Telegram' | 'Email'
-
 export type SessionKeyMessage = {
   mainKey: string,
   sessionKey: string,
-  protocol: Protocol
+  nonce: number
 }
 
 export type ReadAllMessage = {
   sessionKey: string,
   blockNumber: BlockNumber,
-  eventIndex: number
+  eventIndex: number,
+  nonce: number
 }
 
 export type MessageGenericExtends = SessionKeyMessage | ReadAllMessage

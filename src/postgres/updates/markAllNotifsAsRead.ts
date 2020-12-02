@@ -3,6 +3,10 @@ import { log } from '../postges-logger';
 import { runQuery, isValidSignature } from '../utils';
 import { SessionCall, ReadAllMessage } from '../types/sessionKey';
 import { isOwner } from '../selects/getSessionKey';
+import { insertNonce } from '../inserts/insertNonce';
+import { getNonce } from '../selects/getNonce';
+import { updateNonce } from './updateNonce';
+import { isEmptyObj } from '@subsocial/utils';
 
 const query = `
   WITH last_activity AS (
@@ -25,14 +29,21 @@ const query = `
 export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessage>) {
   const { account, signature, message } = sessionCall
 
+  const selectedNonce = await getNonce(account)
+  if( isEmptyObj(selectedNonce))
+    await insertNonce(account, 1)
+  else {
+    if(selectedNonce.nonce as number + 1 !== message.args.nonce) return
+    await updateNonce(account, message.args.nonce)
+  }
   if(isOwner(account, message.args.sessionKey)) {
     const isValid = isValidSignature({account: message.args.sessionKey, signature, message } as SessionCall<ReadAllMessage>)
     if (!isValid) {
       log.error("Signature is not valid: function markAllNotifsAsRead ")
       return
     }
-    log.info(`Message confirmed successfully`)
 
+    log.info(`Message confirmed successfully`)
     try {
       const data = await runQuery(query, { account })
       informClientAboutUnreadNotifications(account, 0)

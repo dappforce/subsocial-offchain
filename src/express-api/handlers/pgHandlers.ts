@@ -3,6 +3,7 @@ import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries
 import * as pgQueries from '../../postgres/queries';
 import * as pgNotifs from '../../postgres/updates/markAllNotifsAsRead';
 import * as pgSessionKey from '../../postgres/inserts/insertSessionKey'
+import * as pgNonce from '../../postgres/selects/getNonce'
 import { SessionCall, SessionKeyMessage, ReadAllMessage } from '../../postgres/types/sessionKey';
 import {
   getOffsetFromRequest,
@@ -87,3 +88,8 @@ export const markAllNotifsAsRead: HandlerFn = (req, res) =>
 
 export const addSessionKey: HandlerFn = (req, res) =>
   resolvePromiseAndReturnJson(res, pgSessionKey.addSessionKey(req.body.sessionCall as SessionCall<SessionKeyMessage>))
+
+export const getNonce: HandlerFn = (req, res) => {
+  const account = req.query.account as string
+  return resolvePromiseAndReturnJson(res, pgNonce.getNonce(account))
+}
