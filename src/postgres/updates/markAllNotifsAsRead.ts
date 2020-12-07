@@ -1,12 +1,13 @@
 import { informClientAboutUnreadNotifications } from '../../express-api/events';
 import { log } from '../postges-logger';
-import { runQuery, isValidSignature } from '../utils';
+import { runQuery, isValidSignature, menageNonce } from '../utils';
 import { SessionCall, ReadAllMessage } from '../types/sessionKey';
-import { isOwner } from '../selects/getSessionKey';
-import { insertNonce } from '../inserts/insertNonce';
+import { getFromSessionKey as getAccountFromSessionKey } from '../selects/getSessionKey';
 import { getNonce } from '../selects/getNonce';
-import { updateNonce } from './updateNonce';
-import { isEmptyObj } from '@subsocial/utils';
+
+export type QueryResult = {
+  nonce: number
+}
 
 const query = `
   WITH last_activity AS (
@@ -29,31 +30,31 @@ const query = `
 export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessage>) {
   const { account, signature, message } = sessionCall
 
-  const selectedNonce = await getNonce(account)
-  if( isEmptyObj(selectedNonce))
-    await insertNonce(account, 1)
-  else {
-    if(selectedNonce.nonce as number + 1 !== message.args.nonce) return
-    await updateNonce(account, message.args.nonce)
-  }
-  if(isOwner(account, message.args.sessionKey)) {
-    const isValid = isValidSignature({account: message.args.sessionKey, signature, message } as SessionCall<ReadAllMessage>)
-    if (!isValid) {
-      log.error("Signature is not valid: function markAllNotifsAsRead ")
-      return
-    }
+  console.log(account)
 
-    log.info(`Message confirmed successfully`)
-    try {
-      const data = await runQuery(query, { account })
-      informClientAboutUnreadNotifications(account, 0)
-      log.debug(`Marked all notifications as read by account: ${account}`)
-      return data.rowCount
-    } catch (err) {
-      log.error(`Failed to mark all notifications as read by account: ${account}`, err.stack)
-      throw err
-    }
+  let mainKey = await getAccountFromSessionKey(account)
+  if (!mainKey) {
+    log.error(`There is no account that owns this session key: ${account}`)
+    mainKey = account
   }
-  log.error(`The session key does not belong to the account ${account}`)
+  const selectedNonce: QueryResult | undefined = await getNonce(mainKey)
+
+  await menageNonce(selectedNonce, message.nonce, mainKey)
+
+  const isValid = isValidSignature({ account, signature, message } as SessionCall<ReadAllMessage>)
+  if (!isValid) {
+    log.error("Signature is not valid: function markAllNotifsAsRead ")
+    return
+  }
+
+  log.debug(`Signature verified`)
+  try {
+    const data = await runQuery(query, { account: mainKey })
+    informClientAboutUnreadNotifications(account, 0)
+    log.debug(`Marked all notifications as read by account: ${mainKey}`)
+    return data.rowCount
+  } catch (err) {
+    log.error(`Failed to mark all notifications as read by account: ${mainKey}`, err.stack)
+    throw err
+  }
 }
-

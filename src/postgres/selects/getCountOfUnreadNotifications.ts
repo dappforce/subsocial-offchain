@@ -10,8 +10,8 @@ const query = `
 export async function getCountOfUnreadNotifications(account: string) {
   try {
     const res = await runQuery<IQueryParams>(query, { account })
-    log.debug(`Found ${res.rows[0].unread_count} unread notifications by account ${account}`)
-    return res.rows[0].unread_count as number;
+    log.debug(`Found ${res.rows[0]?.unread_count} unread notifications by account ${account}`)
+    return res.rows[0] ? res.rows[0].unread_count as number : 0;
   } catch (err) {
     log.error(`Failed to get a count of unread notifications by account ${account}. Error: %s`, err.stack);
     throw err

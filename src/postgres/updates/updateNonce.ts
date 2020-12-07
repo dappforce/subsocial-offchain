@@ -4,16 +4,14 @@ import { log } from '../postges-logger'
 const query = `
   UPDATE df.nonces
   SET nonce = :nonce
-  WHERE main_key = :mainKey`
+  WHERE account = :mainKey`
 
 export const updateNonce = async (mainKey: string, nonce: number) => {
   try {
-    const data = await runQuery(query, { mainKey, nonce })
-      if (data.rowCount) return true
-
-      return false
-    } catch (err) {
-    log.error(`Failed to insert nonce by account: ${mainKey}`, err.stack)
+    await runQuery(query, { mainKey, nonce })
+    log.debug(`Update in session key table: ${mainKey} with nonce ${nonce}`)
+  } catch (err) {
+    log.error(`Failed to update nonce by account: ${mainKey}`, err.stack)
     throw err
   }
 }

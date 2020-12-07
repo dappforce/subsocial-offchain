@@ -7,10 +7,8 @@ const query = `
 
 export const insertNonce = async (mainKey: string, nonce: number) => {
   try {
-    const data = await runQuery(query, { mainKey, nonce })
-      if (data.rowCount) return true
-
-      return false
+    await runQuery(query, { mainKey, nonce })
+    log.debug(`Insert in nonces table: ${mainKey} with nonce ${nonce}`)
     } catch (err) {
     log.error(`Failed to insert nonce by account: ${mainKey}`, err.stack)
     throw err

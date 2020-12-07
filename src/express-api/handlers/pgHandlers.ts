@@ -4,7 +4,7 @@ import * as pgQueries from '../../postgres/queries';
 import * as pgNotifs from '../../postgres/updates/markAllNotifsAsRead';
 import * as pgSessionKey from '../../postgres/inserts/insertSessionKey'
 import * as pgNonce from '../../postgres/selects/getNonce'
-import { SessionCall, SessionKeyMessage, ReadAllMessage } from '../../postgres/types/sessionKey';
+import { SessionCall, AddSessionKeyArgs, ReadAllMessage } from '../../postgres/types/sessionKey';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
@@ -87,7 +87,7 @@ export const markAllNotifsAsRead: HandlerFn = (req, res) =>
   resolvePromiseAndReturnJson(res, pgNotifs.markAllNotifsAsRead(req.body.sessionCall as SessionCall<ReadAllMessage>))
 
 export const addSessionKey: HandlerFn = (req, res) =>
-  resolvePromiseAndReturnJson(res, pgSessionKey.addSessionKey(req.body.sessionCall as SessionCall<SessionKeyMessage>))
+  resolvePromiseAndReturnJson(res, pgSessionKey.addSessionKey(req.body.sessionCall as SessionCall<AddSessionKeyArgs>))
 
 export const getNonce: HandlerFn = (req, res) => {
   const account = req.query.account as string

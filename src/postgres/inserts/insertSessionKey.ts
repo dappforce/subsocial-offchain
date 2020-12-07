@@ -1,30 +1,22 @@
 import { GenericAccountId } from '@polkadot/types';
 import { log } from '../postges-logger';
-import { runQuery, isValidSignature } from '../utils';
+import { runQuery, isValidSignature, menageNonce } from '../utils';
 import registry from '@subsocial/types/substrate/registry';
-import { stringToU8a } from '@polkadot/util';
-import { SessionKeyMessage, SessionCall } from '../types/sessionKey';
+import { AddSessionKeyArgs, SessionCall } from '../types/sessionKey';
 import { IQueryParams } from '../types/addSessionKey.queries';
-import { insertNonce } from './insertNonce';
 import { getNonce } from '../selects/getNonce';
-import { updateNonce } from '../updates/updateNonce';
-import { isEmptyObj } from '@subsocial/utils';
 
 const query = `
   INSERT INTO df.session_keys
   VALUES(:mainKey, :sessionKey)
   RETURNING *`
 
-export async function addSessionKey(sessionCall: SessionCall<SessionKeyMessage>) {
-  const { mainKey, sessionKey, nonce } = sessionCall.message.args
-  const selectedNonce = await getNonce(mainKey)
-  if(isEmptyObj(selectedNonce)) {
-    await insertNonce(mainKey, nonce)
-  }
-  else {
-    if(selectedNonce.nonce as number + 1 !== nonce) return
-    await updateNonce(mainKey, nonce)
-  }
+export async function addSessionKey(sessionCall: SessionCall<AddSessionKeyArgs>) {
+  const { sessionKey } = sessionCall.message.args
+  const { account } = sessionCall
+  const selectedNonce = await getNonce(account)
+
+  await menageNonce(selectedNonce, sessionCall.message.nonce, account)
 
   const isValid = isValidSignature(sessionCall)
   if (!isValid) {
@@ -32,14 +24,15 @@ export async function addSessionKey(sessionCall: SessionCall<SessionKeyMessage>)
     return
   }
 
-  log.info(`Message confirmed successfully`)
+  log.debug(`Signature verified`)
 
   try {
-    const sessionKeyGeneric = new GenericAccountId(registry, stringToU8a(sessionKey))
-    await runQuery<IQueryParams>(query, { mainKey, sessionKey: sessionKeyGeneric.toString() })
-    log.debug(`Insert in session key table: ${mainKey}`)
+    const sessionKeyGeneric = new GenericAccountId(registry, sessionKey)
+    console.log(String(sessionKeyGeneric))
+    await runQuery<IQueryParams>(query, { mainKey: account, sessionKey: String(sessionKeyGeneric)})
+    log.debug(`Insert in nonces table: ${account}`)
   } catch (err) {
-    log.error(`Failed to insert in session key table by account: ${mainKey}`, err.stack)
+    log.error(`Failed to insert in session key table by account: ${account}`, err.stack)
     throw err
   }
 }

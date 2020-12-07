@@ -48,7 +48,6 @@
     "@types/jsonabc": "^2.3.1",
     "@types/multer": "^1.4.4",
     "@types/node": "^10.14.10",
-    "@types/pg": "^7.14.3",
     "@types/request-promise": "^4.1.46",
     "@types/ws": "^7.2.3",
     "@types/yesql": "^4.1.0",
@@ -60,6 +59,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@subsocial/api": "^0.4.24",
+    "@types/pg": "^7.14.7",
     "axios": "^0.19.0",
     "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
@@ -73,10 +73,11 @@
     "express": "^4.17.1",
     "json2csv": "^5.0.4",
     "jsonabc": "^2.3.1",
+    "latest": "^0.2.0",
     "libp2p": "^0.27.3",
     "lodash.isempty": "^4.4.0",
     "multer": "^1.4.2",
-    "pg": "^7.12.1",
+    "pg": "^8.5.1",
     "request-promise": "^4.2.5",
     "ts-jest": "^26.4.4",
     "yesql": "^4.1.3"

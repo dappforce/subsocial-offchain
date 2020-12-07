@@ -3,7 +3,7 @@ import { log } from '../postges-logger';
 
 const query = `
   SELECT nonce FROM df.nonces
-  WHERE main_key = :mainKey`
+  WHERE account = :mainKey`
 
 export const getNonce = async (mainKey: string)  => {
   try {

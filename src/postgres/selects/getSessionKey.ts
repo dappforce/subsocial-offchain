@@ -1,24 +1,19 @@
 import { runQuery } from '../utils';
 import { log } from '../postges-logger';
 import { IQueryParams } from '../types/getSessionKey.querys';
-import { GenericAccountId } from '@polkadot/types';
-import registry from '@subsocial/types/substrate/registry';
-import { stringToU8a } from '@polkadot/util';
 
 const query = `
-  SELECT * FROM df.session_keys
-  WHERE main_key = :mainKey AND session_key = :sessionKey`
+  SELECT account FROM df.session_keys
+  WHERE session_key = :sessionKey`
 
-export const isOwner = async (mainKey: string, sessionKey: string): Promise<boolean> => {
-  const sessionKeyGeneric = new GenericAccountId(registry, stringToU8a(sessionKey))
-
+export const getFromSessionKey = async (sessionKey: string): Promise<string | undefined> => {
   try {
-    const data = await runQuery<IQueryParams>(query, { mainKey, sessionKey: sessionKeyGeneric.toString() })
-      if (data.rowCount) return true
+    const data = await runQuery<IQueryParams>(query, { sessionKey })
+    if (data.rowCount) return data.rows[0].account
 
-      return false
-    } catch (err) {
-    log.error(`Failed to get session key by account: ${mainKey}`, err.stack)
+    return undefined
+  } catch (err) {
+    log.error(`Failed to get session key by session key: ${sessionKey}`, err.stack)
     throw err
   }
 }
