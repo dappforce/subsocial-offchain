@@ -6,7 +6,7 @@ import { runQuery } from '../utils';
 const query = `
   INSERT INTO df.notifications_counter
     (account, last_read_block_number, last_read_event_index, unread_count)
-  VALUES (:account, 0, NULL, 1)
+  VALUES (:account, 0, NULL, 0)
   ON CONFLICT (account) DO UPDATE
   SET unread_count = (
     SELECT DISTINCT COUNT(*)

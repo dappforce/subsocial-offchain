@@ -31,16 +31,15 @@ export function sendUnreadCount(account: string, count: number, client: WebSocke
 export function startNotificationsServer() {
 	resolveWebSocketServer()
 	wss.on('connection', (ws: WebSocket) => {
-
-		ws.on('message', async (data: string | SessionCall<ReadAllMessage>) => {
-			// FIXME: maybe not the best approach
+		ws.on('message', async (data: string) => {
 			log.debug('Received a message with data:', data)
-			if (typeof data === 'string') {
+			try {
+				const dataParsed = JSON.parse(data) as SessionCall<ReadAllMessage>
+				await markAllNotifsAsRead(dataParsed)
+			} catch {
 				wsClients[data] = ws
 				const unreadCount = await getCountOfUnreadNotifications(data)
 				sendUnreadCount(data, unreadCount, wsClients[data])
-			} else {
-				await markAllNotifsAsRead(data)
 			}
 		})
 
