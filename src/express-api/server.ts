@@ -2,7 +2,6 @@ import * as express from 'express'
 import * as bodyParser from 'body-parser'
 import * as cors from 'cors';
 import parseSitePreview from '../parser/parse-preview'
-import { startNotificationsServer } from './ws'
 import * as multer from 'multer';
 import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
@@ -83,8 +82,6 @@ app.get('/v1/offchain/activities/:id/spaces/count', pgReqHandlers.spaceActivitie
 
 app.get('/v1/offchain/activities/:id/counts', pgReqHandlers.activityCountsHandler)
 
-app.post('/v1/offchain/notifications/readAll', pgReqHandlers.markAllNotifsAsRead)
-
 app.post('/v1/offchain/notifications/addSessionKey', pgReqHandlers.addSessionKey)
 
 app.post('/v1/offchain/notifications/getNonce', pgReqHandlers.getNonce)
@@ -94,8 +91,6 @@ app.post('/offchain/parser/', async (req: express.Request, res: express.Response
   const data = await parseSitePreview(req.body.url)
   res.send(data);
 })
-
-startNotificationsServer()
 
 const port = process.env.OFFCHAIN_SERVER_PORT
 app.listen(port, () => {

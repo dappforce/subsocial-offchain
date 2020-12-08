@@ -28,7 +28,6 @@ export async function addSessionKey(sessionCall: SessionCall<AddSessionKeyArgs>)
 
   try {
     const sessionKeyGeneric = new GenericAccountId(registry, sessionKey)
-    console.log(String(sessionKeyGeneric))
     await runQuery<IQueryParams>(query, { mainKey: account, sessionKey: String(sessionKeyGeneric)})
     log.debug(`Insert in nonces table: ${account}`)
   } catch (err) {

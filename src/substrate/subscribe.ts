@@ -5,6 +5,7 @@ import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { resolveSubsocialApi } from '../connections/subsocial';
+import { startNotificationsServer } from '../express-api/ws';
 
 require('dotenv').config()
 
@@ -130,10 +131,12 @@ async function main (substrate: SubsocialSubstrateApi) {
   }
 }
 
+startNotificationsServer()
+
 resolveSubsocialApi()
   .then(({ substrate }) => main(substrate))
   .catch((error) => {
     log.error('Unexpected error during processing of Substrate events:', error)
     process.exit(-1)
   })
-  
+

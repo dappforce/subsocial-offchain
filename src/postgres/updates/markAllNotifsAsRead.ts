@@ -30,8 +30,6 @@ const query = `
 export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessage>) {
   const { account, signature, message } = sessionCall
 
-  console.log(account)
-
   let mainKey = await getAccountFromSessionKey(account)
   if (!mainKey) {
     log.error(`There is no account that owns this session key: ${account}`)
@@ -50,7 +48,7 @@ export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessag
   log.debug(`Signature verified`)
   try {
     const data = await runQuery(query, { account: mainKey })
-    informClientAboutUnreadNotifications(account, 0)
+    informClientAboutUnreadNotifications(mainKey, 0)
     log.debug(`Marked all notifications as read by account: ${mainKey}`)
     return data.rowCount
   } catch (err) {
