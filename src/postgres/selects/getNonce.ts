@@ -8,7 +8,7 @@ const query = `
 export const getNonce = async (mainKey: string)  => {
   try {
     const data = await runQuery(query, { mainKey })
-      return data?.rows[0]
+      return data.rows[0]?.nonce
     } catch (err) {
     log.error(`Failed to get nonce by account: ${mainKey}`, err.stack)
     throw err

@@ -1,13 +1,11 @@
 import { informClientAboutUnreadNotifications } from '../../express-api/events';
 import { log } from '../postges-logger';
-import { runQuery, isValidSignature, menageNonce } from '../utils';
+import { runQuery, isValidSignature } from '../utils';
 import { SessionCall, ReadAllMessage } from '../types/sessionKey';
 import { getFromSessionKey as getAccountFromSessionKey } from '../selects/getSessionKey';
 import { getNonce } from '../selects/getNonce';
-
-export type QueryResult = {
-  nonce: number
-}
+import { insertNonce } from '../inserts/insertNonce';
+import { updateNonce } from './updateNonce';
 
 const query = `
   WITH last_activity AS (
@@ -35,24 +33,31 @@ export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessag
     log.error(`There is no account that owns this session key: ${account}`)
     mainKey = account
   }
-  const selectedNonce: QueryResult | undefined = await getNonce(mainKey)
+  let selectedNonce = await getNonce(account)
 
-  await menageNonce(selectedNonce, message.nonce, mainKey)
-
-  const isValid = isValidSignature({ account, signature, message } as SessionCall<ReadAllMessage>)
-  if (!isValid) {
-    log.error("Signature is not valid: function markAllNotifsAsRead ")
-    return
+  if (!selectedNonce) {
+    await insertNonce(account, message.nonce)
+    selectedNonce = 0
   }
+  if (parseInt(selectedNonce.toString()) === message.nonce) {
+    const isValid = isValidSignature({ account, signature, message } as SessionCall<ReadAllMessage>)
+    if (!isValid) {
+      log.error("Signature is not valid: function markAllNotifsAsRead ")
+      return
+    }
 
-  log.debug(`Signature verified`)
-  try {
-    const data = await runQuery(query, { account: mainKey })
-    informClientAboutUnreadNotifications(mainKey, 0)
-    log.debug(`Marked all notifications as read by account: ${mainKey}`)
-    return data.rowCount
-  } catch (err) {
-    log.error(`Failed to mark all notifications as read by account: ${mainKey}`, err.stack)
-    throw err
+    log.debug(`Signature verified`)
+    try {
+      const data = await runQuery(query, { account: mainKey })
+      informClientAboutUnreadNotifications(mainKey, 0)
+      log.debug(`Marked all notifications as read by account: ${mainKey}`)
+
+      await updateNonce(account, message.nonce + 1)
+
+      return data.rowCount
+    } catch (err) {
+      log.error(`Failed to mark all notifications as read by account: ${mainKey}`, err.stack)
+      throw err
+    }
   }
 }

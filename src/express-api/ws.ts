@@ -39,6 +39,8 @@ export function startNotificationsServer() {
 			} catch {
 				wsClients[data] = ws
 				const unreadCount = await getCountOfUnreadNotifications(data)
+				if(!unreadCount) return
+
 				sendUnreadCount(data, unreadCount, wsClients[data])
 			}
 		})

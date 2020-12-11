@@ -5,7 +5,7 @@ import { newPgError, runQuery } from '../utils';
 import { updateCountOfUnreadNotifications } from '../updates/updateCountOfUnreadNotifications';
 import { IQueryParams } from '../types/fillNotificationsWithPostFollowers.queries';
 
-export async function fillNotificationsWithPostFollowers(postId: string, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
+export async function fillNotificationsWithPostFollowers(postId: string, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount, postCreator: string) {
   const query = fillTableWith("notifications", "post")
   const encodedPostId = encodeStructId(postId);
   const encodedBlockNumber = encodeStructId(blockNumber.toString())
@@ -13,7 +13,7 @@ export async function fillNotificationsWithPostFollowers(postId: string, { accou
 
   try {
     await runQuery<IQueryParams>(query, params)
-    await updateCountOfUnreadNotifications(account)
+    await updateCountOfUnreadNotifications(postCreator ? postCreator : account)
   } catch (err) {
     throw newPgError(err, fillNotificationsWithPostFollowers)
   }
