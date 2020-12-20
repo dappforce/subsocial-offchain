@@ -2,6 +2,7 @@ import * as express from 'express'
 import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
 import * as pgQueries from '../../postgres/queries';
 import * as pgSessionKey from '../../postgres/inserts/insertSessionKey'
+import * as pgTelegram from '../../postgres/inserts/insertTelegramData'
 import * as pgNonce from '../../postgres/selects/getNonce'
 import { SessionCall, AddSessionKeyArgs } from '../../postgres/types/sessionKey';
 import {
@@ -10,6 +11,10 @@ import {
   resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
+import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
+import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
+import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
+import { changeCurrentAccount } from '../../postgres/updates/changeCurrentAccount';
 
 const activityHandler = (
   req: express.Request,
@@ -88,4 +93,29 @@ export const addSessionKey: HandlerFn = (req, res) =>
 export const getNonce: HandlerFn = (req, res) => {
   const account = req.query.account as string
   return resolvePromiseAndReturnJson(res, pgNonce.getNonce(account))
+}
+
+export const setTelegramData: HandlerFn = (req, res) => {
+  const { account, chatId } = req.body
+  return resolvePromiseAndReturnJson(res, pgTelegram.setTelegramData(account, Number(chatId)))
+}
+
+export const getAccountByChatIdReq: HandlerFn = (req, res) => {
+  const { chatId } = req.params
+  return resolvePromiseAndReturnJson(res, getAccountByChatId(Number(chatId)))
+}
+
+export const getTelegramChatReq: HandlerFn = (req, res) => {
+  const { account, chatId } = req.query;
+  return resolvePromiseAndReturnJson(res, getTelegramChat(account.toString(), Number(chatId)))
+}
+
+export const updateTelegramChatReq: HandlerFn = (req, res) => {
+  const { account, chatId, push_notifs, push_feeds } = req.body;
+  return resolvePromiseAndReturnJson(res, updateTelegramChat(account.toString(), Number(chatId), push_notifs, push_feeds))
+}
+
+export const changeCurrentAccountReq: HandlerFn = (req, res) => {
+  const { account, chatId } = req.body;
+  return resolvePromiseAndReturnJson(res, changeCurrentAccount(account.toString(), Number(chatId)))
 }

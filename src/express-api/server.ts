@@ -86,6 +86,16 @@ app.post('/v1/offchain/notifications/addSessionKey', pgReqHandlers.addSessionKey
 
 app.post('/v1/offchain/notifications/getNonce', pgReqHandlers.getNonce)
 
+app.post('/v1/offchain/notifications/setTelegramData', pgReqHandlers.setTelegramData)
+
+app.get('/v1/offchain/notifications/getAccountByChatId/:chatId', pgReqHandlers.getAccountByChatIdReq)
+
+app.get('/v1/offchain/getTelegramChat', pgReqHandlers.getTelegramChatReq)
+
+app.post('/v1/offchain/updateTelegramChat', pgReqHandlers.updateTelegramChatReq)
+
+app.post('/v1/offchain/changeCurrentAccount', pgReqHandlers.changeCurrentAccountReq)
+
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await parseSitePreview(req.body.url)

@@ -9,6 +9,7 @@ import { fillNotificationsWithAccountFollowers } from '../fills/fillNotification
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { asNormalizedComment, NormalizedComment } from '../../substrate/normalizers';
 import { findPost } from '../../substrate/api-wrappers';
+import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
 
 export const onCommentCreated = async (eventAction: SubstrateEvent, post: NormalizedComment) => {
   const { author, commentId } = parseCommentEvent(eventAction)
@@ -44,5 +45,6 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Normal
     log.debug('Comment does not have a parent id');
     await fillNotificationsWithPostFollowers(rootPostId, { account: author, ...insertResult }, postCreator);
     await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
+    informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), postCreator, insertResult.blockNumber, insertResult.eventIndex, 'notification')
   }
 }

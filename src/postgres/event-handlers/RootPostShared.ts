@@ -6,6 +6,7 @@ import { fillNotificationsWithAccountFollowers } from '../fills/fillNotification
 import { insertActivityForPost } from '../inserts/insertActivityForPost';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { NormalizedPost } from '../../substrate/normalizers';
+import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
 
 export const onRootPostShared = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
   const { author, postId } = parsePostEvent(eventAction)
@@ -21,4 +22,7 @@ export const onRootPostShared = async (eventAction: SubstrateEvent, post: Normal
   await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
   await fillNewsFeedWithSpaceFollowers(spaceId, { account: author, ...insertResult });
   await fillNewsFeedWithAccountFollowers({ account: author, ...insertResult })
+  informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), account, insertResult.blockNumber, insertResult.eventIndex, 'notification')
+  informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), account, insertResult.blockNumber, insertResult.eventIndex, 'feed')
+
 }

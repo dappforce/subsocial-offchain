@@ -118,6 +118,16 @@ CREATE TABLE IF NOT EXISTS df.nonces
     nonce bigint NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS df.telegram_chats
+(
+    account varchar(48) NOT NULL,
+    chat_id bigint NOT NULL,
+    current_account boolean NOT NULL DEFAULT true,
+    push_notifs boolean NOT NULL DEFAULT true,
+    push_feeds boolean NOT NULL DEFAULT true,
+    PRIMARY KEY (account, chat_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_follower_account
 ON df.account_followers(follower_account);
 
