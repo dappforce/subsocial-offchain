@@ -15,6 +15,7 @@ import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
 import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
 import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
 import { changeCurrentAccount } from '../../postgres/updates/changeCurrentAccount';
+import { updateLastPush } from '../../postgres/updates/updateLastPush';
 
 const activityHandler = (
   req: express.Request,
@@ -118,4 +119,9 @@ export const updateTelegramChatReq: HandlerFn = (req, res) => {
 export const changeCurrentAccountReq: HandlerFn = (req, res) => {
   const { account, chatId } = req.body;
   return resolvePromiseAndReturnJson(res, changeCurrentAccount(account.toString(), Number(chatId)))
+}
+
+export const updateLastPushReq: HandlerFn = (req, res) => {
+  const { account, chatId, blockNumber, eventIndex } = req.body;
+  return resolvePromiseAndReturnJson(res, updateLastPush(account.toString(), Number(chatId), blockNumber, eventIndex))
 }
