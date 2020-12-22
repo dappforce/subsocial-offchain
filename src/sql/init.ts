@@ -1,19 +1,22 @@
-import { readFileSync } from 'fs';
-import { pg } from '../connections/postgres';
-import { postgesLog as log } from '../connections/loggers';
+import { pg } from '../connections/postgres'
+import { postgesLog as log } from '../connections/loggers'
+import { getMigrationStatus, MigrationStatus, INIT_FILE } from './migrations'
+import { exit } from 'process'
 
-const ENV = process.env.NODE_ENV || 'development';
-const buildPath = ENV === 'production' ? 'build/' : '';
-const initSchema = readFileSync(buildPath + 'src/sql/initSchema.sql', 'utf8');
-const initDb = readFileSync(buildPath + 'src/sql/initDb.sql', 'utf8');
-
-pg.query(initSchema, (err: Error) => {
-  if (err) throw err;
-  pg.query(initDb, (err: Error) => {
+const initSchema = () => {
+  pg.query(INIT_FILE, (err: Error) => {
     if (err) {
-      log.error('Failed to initialize a database', err)
+      log.error('Failed to initialize the database', err)
       throw err
     }
-    log.info('Database inited');
+    log.info('Database initialized')
   })
-});
+}
+
+getMigrationStatus().then((migrationStatus) => {
+  if (migrationStatus === MigrationStatus.SchemaError) {
+    return initSchema()
+  }
+
+  exit()
+})
