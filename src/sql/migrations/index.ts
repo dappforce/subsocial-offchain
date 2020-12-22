@@ -5,7 +5,7 @@ import { isEmptyArray } from '@subsocial/utils'
 import { readFileSync, readdirSync } from 'fs'
 
 const RELATION_NOT_FOUND_ERROR = '42P01'
-const updateSchemaVersionQuery = 'UPDATE "df"."schema_version" SET "value" = $1 WHERE "value" = $2'
+const updateSchemaVersionQuery = 'UPDATE df.schema_version SET value = $1 WHERE value = $2'
 
 export const INIT_FILE = readFileSync(`${__dirname}/1-init.sql`, 'utf8')
 
@@ -31,7 +31,8 @@ export const getMigrationStatus = async (): Promise<MigrationStatus> => {
         const updatesToExecute = schemaFiles.filter((fileName) => stripSchemaVersion(fileName) > actualSchemaVersion)
 
         for (const fileName of updatesToExecute) {
-          await pg.query(fileName)
+          const fileQuery = readFileSync(`${__dirname}/${fileName}`, 'utf8')
+          await pg.query(fileQuery)
 
           const schemaVersion = stripSchemaVersion(fileName)
           await pg.query(updateSchemaVersionQuery, [schemaVersion, actualSchemaVersion])
@@ -46,7 +47,7 @@ export const getMigrationStatus = async (): Promise<MigrationStatus> => {
     if (error.code === RELATION_NOT_FOUND_ERROR) {
       return MigrationStatus.SchemaRestored
     } else {
-      log.error('Undefined error', error)
+      log.error('Undefined', error)
       exit()
     }
   }
