@@ -1,6 +1,6 @@
 import { pg } from '../connections/postgres'
 import { postgesLog as log } from '../connections/loggers'
-import { getMigrationStatus, MigrationStatus, INIT_FILE } from './migrations'
+import { getMigrationStatus, MigrationStatus, INIT_FILE } from '../postgres/migrations'
 import { exit } from 'process'
 
 const initSchema = () => {
