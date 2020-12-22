@@ -9,12 +9,12 @@ const initSchema = () => {
       log.error('Failed to initialize the database', err)
       throw err
     }
-    log.info('Database initialized')
   })
 }
 
 getMigrationStatus().then((migrationStatus) => {
-  if (migrationStatus === MigrationStatus.SchemaError) {
+  log.info(migrationStatus)
+  if (migrationStatus === MigrationStatus.SchemaRestored) {
     return initSchema()
   }
 

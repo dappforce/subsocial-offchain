@@ -10,9 +10,9 @@ const updateSchemaVersionQuery = 'UPDATE "df"."schema_version" SET "value" = $1 
 export const INIT_FILE = readFileSync(`${__dirname}/1-init.sql`, 'utf8')
 
 export enum MigrationStatus {
-  NewMigrationExecuted,
-  NoNewMigrations,
-  SchemaError,
+  NewMigrationsExecuted = "New migrations were successfuly executed",
+  NoNewMigrations = "No new migrations for the current database schema",
+  SchemaRestored = "Schema was restored from 1-init",
 }
 
 const stripSchemaVersion = (fileName: string) => parseInt(fileName.split('-')[0])
@@ -37,14 +37,14 @@ export const getMigrationStatus = async (): Promise<MigrationStatus> => {
           await pg.query(updateSchemaVersionQuery, [schemaVersion, actualSchemaVersion])
         }
 
-        return MigrationStatus.NewMigrationExecuted
+        return MigrationStatus.NewMigrationsExecuted
       }
     } else {
-      return MigrationStatus.SchemaError
+      return MigrationStatus.SchemaRestored
     }
   } catch (error) {
     if (error.code === RELATION_NOT_FOUND_ERROR) {
-      return MigrationStatus.SchemaError
+      return MigrationStatus.SchemaRestored
     } else {
       log.error('Undefined error', error)
       exit()
