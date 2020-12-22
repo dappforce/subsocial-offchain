@@ -98,12 +98,12 @@ CREATE TABLE IF NOT EXISTS df.comment_followers
 
 CREATE TABLE IF NOT EXISTS df.schema_version
 (
-    value integer DEFAULT 1 NOT NULL
+    value integer DEFAULT 0 NOT NULL
 );
 INSERT INTO df.schema_version
 (
     -- Note that the value '1' equals to the DEFAULT of "value" field
-    SELECT 1
+    SELECT 0
     WHERE NOT EXISTS(SELECT * FROM df.schema_version)
 );
 

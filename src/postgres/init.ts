@@ -1,22 +1,47 @@
 import { pg } from '../connections/postgres'
 import { postgesLog as log } from '../connections/loggers'
-import { getMigrationStatus, MigrationStatus, INIT_FILE } from '../postgres/migrations'
 import { exit } from 'process'
+import { readFileSync, readdirSync } from 'fs'
 
-const initSchema = () => {
-  pg.query(INIT_FILE, (err: Error) => {
-    if (err) {
-      log.error('Failed to initialize the database', err)
-      throw err
-    }
-  })
+const RELATION_NOT_FOUND_ERROR = '42P01'
+
+const updateSchemaVersionQuery = 'UPDATE df.schema_version SET value = $1 WHERE value = $2'
+const migrationsFolder = `${__dirname}/migrations/`
+const schemaFiles = readdirSync(migrationsFolder, 'utf8').filter((fileName) => fileName.endsWith('.sql'))
+
+const stripSchemaVersion = (fileName: string) => parseInt(fileName.split('-')[0])
+
+const upgradeDbSchema = async (actualSchemaVersion: number) => {
+  const migrationsToExecute = schemaFiles.filter((fileName) => stripSchemaVersion(fileName) > actualSchemaVersion)
+
+  for (const fileName of migrationsToExecute) {
+    const fileQuery = readFileSync(`${migrationsFolder}${fileName}`, 'utf8')
+    await pg.query(fileQuery)
+
+    const schemaVersion = stripSchemaVersion(fileName)
+    // TODO: update to query params, when branches are merged
+    await pg.query(updateSchemaVersionQuery, [schemaVersion, actualSchemaVersion])
+    log.info(`Updated database to schema version # ${schemaVersion}`)
+  }
 }
 
-getMigrationStatus().then((migrationStatus) => {
-  log.info(migrationStatus)
-  if (migrationStatus === MigrationStatus.SchemaRestored) {
-    return initSchema()
-  }
+const init = async () => {
+  try {
+    const { rows } = await pg.query('SELECT * FROM df.schema_version LIMIT 1')
+    const maxAvailableSchemaVersion = schemaFiles.map(stripSchemaVersion).pop()
 
-  exit()
-})
+    const actualSchemaVersion = rows[0].value as number
+    if (!actualSchemaVersion || actualSchemaVersion < maxAvailableSchemaVersion) {
+      return upgradeDbSchema(actualSchemaVersion || 0)
+    }
+  } catch (error) {
+    if (error.code === RELATION_NOT_FOUND_ERROR) {
+      return upgradeDbSchema(0)
+    } else {
+      log.error('Undefined', error)
+      exit()
+    }
+  }
+}
+
+init()
