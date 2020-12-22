@@ -25,4 +25,4 @@ EXPOSE 3001
 EXPOSE 3011
 
 ENTRYPOINT [ "yarn", "pm2", "start", "--no-daemon" ]
-CMD [ "yarn init-offchain && yarn start" ]
+CMD [ "yarn init-postgres && yarn start" ]
