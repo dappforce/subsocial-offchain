@@ -18,10 +18,11 @@ const upgradeDbSchema = async (actualSchemaVersion: number) => {
     const fileQuery = readFileSync(`${migrationsFolder}${fileName}`, 'utf8')
     await pg.query(fileQuery)
 
-    const schemaVersion = stripSchemaVersion(fileName)
+    const newSchemaVersion = stripSchemaVersion(fileName)
     // TODO: update to query params, when branches are merged
-    await pg.query(updateSchemaVersionQuery, [schemaVersion, actualSchemaVersion])
-    log.info(`Updated database to schema version # ${schemaVersion}`)
+    await pg.query(updateSchemaVersionQuery, [newSchemaVersion, actualSchemaVersion])
+    actualSchemaVersion = newSchemaVersion
+    log.info(`Updated database to schema version # ${newSchemaVersion}`)
   }
 }
 
@@ -30,15 +31,15 @@ const init = async () => {
     const { rows } = await pg.query('SELECT * FROM df.schema_version LIMIT 1')
     const maxAvailableSchemaVersion = schemaFiles.map(stripSchemaVersion).pop()
 
-    const actualSchemaVersion = rows[0].value as number
+    const actualSchemaVersion = rows[0]?.value as number || 0
     if (!actualSchemaVersion || actualSchemaVersion < maxAvailableSchemaVersion) {
-      return upgradeDbSchema(actualSchemaVersion || 0)
+      return upgradeDbSchema(actualSchemaVersion)
     }
   } catch (error) {
     if (error.code === RELATION_NOT_FOUND_ERROR) {
       return upgradeDbSchema(0)
     } else {
-      log.error('Undefined', error)
+      log.error('Unexpected error: ', error)
       exit()
     }
   }

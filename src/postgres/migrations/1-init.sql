@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS df.schema_version
 );
 INSERT INTO df.schema_version
 (
-    -- Note that the value '1' equals to the DEFAULT of "value" field
+    -- Note that the value '0' means a DEFAULT value of the "value" field.
     SELECT 0
     WHERE NOT EXISTS(SELECT * FROM df.schema_version)
 );
