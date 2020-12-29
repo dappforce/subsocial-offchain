@@ -14,7 +14,7 @@
     "reindex-content": "node ./build/src/search/reindexer.js",
     "api": "node ./build/src/express-api/server.js",
     "ipfs": "yarn jsipfs daemon",
-    "setup": "yarn init-offchain && yarn build",
+    "setup": "yarn init-postgres && yarn build",
     "init-search": "node ./build/src/search/index.js",
     "init-postgres": "node ./build/src/postgres/init.js",
     "clear-postgres": "node ./build/src/postgres/clear-db.js",

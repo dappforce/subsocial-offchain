@@ -7,12 +7,12 @@ import { getActivity } from '../postgres/selects/getActivity';
 import { Activity as OldActivity } from '@subsocial/types'
 import { getChatIdByAccount } from '../postgres/selects/getChatIdByAccount';
 
+require('dotenv').config()
+
 export type Activity = Omit<OldActivity, 'id'> & {
 	block_number: string,
 	event_index: number
 }
-
-require('dotenv').config()
 
 export const log = newLogger('Telegram WS')
 
