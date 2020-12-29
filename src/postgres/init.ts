@@ -1,11 +1,11 @@
-import { pg } from '../connections/postgres'
 import { postgesLog as log } from '../connections/loggers'
 import { exit } from 'process'
 import { readFileSync, readdirSync } from 'fs'
+import { runQuery } from './utils';
 
 const RELATION_NOT_FOUND_ERROR = '42P01'
 
-const updateSchemaVersionQuery = 'UPDATE df.schema_version SET value = $1 WHERE value = $2'
+const updateSchemaVersionQuery = 'UPDATE df.schema_version SET value = :newSchemaVersion WHERE value = :actualSchemaVersion'
 const migrationsFolder = `${__dirname}/migrations/`
 const schemaFiles = readdirSync(migrationsFolder, 'utf8').filter((fileName) => fileName.endsWith('.sql'))
 
@@ -13,16 +13,20 @@ const stripSchemaVersion = (fileName: string) => parseInt(fileName.split('-')[0]
 
 const upgradeDbSchema = async (actualSchemaVersion: number) => {
   const migrationsToExecute = schemaFiles
-    .filter((fileName) => stripSchemaVersion(fileName) > actualSchemaVersion)
-    .sort((a, b) => stripSchemaVersion(a) - stripSchemaVersion(b))
+    .map((fileName, index) => [stripSchemaVersion(fileName), index])
+    .filter((version) => version[0] > actualSchemaVersion)
+    .sort((a, b) => a[0] - b[0])
 
-  for (const fileName of migrationsToExecute) {
+  for (const file of migrationsToExecute) {
+    const fileName = schemaFiles[file[1]]
     const fileQuery = readFileSync(`${migrationsFolder}${fileName}`, 'utf8')
-    await pg.query(fileQuery)
+    await runQuery(fileQuery)
 
     const newSchemaVersion = stripSchemaVersion(fileName)
-    // TODO: update to query params, when branches are merged
-    await pg.query(updateSchemaVersionQuery, [newSchemaVersion, actualSchemaVersion])
+    
+    const params = { newSchemaVersion, actualSchemaVersion }
+
+    await runQuery(updateSchemaVersionQuery, params)
     actualSchemaVersion = newSchemaVersion
     log.info(`Updated database to schema version # ${newSchemaVersion}`)
   }
@@ -30,7 +34,7 @@ const upgradeDbSchema = async (actualSchemaVersion: number) => {
 
 const init = async () => {
   try {
-    const { rows } = await pg.query('SELECT * FROM df.schema_version LIMIT 1')
+    const { rows } = await runQuery('SELECT * FROM df.schema_version LIMIT 1')
     const maxAvailableSchemaVersion = schemaFiles.map(stripSchemaVersion).pop()
 
     const actualSchemaVersion = rows[0]?.value as number || 0
