@@ -15,17 +15,18 @@ export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post
     upvotesCount,
     downvotesCount
   } = asNormalizedComment(post)
-  
+
   eventAction.eventName = VirtualEvents.CommentReactionCreated
   const parent = parentId ? parentId : rootPostId
   const ids = [ parent, commentId ];
   const reactionCount = upvotesCount + downvotesCount - 1;
 
   const insertResult = await insertActivityForCommentReaction(eventAction, reactionCount, ids, createdByAccount);
+  console.log(insertResult)
   if (insertResult === undefined) return;
 
   if (voter === createdByAccount) return;
-
   // insertAggStream(eventAction, commentId);
+
   await insertNotificationForOwner({ ...insertResult, account: createdByAccount });
 }

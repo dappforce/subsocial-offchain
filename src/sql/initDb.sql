@@ -25,6 +25,18 @@ BEGIN
     END IF;
 END$$;
 
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'protocol') THEN
+        CREATE TYPE df.protocol as ENUM (
+            'WebApp',
+            'Telegram',
+            'Email'
+        );
+    END IF;
+END$$;
+
 CREATE TABLE IF NOT EXISTS df.activities
 (
     account varchar(48) NOT NULL,
@@ -94,28 +106,40 @@ CREATE TABLE IF NOT EXISTS df.comment_followers
     following_comment_id bigint NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_follower_account 
+CREATE TABLE IF NOT EXISTS df.session_keys
+(
+    account varchar(48) NOT NULL,
+    session_key varchar(48) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS df.nonces
+(
+    account varchar(48) NOT NULL UNIQUE,
+    nonce bigint NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_follower_account
 ON df.account_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_following_account 
+CREATE INDEX IF NOT EXISTS idx_following_account
 ON df.account_followers(following_account);
 
-CREATE INDEX IF NOT EXISTS idx_post_follower_account 
+CREATE INDEX IF NOT EXISTS idx_post_follower_account
 ON df.post_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_space_follower_account 
+CREATE INDEX IF NOT EXISTS idx_space_follower_account
 ON df.space_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_comment_follower_account 
+CREATE INDEX IF NOT EXISTS idx_comment_follower_account
 ON df.comment_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_following_post_id 
+CREATE INDEX IF NOT EXISTS idx_following_post_id
 ON df.post_followers(following_post_id);
 
-CREATE INDEX IF NOT EXISTS idx_following_space_id 
+CREATE INDEX IF NOT EXISTS idx_following_space_id
 ON df.space_followers(following_space_id);
 
-CREATE INDEX IF NOT EXISTS idx_following_comment_id 
+CREATE INDEX IF NOT EXISTS idx_following_comment_id
 ON df.comment_followers(following_comment_id);
 
 CREATE INDEX IF NOT EXISTS idx_account

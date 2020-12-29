@@ -53,7 +53,7 @@ export async function insertActivityForPostReaction(eventAction: SubstrateEvent,
 
     const paramsUpdate  = { blockNumber: encodedBlockNumber, eventIndex, event: eventName as action, postId };
     const resUpdate = await runQuery<IQueryUpdateParams>(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.length)
+    updateCountLog(resUpdate.rowsCount)
   } catch (err) {
     throw newPgError(err, insertActivityForPostReaction)
   }

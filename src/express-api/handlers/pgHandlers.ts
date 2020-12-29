@@ -1,7 +1,9 @@
 import * as express from 'express'
 import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
 import * as pgQueries from '../../postgres/queries';
-import * as pgNotifs from '../../postgres/updates/markAllNotifsAsRead';
+import * as pgSessionKey from '../../postgres/inserts/insertSessionKey'
+import * as pgNonce from '../../postgres/selects/getNonce'
+import { SessionCall, AddSessionKeyArgs } from '../../postgres/types/sessionKey';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
@@ -80,7 +82,10 @@ export const spaceActivitiesCountHandler: HandlerFn = (req, res) =>
 export const activityCountsHandler: HandlerFn = (req, res) =>
   countHandler(req, res, pgQueries.getActivityCounts)
 
-export const markAllNotifsAsRead: HandlerFn = (req, res) => {
-  const account = req.params.id
-  return resolvePromiseAndReturnJson(res, pgNotifs.markAllNotifsAsRead(account))
-} 
+export const addSessionKey: HandlerFn = (req, res) =>
+  resolvePromiseAndReturnJson(res, pgSessionKey.addSessionKey(req.body.sessionCall as SessionCall<AddSessionKeyArgs>))
+
+export const getNonce: HandlerFn = (req, res) => {
+  const account = req.query.account as string
+  return resolvePromiseAndReturnJson(res, pgNonce.getNonce(account))
+}

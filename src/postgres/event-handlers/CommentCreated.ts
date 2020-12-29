@@ -22,7 +22,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Normal
   await insertCommentFollower(eventAction.data);
 
   const postCreator = rootPost.createdByAccount;
-  const ids = [ rootPostId, commentId ];
+  const ids = [rootPostId, commentId];
 
   if (parentId) {
     eventAction.eventName = VirtualEvents.CommentReplyCreated
@@ -42,7 +42,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Normal
     if (insertResult === undefined) return;
 
     log.debug('Comment does not have a parent id');
-    await fillNotificationsWithPostFollowers(rootPostId, { account: author, ...insertResult });
+    await fillNotificationsWithPostFollowers(rootPostId, { account: author, ...insertResult }, postCreator);
     await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
   }
 }
