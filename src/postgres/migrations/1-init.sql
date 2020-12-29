@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS df;
+
 -- Create custom types
 DO $$
 BEGIN
@@ -94,28 +96,16 @@ CREATE TABLE IF NOT EXISTS df.comment_followers
     following_comment_id bigint NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS df.session_keys
+CREATE TABLE IF NOT EXISTS df.schema_version
 (
-    account varchar(48) NOT NULL,
-    session_key varchar(48) NOT NULL
+    value integer DEFAULT 0 NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS df.nonces
+INSERT INTO df.schema_version
 (
-    account varchar(48) NOT NULL UNIQUE,
-    nonce bigint NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS df.telegram_chats
-(
-    account varchar(48) NOT NULL,
-    chat_id bigint NOT NULL,
-    current_account boolean NOT NULL DEFAULT true,
-    push_notifs boolean NOT NULL DEFAULT true,
-    push_feeds boolean NOT NULL DEFAULT true,
-    last_push_block_number bigint NOT NULL DEFAULT 0,
-    last_push_event_index integer NULL,
-    PRIMARY KEY (account, chat_id)
+    -- Note that the value '0' means a DEFAULT value of the "value" field.
+    SELECT 0
+    WHERE NOT EXISTS(SELECT * FROM df.schema_version)
 );
 
 CREATE INDEX IF NOT EXISTS idx_follower_account
