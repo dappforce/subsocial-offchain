@@ -16,6 +16,7 @@ import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
 import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
 import { changeCurrentAccount } from '../../postgres/updates/changeCurrentAccount';
 import { updateLastPush } from '../../postgres/updates/updateLastPush';
+import { isSessionKeyExist } from '../../postgres/selects/isSessionKeyExist';
 
 const activityHandler = (
   req: express.Request,
@@ -90,6 +91,11 @@ export const activityCountsHandler: HandlerFn = (req, res) =>
 
 export const addSessionKey: HandlerFn = (req, res) =>
   resolvePromiseAndReturnJson(res, pgSessionKey.addSessionKey(req.body.sessionCall as SessionCall<AddSessionKeyArgs>))
+
+export const isSessionKeyExistReq: HandlerFn = (req, res) => {
+  const account = req.query.account as string
+  return resolvePromiseAndReturnJson(res, isSessionKeyExist(account))
+}
 
 export const getNonce: HandlerFn = (req, res) => {
   const account = req.query.account as string

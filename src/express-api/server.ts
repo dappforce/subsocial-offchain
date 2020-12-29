@@ -84,6 +84,8 @@ app.get('/v1/offchain/activities/:id/counts', pgReqHandlers.activityCountsHandle
 
 app.post('/v1/offchain/notifications/addSessionKey', pgReqHandlers.addSessionKey)
 
+app.post('/v1/offchain/notifications/isSessionKeyExist', pgReqHandlers.isSessionKeyExistReq)
+
 app.post('/v1/offchain/notifications/getNonce', pgReqHandlers.getNonce)
 
 app.post('/v1/offchain/notifications/setTelegramData', pgReqHandlers.setTelegramData)

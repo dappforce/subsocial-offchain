@@ -2,7 +2,7 @@ import { informClientAboutUnreadNotifications } from '../../express-api/events';
 import { log } from '../postges-logger';
 import { runQuery, isValidSignature } from '../utils';
 import { SessionCall, ReadAllMessage } from '../types/sessionKey';
-import { getFromSessionKey as getAccountFromSessionKey } from '../selects/getSessionKey';
+import { getFromSessionKey as getAccountFromSessionKey } from '../selects/getAccountBySessionKey';
 import { getNonce } from '../selects/getNonce';
 import { insertNonce } from '../inserts/insertNonce';
 import { updateNonce } from './updateNonce';
