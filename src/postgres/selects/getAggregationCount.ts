@@ -1,5 +1,6 @@
 import { log } from '../postges-logger';
-import { pg } from '../../connections/postgres';
+import { runQuery,action } from '../utils';
+import { IQueryParams } from '../types/getAggregationCount.queries';
 
 export type AggCountProps = {
   eventName: string,
@@ -10,16 +11,16 @@ export type AggCountProps = {
 const query = `
   SELECT count(distinct account)
   FROM df.activities
-  WHERE account <> $1
-    AND event = $2
-    AND post_id = $3`
+  WHERE account <> :account
+    AND event = :event
+    AND post_id = :postId`
 
 export async function getAggregationCount(props: AggCountProps) {
   const { eventName, post_id, account } = props;
-  const params = [ account, eventName, post_id ];
+  const params = { account, event: eventName as action, postId: post_id };
 
   try {
-    const res = await pg.query(query, params)
+    const res = await runQuery<IQueryParams>(query, params)
     log.info(`Get ${res.rows[0].count} distinct activities by post id: ${post_id}`)
     return res.rows[0].count as number;
   } catch (err) {

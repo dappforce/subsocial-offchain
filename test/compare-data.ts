@@ -17,13 +17,13 @@ const parseCSVLikeString = (file: string) => {
   const data = JSON.parse(file);
   const parser = new Parser();
   return parser.parse(data).replace(/"/g, '');
-} 
+}
 
 export const compareData = async(resultFileName: string, getQueryDataFn: SelectFromTableFn): Promise<ComparsionResult> => {
   const outputData = readFileSync('./test/output_data/' + resultFileName, 'utf-8').replace(/;/g, ',')
 
   const inputData = await getQueryDataFn()
-  
+
   let parsedInputData = ''
 
   if(inputData.length != 0)
@@ -36,14 +36,12 @@ export const compareData = async(resultFileName: string, getQueryDataFn: SelectF
   if(parsedDataHash !== outputDataHash)
     msg = compareParsedSting(parsedInputData, outputData)
 
-  return { inputData: parsedInputData, outputData, msg } 
+  return { inputData: parsedInputData, outputData, msg }
 }
 
 const compareParsedSting = (inputData: string, outputData: string) => {
-  let parsedInputData = inputData.split('\n') 
+  let parsedInputData = inputData.split('\n')
   let parsedOutputData = outputData.split('\n')
-
-  console.log(parsedInputData.length, parsedOutputData.length)
 
   let message = ''
   if(parsedInputData.length == 1 || parsedOutputData.length == 1)
@@ -54,6 +52,6 @@ const compareParsedSting = (inputData: string, outputData: string) => {
       message = chalk.green(`Expected: `) + parsedOutputData[i] + chalk.red(`\nActual: `) + value
       break
     }
-  }  
+  }
   return message
 }

@@ -1,19 +1,19 @@
 import { EventData } from '@polkadot/types/generic/Event';
 import { encodeStructId } from '../../substrate/utils';
-import { newPgError } from '../utils';
-import { pg } from '../../connections/postgres';
+import { newPgError, runQuery } from '../utils';
+import { IQueryParams } from '../types/insertSpaceFollower.queries';
 
 const query = `
   INSERT INTO df.space_followers(follower_account, following_space_id)
-    VALUES($1, $2)
+    VALUES(:followerAccount, :followingSpaceId)
   RETURNING *`
 
 export async function insertSpaceFollower(data: EventData) {
   const spaceId = encodeStructId(data[1].toString());
-  const params = [ data[0].toString(), spaceId ];
+  const params = { followerAccount: data[0].toString(), followingSpaceId: spaceId };
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
   } catch (err) {
     throw newPgError(err, insertSpaceFollower)
   }
