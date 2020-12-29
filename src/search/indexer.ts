@@ -62,8 +62,8 @@ async function getPostDoc(post: Post): Promise<ElasticPostDoc | undefined> {
 }
 
 type AnyElasticDoc =
-  ElasticProfileDoc | 
-  ElasticSpaceDoc | 
+  ElasticProfileDoc |
+  ElasticSpaceDoc |
   ElasticPostDoc
 
 type IndexContentProps = {
