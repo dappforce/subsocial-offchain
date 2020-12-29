@@ -12,7 +12,9 @@ const schemaFiles = readdirSync(migrationsFolder, 'utf8').filter((fileName) => f
 const stripSchemaVersion = (fileName: string) => parseInt(fileName.split('-')[0])
 
 const upgradeDbSchema = async (actualSchemaVersion: number) => {
-  const migrationsToExecute = schemaFiles.filter((fileName) => stripSchemaVersion(fileName) > actualSchemaVersion)
+  const migrationsToExecute = schemaFiles
+    .filter((fileName) => stripSchemaVersion(fileName) > actualSchemaVersion)
+    .sort((a, b) => stripSchemaVersion(a) - stripSchemaVersion(b))
 
   for (const fileName of migrationsToExecute) {
     const fileQuery = readFileSync(`${migrationsFolder}${fileName}`, 'utf8')
