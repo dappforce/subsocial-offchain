@@ -8,6 +8,7 @@ import { fillNewsFeedWithSpaceFollowers } from '../fills/fillNewsFeedWithSpaceFo
 import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
 import { fillNotificationsWithCommentFollowers } from '../fills/fillNotificationsWithCommentFollowers';
 import { insertActivityForComment } from '../inserts/insertActivityForComment';
+import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
 
 export const onCommentShared = async (eventAction: SubstrateEvent, comment: NormalizedComment) => {
   const { author, commentId } = parseCommentEvent(eventAction)
@@ -28,4 +29,7 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Norm
   await fillNotificationsWithAccountFollowers({ account, ...insertResult });
   await fillNewsFeedWithSpaceFollowers(spaceId, { account: author, ...insertResult });
   await fillNewsFeedWithAccountFollowers({ account: author, ...insertResult })
+  informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), account, insertResult.blockNumber, insertResult.eventIndex, 'notification')
+  informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), account, insertResult.blockNumber, insertResult.eventIndex, 'feed')
+
 }

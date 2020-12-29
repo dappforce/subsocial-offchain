@@ -4,6 +4,7 @@ import { EventHandlerFn } from '../../substrate/types';
 import { insertActivityForSpace } from '../inserts/insertActivityForSpace';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { insertSpaceFollower } from '../inserts/insertSpaceFollower';
+import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
 
 export const onSpaceFollowed: EventHandlerFn = async (eventAction) => {
   const { data } = eventAction;
@@ -21,4 +22,5 @@ export const onSpaceFollowed: EventHandlerFn = async (eventAction) => {
   if (follower === account) return;
 
   await insertNotificationForOwner({ account, ...insertResult });
+  informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), account, insertResult.blockNumber, insertResult.eventIndex, 'notification')
 }

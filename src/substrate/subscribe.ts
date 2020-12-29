@@ -6,6 +6,7 @@ import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
 import { resolveSubsocialApi } from '../connections/subsocial';
 import { startNotificationsServer } from '../express-api/ws';
+import { startNotificationsServerForTelegram } from '../express-api/telegramWS';
 
 require('dotenv').config()
 
@@ -131,6 +132,7 @@ async function main (substrate: SubsocialSubstrateApi) {
   }
 }
 
+startNotificationsServerForTelegram()
 startNotificationsServer()
 
 resolveSubsocialApi()

@@ -25,18 +25,6 @@ BEGIN
     END IF;
 END$$;
 
-
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'protocol') THEN
-        CREATE TYPE df.protocol as ENUM (
-            'WebApp',
-            'Telegram',
-            'Email'
-        );
-    END IF;
-END$$;
-
 CREATE TABLE IF NOT EXISTS df.activities
 (
     account varchar(48) NOT NULL,
@@ -116,6 +104,18 @@ CREATE TABLE IF NOT EXISTS df.nonces
 (
     account varchar(48) NOT NULL UNIQUE,
     nonce bigint NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS df.telegram_chats
+(
+    account varchar(48) NOT NULL,
+    chat_id bigint NOT NULL,
+    current_account boolean NOT NULL DEFAULT true,
+    push_notifs boolean NOT NULL DEFAULT true,
+    push_feeds boolean NOT NULL DEFAULT true,
+    last_push_block_number bigint NOT NULL DEFAULT 0,
+    last_push_event_index integer NULL,
+    PRIMARY KEY (account, chat_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_follower_account

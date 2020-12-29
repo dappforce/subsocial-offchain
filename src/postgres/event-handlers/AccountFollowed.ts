@@ -3,6 +3,7 @@ import { insertAccountFollower } from '../inserts/insertAccountFollower';
 import { insertActivityForAccount } from '../inserts/insertActivityForAccount';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { findSocialAccount } from '../../substrate/api-wrappers';
+import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
 
 export const onAccountFollowed: EventHandlerFn = async (eventAction) => {
   const { data } = eventAction;
@@ -17,4 +18,5 @@ export const onAccountFollowed: EventHandlerFn = async (eventAction) => {
 
   const following = data[1].toString();
   await insertNotificationForOwner( { ...insertResult, account: following });
+  informTelegramClientAboutNotifOrFeed(data[0].toString(), account, insertResult.blockNumber, insertResult.eventIndex, 'notification')
 }
