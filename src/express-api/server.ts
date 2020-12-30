@@ -82,23 +82,25 @@ app.get('/v1/offchain/activities/:id/spaces/count', pgReqHandlers.spaceActivitie
 
 app.get('/v1/offchain/activities/:id/counts', pgReqHandlers.activityCountsHandler)
 
-app.post('/v1/offchain/notifications/addSessionKey', pgReqHandlers.addSessionKey)
 
-app.post('/v1/offchain/notifications/isSessionKeyExist', pgReqHandlers.isSessionKeyExistReq)
+app.post('/v1/offchain/accounts/setSessionKey', pgReqHandlers.setSessionKeyHandler)
 
-app.post('/v1/offchain/notifications/getNonce', pgReqHandlers.getNonce)
+app.post('/v1/offchain/accounts/getSessionKey', pgReqHandlers.getSessionKeyHandler)
 
-app.post('/v1/offchain/notifications/setTelegramData', pgReqHandlers.setTelegramData)
+app.post('/v1/offchain/accounts/getNonce', pgReqHandlers.getNonceHandler)
 
-app.get('/v1/offchain/notifications/getAccountByChatId/:chatId', pgReqHandlers.getAccountByChatIdReq)
 
-app.get('/v1/offchain/getTelegramChat', pgReqHandlers.getTelegramChatReq)
+app.post('/v1/offchain/telegram/setTelegramData', pgReqHandlers.setTelegramDataHandler)
 
-app.post('/v1/offchain/updateTelegramChat', pgReqHandlers.updateTelegramChatReq)
+app.post('/v1/offchain/telegram/setCurrentAccount', pgReqHandlers.setCurrentAccountHandler)
 
-app.post('/v1/offchain/changeCurrentAccount', pgReqHandlers.changeCurrentAccountReq)
+app.post('/v1/offchain/telegram/setLastPush', pgReqHandlers.setLastPushHandler)
 
-app.post('/v1/offchain/updateLastPush', pgReqHandlers.updateLastPushReq)
+app.get('/v1/offchain/telegram/getAccountByChatId/:chatId', pgReqHandlers.getAccountByChatIdHandler)
+
+app.get('/v1/offchain/telegram/getTelegramChat', pgReqHandlers.getTelegramChatHandler)
+
+app.post('/v1/offchain/telegram/updateTelegramChat', pgReqHandlers.updateTelegramChatHandler)
 
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {

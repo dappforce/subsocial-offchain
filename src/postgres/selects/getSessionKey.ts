@@ -6,7 +6,7 @@ const query = `
   SELECT session_key FROM df.session_keys
   WHERE session_key = :sessionKey`
 
-export const isSessionKeyExist = async (sessionKey: string): Promise<boolean> => {
+export const getSessionKey = async (sessionKey: string): Promise<boolean> => {
   try {
     const data = await runQuery<IQueryParams>(query, { sessionKey })
     if (data.rowCount) return true

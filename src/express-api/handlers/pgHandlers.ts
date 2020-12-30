@@ -1,22 +1,23 @@
 import * as express from 'express'
-import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
 import * as pgQueries from '../../postgres/queries';
-import * as pgSessionKey from '../../postgres/inserts/insertSessionKey'
-import * as pgTelegram from '../../postgres/inserts/insertTelegramData'
-import * as pgNonce from '../../postgres/selects/getNonce'
+import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
+import { setTelegramData } from '../../postgres/inserts/insertTelegramData'
+import { addSessionKey } from '../../postgres/inserts/insertSessionKey'
+import { getNonce } from '../../postgres/selects/getNonce'
 import { SessionCall, AddSessionKeyArgs } from '../../postgres/types/sessionKey';
+import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
+import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
+import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
+import { changeCurrentAccount } from '../../postgres/updates/changeCurrentAccount';
+import { updateLastPush } from '../../postgres/updates/updateLastPush';
+import { getSessionKey } from '../../postgres/selects/getSessionKey';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
   resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
-import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
-import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
-import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
-import { changeCurrentAccount } from '../../postgres/updates/changeCurrentAccount';
-import { updateLastPush } from '../../postgres/updates/updateLastPush';
-import { isSessionKeyExist } from '../../postgres/selects/isSessionKeyExist';
+
 
 const activityHandler = (
   req: express.Request,
@@ -89,45 +90,47 @@ export const spaceActivitiesCountHandler: HandlerFn = (req, res) =>
 export const activityCountsHandler: HandlerFn = (req, res) =>
   countHandler(req, res, pgQueries.getActivityCounts)
 
-export const addSessionKey: HandlerFn = (req, res) =>
-  resolvePromiseAndReturnJson(res, pgSessionKey.addSessionKey(req.body.sessionCall as SessionCall<AddSessionKeyArgs>))
 
-export const isSessionKeyExistReq: HandlerFn = (req, res) => {
+export const setSessionKeyHandler: HandlerFn = (req, res) =>
+  resolvePromiseAndReturnJson(res, addSessionKey(req.body.sessionCall as SessionCall<AddSessionKeyArgs>))
+
+export const getSessionKeyHandler: HandlerFn = (req, res) => {
   const account = req.query.account as string
-  return resolvePromiseAndReturnJson(res, isSessionKeyExist(account))
+  return resolvePromiseAndReturnJson(res, getSessionKey(account))
 }
 
-export const getNonce: HandlerFn = (req, res) => {
+export const getNonceHandler: HandlerFn = (req, res) => {
   const account = req.query.account as string
-  return resolvePromiseAndReturnJson(res, pgNonce.getNonce(account))
+  return resolvePromiseAndReturnJson(res, getNonce(account))
 }
 
-export const setTelegramData: HandlerFn = (req, res) => {
+
+export const setTelegramDataHandler: HandlerFn = (req, res) => {
   const { account, chatId } = req.body
-  return resolvePromiseAndReturnJson(res, pgTelegram.setTelegramData(account, Number(chatId)))
+  return resolvePromiseAndReturnJson(res, setTelegramData(account, Number(chatId)))
 }
 
-export const getAccountByChatIdReq: HandlerFn = (req, res) => {
-  const { chatId } = req.params
-  return resolvePromiseAndReturnJson(res, getAccountByChatId(Number(chatId)))
-}
-
-export const getTelegramChatReq: HandlerFn = (req, res) => {
-  const { account, chatId } = req.query;
-  return resolvePromiseAndReturnJson(res, getTelegramChat(account.toString(), Number(chatId)))
-}
-
-export const updateTelegramChatReq: HandlerFn = (req, res) => {
-  const { account, chatId, push_notifs, push_feeds } = req.body;
-  return resolvePromiseAndReturnJson(res, updateTelegramChat(account.toString(), Number(chatId), push_notifs, push_feeds))
-}
-
-export const changeCurrentAccountReq: HandlerFn = (req, res) => {
+export const setCurrentAccountHandler: HandlerFn = (req, res) => {
   const { account, chatId } = req.body;
   return resolvePromiseAndReturnJson(res, changeCurrentAccount(account.toString(), Number(chatId)))
 }
 
-export const updateLastPushReq: HandlerFn = (req, res) => {
+export const setLastPushHandler: HandlerFn = (req, res) => {
   const { account, chatId, blockNumber, eventIndex } = req.body;
   return resolvePromiseAndReturnJson(res, updateLastPush(account.toString(), Number(chatId), blockNumber, eventIndex))
+}
+
+export const getAccountByChatIdHandler: HandlerFn = (req, res) => {
+  const { chatId } = req.params
+  return resolvePromiseAndReturnJson(res, getAccountByChatId(Number(chatId)))
+}
+
+export const getTelegramChatHandler: HandlerFn = (req, res) => {
+  const { account, chatId } = req.query;
+  return resolvePromiseAndReturnJson(res, getTelegramChat(account.toString(), Number(chatId)))
+}
+
+export const updateTelegramChatHandler: HandlerFn = (req, res) => {
+  const { account, chatId, push_notifs, push_feeds } = req.body;
+  return resolvePromiseAndReturnJson(res, updateTelegramChat(account.toString(), Number(chatId), push_notifs, push_feeds))
 }
