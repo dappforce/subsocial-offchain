@@ -2,6 +2,8 @@ import * as events from 'events'
 import { log } from './ws';
 import * as BN from 'bn.js';
 
+events.EventEmitter.defaultMaxListeners = 0;
+
 export type Type = 'notification' | 'feed'
 
 export const eventEmitter = new events.EventEmitter()

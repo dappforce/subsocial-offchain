@@ -43,6 +43,7 @@ export function startNotificationsServer() {
 
 				sendUnreadCount(data, unreadCount, wsClients[data])
 			}
+			wss.removeAllListeners(EVENT_UPDATE_NOTIFICATIONS_COUNTER)
 		})
 
 		eventEmitter.on(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, unreadCount: number) => {
@@ -53,6 +54,7 @@ export function startNotificationsServer() {
 				return
 			}
 			sendUnreadCount(account, unreadCount, client)
+			wss.removeAllListeners(EVENT_UPDATE_NOTIFICATIONS_COUNTER)
 		})
 
 		ws.on('close', (ws: WebSocket) => {
