@@ -5,7 +5,7 @@ import { appsUrl } from '../../env';
 
 export const log = newLogger("Email")
 
-export type Type = 'New notification' | 'New feed' | 'Email confirmation'
+export type Type = 'notifications' | 'feeds' | 'confirmation'
 
 export const createHrefForPost = (spaceId: string, postId: string, name: string) => {
 	return `<a href="${appsUrl}/${spaceId}/${postId}">${name}</a>`
