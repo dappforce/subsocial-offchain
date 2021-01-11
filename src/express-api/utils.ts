@@ -6,6 +6,19 @@ export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 2
 
 export type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
 
+export type EmailSettings = {
+	account: string,
+	email: string,
+	recurrence: string,
+	send_feeds: boolean,
+	send_notifs: boolean,
+	last_block_bumber: number,
+	last_event_index: number,
+	next_leter_date: Date,
+	confirmation_code: string,
+	confirmed_on: Date
+}
+
 const getNumberFromRequest = (
   req: express.Request,
   value: 'limit' | 'offset',

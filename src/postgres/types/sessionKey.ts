@@ -11,7 +11,7 @@ export type ReadAllMessage = {
   eventIndex: number
 }
 
-export type MessageGenericExtends = AddSessionKeyArgs | ReadAllMessage
+export type MessageGenericExtends = AddSessionKeyArgs | ReadAllMessage | SetUpEmailArgs
 
 export type Message<T extends MessageGenericExtends> = {
   nonce: number,
@@ -23,4 +23,11 @@ export type SessionCall<T extends MessageGenericExtends> = {
   account: string,
   signature: string,
   message: Message<T>
+}
+
+export type SetUpEmailArgs = {
+	email: string,
+	recurrence: string,
+	send_feeds: boolean,
+	send_notifs: boolean
 }

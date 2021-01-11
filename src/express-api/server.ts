@@ -9,6 +9,7 @@ import * as pgReqHandlers from './handlers/pgHandlers'
 import { expressApiLog as log } from '../connections/loggers';
 import * as timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
+import './email/jobs'
 
 require('dotenv').config()
 
@@ -85,9 +86,9 @@ app.get('/v1/offchain/activities/:id/counts', pgReqHandlers.activityCountsHandle
 
 app.post('/v1/offchain/accounts/setSessionKey', pgReqHandlers.setSessionKeyHandler)
 
-app.post('/v1/offchain/accounts/getSessionKey', pgReqHandlers.getSessionKeyHandler)
+app.get('/v1/offchain/accounts/getSessionKey', pgReqHandlers.getSessionKeyHandler)
 
-app.post('/v1/offchain/accounts/getNonce', pgReqHandlers.getNonceHandler)
+app.get('/v1/offchain/accounts/getNonce', pgReqHandlers.getNonceHandler)
 
 
 app.post('/v1/offchain/telegram/setTelegramData', pgReqHandlers.setTelegramDataHandler)
@@ -101,6 +102,15 @@ app.get('/v1/offchain/telegram/getAccountByChatId/:chatId', pgReqHandlers.getAcc
 app.get('/v1/offchain/telegram/getTelegramChat', pgReqHandlers.getTelegramChatHandler)
 
 app.post('/v1/offchain/telegram/updateTelegramChat', pgReqHandlers.updateTelegramChatHandler)
+
+
+app.post('/v1/offchain/email/setEmailSettings', pgReqHandlers.setEmailSettingsHandler)
+
+app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHandler)
+
+app.post('/v1/offchain/email/sendConfirmationLetter', pgReqHandlers.sendConfirmationLetterHandler)
+
+app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailHandler)
 
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {

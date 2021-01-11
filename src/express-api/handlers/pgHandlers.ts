@@ -4,19 +4,23 @@ import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries
 import { setTelegramData } from '../../postgres/inserts/insertTelegramData'
 import { addSessionKey } from '../../postgres/inserts/insertSessionKey'
 import { getNonce } from '../../postgres/selects/getNonce'
-import { SessionCall, AddSessionKeyArgs } from '../../postgres/types/sessionKey';
+import { SessionCall, AddSessionKeyArgs, SetUpEmailArgs } from '../../postgres/types/sessionKey';
 import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
 import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
 import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
 import { changeCurrentAccount } from '../../postgres/updates/changeCurrentAccount';
 import { updateLastPush } from '../../postgres/updates/updateLastPush';
 import { getSessionKey } from '../../postgres/selects/getSessionKey';
+import { setEmailSettings } from '../../postgres/inserts/insertEmailSettings';
+import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
+import { sendConfirmationLetter as sendConfirmationLetter } from '../email/notifications';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
   resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
+import { setConfirmationDate } from '../../postgres/updates/setConfirmationDate';
 
 
 const activityHandler = (
@@ -133,4 +137,23 @@ export const getTelegramChatHandler: HandlerFn = (req, res) => {
 export const updateTelegramChatHandler: HandlerFn = (req, res) => {
   const { account, chatId, push_notifs, push_feeds } = req.body;
   return resolvePromiseAndReturnJson(res, updateTelegramChat(account.toString(), Number(chatId), push_notifs, push_feeds))
+}
+
+export const setEmailSettingsHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, setEmailSettings(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
+}
+
+export const getEmailSettingsHandler: HandlerFn = (req, res) => {
+  const account = req.query.account as string
+  return resolvePromiseAndReturnJson(res, getEmailSettingsByAccount(account))
+}
+
+export const sendConfirmationLetterHandler: HandlerFn = (req, res) => {
+  const { account, email } = req.body;
+  return resolvePromiseAndReturnJson(res, sendConfirmationLetter(account, email))
+}
+
+export const confirmEmailHandler: HandlerFn = (req, res) => {
+  const { account, confirmationCode } = req.body;
+  return resolvePromiseAndReturnJson(res, setConfirmationDate(account, confirmationCode))
 }

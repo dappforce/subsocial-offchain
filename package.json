@@ -37,7 +37,7 @@
   "devDependencies": {
     "@polkadot/types": "1.28.1",
     "@subsocial/config": "^0.4.23",
-    "@subsocial/types": "^0.4.23",
+    "@subsocial/types": "^0.4.26",
     "@subsocial/utils": "^0.4.23",
     "@types/axios": "^0.14.0",
     "@types/bn.js": "^4.11.5",
@@ -59,7 +59,10 @@
   "dependencies": {
     "@elastic/elasticsearch": "^7.4.0",
     "@subsocial/api": "^0.4.24",
+    "@types/node-cron": "^2.0.3",
+    "@types/nodemailer": "^6.4.0",
     "@types/pg": "^7.14.7",
+    "@types/uuid": "^8.3.0",
     "axios": "^0.19.0",
     "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
@@ -77,9 +80,12 @@
     "libp2p": "^0.27.3",
     "lodash.isempty": "^4.4.0",
     "multer": "^1.4.2",
+    "node-cron": "^2.0.3",
+    "nodemailer": "^6.4.17",
     "pg": "^8.5.1",
     "request-promise": "^4.2.5",
     "ts-jest": "^26.4.4",
+    "uuid": "^8.3.2",
     "yesql": "^4.1.3"
   }
 }

@@ -1,12 +1,7 @@
 import { log } from '../postges-logger';
 import { runQuery } from '../utils';
 import * as BN from 'bn.js';
-import { Activity as OldActivity } from '@subsocial/types';
-
-export type Activity = Omit<OldActivity, 'id'> & {
-  block_number: string,
-  event_index: number
-}
+import { Activity } from '@subsocial/types';
 
 const query = `
   SELECT * FROM df.activities
@@ -21,7 +16,7 @@ export async function getActivity(account: string, blockNumber: BN, eventIndex: 
     const res = await runQuery(query, params)
     return res.rows[0] as Activity;
   } catch (err) {
-    log.error('Failed to getAggregationCount:', err.stack)
+    log.error('Failed to get activities:', err.stack)
     throw err
   }
 }
