@@ -1,10 +1,7 @@
 import { informClientAboutUnreadNotifications } from '../../express-api/events';
 import { log } from '../postges-logger';
-import { runQuery, isValidSignature } from '../utils';
+import { runQuery, isValidSignature, upsertNonce } from '../utils';
 import { SessionCall, ReadAllMessage } from '../types/sessionKey';
-import { getFromSessionKey as getAccountFromSessionKey } from '../selects/getAccountBySessionKey';
-import { getNonce } from '../selects/getNonce';
-import { insertNonce } from '../inserts/insertNonce';
 import { updateNonce } from './updateNonce';
 
 const query = `
@@ -28,18 +25,9 @@ const query = `
 export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessage>) {
   const { account, signature, message } = sessionCall
 
-  let mainKey = await getAccountFromSessionKey(account)
-  if (!mainKey) {
-    log.error(`There is no account that owns this session key: ${account}`)
-    mainKey = account
-  }
-  let selectedNonce = await getNonce(account)
+  const { nonce, rootAddress } = await upsertNonce(account, message)
 
-  if (!selectedNonce) {
-    await insertNonce(account, message.nonce)
-    selectedNonce = 0
-  }
-  if (parseInt(selectedNonce.toString()) === message.nonce) {
+  if (parseInt(nonce.toString()) === message.nonce) {
     const isValid = isValidSignature({ account, signature, message } as SessionCall<ReadAllMessage>)
     if (!isValid) {
       log.error("Signature is not valid: function markAllNotifsAsRead ")
@@ -48,15 +36,15 @@ export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessag
 
     log.debug(`Signature verified`)
     try {
-      const data = await runQuery(query, { account: mainKey })
-      informClientAboutUnreadNotifications(mainKey, 0)
-      log.debug(`Marked all notifications as read by account: ${mainKey}`)
+      const data = await runQuery(query, { account: rootAddress })
+      informClientAboutUnreadNotifications(rootAddress, 0)
+      log.debug(`Marked all notifications as read by account: ${rootAddress}`)
 
       await updateNonce(account, message.nonce + 1)
 
       return data.rowCount
     } catch (err) {
-      log.error(`Failed to mark all notifications as read by account: ${mainKey}`, err.stack)
+      log.error(`Failed to mark all notifications as read by account: ${rootAddress}`, err.stack)
       throw err
     }
   }

@@ -1,11 +1,11 @@
 import { createTransport, getTestMessageUrl } from 'nodemailer'
-import { Type } from './utils';
 import { emailHost, emailPort, emailUser, emailPassword } from '../../env';
 import { newLogger } from '@subsocial/utils';
+import { ActivityType } from './utils';
 
 const log = newLogger('Email')
 
-export const sendEmail = async (email: string, message: string, type: Type) => {
+export const sendEmail = async (email: string, message: string, type: ActivityType) => {
 	const transporter = createTransport({
 		host: emailHost,
 		port: parseInt(emailPort),

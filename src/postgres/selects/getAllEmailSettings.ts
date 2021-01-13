@@ -4,7 +4,7 @@ import { log } from '../postges-logger';
 const query = `
 	SELECT * FROM df.email_settings
 	WHERE confirmed_on is NOT NULL
-		AND recurrence = :recurrence`
+	AND recurrence = :recurrence`
 
 export const getAllEmailSettings = async (recurrence: string) => {
 	try {

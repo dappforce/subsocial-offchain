@@ -4,6 +4,7 @@ import * as BN from 'bn.js';
 
 events.EventEmitter.defaultMaxListeners = 0;
 
+// FIXME: replace this with type in src/express-api/email/utils.ts that should be exported
 export type Type = 'notification' | 'feed'
 
 export const eventEmitter = new events.EventEmitter()

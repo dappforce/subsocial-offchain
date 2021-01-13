@@ -2,10 +2,22 @@ import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { newLogger } from '@subsocial/utils';
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import { appsUrl } from '../../env';
+import { ActivityTable } from '../../postgres/queries/feed-and-notifs';
+import { Activity } from '../telegramWS';
 
 export const log = newLogger("Email")
 
-export type Type = 'notifications' | 'feeds' | 'confirmation'
+// FIXME: export these to JS libs
+export type ActivityType = 'notifications' | 'feeds' | 'confirmation'
+
+type TableNameByActivityType = Record<ActivityType, ActivityTable>
+export const TableNameByActivityType: TableNameByActivityType = {
+	'feeds': 'news_feed',
+	'notifications': 'notifications',
+	'confirmation': null
+}
+
+export type CreateEmailMessageFn = (activity: Activity) => Promise<string>
 
 export const createHrefForPost = (spaceId: string, postId: string, name: string) => {
 	return `<a href="${appsUrl}/${spaceId}/${postId}">${name}</a>`

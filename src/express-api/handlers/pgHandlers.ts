@@ -11,7 +11,7 @@ import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
 import { changeCurrentAccount } from '../../postgres/updates/changeCurrentAccount';
 import { updateLastPush } from '../../postgres/updates/updateLastPush';
 import { getSessionKey } from '../../postgres/selects/getSessionKey';
-import { setEmailSettings } from '../../postgres/inserts/insertEmailSettings';
+import { addEmailSettings } from '../../postgres/inserts/insertEmailSettings';
 import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
 import { sendConfirmationLetter as sendConfirmationLetter } from '../email/notifications';
 import {
@@ -139,8 +139,8 @@ export const updateTelegramChatHandler: HandlerFn = (req, res) => {
   return resolvePromiseAndReturnJson(res, updateTelegramChat(account.toString(), Number(chatId), push_notifs, push_feeds))
 }
 
-export const setEmailSettingsHandler: HandlerFn = (req, res) => {
-  return resolvePromiseAndReturnJson(res, setEmailSettings(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
+export const addEmailSettingsHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, addEmailSettings(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
 }
 
 export const getEmailSettingsHandler: HandlerFn = (req, res) => {

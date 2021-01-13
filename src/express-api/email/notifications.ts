@@ -1,5 +1,5 @@
 import { resolveSubsocialApi } from '../../connections/subsocial';
-import messages from './messages';
+import messages from './emailMessages';
 import { getAccountName, createHrefForPost, createHrefForAccount, createNotification, createHrefForSpace } from './utils';
 import { EventsName } from '@subsocial/types';
 import { Activity } from '../telegramWS';
@@ -98,6 +98,7 @@ export const sendConfirmationLetter = async (sessionCall: SessionCall<ConfirmLet
 		await sendEmail(email, message, "confirmation")
 		await setConfirmationCode(sessionCall, confirmationCode)
 	} catch (err) {
+		// TODO: replace with logger created by newLogger
 		console.log("Error", err)
 	}
 }

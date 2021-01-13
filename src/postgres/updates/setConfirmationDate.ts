@@ -1,10 +1,7 @@
-import { runQuery, newPgError, isValidSignature } from '../utils';
+import { runQuery, newPgError, isValidSignature, upsertNonce } from '../utils';
 import { getConfirmationData } from '../selects/getConfirmationCode';
 import { log } from '../postges-logger';
 import { ConfirmEmail, SessionCall } from '../types/sessionKey';
-import { insertNonce } from '../inserts/insertNonce';
-import { getNonce } from '../selects/getNonce';
-import { getFromSessionKey as getAccountFromSessionKey } from '../selects/getAccountBySessionKey';
 import { updateNonce } from './updateNonce';
 
 const query = `
@@ -14,42 +11,29 @@ const query = `
   RETURNING *`
 
 export async function setConfirmationDate(sessionCall: SessionCall<ConfirmEmail>) {
-  const { account, signature, message } = sessionCall
+  const { account, message } = sessionCall
 
-  let mainKey = await getAccountFromSessionKey(account)
-  if (!mainKey) {
-    log.error(`There is no account that owns this session key: ${account}`)
-    mainKey = account
-  }
+  const { nonce, rootAddress } = await upsertNonce(account, message)
 
-  let selectedNonce = await getNonce(account)
-
-  if (!selectedNonce) {
-    await insertNonce(account, message.nonce)
-    selectedNonce = 0
-  }
-
-  if (parseInt(selectedNonce.toString()) === message.nonce) {
-    const isValid = isValidSignature({ account, signature, message } as SessionCall<ConfirmEmail>)
+  if (parseInt(nonce.toString()) === message.nonce) {
+    const isValid = isValidSignature(sessionCall)
     if (!isValid) {
-      log.error("Signature is not valid: function setConfirmationCode ")
+      log.error("Signature is not valid: function setConfirmationCode")
       return false
     }
     log.debug(`Signature verified`)
 
     const confirmationCodeFromClient = message.args.confirmationCode
 
-    const params = { account: mainKey, date: new Date() };
+    const params = { account: rootAddress, date: new Date() };
     try {
-      const { confirmation_code, expires_on } = await getConfirmationData(mainKey)
-      console.log(confirmation_code, new Date(expires_on.toString()))
+      const { confirmation_code, expires_on } = await getConfirmationData(rootAddress)
       if (confirmation_code != confirmationCodeFromClient) {
         log.error("Confirmation code is wrong")
         return false
       }
 
       if (new Date().getTime() >= new Date(expires_on).getTime()) {
-        console.log(false)
         return false
       }
 
