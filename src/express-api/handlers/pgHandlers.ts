@@ -4,7 +4,7 @@ import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries
 import { setTelegramData } from '../../postgres/inserts/insertTelegramData'
 import { addSessionKey } from '../../postgres/inserts/insertSessionKey'
 import { getNonce } from '../../postgres/selects/getNonce'
-import { SessionCall, AddSessionKeyArgs, SetUpEmailArgs } from '../../postgres/types/sessionKey';
+import { SessionCall, AddSessionKeyArgs, SetUpEmailArgs, ConfirmEmail } from '../../postgres/types/sessionKey';
 import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
 import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
 import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
@@ -149,11 +149,9 @@ export const getEmailSettingsHandler: HandlerFn = (req, res) => {
 }
 
 export const sendConfirmationLetterHandler: HandlerFn = (req, res) => {
-  const { account, email } = req.body;
-  return resolvePromiseAndReturnJson(res, sendConfirmationLetter(account, email))
+  return resolvePromiseAndReturnJson(res, sendConfirmationLetter(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
 }
 
 export const confirmEmailHandler: HandlerFn = (req, res) => {
-  const { account, confirmationCode } = req.body;
-  return resolvePromiseAndReturnJson(res, setConfirmationDate(account, confirmationCode))
+  return resolvePromiseAndReturnJson(res, setConfirmationDate(req.body.sessionCall as SessionCall<ConfirmEmail>))
 }

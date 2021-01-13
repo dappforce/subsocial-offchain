@@ -2,15 +2,15 @@ import { runQuery } from '../utils';
 import { log } from '../postges-logger';
 
 const query = `
-  SELECT confirmation_code FROM df.email_settings
+  SELECT confirmation_code, expires_on FROM df.email_settings
   WHERE account = :account`
 
-export const getConfirmationCode = async (account: string) => {
+export const getConfirmationData = async (account: string) => {
 	try {
 		const data = await runQuery(query, { account })
-		return data.rows[0]?.confirmation_code
+		return data.rows[0]
 	} catch (err) {
-		log.error(`Failed to get email settings by account: ${account}`, err.stack)
+		log.error(`Failed to get confirmation data by account: ${account}`, err.stack)
 		throw err
 	}
 }

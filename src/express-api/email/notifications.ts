@@ -8,6 +8,7 @@ import { sendEmail } from './emailSender';
 import { v4 } from 'uuid'
 import { appsUrl } from '../../env';
 import { setConfirmationCode } from '../../postgres/updates/setConfirmationCode';
+import { SessionCall, ConfirmLetter } from '../../postgres/types/sessionKey';
 
 export const createNotifsEmailMessage = async (activity: Activity): Promise<string> => {
 	const { account, event, space_id, post_id, date, following_id, comment_id } = activity
@@ -88,13 +89,14 @@ const getPostPreview = async (account: string, postId: string, msg: string, date
 	return createNotification(formatDate, accountUrl, msg, url)
 }
 
-export const sendConfirmationLetter = async (account: string, email: string) => {
+export const sendConfirmationLetter = async (sessionCall: SessionCall<ConfirmLetter>) => {
+	const email = sessionCall.message.args.email
 	const confirmationCode = v4()
 	const message = `<a href="${appsUrl}/settings?confirmationCode=${confirmationCode}">link</a>`
 
 	try {
 		await sendEmail(email, message, "confirmation")
-		await setConfirmationCode(account, confirmationCode)
+		await setConfirmationCode(sessionCall, confirmationCode)
 	} catch (err) {
 		console.log("Error", err)
 	}

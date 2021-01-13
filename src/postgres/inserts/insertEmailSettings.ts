@@ -4,6 +4,7 @@ import { SessionCall, SetUpEmailArgs } from '../types/sessionKey';
 import { getNonce } from '../selects/getNonce';
 import { insertNonce } from './insertNonce';
 import { getFromSessionKey as getAccountFromSessionKey } from '../selects/getAccountBySessionKey';
+import { updateNonce } from '../updates/updateNonce';
 
 const query = `
   INSERT INTO df.email_settings (account, email, recurrence, send_feeds, send_notifs)
@@ -39,6 +40,7 @@ export const setEmailSettings = async (sessionCall: SessionCall<SetUpEmailArgs>)
 		log.debug(`Signature verified`)
 		try {
 			await runQuery(query, { account: mainKey, email, recurrence, send_feeds, send_notifs })
+			await updateNonce(account, message.nonce + 1)
 			log.debug(`Insert email settings in database: ${mainKey}`)
 		} catch (err) {
 			log.error(`Failed to insert email settings for account: ${mainKey}`, err.stack)

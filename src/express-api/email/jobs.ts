@@ -7,22 +7,23 @@ import { createNotifsEmailMessage } from './notifications';
 import { sendEmail } from './emailSender';
 import { createFeedEmailMessage } from './feed';
 import { newLogger } from '@subsocial/utils';
+import { updateLastPush } from '../../postgres/updates/updateLastActivities';
 
 const log = newLogger('Cron job')
 
 schedule('*/5 * * * *', async () => {
 	log.log('Running a task every 5 minutes');
-	await sendNotificationsAndFeeds('immediately')
+	await sendNotificationsAndFeeds('Immediately')
 });
 
 schedule('0 23 * * *', async () => {
 	log.log('Running a task every day at 23:00 ');
-	await sendNotificationsAndFeeds('daily')
+	await sendNotificationsAndFeeds('Daily')
 });
 
 schedule('0 23 * * 0', async () => {
 	log.log('Running a task every week at 23:00');
-	await sendNotificationsAndFeeds('weekly')
+	await sendNotificationsAndFeeds('Weekly')
 });
 
 const sendNotificationsAndFeeds = async (recurrence: string) => {
@@ -40,6 +41,8 @@ const sendNotificationsAndFeeds = async (recurrence: string) => {
 
 			if (notifsMessage) {
 				await sendEmail(email, notifsMessage, 'notifications')
+				const { block_number, event_index } = notifsActivities.pop()
+				await updateLastPush(account, block_number, event_index)
 			}
 		}
 		if (emailSetting.send_feeds) {
@@ -51,6 +54,8 @@ const sendNotificationsAndFeeds = async (recurrence: string) => {
 
 			if (feedsMessage) {
 				await sendEmail(email, feedsMessage, 'feeds')
+				const { block_number, event_index } = feedsActivities.pop()
+				await updateLastPush(account, block_number, event_index)
 			}
 		}
 	}

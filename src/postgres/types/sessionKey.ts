@@ -1,6 +1,6 @@
 import { BlockNumber } from '@polkadot/types/interfaces';
 
-type Action = 'readAll' | 'addSessionKey'
+type Action = 'readAll' | 'addSessionKey' | 'setUpEmail' | 'confirmEmail'
 
 export type AddSessionKeyArgs = {
   sessionKey: string
@@ -11,7 +11,7 @@ export type ReadAllMessage = {
   eventIndex: number
 }
 
-export type MessageGenericExtends = AddSessionKeyArgs | ReadAllMessage | SetUpEmailArgs
+export type MessageGenericExtends = AddSessionKeyArgs | ReadAllMessage | SetUpEmailArgs | ConfirmLetter | ConfirmEmail
 
 export type Message<T extends MessageGenericExtends> = {
   nonce: number,
@@ -30,4 +30,12 @@ export type SetUpEmailArgs = {
 	recurrence: string,
 	send_feeds: boolean,
 	send_notifs: boolean
+}
+
+export type ConfirmLetter = {
+	email: string
+}
+
+export type ConfirmEmail = {
+	confirmationCode: string
 }
