@@ -2,18 +2,18 @@ import { schedule } from 'node-cron'
 import { getAllEmailSettings } from '../../postgres/selects/getAllEmailSettings';
 import { EmailSettings } from '../utils';
 import { getActivitiesForEmailSender } from '../../postgres/selects/getActivitiesForEmailSender'
-import * as BN from 'bn.js';
 import { createNotifsEmailMessage } from './notifications';
 import { sendEmail } from './emailSender';
 import { createFeedEmailMessage } from './feed';
-import { newLogger, nonEmptyArr } from '@subsocial/utils';
+import { newLogger, nonEmptyArr, isEmptyArray } from '@subsocial/utils';
 import { updateLastPush } from '../../postgres/updates/updateLastActivities';
 import { ActivityType, TableNameByActivityType, CreateEmailMessageFn } from './utils';
 import { Activity } from '@subsocial/types'
+import * as BN from 'bn.js';
 
 const log = newLogger('Cron job')
 
-schedule('*/5 * * * *', async () => {
+schedule('*/1 * * * *', async () => {
   log.log('Running a task every 5 minutes');
   await sendNotificationsAndFeeds('Immediately')
 });
@@ -28,6 +28,11 @@ schedule('0 23 * * 0', async () => {
   await sendNotificationsAndFeeds('Weekly')
 });
 
+const insertEmailTemplatesImages = () => {
+}
+
+insertEmailTemplatesImages()
+
 type ActivitiesWithType = {
   activityType: ActivityType,
   activities: Activity[]
@@ -40,13 +45,12 @@ const compareActivities = (a: Activity, b: Activity) => (
 
 const sendActivitiesEmail = async (email: string, activitiesWithType: ActivitiesWithType, createEmailFn: CreateEmailMessageFn) => {
   const { activityType, activities } = activitiesWithType
-  let message = ''
-
+  let message = []
   for (const activity of activities) {
-    message += await createEmailFn(activity)
+    message.push(await createEmailFn(activity))
   }
 
-  if (message) {
+  if (!isEmptyArray(message)) {
     await sendEmail(email, message, activityType)
   }
 }
@@ -63,16 +67,18 @@ const sendNotificationsAndFeeds = async (recurrence: string) => {
       const activityType = 'notifications'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      lastActivities.push(activities.pop())
       await sendActivitiesEmail(email, { activityType, activities }, createNotifsEmailMessage)
+      if (nonEmptyArr(activities))
+        lastActivities.push(activities.pop())
     }
 
     if (send_feeds) {
       const activityType = 'feeds'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      lastActivities.push(activities.pop())
       await sendActivitiesEmail(email, { activityType, activities }, createFeedEmailMessage)
+      if (nonEmptyArr(activities))
+        lastActivities.push(activities.pop())
     }
 
     if (nonEmptyArr(lastActivities)) {

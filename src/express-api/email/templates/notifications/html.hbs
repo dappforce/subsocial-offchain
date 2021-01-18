@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Feed</title>
+  <meta charset="utf-8">
+  <style type="text/css">
+    .background {
+      background: #fafafa;
+    }
+
+    .title {
+      margin: 0 0 0 35%;
+      font-size: 1.5rem;
+
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    }
+
+    .notification-item {
+      display: flex;
+      width: 100%;
+      color: #222222;
+      min-height: 60px;
+      margin-left: 35%;
+    }
+
+    hr {
+      width: 450px;
+      margin: 0 0 0.75rem 35%
+    }
+
+    .notification-content {
+      margin-left: 40px;
+      margin: 0 .75rem 0 1rem;
+      width: inherit;
+    }
+
+    a {
+      font-weight: bold;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      color: #222222 !important;
+    }
+
+    a:hover {
+      cursor: pointer;
+    }
+
+    .image {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 50%;
+    }
+
+    .text-activity {
+      display: inline-flex;
+    }
+
+    .activity-item {
+      margin-left: 0.35rem;
+    }
+
+    .date {
+      width: 100%;
+      font-size: 0.875rem;
+      color: #888;
+    }
+  </style>
+</head>
+
+<body>
+  <div class='background'>
+    <p class="title">My notifications</p>
+    <hr>
+    {{#each data}}
+    <div class='notification-item'>
+      {{#notEq avatar ''}}
+      <img src="{{avatar}}" class='image' />
+      {{/notEq}}
+      <div class="notification-content">
+        <div class='text-activity'>
+
+          <div><a href="{{performerAccountUrl}}">{{performerAccountName}}</a></div>
+
+          <span class='activity-item'>
+            {{message}}
+          </span>
+
+          <div class="activity-item"><a href="{{relatedEntityUrl}}">{{relatedEntityName}}</a></div>
+        </div>
+
+        <div class='date'>{{date}}</div>
+
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</body>
+<html>

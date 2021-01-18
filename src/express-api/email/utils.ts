@@ -1,9 +1,11 @@
 import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { newLogger } from '@subsocial/utils';
 import { resolveSubsocialApi } from '../../connections/subsocial';
-import { appsUrl } from '../../env';
+import { appsUrl, ipfsGatewayUrl } from '../../env';
 import { ActivityTable } from '../../postgres/queries/feed-and-notifs';
 import { Activity } from '../telegramWS';
+import { NotificationTemplateProp } from './notifications';
+import { FeedTemplateProp } from './feed';
 
 export const log = newLogger("Email")
 
@@ -17,18 +19,18 @@ export const TableNameByActivityType: TableNameByActivityType = {
 	'confirmation': null
 }
 
-export type CreateEmailMessageFn = (activity: Activity) => Promise<string>
+export type CreateEmailMessageFn = (activity: Activity) => Promise<NotificationTemplateProp | FeedTemplateProp>
 
-export const createHrefForPost = (spaceId: string, postId: string, name: string) => {
-	return `<a href="${appsUrl}/${spaceId}/${postId}">${name}</a>`
+export const createHrefForPost = (spaceId: string, postId: string) => {
+	return `${appsUrl}/${spaceId}/${postId}`
 }
 
-export const createHrefForSpace = (spaceId: string, name: string) => {
-	return `<a href="${appsUrl}/${spaceId}">${name}</a>`
+export const createHrefForSpace = (spaceId: string) => {
+	return `${appsUrl}/${spaceId}`
 }
 
-export const createHrefForAccount = (followingId: string, name: string) => {
-	return `<a href="${appsUrl}/accounts/${followingId}">${name}</a>`
+export const createHrefForAccount = (followingId: string) => {
+	return `${appsUrl}/accounts/${followingId}`
 }
 
 export const createMessageForFeeds = (link: string, account: string, spaceName: string, date: string) => {
@@ -45,14 +47,19 @@ export const createNotification = (date: string, account: string, msg: string, l
   `
 }
 
-export const getAccountName = async (account: string): Promise<string> => {
+export const resolveIpfsUrl = (cid: string) => {
+    return `${ipfsGatewayUrl}/${cid}`
+}
+
+export const getAccountContent = async (account: string) => {
 	const subsocial = await resolveSubsocialApi()
 	const profile = await subsocial.findProfile(account)
 	if (profile?.content) {
 		const name = profile.content.name
-		return name
+		const avatar = profile.content.avatar ? resolveIpfsUrl(profile.content.avatar) : ''
+		return {name, avatar}
 	}
-	else return account
+	else return {name: account, avatar: ''}
 }
 
 export const getSpaceName = async (spaceId: SpaceId): Promise<string> => {
