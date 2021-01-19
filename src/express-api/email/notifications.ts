@@ -6,9 +6,10 @@ import { Activity } from '../telegramWS';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
 import { sendEmail } from './emailSender';
 import { v4 } from 'uuid'
-import { appsUrl, ipfsGatewayUrl } from '../../env';
+import { appsUrl } from '../../env';
 import { setConfirmationCode } from '../../postgres/updates/setConfirmationCode';
 import { SessionCall, ConfirmLetter } from '../../postgres/types/sessionKey';
+import { ipfsReadOnlyNodeUrl } from '../../connections';
 
 export type NotificationTemplateProp = {
 	date: string,
@@ -17,7 +18,7 @@ export type NotificationTemplateProp = {
 	avatar: string,
 	message: string,
 	relatedEntityUrl: string,
-	relatedEntityName: string
+	relatedEntityName: string,
 }
 
 export type ConfirmationLink = {
@@ -63,7 +64,6 @@ const getAccountPreview = async (account: string, following_id: string, message:
 		message,
 		relatedEntityUrl: accountUrl,
 		relatedEntityName: accountName
-
 	}
 }
 
@@ -146,7 +146,7 @@ export const sendConfirmationLetter = async (sessionCall: SessionCall<ConfirmLet
 	const confirmationCode = v4()
 
 	// TODO: replace hard-code
-	let imageLink = `${ipfsGatewayUrl}/QmYnF6YpRvvXETzCmVVc3PBziig7sgra6QmtqKEoCngm2C`
+	let imageLink = `${ipfsReadOnlyNodeUrl}/QmYnF6YpRvvXETzCmVVc3PBziig7sgra6QmtqKEoCngm2C`
 	const link: ConfirmationLink = {
 		link: `${appsUrl}/settings?confirmationCode=${confirmationCode}`,
 		image: imageLink

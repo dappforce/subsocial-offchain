@@ -46,7 +46,7 @@ const compareActivities = (a: Activity, b: Activity) => (
 const sendActivitiesEmail = async (email: string, activitiesWithType: ActivitiesWithType, createEmailFn: CreateEmailMessageFn) => {
   const { activityType, activities } = activitiesWithType
   let message = []
-  for (const activity of activities) {
+  for (const activity of activities.slice(0, 10)) {
     message.push(await createEmailFn(activity))
   }
 

@@ -1,11 +1,12 @@
 import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { newLogger } from '@subsocial/utils';
 import { resolveSubsocialApi } from '../../connections/subsocial';
-import { appsUrl, ipfsGatewayUrl } from '../../env';
+import { appsUrl } from '../../env';
 import { ActivityTable } from '../../postgres/queries/feed-and-notifs';
 import { Activity } from '../telegramWS';
 import { NotificationTemplateProp } from './notifications';
 import { FeedTemplateProp } from './feed';
+import { ipfsReadOnlyNodeUrl } from '../../connections';
 
 export const log = newLogger("Email")
 
@@ -48,7 +49,7 @@ export const createNotification = (date: string, account: string, msg: string, l
 }
 
 export const resolveIpfsUrl = (cid: string) => {
-    return `${ipfsGatewayUrl}/${cid}`
+    return `${ipfsReadOnlyNodeUrl}/${cid}`
 }
 
 export const getAccountContent = async (account: string) => {

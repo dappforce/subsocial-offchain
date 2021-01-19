@@ -17,6 +17,7 @@ export type FeedTemplateProp = {
 
 export const createFeedEmailMessage = async (activity: Activity): Promise<FeedTemplateProp> => {
 	const { post_id, date } = activity
+	const formatDate = new Date(date).toUTCString()
 	const subsocial = await resolveSubsocialApi()
 	const post = await subsocial.findPostWithAllDetails(post_id as unknown as PostId)
 	const { id, owner, space_id } = post.post.struct
@@ -31,5 +32,5 @@ export const createFeedEmailMessage = async (activity: Activity): Promise<FeedTe
 
 	const postLink = createHrefForPost(space_id.toString(), id.toString())
 
-	return { ownerName, ownerLink, avatar, spaceName, spaceLink, postName, postLink, postBody, date }
+	return { ownerName, ownerLink, avatar, spaceName, spaceLink, postName, postLink, postBody, date: formatDate }
 }

@@ -1,5 +1,5 @@
 import { createTransport, getTestMessageUrl } from 'nodemailer'
-import { emailHost, emailPort, emailUser, emailPassword } from '../../env';
+import { emailHost, emailPort, emailUser, emailPassword, appsUrl } from '../../env';
 import { newLogger } from '@subsocial/utils';
 import { ActivityType } from './utils';
 import { NotificationTemplateProp, ConfirmationLink } from './notifications';
@@ -29,13 +29,14 @@ export const sendEmail = async (email: string, data: DataTemplateProp, type: Act
 		}
 		return options.inverse(this);
 	});
+
 	const template = compile(source)
 
 	const info = await transporter.sendMail({
 		from: emailUser,
 		to: email,
 		subject: `New ${type}`,
-		html: template({ data })
+		html: template({ data, appsUrl })
 	})
 	log.debug("Message sent: %s", info.messageId);
 
