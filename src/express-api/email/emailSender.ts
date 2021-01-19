@@ -2,11 +2,10 @@ import { createTransport, getTestMessageUrl } from 'nodemailer'
 import { emailHost, emailPort, emailUser, emailPassword } from '../../env';
 import { newLogger } from '@subsocial/utils';
 import { ActivityType } from './utils';
-import { NotificationTemplateProp, ConfirmationLink } from './notifications';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { compile, registerHelper } from 'handlebars';
-import { FeedTemplateProp } from './feed';
+import { NotificationTemplateProp, ConfirmationLink, FeedTemplateProp } from './types';
 
 const log = newLogger('Email')
 

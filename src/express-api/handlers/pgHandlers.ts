@@ -13,7 +13,7 @@ import { updateLastPush } from '../../postgres/updates/updateLastPush';
 import { getSessionKey } from '../../postgres/selects/getSessionKey';
 import { addEmailSettings } from '../../postgres/inserts/insertEmailSettings';
 import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
-import { sendConfirmationLetter as sendConfirmationLetter } from '../email/notifications';
+import { confirmationEmailForSettings } from '../email/confirmation';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
@@ -149,9 +149,9 @@ export const getEmailSettingsHandler: HandlerFn = (req, res) => {
 }
 
 export const sendConfirmationLetterHandler: HandlerFn = (req, res) => {
-  return resolvePromiseAndReturnJson(res, sendConfirmationLetter(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
+  return resolvePromiseAndReturnJson(res, confirmationEmailForSettings(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
 }
 
-export const confirmEmailHandler: HandlerFn = (req, res) => {
+export const confirmEmailForSettingsHandler: HandlerFn = (req, res) => {
   return resolvePromiseAndReturnJson(res, setConfirmationDate(req.body.sessionCall as SessionCall<ConfirmEmail>))
 }

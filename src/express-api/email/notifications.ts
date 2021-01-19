@@ -4,26 +4,7 @@ import { getAccountContent, createHrefForPost, createHrefForAccount, createHrefF
 import { EventsName } from '@subsocial/types';
 import { Activity } from '../telegramWS';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
-import { sendEmail } from './emailSender';
-import { v4 } from 'uuid'
-import { appsUrl, ipfsGatewayUrl } from '../../env';
-import { setConfirmationCode } from '../../postgres/updates/setConfirmationCode';
-import { SessionCall, ConfirmLetter } from '../../postgres/types/sessionKey';
-
-export type NotificationTemplateProp = {
-	date: string,
-	performerAccountUrl: string,
-	performerAccountName: string,
-	avatar: string,
-	message: string,
-	relatedEntityUrl: string,
-	relatedEntityName: string
-}
-
-export type ConfirmationLink = {
-	link: string,
-	image: string
-}
+import { NotificationTemplateProp } from './types';
 
 export const createNotifsEmailMessage = async (activity: Activity): Promise<NotificationTemplateProp> => {
 	const { account, event, space_id, post_id, date, following_id, comment_id } = activity
@@ -139,24 +120,4 @@ const getPostPreview = async (account: string, postId: string, message: string, 
 		relatedEntityName: content
 	}
 
-}
-
-export const sendConfirmationLetter = async (sessionCall: SessionCall<ConfirmLetter>) => {
-	const email = sessionCall.message.args.email
-	const confirmationCode = v4()
-
-	// TODO: replace hard-code
-	let imageLink = `${ipfsGatewayUrl}/QmYnF6YpRvvXETzCmVVc3PBziig7sgra6QmtqKEoCngm2C`
-	const link: ConfirmationLink = {
-		link: `${appsUrl}/settings?confirmationCode=${confirmationCode}`,
-		image: imageLink
-	}
-
-	try {
-		await sendEmail(email, link, "confirmation")
-		await setConfirmationCode(sessionCall, confirmationCode)
-	} catch (err) {
-		// TODO: replace with logger created by newLogger
-		console.log("Error", err)
-	}
 }

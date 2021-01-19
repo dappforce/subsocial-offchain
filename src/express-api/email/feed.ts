@@ -2,18 +2,7 @@ import { Activity } from '../telegramWS';
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import { PostId } from '@subsocial/types/substrate/interfaces';
 import { createHrefForAccount, createHrefForPost, getAccountContent, createHrefForSpace } from './utils';
-
-export type FeedTemplateProp = {
-	ownerName: string,
-	ownerLink: string,
-	avatar: string
-	spaceName: string,
-	spaceLink: string,
-	postName: string,
-	postLink: string,
-	postBody: string,
-	date: string
-}
+import { FeedTemplateProp } from './types';
 
 export const createFeedEmailMessage = async (activity: Activity): Promise<FeedTemplateProp> => {
 	const { post_id, date } = activity
