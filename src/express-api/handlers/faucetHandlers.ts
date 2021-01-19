@@ -1,19 +1,13 @@
 import Express from "express";
-import { sendConfirmationLetter } from '../email/confirmation';
-
-type FormData = {
-  address: string,
-  email: string,
-  token: string
-}
-
-async function checkEmail(_formData: FormData): Promise<boolean> {
-  // TODO: checkEmail in database
-  return true;
-}
+import { validateHuman } from '../captcha';
+import { sendFaucetConfirmationLetter } from '../email/confirmation';
+import { checkEmail } from '../faucet/check';
+import { FaucetFormData } from '../faucet/types';
 
 export  const confirmEmailHandler = async (req: Express.Request, res: Express.Response) => {
-  const formData: FormData = req.body;
+  const formData: FaucetFormData = req.body;
+
+  console.log('formData', formData)
 
   const human = await validateHuman(formData.token);
   if (!human) {
@@ -23,7 +17,7 @@ export  const confirmEmailHandler = async (req: Express.Request, res: Express.Re
   }
 
   if (checkEmail(formData)) {
-    await sendConfirmationLetter(formData.email)
+    await sendFaucetConfirmationLetter(formData.email)
     res.status(201);
     res.json({ message: "Success!" });
   } else {

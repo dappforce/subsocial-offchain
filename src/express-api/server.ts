@@ -113,7 +113,7 @@ app.post('/v1/offchain/email/sendConfirmationLetter', pgReqHandlers.sendConfirma
 
 app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailForSettingsHandler)
 
-app.post('v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
+app.post('/v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
 
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {

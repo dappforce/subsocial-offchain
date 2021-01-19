@@ -1,8 +1,8 @@
+import { recatchaKey } from "../env";
 
-async function validateHuman(token: string): Promise<boolean> {
-  const secret = process.env.RECAPTCHA_SECRET_KEY;
+export async function validateHuman (token: string): Promise<boolean> {
   const response = await fetch(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`,
+    `https://www.google.com/recaptcha/api/siteverify?secret=${recatchaKey}&response=${token}`,
     {
       method: "POST",
     }

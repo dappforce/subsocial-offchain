@@ -10,13 +10,14 @@ import { NotificationTemplateProp, FeedTemplateProp } from './types';
 export const log = newLogger("Email")
 
 // FIXME: export these to JS libs
-export type ActivityType = 'notifications' | 'feeds' | 'confirmation'
+export type ActivityType = 'notifications' | 'feeds' | 'faucet-confirmation' | 'notif-confirmation'
 
 type TableNameByActivityType = Record<ActivityType, ActivityTable>
 export const TableNameByActivityType: TableNameByActivityType = {
 	'feeds': 'news_feed',
 	'notifications': 'notifications',
-	'confirmation': null
+	'faucet-confirmation': null,
+	'notif-confirmation': null
 }
 
 export type CreateEmailMessageFn = (activity: Activity) => Promise<NotificationTemplateProp | FeedTemplateProp>

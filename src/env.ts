@@ -13,3 +13,7 @@ export const emailHost = process.env.EMAIL_HOST
 export const emailPort = process.env.EMAIL_PORT
 export const emailUser = process.env.EMAIL_USER
 export const emailPassword = process.env.EMAIL_PASSWORD
+
+export const recatchaKey = process.env.RECAPTCHA_KEY
+
+export const subsocialLogo = `${ipfsNodeUrl}/ipfs/QmYnF6YpRvvXETzCmVVc3PBziig7sgra6QmtqKEoCngm2C`
