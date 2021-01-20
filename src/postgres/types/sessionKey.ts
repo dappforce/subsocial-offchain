@@ -27,7 +27,7 @@ export type SessionCall<T extends MessageGenericExtends> = {
 
 export type SetUpEmailArgs = {
 	email: string,
-	recurrence: string,
+	periodicity: string,
 	send_feeds: boolean,
 	send_notifs: boolean
 }

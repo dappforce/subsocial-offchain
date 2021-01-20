@@ -3,6 +3,7 @@ import { getConfirmationData } from '../selects/getConfirmationCode';
 import { log } from '../postges-logger';
 import { ConfirmEmail, SessionCall } from '../types/sessionKey';
 import { updateNonce } from './updateNonce';
+import { BaseConfirmData } from '../../express-api/faucet/types';
 
 const query = `
   UPDATE df.email_settings
@@ -10,7 +11,29 @@ const query = `
   WHERE account = :account
   RETURNING *`
 
-export async function setConfirmationDate(sessionCall: SessionCall<ConfirmEmail>) {
+export const setConfirmationDate = async ({ account, confirmationCode: confirmationCodeFromClient }: BaseConfirmData) => {
+  const params = { account, date: new Date() };
+    try {
+      const { confirmation_code, expires_on } = await getConfirmationData(account)
+      if (confirmation_code != confirmationCodeFromClient) {
+        log.error("Confirmation code is wrong")
+        return false
+      }
+      
+      if (new Date().getTime() >= new Date(expires_on).getTime()) {
+        return false
+      }
+
+      const res = await runQuery(query, params)
+      if (!res.rows[0]) return false
+
+      return true
+    } catch (err) {
+      throw newPgError(err, setConfirmationDateForSettings)
+    }
+}
+
+export async function setConfirmationDateForSettings(sessionCall: SessionCall<ConfirmEmail>) {
   const { account, message } = sessionCall
 
   const { nonce, rootAddress } = await upsertNonce(account, message)
@@ -23,27 +46,10 @@ export async function setConfirmationDate(sessionCall: SessionCall<ConfirmEmail>
     }
     log.debug(`Signature verified`)
 
-    const confirmationCodeFromClient = message.args.confirmationCode
+    const confirmationCode = message.args.confirmationCode
 
-    const params = { account: rootAddress, date: new Date() };
-    try {
-      const { confirmation_code, expires_on } = await getConfirmationData(rootAddress)
-      if (confirmation_code != confirmationCodeFromClient) {
-        log.error("Confirmation code is wrong")
-        return false
-      }
-
-      if (new Date().getTime() >= new Date(expires_on).getTime()) {
-        return false
-      }
-
-      const res = await runQuery(query, params)
-      await updateNonce(account, message.nonce + 1)
-      if (!res.rows[0]) return false
-      return true
-    } catch (err) {
-      throw newPgError(err, setConfirmationDate)
-    }
+    await setConfirmationDate({ account: rootAddress, confirmationCode })
+    await updateNonce(account, message.nonce + 1)
   }
   return false
 };
