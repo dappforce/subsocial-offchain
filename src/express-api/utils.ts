@@ -4,12 +4,12 @@ import { expressApiLog } from '../connections/loggers'
 
 export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 20
 
-export type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
+export type HandlerFn = (req: express.Request, res: express.Response) => Promise<any>
 
 export type EmailSettings = {
 	account: string,
 	email: string,
-	recurrence: string,
+	periodicity: string,
 	send_feeds: boolean,
 	send_notifs: boolean,
 	last_block_bumber: number,
@@ -17,6 +17,11 @@ export type EmailSettings = {
 	next_leter_date: Date,
 	confirmation_code: string,
 	confirmed_on: Date
+}
+
+export type OkOrError = {
+  ok: boolean,
+  errors?: Record<string, string>
 }
 
 const getNumberFromRequest = (
