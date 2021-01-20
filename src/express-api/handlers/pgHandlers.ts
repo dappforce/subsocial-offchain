@@ -20,7 +20,7 @@ import {
   resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
-import { setConfirmationDate } from '../../postgres/updates/setConfirmationDate';
+import { setConfirmationDateForSettings } from '../../postgres/updates/setConfirmationDate';
 
 
 const activityHandler = (
@@ -153,5 +153,5 @@ export const sendConfirmationLetterHandler: HandlerFn = (req, res) => {
 }
 
 export const confirmEmailForSettingsHandler: HandlerFn = (req, res) => {
-  return resolvePromiseAndReturnJson(res, setConfirmationDate(req.body.sessionCall as SessionCall<ConfirmEmail>))
+  return resolvePromiseAndReturnJson(res, setConfirmationDateForSettings(req.body.sessionCall as SessionCall<ConfirmEmail>))
 }

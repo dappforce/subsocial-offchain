@@ -55,8 +55,8 @@ const sendActivitiesEmail = async (email: string, activitiesWithType: Activities
   }
 }
 
-const sendNotificationsAndFeeds = async (recurrence: string) => {
-  const emailSettingsArray: EmailSettings[] = await getAllEmailSettings(recurrence)
+const sendNotificationsAndFeeds = async (periodicity: string) => {
+  const emailSettingsArray: EmailSettings[] = await getAllEmailSettings(periodicity)
 
   for (const setting of emailSettingsArray) {
     const { account, last_block_bumber, last_event_index, email, send_notifs, send_feeds } = setting
