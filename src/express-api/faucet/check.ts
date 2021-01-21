@@ -16,13 +16,12 @@ export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData,
 
   if (foundEmail === email) { 
     ok = false
-    errors.account = 'The email was drop token yet'
+    errors.email = 'The email was drop token yet'
   }
 
-  const { substrate: { api } } = await resolveSubsocialApi()
-  const readyApi = await api
+  const { api } = await resolveSubsocialApi()
 
-  const { freeBalance } = await readyApi.derive.balances.all(account)
+  const { freeBalance } = await api.derive.balances.all(account)
   
   if (!freeBalance.eqn(0)) { 
     ok = false
