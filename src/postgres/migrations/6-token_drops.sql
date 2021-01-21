@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS df.token_drops
 (
+    block_number bigint NOT NULL,
+    event_index integer NOT NULL,
     faucet varchar(48) NOT NULL,
     account varchar(48) NOT NULL,
     amount double precision NOT NULL,
