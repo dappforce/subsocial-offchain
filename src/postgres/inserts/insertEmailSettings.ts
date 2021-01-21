@@ -2,6 +2,7 @@ import { runQuery, isValidSignature, upsertNonce } from '../utils';
 import { log } from '../postges-logger'
 import { SessionCall, SetUpEmailArgs } from '../types/sessionKey';
 import { updateNonce } from '../updates/updateNonce';
+import { getExpiresOnDate } from '../../express-api/email/utils';
 
 type RequireEmailSettingsParams = {
 	account: string,
@@ -56,7 +57,7 @@ const addEmailWithConfirmCodeQuery = `
 	expires_on = :expiresOn`
 
 export const addEmailWithConfirmCode = async (params: AddEmailWithConfirmCodeParams) => {
-	const expiresOn = new Date(new Date().getTime() + (60 * 60 * 1000)).toISOString() // TODO: replace dayjs
+	const expiresOn = getExpiresOnDate()
 
 	try {
 		await runQuery(addEmailWithConfirmCodeQuery, { ...params, expiresOn })
