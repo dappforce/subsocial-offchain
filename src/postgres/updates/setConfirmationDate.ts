@@ -4,6 +4,7 @@ import { log } from '../postges-logger';
 import { ConfirmEmail, SessionCall } from '../types/sessionKey';
 import { updateNonce } from './updateNonce';
 import { BaseConfirmData } from '../../express-api/faucet/types';
+import dayjs from 'dayjs'
 
 const query = `
   UPDATE df.email_settings
@@ -12,7 +13,7 @@ const query = `
   RETURNING *`
 
 export const setConfirmationDate = async ({ account, confirmationCode: confirmationCodeFromClient }: BaseConfirmData) => {
-  const params = { account, date: new Date() };
+  const params = { account, date: dayjs() };
     try {
       const { confirmation_code, expires_on } = await getConfirmationData(account)
       if (confirmation_code != confirmationCodeFromClient) {
@@ -20,7 +21,10 @@ export const setConfirmationDate = async ({ account, confirmationCode: confirmat
         return false
       }
       
-      if (new Date().getTime() >= new Date(expires_on).getTime()) {
+      console.log(dayjs().toString(), expires_on, dayjs(expires_on).toString())
+
+      if (dayjs().unix() - dayjs(expires_on).unix() > 0) {
+        console.log('Outdate')
         return false
       }
 

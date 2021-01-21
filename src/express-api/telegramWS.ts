@@ -2,7 +2,7 @@ import * as WebSocket from 'ws'
 import { newLogger } from '@subsocial/utils'
 import { EVENT_SEND_FOR_TELEGRAM, eventEmitter, Type } from './events';
 import { offchainTWSPort } from '../env';
-import * as BN from 'bn.js';
+import BN from 'bn.js';
 import { getActivity } from '../postgres/selects/getActivity';
 import { Activity as OldActivity } from '@subsocial/types'
 import { getChatIdByAccount } from '../postgres/selects/getChatIdByAccount';

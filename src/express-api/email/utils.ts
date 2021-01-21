@@ -6,6 +6,7 @@ import { appsUrl } from '../../env';
 import { ActivityTable } from '../../postgres/queries/feed-and-notifs';
 import { Activity } from '../telegramWS';
 import { NotificationTemplateProp, FeedTemplateProp } from './types';
+import dayjs from 'dayjs'
 
 export const log = newLogger("Email")
 
@@ -72,3 +73,5 @@ export const getSpaceName = async (spaceId: SpaceId): Promise<string> => {
 	}
 	else return ''
 }
+
+export const getExpiresOnDate = () => dayjs().add(1, 'hours').toString()

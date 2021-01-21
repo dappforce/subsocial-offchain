@@ -1,5 +1,6 @@
 /** Types generated for queries found in "src/postgres/inserts/insertActivityForAccount.ts" */
 import { action } from '../utils';
+import { Dayjs } from 'dayjs'
 
 /** 'Query' parameters type */
 export interface IQueryParams {
@@ -8,7 +9,7 @@ export interface IQueryParams {
   account: string | null | void;
   event: action | null | void;
   followingId: string | null | void;
-  date: Date | null | void;
+  date: Dayjs | null | void;
   aggCount: number | null | void;
 }
 

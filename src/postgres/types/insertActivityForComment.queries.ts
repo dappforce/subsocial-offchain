@@ -1,5 +1,6 @@
 /** Types generated for queries found in "src/postgres/inserts/insertActivityForComment.ts" */
 import { action } from '../utils';
+import { Dayjs } from 'dayjs'
 
 /** 'Query' parameters type */
 export interface IQueryParams {
@@ -10,7 +11,7 @@ export interface IQueryParams {
   postId: bigint | null | void;
   commentId: bigint | null | void;
   parentCommentId: bigint | null | void;
-  date: Date | null | void;
+  date: Dayjs | null | void;
   aggCount: number | null | void;
   aggregated: boolean | null | void;
 }

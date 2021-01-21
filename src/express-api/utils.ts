@@ -1,6 +1,7 @@
 import * as express from 'express'
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils'
 import { expressApiLog } from '../connections/loggers'
+import { Dayjs } from 'dayjs'
 
 export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 20
 
@@ -14,14 +15,15 @@ export type EmailSettings = {
 	send_notifs: boolean,
 	last_block_bumber: number,
 	last_event_index: number,
-	next_leter_date: Date,
+	next_leter_date: Dayjs,
 	confirmation_code: string,
-	confirmed_on: Date
+	confirmed_on: Dayjs
 }
 
-export type OkOrError = {
+export type OkOrError<T = null> = {
   ok: boolean,
   errors?: Record<string, string>
+  data?: T
 }
 
 const getNumberFromRequest = (
