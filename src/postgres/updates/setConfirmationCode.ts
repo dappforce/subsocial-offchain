@@ -2,6 +2,7 @@ import { runQuery, newPgError, isValidSignature, upsertNonce } from '../utils';
 import { log } from '../postges-logger';
 import { ConfirmLetter, SessionCall } from '../types/sessionKey';
 import { updateNonce } from './updateNonce';
+import { getExpiresOnDate } from '../../express-api/email/utils';
 
 const query = `
   UPDATE df.email_settings
@@ -21,7 +22,8 @@ export async function setConfirmationCode(sessionCall: SessionCall<ConfirmLetter
       return
     }
     log.debug(`Signature verified`)
-    const expiresOn = new Date(new Date().getTime() + (60 * 60 * 1000))
+    const expiresOn = getExpiresOnDate()
+
     const params = { account: rootAddress, expiresOn, confirmationCode };
     try {
       const res = await runQuery(query, params)
