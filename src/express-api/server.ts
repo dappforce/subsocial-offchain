@@ -1,16 +1,17 @@
-import * as express from 'express'
-import * as bodyParser from 'body-parser'
-import * as cors from 'cors';
+import express from 'express'
+import bodyParser from 'body-parser'
+import cors from 'cors';
 import parseSitePreview from '../parser/parse-preview'
-import * as multer from 'multer';
+import multer from 'multer';
 import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
 import * as faucetReqHandlers from './handlers/faucetHandlers'
 import { expressApiLog as log } from '../connections/loggers';
-import * as timeout from 'connect-timeout';
+import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
 import './email/jobs'
+import { resolveSubsocialApi } from '../connections';
 
 require('dotenv').config()
 
@@ -115,6 +116,8 @@ app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailFor
 
 app.post('/v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
 
+app.post('/v1/offchain/faucet/drop', faucetReqHandlers.tokenDropHandler)
+
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await parseSitePreview(req.body.url)
@@ -122,6 +125,9 @@ app.post('/offchain/parser/', async (req: express.Request, res: express.Response
 })
 
 const port = process.env.OFFCHAIN_SERVER_PORT
-app.listen(port, () => {
-  log.info(`HTTP server started on port ${port}`)
-})
+
+resolveSubsocialApi()
+  .finally(() => app.listen(port, () => {
+    log.info(`HTTP server started on port ${port}`)
+  }))
+
