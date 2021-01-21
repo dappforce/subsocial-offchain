@@ -1,6 +1,6 @@
 import * as events from 'events'
 import { log } from './ws';
-import * as BN from 'bn.js';
+import BN from 'bn.js';
 
 events.EventEmitter.defaultMaxListeners = 0;
 

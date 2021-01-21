@@ -2,7 +2,7 @@ import { SubsocialSubstrateApi } from '@subsocial/api/substrate'
 import { resolveSubsocialApi } from '../connections/subsocial'
 import { indexPostContent, indexProfileContent, indexSpaceContent } from './indexer'
 import { elasticLog as log } from '../connections/loggers'
-import * as BN from 'bn.js'
+import BN from 'bn.js';
 import { argv, exit } from 'process'
 import { GenericAccountId } from '@polkadot/types'
 import { isEmptyArray } from '@subsocial/utils';

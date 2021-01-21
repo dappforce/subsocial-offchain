@@ -1,6 +1,6 @@
 import { log } from '../postges-logger';
 import { runQuery } from '../utils';
-import * as BN from 'bn.js';
+import BN from 'bn.js';
 import { Activity } from '@subsocial/types';
 
 const query = `

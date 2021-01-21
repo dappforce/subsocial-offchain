@@ -5,7 +5,7 @@ import { resolveSubsocialApi } from '../connections/subsocial';
 import { Id, NormalizedPost, NormalizedProfile, NormalizedSpace, normalizeSpaceStruct, normalizePostStruct, normalizeProfileStruct } from './normalizers';
 import AccountId from '@polkadot/types/generic/AccountId';
 import { TEST_MODE } from '../env';
-import * as BN from 'bn.js';
+import BN from 'bn.js';
 
 type StorageName = 'posts' | 'spaces' | 'profiles'
 

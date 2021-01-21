@@ -2,8 +2,9 @@ import { Option } from '@polkadot/types'
 import { Event } from '@polkadot/types/interfaces';
 import { newLogger } from '@subsocial/utils'
 import { SubstrateEvent } from './types'
-import * as BN from 'bn.js';
+import BN from 'bn.js';
 import { resolveSubsocialApi } from '../connections/subsocial';
+import dayjs from 'dayjs'
 
 require('dotenv').config()
 
@@ -84,5 +85,5 @@ export const blockNumberToApproxDate = async (eventBlock: BN) => {
   const lastBlockNumber = block.block.header.number.unwrap()
   const result = currentTimestamp.sub(lastBlockNumber.sub(new BN(eventBlock)).muln(blockTime))
 
-  return new Date(result.toNumber())
+  return dayjs(result.toNumber())
 }
