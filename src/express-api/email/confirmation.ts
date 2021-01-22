@@ -26,13 +26,10 @@ export async function sendConfirmationLetter ({ email, url, args, type }: SendCo
 		image: subsocialLogo
 	}
 
-	console.log(data)
-
 	try {
 		await sendEmail(email, data, type)
 		return confirmationCode
 	} catch (err) {
-		// TODO: replace with logger created by newLogger
 		log.error("Failed send confirmation:", err)
 		return undefined
   }
@@ -46,8 +43,7 @@ export const sendNotifConfirmationLetter = async (sessionCall: SessionCall<Confi
 		const confirmationCode = await sendConfirmationLetter({ email, url: 'settings', type: 'notif-confirmation' })
 		confirmationCode && await setConfirmationCode(sessionCall, confirmationCode)
 	} catch (err) {
-		// TODO: replace with logger created by newLogger
-    console.log("Error", err)
+    log.error("Error", err)
   }
   
 }
@@ -57,8 +53,7 @@ export const sendFaucetConfirmationLetter = async ({ email, account }: FaucetFor
 		const confirmationCode = await sendConfirmationLetter({ email, url: `faucet/drop`, args: { account }, type: 'faucet-confirmation' })
 		return confirmationCode
 	} catch (err) {
-		// TODO: replace with logger created by newLogger
-		console.log("Error", err)
+		log.error("Error", err)
 		return undefined
   }
 }
