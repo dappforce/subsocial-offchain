@@ -4,10 +4,11 @@ import { sendFaucetConfirmationLetter } from '../email/confirmation';
 import { checkWasTokenDrop } from '../faucet/check';
 import { BaseConfirmData, FaucetFormData } from '../faucet/types';
 import { HandlerFn } from '../utils';
-import { tokenDrop } from '../faucet/drop';
+import { confirmAndTokenDrop, tokenDrop } from '../faucet/drop';
 import { GenericAccountId } from '@polkadot/types';
 import { registry } from '@subsocial/types/substrate/registry';
 import isEmpty from 'lodash.isempty'
+import { getConfirmationData } from '../../postgres/selects/getConfirmationCode';
 
 const getSubsocialAccountId = (account: string) => new GenericAccountId(registry, account).toString()
 
@@ -30,11 +31,22 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
 
   const { ok, errors } = await checkWasTokenDrop(data)
 
-  console.log('errors', errors, ok)
-
   if (ok) {
+    const { confirmed_on, email } = await getConfirmationData(account)
+
+    if (confirmed_on) {
+
+      const { ok, errors } = await tokenDrop({ account, email })
+      if (ok) {
+        res.status(301);
+        res.json({ ok, data: { message: 'droped' } });
+      } else {
+        res.status(401).json({ errors })
+      }
+
+    } 
+
     const confirmationCode = await sendFaucetConfirmationLetter(data)
-    console.log('confirmationCode', confirmationCode)
     confirmationCode && await addEmailWithConfirmCode({ ...data, confirmationCode })
     res.status(200);
     res.json({ ok });
@@ -53,8 +65,7 @@ export const tokenDropHandler: HandlerFn = async (req, res) => {
 
   const account = getSubsocialAccountId(data.account)
 
-  const { ok, errors } = await tokenDrop({ ...data, account })
-  console.log('tokenDrop', ok, errors)
+  const { ok, errors } = await confirmAndTokenDrop({ ...data, account })
   if (ok) {
     res.status(200).send({ ok })
   } else {

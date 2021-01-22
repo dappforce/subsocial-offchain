@@ -58,7 +58,6 @@ const addEmailWithConfirmCodeQuery = `
 
 export const addEmailWithConfirmCode = async (params: AddEmailWithConfirmCodeParams) => {
 	const expiresOn = getExpiresOnDate()
-
 	try {
 		await runQuery(addEmailWithConfirmCodeQuery, { ...params, expiresOn })
 		log.debug(`Insert email settings in database: ${params.account}`)
