@@ -7,29 +7,35 @@ import { setConfirmationDate } from '../../postgres/updates/setConfirmationDate'
 import { OkOrError } from '../utils';
 import { checkWasTokenDrop } from './check';
 import { getFaucetPublicKey, transferToken } from './transfer';
-import { BaseConfirmData } from "./types";
+import { BaseConfirmData, FaucetFormData } from "./types";
 
-export const tokenDrop = async ({ account: clientSideAccount, confirmationCode }: BaseConfirmData): Promise<OkOrError<number>> => {
+export const tokenDrop = async ({ account, email }: Omit<FaucetFormData, 'token'>): Promise<OkOrError> => {
+  const { ok: noTokenDrop, errors } = await checkWasTokenDrop({ account, email })
+
+  if (!noTokenDrop) return { ok: false, errors }
+
+  await transferToken(account,
+    (block_number, event_index) => insertTokenDrop({
+      block_number,
+      event_index,
+      faucet: getFaucetPublicKey(),
+      account,
+      amount: faucetAmount,
+      email,
+      captcha_solved: true
+    }))
+
+  return { ok: true }
+}
+
+export const confirmAndTokenDrop = async ({ account: clientSideAccount, confirmationCode }: BaseConfirmData): Promise<OkOrError> => {
   const account = new GenericAccountId(registry, clientSideAccount).toString()
   try {
     const { email } = await getConfirmationData(account)
-    const isConfirmed = await setConfirmationDate({ account, confirmationCode })
-    const { ok: noTokenDrop, errors } = await checkWasTokenDrop({ account, email })
+    const { ok, errors } = await setConfirmationDate({ account, confirmationCode })
 
-    console.log(isConfirmed, noTokenDrop)
-    if (/* isConfirmed && */noTokenDrop) {
-      await transferToken(account,
-        (block_number, event_index) => insertTokenDrop({
-          block_number,
-          event_index,
-          faucet: getFaucetPublicKey(),
-          account,
-          amount: faucetAmount,
-          email,
-          captcha_solved: true
-        }))
-
-      return { ok: true, data: faucetAmount }
+    if (ok) {
+     return tokenDrop({ account, email })
     } else {
       throw errors
     }
