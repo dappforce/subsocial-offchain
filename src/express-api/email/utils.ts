@@ -74,4 +74,4 @@ export const getSpaceName = async (spaceId: SpaceId): Promise<string> => {
 	else return ''
 }
 
-export const getExpiresOnDate = () => dayjs().add(1, 'hours').toString()
+export const getExpiresOnDate = () => dayjs().add(1, 'hours').format('YYYY-MM-DDTHH:mm:ss')

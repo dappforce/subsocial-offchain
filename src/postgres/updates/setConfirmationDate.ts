@@ -5,6 +5,8 @@ import { ConfirmEmail, SessionCall } from '../types/sessionKey';
 import { updateNonce } from './updateNonce';
 import { BaseConfirmData } from '../../express-api/faucet/types';
 import dayjs from 'dayjs'
+import { nonEmptyStr } from '@subsocial/utils';
+import { OkOrError } from '../../express-api/utils';
 
 const query = `
   UPDATE df.email_settings
@@ -12,26 +14,27 @@ const query = `
   WHERE account = :account
   RETURNING *`
 
-export const setConfirmationDate = async ({ account, confirmationCode: confirmationCodeFromClient }: BaseConfirmData) => {
+export const setConfirmationDate = async ({ account, confirmationCode: confirmationCodeFromClient }: BaseConfirmData): Promise<OkOrError> => {
   const params = { account, date: dayjs() };
     try {
-      const { confirmation_code, expires_on } = await getConfirmationData(account)
-      if (confirmation_code != confirmationCodeFromClient) {
-        log.error("Confirmation code is wrong")
-        return false
-      }
-      
-      console.log(dayjs().toString(), expires_on, dayjs(expires_on).toString())
+      const { confirmation_code, expires_on, confirmed_on } = await getConfirmationData(account)
 
-      if (dayjs().unix() - dayjs(expires_on).unix() > 0) {
-        console.log('Outdate')
-        return false
+      if (nonEmptyStr(confirmed_on)) return { ok: true }
+
+      if (confirmation_code != confirmationCodeFromClient) {
+        log.error('Confirmation code is wrong')
+        return { ok: false, errors: { confirm: 'Confirmation code is wrong' } }
+      }
+
+      if (dayjs().diff(expires_on) > 0) {
+        log.error('Outdate')
+        return { ok: false, errors: { confirm: 'Confirmation code is outdate' } }
       }
 
       const res = await runQuery(query, params)
-      if (!res.rows[0]) return false
+      if (!res.rows[0]) return { ok: false, errors: { confirm: 'This email is not found' } }
 
-      return true
+      return { ok: true }
     } catch (err) {
       throw newPgError(err, setConfirmationDateForSettings)
     }
