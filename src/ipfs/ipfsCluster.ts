@@ -1,5 +1,5 @@
 import { newLogger } from '@subsocial/utils'
-import * as request from 'request-promise'
+import request from 'request-promise'
 
 type IpfsCid = string
 type IpfsUrl = string

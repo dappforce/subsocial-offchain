@@ -2,7 +2,7 @@ import { Option } from '@polkadot/types'
 import { Event } from '@polkadot/types/interfaces';
 import { newLogger } from '@subsocial/utils'
 import { SubstrateEvent } from './types'
-import * as BN from 'bn.js';
+import BN from 'bn.js';
 import { resolveSubsocialApi } from '../connections/subsocial';
 
 require('dotenv').config()
@@ -29,7 +29,7 @@ export function shouldHandleEvent (event: Event): boolean {
   }
 
   return eventsFilterMethods.has(ANY_EVENT) || (
-    eventsFilterSections.has(event.section.toString()) && 
+    eventsFilterSections.has(event.section.toString()) &&
     eventsFilterMethods.has(event.method.toString())
   )
 }

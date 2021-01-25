@@ -33,9 +33,10 @@ export async function addSessionKey(sessionCall: SessionCall<AddSessionKeyArgs>)
     log.debug(`Signature verified`)
 
     try {
+      console.log(sessionKey)
       const sessionKeyGeneric = new GenericAccountId(registry, sessionKey)
       await runQuery<IQueryParams>(query, { mainKey: account, sessionKey: String(sessionKeyGeneric) })
-      log.debug(`Insert in nonces table: ${account}`)
+      log.debug(`Insert in nonces table: ${account} session key ${String(sessionKeyGeneric)}`)
       await updateNonce(account, message.nonce + 1)
     } catch (err) {
       log.error(`Failed to insert in session key table by account: ${account}`, err.stack)

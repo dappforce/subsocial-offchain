@@ -7,6 +7,9 @@ import { Activity } from '../telegramWS';
 import { NotificationTemplateProp } from './notifications';
 import { FeedTemplateProp } from './feed';
 import { ipfsReadOnlyNodeUrl } from '../../connections';
+import { AnyAccountId } from '@subsocial/types';
+import dayjs from 'dayjs';
+import BN from 'bn.js';
 
 export const log = newLogger("Email")
 
@@ -38,18 +41,21 @@ export const createMessageForFeeds = (link: string, account: string, spaceName: 
 	return link + "\n" + "Posted by " + account + " in space " + spaceName + "\n" + date
 }
 
-export const createNotification = (date: string, account: string, msg: string, link: string): string => {
+export const toShortAddress = (_address: AnyAccountId) => {
+  const address = (_address || '').toString()
 
-	return `
-		<a href='${link}'>
-			Photo ${account} ${msg} ${link} Avatar\n
-			${date}
-		</a>
-  `
+  return address.length > 13 ? `${address.slice(0, 6)}…${address.slice(-6)}` : address
 }
 
 export const resolveIpfsUrl = (cid: string) => {
     return `${ipfsReadOnlyNodeUrl}/${cid}`
+}
+
+export const DEFAULT_DATE_FORMAT = 'D MMM, YYYY h:mm A'
+
+export const formatDate = (date: dayjs.ConfigType | BN, format = DEFAULT_DATE_FORMAT) => {
+  date = BN.isBN(date) ? date.toNumber() : date
+  return dayjs(date).format(format)
 }
 
 export const getAccountContent = async (account: string) => {
@@ -60,7 +66,7 @@ export const getAccountContent = async (account: string) => {
 		const avatar = profile.content.avatar ? resolveIpfsUrl(profile.content.avatar) : ''
 		return {name, avatar}
 	}
-	else return {name: account, avatar: ''}
+	else return {name: toShortAddress(account), avatar: ''}
 }
 
 export const getSpaceName = async (spaceId: SpaceId): Promise<string> => {

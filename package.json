@@ -76,6 +76,7 @@
     "connect-timeout": "^1.9.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "dayjs": "^1.10.4",
     "dotenv": "^8.0.0",
     "email-templates": "^8.0.3",
     "express": "^4.17.1",

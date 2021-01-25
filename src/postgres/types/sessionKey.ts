@@ -39,3 +39,7 @@ export type ConfirmLetter = {
 export type ConfirmEmail = {
 	confirmationCode: string
 }
+
+export type ClearConfirmDateArgs = {
+  email: string
+}

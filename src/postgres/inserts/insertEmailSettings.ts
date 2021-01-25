@@ -6,7 +6,7 @@ import { updateNonce } from '../updates/updateNonce';
 const query = `
   INSERT INTO df.email_settings (account, email, recurrence, send_feeds, send_notifs)
   VALUES(:account, :email, :recurrence, :send_feeds, :send_notifs)
-  ON CONFLICT (account, email) DO UPDATE
+  ON CONFLICT (account) DO UPDATE
   SET email = :email,
 	recurrence = :recurrence,
 	send_feeds = :send_feeds,

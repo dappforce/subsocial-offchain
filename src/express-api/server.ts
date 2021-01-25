@@ -1,15 +1,17 @@
-import * as express from 'express'
+import express from 'express'
 import * as bodyParser from 'body-parser'
-import * as cors from 'cors';
+import cors from 'cors';
 import parseSitePreview from '../parser/parse-preview'
-import * as multer from 'multer';
+import multer from 'multer';
 import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
 import { expressApiLog as log } from '../connections/loggers';
-import * as timeout from 'connect-timeout';
+import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
 import './email/jobs'
+import { resolveSubsocialApi } from '../connections/subsocial';
+import { port } from '../env';
 
 require('dotenv').config()
 
@@ -20,7 +22,7 @@ app.use(cors((req, callback) => {
   callback(null, { origin })
 }))
 
-function haltOnTimedout (req: express.Request, _res: express.Response, next) {
+function haltOnTimedout(req: express.Request, _res: express.Response, next) {
   if (!req.timedout) next()
 }
 
@@ -35,7 +37,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }))
 app.use(haltOnTimedout)
 
 // for parsing multipart/form-data
-const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
+const upload = multer({ limits: { fieldSize: maxFileSizeBytes } })
 app.use(express.static('public'))
 
 // IPFS API
@@ -112,13 +114,16 @@ app.post('/v1/offchain/email/sendConfirmationLetter', pgReqHandlers.sendConfirma
 
 app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailHandler)
 
+app.post('/v1/offchain/email/clearConfirmDate', pgReqHandlers.clearConfirmationDateHandler)
+
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await parseSitePreview(req.body.url)
   res.send(data);
 })
 
-const port = process.env.OFFCHAIN_SERVER_PORT
-app.listen(port, () => {
-  log.info(`HTTP server started on port ${port}`)
-})
+resolveSubsocialApi()
+  .finally(() => app.listen(port, () => {
+    log.info(`HTTP server started on port ${port}`)
+  }))
+

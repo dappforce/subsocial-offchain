@@ -9,7 +9,7 @@ import { newLogger, nonEmptyArr, isEmptyArray } from '@subsocial/utils';
 import { updateLastPush } from '../../postgres/updates/updateLastActivities';
 import { ActivityType, TableNameByActivityType, CreateEmailMessageFn } from './utils';
 import { Activity } from '@subsocial/types'
-import * as BN from 'bn.js';
+import BN from 'bn.js';
 
 const log = newLogger('Cron job')
 

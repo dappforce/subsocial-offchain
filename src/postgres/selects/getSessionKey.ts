@@ -7,6 +7,7 @@ const query = `
   WHERE session_key = :sessionKey`
 
 export const getSessionKey = async (sessionKey: string): Promise<boolean> => {
+  console.log("SessionKey", sessionKey)
   try {
     const data = await runQuery<IQueryParams>(query, { sessionKey })
     if (data.rowCount) return true

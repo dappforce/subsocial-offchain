@@ -1,5 +1,5 @@
 // Works with request '^2.88.0'
-import * as request from 'request'
+import request from 'request'
 
 // Works with cheerio '^1.0.0-rc.2'
 import * as cheerio from 'cheerio'

@@ -3,6 +3,7 @@ import { SubsocialApi } from '@subsocial/api/subsocial'
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate'
 import { Api } from '@subsocial/api/substrateConnect'
 import { ipfsConfig } from './ipfs'
+import registry from '@subsocial/types/substrate/registry';
 
 export let subsocial: SubsocialApi
 export let substrate: SubsocialSubstrateApi
@@ -17,6 +18,9 @@ export const resolveSubsocialApi = async () => {
 
   if (!subsocial) {
     const api = await Api.connect(process.env.SUBSTRATE_URL)
+    const properties = await api.rpc.system.properties()
+
+    registry.setChainProperties(properties)
     subsocial = new SubsocialApi({
       substrateApi: api,
       ...ipfsConfig

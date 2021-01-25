@@ -28,7 +28,7 @@ export async function setConfirmationDate(sessionCall: SessionCall<ConfirmEmail>
     const params = { account: rootAddress, date: new Date() };
     try {
       const { confirmation_code, expires_on } = await getConfirmationData(rootAddress)
-      if (confirmation_code != confirmationCodeFromClient) {
+      if (!confirmation_code || !confirmationCodeFromClient || confirmation_code != confirmationCodeFromClient) {
         log.error("Confirmation code is wrong")
         return false
       }
