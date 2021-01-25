@@ -20,13 +20,12 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
   }
   
   const account = getSubsocialAccountId(formData.account)
-
   const data = { ...formData, account }
 
   const human = await validateHuman(data.token);
   if (!human) {
     res.status(400);
-    res.json({ errors: { account: 'Please, you\'re not fooling us, bot.' } });
+    res.json({ errors: { captcha: 'Please, you\'re not fooling us, bot.' } });
   }
 
   const { ok, errors } = await checkWasTokenDrop(data)

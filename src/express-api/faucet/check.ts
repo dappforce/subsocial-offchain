@@ -11,12 +11,12 @@ export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData,
 
   if (foundAccount === account) { 
     ok = false
-    errors.account = 'The account was drop token yet'
+    errors.account = 'On this account already had droped tokens'
   }
 
   if (foundEmail === email) { 
     ok = false
-    errors.email = 'The email was drop token yet'
+    errors.email = `On this email "${email}" already had droped tokens`
   }
 
   const { api } = await resolveSubsocialApi()
@@ -25,7 +25,7 @@ export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData,
   
   if (!freeBalance.eqn(0)) { 
     ok = false
-    errors.account = 'The account haven\'t zero balance'
+    errors.account = 'This account already had tokens'
   }
 
   return { ok, errors };
