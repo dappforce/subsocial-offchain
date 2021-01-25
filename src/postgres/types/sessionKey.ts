@@ -11,7 +11,7 @@ export type ReadAllMessage = {
   eventIndex: number
 }
 
-export type MessageGenericExtends = AddSessionKeyArgs | ReadAllMessage | SetUpEmailArgs | ConfirmLetter | ConfirmEmail
+export type MessageGenericExtends = AddSessionKeyArgs | ReadAllMessage | SetUpEmailArgs | ConfirmLetter | ConfirmEmail | ClearConfirmDateArgs
 
 export type Message<T extends MessageGenericExtends> = {
   nonce: number,
