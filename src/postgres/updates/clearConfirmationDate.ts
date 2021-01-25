@@ -1,6 +1,6 @@
 import { runQuery, newPgError, isValidSignature, upsertNonce } from '../utils';
 import { log } from '../postges-logger';
-import { ConfirmLetter, SessionCall, ClearConfirmDate } from '../types/sessionKey';
+import { ConfirmLetter, SessionCall, ClearConfirmDateArgs } from '../types/sessionKey';
 import { updateNonce } from './updateNonce';
 
 const query = `
@@ -9,7 +9,7 @@ const query = `
   WHERE account = :account
   RETURNING *`
 
-export async function clearConfirmationDate(sessionCall: SessionCall<ClearConfirmDate>) {
+export async function clearConfirmationDate(sessionCall: SessionCall<ClearConfirmDateArgs>) {
   const { account, signature, message } = sessionCall
 
   const { nonce, rootAddress } = await upsertNonce(account, message)
