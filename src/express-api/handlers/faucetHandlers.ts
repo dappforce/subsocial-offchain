@@ -24,8 +24,7 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
 
   const human = await validateHuman(data.token);
   if (!human) {
-    res.status(400);
-    res.json({ errors: { captcha: 'Please, you\'re not fooling us, bot.' } });
+    res.status(403);
   }
 
   const { ok, errors } = await checkWasTokenDrop(data)
@@ -50,7 +49,7 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
     res.status(200);
     res.json({ ok });
   } else {
-    res.status(401);
+    res.status(403);
     res.json({ errors });
   }
 };
