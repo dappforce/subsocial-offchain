@@ -9,10 +9,10 @@
     "node": ">= 10.13"
   },
   "scripts": {
-    "start": "concurrently \"yarn subscribe\" \"yarn api\" \"yarn init-search\"",
-    "subscribe": "node ./build/src/substrate/subscribe.js",
+    "start": "concurrently \"node ./build/src/index.js\" \"yarn init-search\"",
+    "subscribe": "node ./build/src/substrate/index.js",
     "reindex-content": "node ./build/src/search/reindexer.js",
-    "api": "node ./build/src/express-api/server.js",
+    "api": "node ./build/src/express-api/index.js",
     "ipfs": "yarn jsipfs daemon",
     "setup": "yarn init-postgres && yarn build",
     "init-search": "node ./build/src/search/index.js",
@@ -39,7 +39,7 @@
     "@polkadot/types": "1.28.1",
     "@subsocial/config": "^0.4.23",
     "@subsocial/types": "^0.4.26",
-    "@subsocial/utils": "^0.4.23",
+    "@subsocial/utils": "0.4.23",
     "@types/axios": "^0.14.0",
     "@types/bn.js": "^4.11.5",
     "@types/connect-timeout": "^0.0.34",
@@ -58,7 +58,7 @@
     "typescript": "^4.1.2"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "^7.4.0",
+    "@elastic/elasticsearch": "7.4.0",
     "@subsocial/api": "^0.4.24",
     "@types/email-templates": "^8.0.0",
     "@types/handlebars": "^4.1.0",
