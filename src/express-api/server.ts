@@ -11,7 +11,6 @@ import { expressApiLog as log } from '../connections/loggers';
 import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
 import './email/jobs'
-import { resolveSubsocialApi } from '../connections';
 
 require('dotenv').config()
 
@@ -126,8 +125,6 @@ app.post('/offchain/parser/', async (req: express.Request, res: express.Response
 
 const port = process.env.OFFCHAIN_SERVER_PORT
 
-resolveSubsocialApi()
-  .finally(() => app.listen(port, () => {
-    log.info(`HTTP server started on port ${port}`)
-  }))
-
+export const startHttpServer = () => app.listen(port, () => {
+  log.info(`HTTP server started on port ${port}`)
+})

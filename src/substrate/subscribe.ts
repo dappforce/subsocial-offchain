@@ -4,10 +4,6 @@ import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
-import { resolveSubsocialApi } from '../connections/subsocial';
-import { startNotificationsServer } from '../express-api/ws';
-import { startNotificationsServerForTelegram } from '../express-api/telegramWS';
-
 require('dotenv').config()
 
 let blockTime = 6
@@ -132,13 +128,8 @@ async function main (substrate: SubsocialSubstrateApi) {
   }
 }
 
-startNotificationsServerForTelegram()
-startNotificationsServer()
-
-resolveSubsocialApi()
-  .then(({ substrate }) => main(substrate))
-  .catch((error) => {
+export const startSubstrateSubscriber = (substrate: SubsocialSubstrateApi) => 
+  main(substrate).catch((error) => {
     log.error('Unexpected error during processing of Substrate events:', error)
-    process.exit(-1)
   })
 
