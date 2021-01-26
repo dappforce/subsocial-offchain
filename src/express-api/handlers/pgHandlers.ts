@@ -22,6 +22,10 @@ import {
 } from '../utils'
 import { setConfirmationDate } from '../../postgres/updates/setConfirmationDate';
 import { clearConfirmationDate } from '../../postgres/updates/clearConfirmationDate';
+import { action } from '../../postgres/utils';
+import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCountByActivities';
+import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
+import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
 
 
 const activityHandler = (
@@ -159,4 +163,19 @@ export const confirmEmailHandler: HandlerFn = (req, res) => {
 
 export const clearConfirmationDateHandler: HandlerFn = (req, res) => {
   return resolvePromiseAndReturnJson(res, clearConfirmationDate(req.body.sessionCall as SessionCall<ClearConfirmDateArgs>))
+}
+
+export const getStatisticDataHandler: HandlerFn = (req, res) => {
+  const event = req.query.event as action
+  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event))
+}
+
+export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
+  const event = req.query.event as action
+  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event))
+}
+
+export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {
+  const event = req.query.event as action
+  return resolvePromiseAndReturnJson(res, getActivityCountForToday(event))
 }

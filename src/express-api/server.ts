@@ -116,6 +116,13 @@ app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailHan
 
 app.post('/v1/offchain/email/clearConfirmDate', pgReqHandlers.clearConfirmationDateHandler)
 
+
+app.get('/v1/offchain/stats/getStatisticData', pgReqHandlers.getStatisticDataHandler)
+
+app.get('/v1/offchain/stats/getActivityCount', pgReqHandlers.getActivityCountByEventHandler)
+
+app.get('/v1/offchain/stats/getActivityCountForToday', pgReqHandlers.getActivityCountForTodayHandler)
+
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await parseSitePreview(req.body.url)
