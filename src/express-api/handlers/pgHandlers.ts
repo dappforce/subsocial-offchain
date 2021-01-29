@@ -22,7 +22,6 @@ import {
 } from '../utils'
 import { setConfirmationDate } from '../../postgres/updates/setConfirmationDate';
 import { clearConfirmationDate } from '../../postgres/updates/clearConfirmationDate';
-import { action } from '../../postgres/utils';
 import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCountByActivities';
 import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
 import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
@@ -166,16 +165,19 @@ export const clearConfirmationDateHandler: HandlerFn = (req, res) => {
 }
 
 export const getStatisticDataHandler: HandlerFn = (req, res) => {
-  const event = req.query.event as action
-  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event))
+  const {event, period} = req.query
+  console.log(event)
+  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event.toString(), period.toString()))
 }
 
 export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
-  const event = req.query.event as action
-  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event))
+  const {event, period} = req.query
+  console.log(event)
+  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event.toString(), period.toString()))
 }
 
 export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {
-  const event = req.query.event as action
-  return resolvePromiseAndReturnJson(res, getActivityCountForToday(event))
+  const event = req.query.event
+  console.log(event)
+  return resolvePromiseAndReturnJson(res, getActivityCountForToday(event.toString()))
 }

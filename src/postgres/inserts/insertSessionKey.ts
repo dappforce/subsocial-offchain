@@ -33,7 +33,6 @@ export async function addSessionKey(sessionCall: SessionCall<AddSessionKeyArgs>)
     log.debug(`Signature verified`)
 
     try {
-      console.log(sessionKey)
       const sessionKeyGeneric = new GenericAccountId(registry, sessionKey)
       await runQuery<IQueryParams>(query, { mainKey: account, sessionKey: String(sessionKeyGeneric) })
       log.debug(`Insert in nonces table: ${account} session key ${String(sessionKeyGeneric)}`)
