@@ -8,7 +8,6 @@ const createQuery = (period: string) => `
 export async function getActivityCountByEvent(eventName: string, period: string) {
   const params = { event: eventName.split(',') };
   const query = createQuery(period)
-  console.log(query)
 
   try {
     const res = await runQuery(query, params)

@@ -54,9 +54,10 @@ export async function setConfirmationDateForSettings(sessionCall: SessionCall<Co
     log.debug(`Signature verified`)
 
     const confirmationCode = message.args.confirmationCode
-
-    await setConfirmationDate({ account: rootAddress, confirmationCode })
+    
     await updateNonce(account, message.nonce + 1)
+    const { ok } = await setConfirmationDate({ account: rootAddress, confirmationCode })
+    return ok
   }
 
   return false

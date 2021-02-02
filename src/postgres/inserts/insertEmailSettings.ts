@@ -12,7 +12,7 @@ type RequireEmailSettingsParams = {
 const addEmailSettingsQuery = `
   INSERT INTO df.email_settings (account, email, periodicity, send_feeds, send_notifs)
   VALUES(:account, :email, :periodicity, :send_feeds, :send_notifs)
-  ON CONFLICT (account, email) DO UPDATE
+  ON CONFLICT (account) DO UPDATE
   SET email = :email,
 	periodicity = :periodicity,
 	send_feeds = :send_feeds,

@@ -19,7 +19,7 @@ const log = newLogger(sendConfirmationLetter.name)
 export async function sendConfirmationLetter ({ email, url, args, type }: SendConfirmationLetterParams) {
 	const confirmationCode = v4()
 
-	const argsStr = args && Object.entries(args).map(([ name, value ]) => `&${name}=${value}`).join()
+	const argsStr = args ? Object.entries(args).map(([ name, value ]) => `&${name}=${value}`).join() : ''
 
 	const data: ConfirmationLink = {
 		link: `${appsUrl}/${url}?confirmationCode=${confirmationCode}${argsStr}`, // TODO: use getFullUrl ?
@@ -40,7 +40,7 @@ export const sendNotifConfirmationLetter = async (sessionCall: SessionCall<Confi
 	const email = sessionCall.message.args.email
 
 	try {
-		const confirmationCode = await sendConfirmationLetter({ email, url: 'settings', type: 'notif-confirmation' })
+		const confirmationCode = await sendConfirmationLetter({ email, url: 'settings/email/confirm-email', type: 'notif-confirmation' })
 		confirmationCode && await setConfirmationCode(sessionCall, confirmationCode)
 	} catch (err) {
     log.error("Error", err)

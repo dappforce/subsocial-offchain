@@ -123,23 +123,3 @@ const getPostPreview = async (account: string, postId: string, message: string, 
 	}
 }
 
-// export const sendConfirmationLetter = async (sessionCall: SessionCall<ConfirmLetter>) => {
-// 	const email = sessionCall.message.args.email
-// 	const confirmationCode = v4()
-
-// 	// TODO: replace hard-code
-// 	let imageLink = `${ipfsReadOnlyNodeUrl}/QmYnF6YpRvvXETzCmVVc3PBziig7sgra6QmtqKEoCngm2C`
-// 	const link: ConfirmationLink = {
-// 		link: `${appsUrl}/settings/email/confirm-email?confirmationCode=${confirmationCode}`,
-// 		image: imageLink
-// 	}
-
-// 	try {
-// 		await sendEmail(email, link, "confirmation")
-// 		await setConfirmationCode(sessionCall, confirmationCode)
-// 	} catch (err) {
-// 		// TODO: replace with logger created by newLogger
-// 		console.log("Error", err)
-// 	}
-// }
-
