@@ -16,8 +16,8 @@ const addEmailSettingsQuery = `
   SET email = :email,
 	periodicity = :periodicity,
 	send_feeds = :send_feeds,
-	send_notifs = :send_notifs,
-	`
+	send_notifs = :send_notifs
+	RETURNING *`
 
 export const addEmailSettings = async (sessionCall: SessionCall<SetUpEmailArgs>) => {
 	const { account, signature, message } = sessionCall
@@ -34,9 +34,10 @@ export const addEmailSettings = async (sessionCall: SessionCall<SetUpEmailArgs>)
 
 		log.debug(`Signature verified`)
 		try {
-			await runQuery(addEmailSettingsQuery, { account: rootAddress, email, periodicity, send_feeds, send_notifs })
+			const res = await runQuery(addEmailSettingsQuery, { account: rootAddress, email, periodicity, send_feeds, send_notifs })
 			await updateNonce(account, message.nonce + 1)
 			log.debug(`Insert email settings in database: ${rootAddress}`)
+			return res.rows
 		} catch (err) {
 			log.error(`Failed to insert email settings for account: ${rootAddress}`, err.stack)
 			throw err

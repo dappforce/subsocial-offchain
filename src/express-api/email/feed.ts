@@ -1,11 +1,12 @@
 import { Activity } from '../telegramWS';
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import { PostId } from '@subsocial/types/substrate/interfaces';
-import { createHrefForAccount, createHrefForPost, getAccountContent, createHrefForSpace } from './utils';
+import { createHrefForAccount, createHrefForPost, getAccountContent, createHrefForSpace, getFormatDate } from './utils';
 import { FeedTemplateProp } from './types';
 
 export const createFeedEmailMessage = async (activity: Activity): Promise<FeedTemplateProp> => {
 	const { post_id, date } = activity
+	const actionDate = getFormatDate(date)
 	const subsocial = await resolveSubsocialApi()
 	const post = await subsocial.findPostWithAllDetails(post_id as unknown as PostId)
 	const { id, owner, space_id } = post.post.struct
@@ -20,5 +21,5 @@ export const createFeedEmailMessage = async (activity: Activity): Promise<FeedTe
 
 	const postLink = createHrefForPost(space_id.toString(), id.toString())
 
-	return { ownerName, ownerLink, avatar, spaceName, spaceLink, postName, postLink, postBody, date }
+	return { ownerName, ownerLink, avatar, spaceName, spaceLink, postName, postLink, postBody, date: actionDate }
 }

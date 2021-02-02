@@ -58,5 +58,6 @@ export async function setConfirmationDateForSettings(sessionCall: SessionCall<Co
     await setConfirmationDate({ account: rootAddress, confirmationCode })
     await updateNonce(account, message.nonce + 1)
   }
+
   return false
-};
+}

@@ -7,6 +7,7 @@ import { ActivityTable } from '../../postgres/queries/feed-and-notifs';
 import { Activity } from '../telegramWS';
 import { NotificationTemplateProp, FeedTemplateProp } from './types';
 import dayjs from 'dayjs'
+import { AnyAccountId } from '@subsocial/types';
 
 export const log = newLogger("Email")
 
@@ -39,19 +40,17 @@ export const createMessageForFeeds = (link: string, account: string, spaceName: 
 	return link + "\n" + "Posted by " + account + " in space " + spaceName + "\n" + date
 }
 
-export const createNotification = (date: string, account: string, msg: string, link: string): string => {
+export const toShortAddress = (_address: AnyAccountId) => {
+  const address = (_address || '').toString()
 
-	return `
-		<a href='${link}'>
-			Photo ${account} ${msg} ${link} Avatar\n
-			${date}
-		</a>
-  `
+  return address.length > 13 ? `${address.slice(0, 6)}…${address.slice(-6)}` : address
 }
 
 export const resolveIpfsUrl = (cid: string) => {
     return `${ipfsNodeUrl}/ipfs/${cid}`
 }
+
+export const DEFAULT_DATE_FORMAT = 'D MMM, YYYY h:mm A'
 
 export const getAccountContent = async (account: string) => {
 	const subsocial = await resolveSubsocialApi()
@@ -61,7 +60,7 @@ export const getAccountContent = async (account: string) => {
 		const avatar = profile.content.avatar ? resolveIpfsUrl(profile.content.avatar) : ''
 		return {name, avatar}
 	}
-	else return {name: account, avatar: ''}
+	else return {name: toShortAddress(account), avatar: ''}
 }
 
 export const getSpaceName = async (spaceId: SpaceId): Promise<string> => {
@@ -75,3 +74,5 @@ export const getSpaceName = async (spaceId: SpaceId): Promise<string> => {
 }
 
 export const getExpiresOnDate = () => dayjs().add(1, 'hours').format('YYYY-MM-DDTHH:mm:ss')
+
+export const getFormatDate = (date: string) => dayjs(date).format('lll')

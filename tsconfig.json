@@ -18,10 +18,10 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
-    "esModuleInterop": true
+    "esModuleInterop": true,
   },
   "include": [
-    "src/**/*",    
+    "src/**/*",
     "tests/**/*"
   ]
 }

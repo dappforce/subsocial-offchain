@@ -4,7 +4,7 @@ import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries
 import { setTelegramData } from '../../postgres/inserts/insertTelegramData'
 import { addSessionKey } from '../../postgres/inserts/insertSessionKey'
 import { getNonce } from '../../postgres/selects/getNonce'
-import { SessionCall, AddSessionKeyArgs, SetUpEmailArgs, ConfirmEmail } from '../../postgres/types/sessionKey';
+import { SessionCall, AddSessionKeyArgs, SetUpEmailArgs, ConfirmEmail, ClearConfirmDateArgs } from '../../postgres/types/sessionKey';
 import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
 import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
 import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
@@ -20,6 +20,10 @@ import {
   resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
+import { clearConfirmationDate } from '../../postgres/updates/clearConfirmationDate';
+import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCountByActivities';
+import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
+import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
 import { setConfirmationDateForSettings } from '../../postgres/updates/setConfirmationDate';
 
 
@@ -154,4 +158,26 @@ export const sendConfirmationLetterHandler: HandlerFn = (req, res) => {
 
 export const confirmEmailForSettingsHandler: HandlerFn = (req, res) => {
   return resolvePromiseAndReturnJson(res, setConfirmationDateForSettings(req.body.sessionCall as SessionCall<ConfirmEmail>))
+}
+
+export const clearConfirmationDateHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, clearConfirmationDate(req.body.sessionCall as SessionCall<ClearConfirmDateArgs>))
+}
+
+export const getStatisticDataHandler: HandlerFn = (req, res) => {
+  const {event, period} = req.query
+  console.log(event)
+  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event.toString(), period.toString()))
+}
+
+export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
+  const {event, period} = req.query
+  console.log(event)
+  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event.toString(), period.toString()))
+}
+
+export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {
+  const event = req.query.event
+  console.log(event)
+  return resolvePromiseAndReturnJson(res, getActivityCountForToday(event.toString()))
 }

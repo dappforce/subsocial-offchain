@@ -2,11 +2,12 @@
 <html>
 
 <head>
-  <title>Feed</title>
+  <title>Notifications</title>
   <meta charset="utf-8">
   <style type="text/css">
     .background {
-      background: #fafafa;
+      padding-bottom: 1rem;
+      padding-top: 1rem;
     }
 
     .title {
@@ -31,7 +32,7 @@
 
     .notification-content {
       margin-left: 40px;
-      margin: 0 .75rem 0 1rem;
+      margin: 0 .75rem 0 0;
       width: inherit;
     }
 
@@ -47,6 +48,38 @@
     a:hover {
       cursor: pointer;
     }
+
+    .buttonLink {
+      color: rgb(255, 255, 255) !important;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    button {
+      color: #fff;
+      background: #eb2f96;
+      border-color: #eb2f96;
+      text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+      line-height: 1.5715;
+      position: relative;
+      display: inline-block;
+      font-weight: 400;
+      white-space: nowrap;
+      text-align: center;
+      border: 1px solid transparent;
+      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+      cursor: pointer;
+      touch-action: manipulation;
+      height: 32px;
+      padding: 4px 15px;
+      font-size: 14px;
+      border-radius: 2px;
+      color: rgba(0, 0, 0, 0.85);
+      margin: 0 0 10px 35%;
+    }
+
 
     .image {
       width: 36px;
@@ -98,6 +131,9 @@
       </div>
     </div>
     {{/each}}
+    <button>
+      <a href="{{appsUrl}}" class='buttonLink'>See more on the website</a>
+    </button>
   </div>
 </body>
 <html>

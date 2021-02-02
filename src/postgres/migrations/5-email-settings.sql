@@ -23,5 +23,5 @@ CREATE TABLE IF NOT EXISTS df.email_settings
     confirmation_code varchar(36) NULL,
     expires_on TIMESTAMP NULL,
     confirmed_on TIMESTAMP NULL,
-    PRIMARY KEY (account, email)
+    PRIMARY KEY (account)
 );

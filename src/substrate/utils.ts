@@ -30,7 +30,7 @@ export function shouldHandleEvent (event: Event): boolean {
   }
 
   return eventsFilterMethods.has(ANY_EVENT) || (
-    eventsFilterSections.has(event.section.toString()) && 
+    eventsFilterSections.has(event.section.toString()) &&
     eventsFilterMethods.has(event.method.toString())
   )
 }

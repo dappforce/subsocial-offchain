@@ -11,6 +11,7 @@ import { expressApiLog as log } from '../connections/loggers';
 import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
 import './email/jobs'
+import { port } from '../env';
 
 require('dotenv').config()
 
@@ -21,7 +22,7 @@ app.use(cors((req, callback) => {
   callback(null, { origin })
 }))
 
-function haltOnTimedout (req: express.Request, _res: express.Response, next) {
+function haltOnTimedout(req: express.Request, _res: express.Response, next) {
   if (!req.timedout) next()
 }
 
@@ -36,7 +37,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }))
 app.use(haltOnTimedout)
 
 // for parsing multipart/form-data
-const upload = multer({ limits: { fieldSize: maxFileSizeBytes }})
+const upload = multer({ limits: { fieldSize: maxFileSizeBytes } })
 app.use(express.static('public'))
 
 // IPFS API
@@ -104,7 +105,6 @@ app.get('/v1/offchain/telegram/getTelegramChat', pgReqHandlers.getTelegramChatHa
 
 app.post('/v1/offchain/telegram/updateTelegramChat', pgReqHandlers.updateTelegramChatHandler)
 
-
 app.post('/v1/offchain/email/addEmailSettings', pgReqHandlers.addEmailSettingsHandler)
 
 app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHandler)
@@ -112,6 +112,16 @@ app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHan
 app.post('/v1/offchain/email/sendConfirmationLetter', pgReqHandlers.sendConfirmationLetterHandler)
 
 app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailForSettingsHandler)
+
+app.post('/v1/offchain/email/clearConfirmDate', pgReqHandlers.clearConfirmationDateHandler)
+
+
+app.get('/v1/offchain/stats/getStatisticData', pgReqHandlers.getStatisticDataHandler)
+
+app.get('/v1/offchain/stats/getActivityCount', pgReqHandlers.getActivityCountByEventHandler)
+
+app.get('/v1/offchain/stats/getActivityCountForToday', pgReqHandlers.getActivityCountForTodayHandler)
+
 
 app.post('/v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
 
@@ -122,8 +132,6 @@ app.post('/offchain/parser/', async (req: express.Request, res: express.Response
   const data = await parseSitePreview(req.body.url)
   res.send(data);
 })
-
-const port = process.env.OFFCHAIN_SERVER_PORT
 
 export const startHttpServer = () => app.listen(port, () => {
   log.info(`HTTP server started on port ${port}`)
