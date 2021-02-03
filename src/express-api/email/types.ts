@@ -8,9 +8,11 @@ export type NotificationTemplateProp = {
 	relatedEntityName: string
 }
 
-export type ConfirmationLink = {
+export type ConfirmationProp = {
 	link: string,
-	image?: string
+	message: string,
+	image?: string,
+	buttonText?: string
 }
 
 export type FeedTemplateProp = {

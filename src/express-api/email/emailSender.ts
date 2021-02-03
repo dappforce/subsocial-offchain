@@ -5,11 +5,11 @@ import { ActivityType } from './utils';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { compile, registerHelper } from 'handlebars';
-import { NotificationTemplateProp, ConfirmationLink, FeedTemplateProp } from './types';
+import { NotificationTemplateProp, ConfirmationProp, FeedTemplateProp } from './types';
 
 const log = newLogger('Email')
 
-type DataTemplateProp = NotificationTemplateProp[] | FeedTemplateProp[] | ConfirmationLink
+type DataTemplateProp = NotificationTemplateProp[] | FeedTemplateProp[] | ConfirmationProp
 
 export const sendEmail = async (email: string, data: DataTemplateProp, type: ActivityType) => {
 	const transporter = createTransport({

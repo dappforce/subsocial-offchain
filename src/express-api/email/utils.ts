@@ -12,14 +12,13 @@ import { AnyAccountId } from '@subsocial/types';
 export const log = newLogger("Email")
 
 // FIXME: export these to JS libs
-export type ActivityType = 'notifications' | 'feeds' | 'faucet-confirmation' | 'notif-confirmation'
+export type ActivityType = 'notifications' | 'feeds' | 'confirmation'
 
 type TableNameByActivityType = Record<ActivityType, ActivityTable>
 export const TableNameByActivityType: TableNameByActivityType = {
 	'feeds': 'news_feed',
 	'notifications': 'notifications',
-	'faucet-confirmation': null,
-	'notif-confirmation': null
+	'confirmation': null
 }
 
 export type CreateEmailMessageFn = (activity: Activity) => Promise<NotificationTemplateProp | FeedTemplateProp>

@@ -6,7 +6,8 @@
   <meta charset="utf-8">
   <style type="text/css">
     .background {
-      background: #fafafa;
+      padding-bottom: 1rem;
+      padding-top: 1rem;
     }
 
     .image {
@@ -71,13 +72,11 @@
       <img src="{{data.image}}" class='image' />
       <div class='confirmation-content'>
         <p style="font-size: 1.5rem;">Thank you for using Subsocial.</p>
-        <p>Now you need to confirm your email address by clicking the button below. After confirmation, you will have tokens.</p>
+        <p>{{data.message}}</p>
         <p>This link will expire in 1 hour</p>
-
-        <p>Enjoy :)</p>
       </div>
       <button>
-        <a href="{{data.link}}" class='buttonLink'>Drop tokens</a>
+        <a href="{{data.link}}" class='buttonLink'>{{data.buttonText}}</a>
       </button>
     </div>
   </div>

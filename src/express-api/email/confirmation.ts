@@ -3,31 +3,36 @@ import { v4 } from 'uuid'
 import { appsUrl, subsocialLogo } from '../../env';
 import { setConfirmationCode } from '../../postgres/updates/setConfirmationCode';
 import { SessionCall, ConfirmLetter } from '../../postgres/types/sessionKey';
-import { ConfirmationLink } from './types';
+import { ConfirmationProp } from './types';
 import { newLogger } from '@subsocial/utils';
 import { FaucetFormData } from '../faucet/types';
 
 type SendConfirmationLetterParams = {
 	email: string,
-	type: 'faucet-confirmation' | 'notif-confirmation',
 	url: string,
+	customTemplate?: Partial<ConfirmationProp>,
 	args?: Record<string,string>
 }
 
+const confirmationMsg = `Now you need to confirm your email address by clicking the button below. After confirmation, you will be able
+to receive notifications and feed updates depending on the settings on the Settings page.`
+
 const log = newLogger(sendConfirmationLetter.name)
 
-export async function sendConfirmationLetter ({ email, url, args, type }: SendConfirmationLetterParams) {
+export async function sendConfirmationLetter ({ email, url, args, customTemplate }: SendConfirmationLetterParams) {
 	const confirmationCode = v4()
 
 	const argsStr = args ? Object.entries(args).map(([ name, value ]) => `&${name}=${value}`).join() : ''
 
-	const data: ConfirmationLink = {
+	const data: ConfirmationProp = Object.assign({
 		link: `${appsUrl}/${url}?confirmationCode=${confirmationCode}${argsStr}`, // TODO: use getFullUrl ?
-		image: subsocialLogo
-	}
+		image: subsocialLogo,
+		message: confirmationMsg,
+		buttonText: 'Confirm email'
+	}, customTemplate)
 
 	try {
-		await sendEmail(email, data, type)
+		await sendEmail(email, data, 'confirmation')
 		return confirmationCode
 	} catch (err) {
 		log.error("Failed send confirmation:", err)
@@ -40,7 +45,7 @@ export const sendNotifConfirmationLetter = async (sessionCall: SessionCall<Confi
 	const email = sessionCall.message.args.email
 
 	try {
-		const confirmationCode = await sendConfirmationLetter({ email, url: 'settings/email/confirm-email', type: 'notif-confirmation' })
+		const confirmationCode = await sendConfirmationLetter({ email, url: 'settings/email/confirm-email' })
 		confirmationCode && await setConfirmationCode(sessionCall, confirmationCode)
 	} catch (err) {
     log.error("Error", err)
@@ -50,7 +55,7 @@ export const sendNotifConfirmationLetter = async (sessionCall: SessionCall<Confi
 
 export const sendFaucetConfirmationLetter = async ({ email, account }: FaucetFormData)  => {
 	try {
-		const confirmationCode = await sendConfirmationLetter({ email, url: `faucet/drop`, args: { account }, type: 'faucet-confirmation' })
+		const confirmationCode = await sendConfirmationLetter({ email, url: `faucet/drop`, args: { account }, customTemplate: { buttonText: 'Drop tokens' } })
 		return confirmationCode
 	} catch (err) {
 		log.error("Error", err)
