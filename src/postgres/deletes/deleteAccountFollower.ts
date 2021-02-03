@@ -1,4 +1,4 @@
-import { EventData } from '@polkadot/types/generic/Event';
+import { GenericEventData } from '@polkadot/types';
 import { newPgError, runQuery } from '../utils';
 import { IQueryParams } from '../types/deleteAccountFollower.queries';
 
@@ -8,7 +8,7 @@ const query = `
     AND following_account = :followingAccount
   RETURNING *`
 
-export async function deleteAccountFollower (data: EventData) {
+export async function deleteAccountFollower (data: GenericEventData) {
   const params = { followerAccount: data[0].toString(), followingAccount: data[1].toString() };
 
   try {

@@ -1,5 +1,5 @@
 import { EventHandlerFn } from '../../substrate/types';
-import AccountId from '@polkadot/types/generic/AccountId';
+import { AccountId } from '@polkadot/types/interfaces'
 import { indexProfileContent } from '../indexer';
 import { resolveSubsocialApi } from '../../connections';
 

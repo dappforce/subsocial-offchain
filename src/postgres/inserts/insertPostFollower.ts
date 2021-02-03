@@ -1,4 +1,4 @@
-import { EventData } from '@polkadot/types/generic/Event';
+import { GenericEventData } from '@polkadot/types';
 import { encodeStructId } from '../../substrate/utils';
 import { newPgError, runQuery } from '../utils';
 import { IQueryParams } from '../types/insertPostFollower.queries';
@@ -8,7 +8,7 @@ const query = `
     VALUES(:followerAccount, :followingPostId)
   RETURNING *`
 
-export async function insertPostFollower(data: EventData) {
+export async function insertPostFollower(data: GenericEventData) {
   const postId = encodeStructId(data[1].toString());
   const params = { followerAccount: data[0].toString(), followingPostId: postId };
 

@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { resolveSubsocialApi } from '../connections/subsocial';
 
 import { Id, NormalizedPost, NormalizedProfile, NormalizedSpace, normalizeSpaceStruct, normalizePostStruct, normalizeProfileStruct } from './normalizers';
-import AccountId from '@polkadot/types/generic/AccountId';
+import { AccountId } from '@polkadot/types/interfaces'
 import { TEST_MODE } from '../env';
 import BN from 'bn.js';
 

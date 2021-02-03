@@ -3,7 +3,7 @@ import { GenericAccountId } from '@polkadot/types';
 import registry from '@subsocial/types/substrate/registry';
 import { resolveSubsocialApi } from '../../connections';
 import { faucetAmount, faucetSeed } from '../../env';
-import testKeyring from '@polkadot/keyring/testing'
+import { createTestKeyring } from '@polkadot/keyring/testing'
 import { newLogger } from '@subsocial/utils';
 
 let keyring: Keyring
@@ -12,7 +12,7 @@ const log = newLogger(transferToken.name)
 
 function enableFaucet() {
 	// keyring = new Keyring({ type: 'sr25519' });
-	keyring = testKeyring() as Keyring
+	keyring = createTestKeyring() as Keyring
 	// const faucet = keyring.addFromAddress(faucetSeed, { name: 'Faucet' });
 	return keyring.getPair(faucetSeed);
 }

@@ -1,4 +1,4 @@
-import { EventData } from '@polkadot/types/generic/Event';
+import { GenericEventData } from '@polkadot/types';
 import { newPgError, runQuery } from '../utils';
 import { IQueryParams } from '../types/insertAccountFollower.queries';
 
@@ -7,7 +7,7 @@ const query = `
     VALUES(:followerAccount, :followingAccount)
   RETURNING *`;
 
-export async function insertAccountFollower(data: EventData) {
+export async function insertAccountFollower(data: GenericEventData) {
   const params = { followerAccount: data[0].toString(), followingAccount: data[1].toString() };
 
   try {

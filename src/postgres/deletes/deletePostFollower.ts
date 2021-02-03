@@ -1,6 +1,6 @@
 import { newPgError, runQuery } from '../utils';
 import { encodeStructId } from '../../substrate/utils';
-import { EventData } from '@polkadot/types/generic/Event';
+import { GenericEventData } from '@polkadot/types';
 import { IQueryParams } from '../types/deletePostFollower.queries';
 
 const query = `
@@ -9,7 +9,7 @@ const query = `
     AND following_post_id = :followingPostId
   RETURNING *`
 
-export async function deletePostFollower (data: EventData) {
+export async function deletePostFollower (data: GenericEventData) {
   const postId = encodeStructId(data[1].toString());
   const params = { followerAccount: data[0].toString(), followingPostId: postId };
 

@@ -1,4 +1,4 @@
-import { EventData } from '@polkadot/types/generic/Event';
+import { GenericEventData } from '@polkadot/types';
 import { encodeStructId } from '../../substrate/utils';
 import { newPgError, runQuery } from '../utils';
 import { IQueryParams } from '../types/deleteSpaceFollower.queries';
@@ -9,7 +9,7 @@ const query = `
     AND following_space_id = :followingSpaceId
   RETURNING *`
 
-export async function deleteSpaceFollower (data: EventData) {
+export async function deleteSpaceFollower (data: GenericEventData) {
   const spaceId = encodeStructId(data[1].toString());
   const params = { followerAccount: data[0].toString(), followingSpaceId: spaceId };
 
