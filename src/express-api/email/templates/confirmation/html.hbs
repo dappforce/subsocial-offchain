@@ -61,7 +61,8 @@
     .confirmation-content {
       position: absolute;
       width: 500px;
-      margin-left: 33.5%;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
@@ -69,15 +70,16 @@
 <body>
   <div class='background'>
     <div class='confirmation-item'>
-      <img src="{{data.image}}" class='image' />
       <div class='confirmation-content'>
+        <img src="{{data.image}}" class='image' />
         <p style="font-size: 1.5rem;">Thank you for using Subsocial.</p>
         <p>{{data.message}}</p>
         <p>This link will expire in 1 hour</p>
+        <button>
+          <a href="{{data.link}}" class='buttonLink'>{{data.buttonText}}</a>
+        </button>
       </div>
-      <button>
-        <a href="{{data.link}}" class='buttonLink'>{{data.buttonText}}</a>
-      </button>
+
     </div>
   </div>
 </body>
