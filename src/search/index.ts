@@ -12,7 +12,6 @@ async function maybeCreateIndices () {
 }
 
 async function createIndexIfNotFound (indexName: string, mapping: any) {
-  console.log('indexName', indexName, mapping)
   const result = await elasticIndexer.indices.exists(
     { index: indexName },
     { ignore: [ 404 ] }
