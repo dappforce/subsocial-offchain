@@ -127,6 +127,8 @@ app.post('/v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
 
 app.post('/v1/offchain/faucet/drop', faucetReqHandlers.tokenDropHandler)
 
+app.get('/v1/offchain/faucet/status', faucetReqHandlers.getFaucetStatus)
+
 // TODO Rename to '/v1/parseSite'
 app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
   const data = await parseSitePreview(req.body.url)

@@ -9,6 +9,7 @@ import { GenericAccountId } from '@polkadot/types';
 import { registry } from '@subsocial/types/substrate/registry';
 import isEmpty from 'lodash.isempty'
 import { getConfirmationData } from '../../postgres/selects/getConfirmationCode';
+import { checkFaucetIsActive } from '../faucet/status';
 
 const getSubsocialAccountId = (account: string) => new GenericAccountId(registry, account).toString()
 
@@ -68,5 +69,15 @@ export const tokenDropHandler: HandlerFn = async (req, res) => {
     res.status(200).send({ ok })
   } else {
     res.status(400).send({ errors })
+  }
+}
+
+export const getFaucetStatus: HandlerFn = async (_req, res) => {
+  const { ok, errors } = await checkFaucetIsActive()
+
+  if (ok) {
+    res.status(200).send({ ok })
+  } else {
+    res.status(403).send({ errors })
   }
 }
