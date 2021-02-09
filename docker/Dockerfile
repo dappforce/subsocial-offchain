@@ -18,7 +18,7 @@ COPY --from=builder package.json tsconfig.json .env yarn.lock ./
 COPY --from=builder build/ ./build
 COPY --from=builder node_modules/ ./node_modules
 
-RUN yarn add concurrently
+RUN yarn add concurrently -G
 RUN yarn add pm2 -G
 
 EXPOSE 3001
