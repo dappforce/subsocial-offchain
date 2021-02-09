@@ -1,6 +1,7 @@
 import { resolveSubsocialApi } from '../../connections';
 import { checkDropByAccountAndEmail } from '../../postgres/selects/checkDropByAccountAndEmail';
 import { OkOrError } from '../utils';
+import { checkFaucetIsActive } from './status';
 import { FaucetFormData } from "./types";
 
 export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData, 'token'>): Promise<OkOrError> {
@@ -28,5 +29,9 @@ export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData,
     errors.account = 'This account already had tokens'
   }
 
-  return { ok, errors };
+  const { ok: isActiveFaucet, errors: faucetErrors } = await checkFaucetIsActive()
+
+  ok = ok && isActiveFaucet
+
+  return { ok, errors: { ...errors, ...faucetErrors } };
 }
