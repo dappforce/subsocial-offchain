@@ -17,7 +17,7 @@ const log = newLogger(dropTx.name)
 export async function dropTx (toAddress: string, insertToDb: (blockNumber: BigInt, eventIndex: number) => void) {
 	const { api } = await resolveSubsocialApi()
 
-	const drip = api.tx.faucets.drip(toAddress, faucetAmount * 10 ** 12);
+	const drip = api.tx.faucets.drip(toAddress, faucetAmount);
 
 	const unsub = await drip.signAndSend(faucetPair, ({ events = [], status }) => {
 		log.debug('Transaction status:', status.type);
@@ -53,7 +53,7 @@ export const tokenDrop = async ({ account, email }: Omit<FaucetFormData, 'token'
       event_index,
       faucet: getFaucetPublicKey(),
       account,
-      amount: faucetAmount,
+      amount: faucetAmount.toNumber(),
       email,
       captcha_solved: true
     }))

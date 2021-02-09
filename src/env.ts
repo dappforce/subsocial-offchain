@@ -1,3 +1,5 @@
+import BN from "bn.js"
+
 export const TEST_MODE = process.env.TEST_MODE?.toLocaleLowerCase() === 'true'
 
 export const offchainTWSPort = process.env.OFFCHAIN_TELEGRAM_WS_PORT
@@ -19,4 +21,4 @@ export const recatchaKey = process.env.RECAPTCHA_KEY
 export const subsocialLogo = `https://app.subsocial.network/ipfs/ipfs/Qmasp4JHhQWPkEpXLHFhMAQieAH1wtfVRNHWZ5snhfFeBe`
 
 export const faucetMnemonic = process.env.FAUCET_MNEMONIC
-export const faucetAmount = parseFloat(process.env.FAUCET_AMOUNT)
+export const faucetAmount = new BN(parseFloat(process.env.FAUCET_AMOUNT || '0') * 10 ** 12)

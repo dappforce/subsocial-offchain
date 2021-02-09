@@ -18,14 +18,13 @@ const BLOCK_TIME = 6 * 1000
 const calculateComeBackTime = (nextPeriodAt: BlockNumber, currentBlock: BN) => {
   const toSeconds = nextPeriodAt.sub(currentBlock).muln(BLOCK_TIME).toNumber()
   const to = dayjs().add(toSeconds).add(1, 'hours')
-  console.log('toSeconds', toSeconds)
 
   return dayjs().to(to)
 }
 
 export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
   const failedRes = { ok: false, errors }
-  if (faucetAmount === 0) return failedRes
+  if (faucetAmount.eqn(0)) return failedRes
 
   const faucetAddress = getFaucetPublicKey()
 
@@ -33,7 +32,7 @@ export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
 
   const { freeBalance } = await api.derive.balances.all(faucetAddress)
   
-  if (freeBalance.ltn(faucetAmount)) return failedRes
+  if (freeBalance.lt(faucetAmount)) return failedRes
 
   const faucetOpt = await api.query.faucets.faucetByAccount(getFaucetPublicKey()) as Option<Faucet>
 
@@ -43,14 +42,14 @@ export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
 
   if (!enabled) return failedRes
 
-  if (drip_limit.ltn(faucetAmount)) return failedRes
+  if (drip_limit.lt(faucetAmount)) return failedRes
 
   const tokensLeftInCurrentPeriod = period_limit.sub(dripped_in_current_period)
 
   const lastBlock = await api.rpc.chain.getBlock()
   const currentBlock = lastBlock.block.header.number.toBn().addn(1)
-
-  if (tokensLeftInCurrentPeriod.ltn(faucetAmount)) return {
+  
+  if (tokensLeftInCurrentPeriod.lt(faucetAmount)) return {
     ok: false,
     errors: {
       faucet: {
