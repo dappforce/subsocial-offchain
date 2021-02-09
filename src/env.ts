@@ -16,7 +16,7 @@ export const emailPassword = process.env.EMAIL_PASSWORD
 
 export const recatchaKey = process.env.RECAPTCHA_KEY
 
-export const subsocialLogo = `https://app.subsocial.network/ipfs/QmYnF6YpRvvXETzCmVVc3PBziig7sgra6QmtqKEoCngm2C`
+export const subsocialLogo = `https://app.subsocial.network/ipfs/ipfs/Qmasp4JHhQWPkEpXLHFhMAQieAH1wtfVRNHWZ5snhfFeBe`
 
-export const faucetSeed = process.env.FAUCET_SEED
+export const faucetMnemonic = process.env.FAUCET_MNEMONIC
 export const faucetAmount = parseFloat(process.env.FAUCET_AMOUNT)
