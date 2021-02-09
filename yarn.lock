@@ -667,10 +667,10 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@^0.4.30":
-  version "0.4.30"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.30.tgz#6c4fceba03faffb67de3f66d7a5a9f50eb09c93a"
-  integrity sha512-1mTaihZirg77udJHd94whoyn2pBbnNH5ncz2cQX2g652KKmtL7brVZMfAI+vWN7cNiy/aRzLkU/Qupt4S0MTqg==
+"@subsocial/api@^0.4.32":
+  version "0.4.32"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.4.32.tgz#0e15268a1a46eb5422f909d068f39f537d0fd2e4"
+  integrity sha512-8UyosGd9b+aIwmNmklypsQqffJZpdyKGVrqnPlRBh6qY7mTVOaaug6aHwOWuhUQ8Qs0l10GRxCp3LLaOCgYjxg==
   dependencies:
     "@polkadot/api" "^3.7.1"
     "@subsocial/utils" "^0.4.26"
@@ -681,10 +681,10 @@
   resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.25.tgz#2a5060bce66db2a6a778916dbc6936042645313d"
   integrity sha512-iCwiWneWbbYdOELjCzUshfelsYvD6Rnhmcz+FU0DCOIQaXFTS2JBfBsK1TYLhYOjJEluhpBmxE7vKZPhO7isbw==
 
-"@subsocial/types@^0.4.30":
-  version "0.4.30"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.30.tgz#c4326cca82a2077e3667326bedbe6275344942ae"
-  integrity sha512-G3NU8r+Sg7Ul44qDMuQiaDsZyGgn78KlpDhtuqXsGz5kEGuxcDe4zIHw1IsbB1mncT9fWBYUn7BVz64ixz/Y3A==
+"@subsocial/types@^0.4.32":
+  version "0.4.32"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.4.32.tgz#1b3716ba6615ef4ec0ab1758a6d5ccbad7817cd4"
+  integrity sha512-7kG7BwSVU2R+D/+U6fP+7zNvq8lFDCZp/6sEgdonMMkOjCX4g8aFr2QatQPnSHdt8ifo1dkns6wZ0XafCU3/1g==
   dependencies:
     "@subsocial/utils" "^0.4.26"
     cids "^0.7.1"

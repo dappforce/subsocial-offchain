@@ -32,10 +32,7 @@
     "export-storages": "node ./build/src/substrate/exportSubstrateStoragesToFiles.js"
   },
   "devDependencies": {
-    "@polkadot/types": "^3.7.1",
     "@subsocial/config": "^0.4.25",
-    "@subsocial/types": "^0.4.30",
-    "@subsocial/utils": "0.4.26",
     "@types/bn.js": "^4.11.5",
     "@types/connect-timeout": "^0.0.34",
     "@types/cors": "^2.8.6",
@@ -52,7 +49,10 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
-    "@subsocial/api": "^0.4.30",
+    "@subsocial/api": "^0.4.32",
+    "@subsocial/types": "^0.4.32",
+    "@subsocial/utils": "0.4.26",
+    "@polkadot/types": "^3.7.1",
     "@types/email-templates": "^8.0.0",
     "@types/handlebars": "^4.1.0",
     "@types/node-cron": "^2.0.3",
