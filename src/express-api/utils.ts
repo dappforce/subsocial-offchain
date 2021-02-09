@@ -20,9 +20,14 @@ export type EmailSettings = {
 	confirmed_on: Dayjs
 }
 
+type ErrorType = string | {
+  status: string,
+  data: string
+}
+
 export type OkOrError<T = null> = {
   ok: boolean,
-  errors?: Record<string, string>
+  errors?: Record<string, ErrorType>
   data?: T
 }
 
