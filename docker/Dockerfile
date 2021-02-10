@@ -23,8 +23,7 @@ RUN yarn add pm2 -G
 
 COPY block-numbers.csv /app/build
 
-EXPOSE 3001
-EXPOSE 3011
+EXPOSE 3001 3011 3012
 
 ENTRYPOINT [ "yarn", "pm2", "start", "--no-daemon" ]
 CMD [ "yarn init-postgres && yarn start" ]
