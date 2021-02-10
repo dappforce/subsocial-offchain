@@ -1,11 +1,17 @@
 import { resolveSubsocialApi } from '../../connections';
 import { checkDropByAccountAndEmail } from '../../postgres/selects/checkDropByAccountAndEmail';
+import { formattingEmail } from '../email/formatting-email';
 import { OkOrError } from '../utils';
 import { checkFaucetIsActive } from './status';
 import { FaucetFormData } from "./types";
 
 export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData, 'token'>): Promise<OkOrError> {
-  const { account: foundAccount, email: foundEmail } = await checkDropByAccountAndEmail(account, email)
+  const formattedEmail = formattingEmail(email)
+  const {
+    account: foundAccount,
+    original_email,
+    formatted_email: foundEmail
+  } = await checkDropByAccountAndEmail(account, formattedEmail)
 
   const errors: Record<string, string> = {}
   let ok = true
@@ -15,9 +21,9 @@ export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData,
     errors.account = 'On this account already had droped tokens'
   }
 
-  if (foundEmail === email) { 
+  if (foundEmail === formattedEmail) { 
     ok = false
-    errors.email = `On this email "${email}" already had droped tokens`
+    errors.email = `On this email "${original_email}" already had droped tokens`
   }
 
   const { api } = await resolveSubsocialApi()
