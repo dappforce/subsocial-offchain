@@ -1,4 +1,4 @@
-import { formattingEmail } from '../src/express-api/email/formatting-email'
+import { formatEmail } from '../src/express-api/email/format-email'
 
 const formattedEmail = 'test@gmailcom'
 
@@ -17,6 +17,6 @@ const emails = [
 ]
 
 emails.forEach(email => test(`Check "${email}" email`, () => {
-  const res = formattingEmail(email)
+  const res = formatEmail(email)
   expect(res).toEqual(formattedEmail)
 }))

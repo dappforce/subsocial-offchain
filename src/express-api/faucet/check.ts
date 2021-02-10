@@ -1,12 +1,12 @@
 import { resolveSubsocialApi } from '../../connections';
 import { checkDropByAccountAndEmail } from '../../postgres/selects/checkDropByAccountAndEmail';
-import { formattingEmail } from '../email/formatting-email';
+import { formatEmail } from '../email/format-email';
 import { OkOrError } from '../utils';
 import { checkFaucetIsActive } from './status';
 import { FaucetFormData } from "./types";
 
 export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData, 'token'>): Promise<OkOrError> {
-  const formattedEmail = formattingEmail(email)
+  const formattedEmail = formatEmail(email)
   const {
     account: foundAccount,
     original_email,
