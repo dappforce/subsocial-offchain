@@ -1,4 +1,4 @@
-import { formatEmail } from '../src/express-api/email/format-email'
+import { formatEmail } from '../../src/express-api/email/format-email'
 
 const formattedEmail = 'test@gmail.com'
 
