@@ -21,8 +21,9 @@ COPY --from=builder node_modules/ ./node_modules
 RUN yarn add concurrently -G
 RUN yarn add pm2 -G
 
-EXPOSE 3001
-EXPOSE 3011
+COPY block-numbers.csv /app/build
+
+EXPOSE 3001 3011 3012
 
 ENTRYPOINT [ "yarn", "pm2", "start", "--no-daemon" ]
 CMD [ "yarn init-postgres && yarn start" ]
