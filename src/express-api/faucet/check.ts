@@ -1,12 +1,20 @@
 import { resolveSubsocialApi } from '../../connections';
 import { checkDropByAccountAndEmail } from '../../postgres/selects/checkDropByAccountAndEmail';
 import { formatEmail } from '../email/format-email';
+import { isValidEmailProvider } from '../email/is-valid-email';
 import { OkOrError } from '../utils';
 import { checkFaucetIsActive } from './status';
 import { FaucetFormData } from "./types";
 
 export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData, 'token'>): Promise<OkOrError> {
+  
+  if (!isValidEmailProvider(email)) return {
+    ok: false,
+    errors: { email: 'This email domain is not supported, sorry' }
+  }
+
   const formattedEmail = formatEmail(email)
+
   const {
     account: foundAccount,
     original_email,
