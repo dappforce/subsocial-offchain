@@ -21,7 +21,7 @@ const addEmailSettingsQuery = `
 
 export const addEmailSettings = async (sessionCall: SessionCall<SetUpEmailArgs>) => {
 	const { account, signature, message } = sessionCall
-	const { email, periodicity, send_feeds, send_notifs } = message.args
+	const { email, periodicity, send_feeds = false, send_notifs = false } = message.args
 
 	const { nonce, rootAddress } = await upsertNonce(account, message)
 
