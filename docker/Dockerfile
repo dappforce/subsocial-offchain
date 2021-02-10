@@ -21,6 +21,8 @@ COPY --from=builder node_modules/ ./node_modules
 RUN yarn add concurrently -G
 RUN yarn add pm2 -G
 
+COPY block-numbers.csv /app/build
+
 EXPOSE 3001
 EXPOSE 3011
 

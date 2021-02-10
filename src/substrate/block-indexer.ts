@@ -23,7 +23,7 @@ async function processBlockEvents(events: SubstrateEvent[]) {
 }
 
 export function getBlockNumbersFromFile(): BlockNumber[] {
-  const strBlockNumbers = readFileSync(join(stateDirPath, 'block-numbers.csv'), 'utf-8').split('\n')
+  const strBlockNumbers = readFileSync(join(stateDirPath, '../block-numbers.csv'), 'utf-8').split('\n')
 
   return getUniqueIds(strBlockNumbers)
     .map(x => new u32(registry, x))
