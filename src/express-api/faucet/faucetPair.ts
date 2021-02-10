@@ -7,7 +7,7 @@ export const keyring = new Keyring({ type: 'ed25519' })
 
 function createFaucetPair() {
 	// const faucet = keyring.addFromAddress(faucetSeed, { name: 'Faucet' });
-	if (isEmptyStr(faucetMnemonic)) {
+	if (!faucetMnemonic || isEmptyStr(faucetMnemonic)) {
 		log.error('Faucet mnemonic is not defined')
 		return undefined
 	}
