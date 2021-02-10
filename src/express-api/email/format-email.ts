@@ -1,5 +1,10 @@
 export const formatEmail = (email?: string) => {
 	if (!email) return ''
 
-	return email.trim().toLowerCase().replace(/[^0-9a-zA-Z@]/g, '');
+	const [ username, domain ] = email
+	.trim()
+	.toLowerCase()
+	.split('@')
+
+	return `${username.replace(/[\W_]/g, '')}@${domain}`
 }
