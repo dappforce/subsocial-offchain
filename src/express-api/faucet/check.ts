@@ -1,7 +1,6 @@
 import { resolveSubsocialApi } from '../../connections';
 import { checkDropByAccountAndEmail } from '../../postgres/selects/checkDropByAccountAndEmail';
-import { formatEmail } from '../email/format-email';
-import { isValidEmailProvider } from '../email/is-valid-email';
+import { formatEmail, isValidEmailProvider } from '@subsocial/utils/email';
 import { OkOrError } from '../utils';
 import { checkFaucetIsActive } from './status';
 import { FaucetFormData } from "./types";
