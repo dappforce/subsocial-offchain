@@ -1,4 +1,4 @@
-import { formatEmail } from '../../express-api/email/format-email'
+import { formatEmail } from '@subsocial/utils/email'
 import { TokenDropsColumns } from '../../express-api/faucet/types'
 import { newPgError, runQuery } from '../utils'
 
