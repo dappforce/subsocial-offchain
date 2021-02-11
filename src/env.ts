@@ -21,4 +21,4 @@ export const recatchaKey = process.env.RECAPTCHA_KEY
 export const subsocialLogo = `https://app.subsocial.network/ipfs/ipfs/Qmasp4JHhQWPkEpXLHFhMAQieAH1wtfVRNHWZ5snhfFeBe`
 
 export const faucetMnemonic = process.env.FAUCET_MNEMONIC
-export const faucetAmount = new BN(parseFloat(process.env.FAUCET_AMOUNT || '0') * 10 ** 12)
+export const faucetDripAmount = new BN(parseFloat(process.env.FAUCET_DRIP_AMOUNT || '0') * 10 ** 12)

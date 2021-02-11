@@ -1,6 +1,6 @@
 import { GenericAccountId } from '@polkadot/types/generic';
 import { registry } from '@subsocial/types/substrate/registry';
-import { faucetAmount } from '../../env';
+import { faucetDripAmount } from '../../env';
 import { insertTokenDrop } from '../../postgres/inserts/insertTokenDrop';
 import { getConfirmationData } from '../../postgres/selects/getConfirmationCode';
 import { setConfirmationDate } from '../../postgres/updates/setConfirmationDate';
@@ -17,7 +17,7 @@ const log = newLogger(dropTx.name)
 export async function dropTx (toAddress: string, insertToDb: (blockNumber: BigInt, eventIndex: number) => void) {
 	const { api } = await resolveSubsocialApi()
 
-	const drip = api.tx.faucets.drip(toAddress, faucetAmount);
+	const drip = api.tx.faucets.drip(toAddress, faucetDripAmount);
 
 	const unsub = await drip.signAndSend(faucetPair, ({ events = [], status }) => {
 		log.debug('Transaction status:', status.type);
@@ -53,7 +53,7 @@ export const tokenDrop = async ({ account, email }: Omit<FaucetFormData, 'token'
       event_index,
       faucet: getFaucetPublicKey(),
       account,
-      amount: faucetAmount.toNumber(),
+      amount: faucetDripAmount.toNumber(),
       email,
       captcha_solved: true
     }))
