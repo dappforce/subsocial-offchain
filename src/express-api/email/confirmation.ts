@@ -10,6 +10,7 @@ import { FaucetFormData } from '../faucet/types';
 type SendConfirmationLetterParams = {
 	email: string,
 	url: string,
+	title: string,
 	customTemplate?: Partial<ConfirmationProp>,
 	args?: Record<string,string>
 }
@@ -21,7 +22,7 @@ const confirmationMsg = `Now you need to confirm your email address by clicking 
 
 const log = newLogger(sendConfirmationLetter.name)
 
-export async function sendConfirmationLetter ({ email, url, args, customTemplate }: SendConfirmationLetterParams) {
+export async function sendConfirmationLetter ({ email, url, title, args, customTemplate }: SendConfirmationLetterParams) {
 	const confirmationCode = v4()
 
 	const argsStr = args ? Object.entries(args).map(([ name, value ]) => `&${name}=${value}`).join() : ''
@@ -34,7 +35,7 @@ export async function sendConfirmationLetter ({ email, url, args, customTemplate
 	}, customTemplate)
 
 	try {
-		await sendEmail(email, data, 'confirmation')
+		await sendEmail({ email, data, type: 'confirmation', title })
 		return confirmationCode
 	} catch (err) {
 		log.error("Failed send confirmation:", err)
@@ -48,23 +49,24 @@ export const sendNotifConfirmationLetter = async (sessionCall: SessionCall<Confi
 
 	try {
 		const confirmationCode = await sendConfirmationLetter({
+			title: 'Confirm your email',
 			email, url: 'settings/email/confirm-email',
-			customTemplate: { message: confirmationMsgForSetting}
+			customTemplate: { message: confirmationMsgForSetting }
 		})
 		confirmationCode && await setConfirmationCode(sessionCall, confirmationCode)
 	} catch (err) {
     log.error("Error", err)
   }
-  
 }
 
 export const sendFaucetConfirmationLetter = async ({ email, account }: FaucetFormData)  => {
 	try {
 		const confirmationCode = await sendConfirmationLetter({
 			email,
+			title: 'Claim your tokens',
 			url: `faucet/drop`,
 			args: { account },
-			customTemplate: { buttonText: 'Drop tokens' }
+			customTemplate: { buttonText: 'Claim tokens' }
 		})
 		return confirmationCode
 	} catch (err) {

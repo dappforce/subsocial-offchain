@@ -7,9 +7,10 @@ import { sendEmail } from './emailSender';
 import { createFeedEmailMessage } from './feed';
 import { newLogger, nonEmptyArr, isEmptyArray } from '@subsocial/utils';
 import { updateLastPush } from '../../postgres/updates/updateLastActivities';
-import { ActivityType, TableNameByActivityType, CreateEmailMessageFn } from './utils';
+import { TableNameByActivityType, CreateEmailMessageFn } from './utils';
 import { Activity } from '@subsocial/types'
 import BN from 'bn.js';
+import { TemplateType } from './templates';
 
 const log = newLogger('Cron job')
 
@@ -34,7 +35,7 @@ const insertEmailTemplatesImages = () => {
 insertEmailTemplatesImages()
 
 type ActivitiesWithType = {
-  activityType: ActivityType,
+  activityType: TemplateType,
   activities: Activity[]
 }
 
@@ -51,7 +52,7 @@ const sendActivitiesEmail = async (email: string, activitiesWithType: Activities
   }
 
   if (!isEmptyArray(message)) {
-    await sendEmail(email, message, activityType)
+    await sendEmail({ email, data: message, type: activityType })
   }
 }
 

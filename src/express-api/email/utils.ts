@@ -8,13 +8,13 @@ import { Activity } from '../telegramWS';
 import { NotificationTemplateProp, FeedTemplateProp } from './types';
 import dayjs from 'dayjs'
 import { AnyAccountId } from '@subsocial/types';
+import { TemplateType } from './templates';
 
 export const log = newLogger("Email")
 
 // FIXME: export these to JS libs
-export type ActivityType = 'notifications' | 'feeds' | 'confirmation'
 
-type TableNameByActivityType = Record<ActivityType, ActivityTable>
+type TableNameByActivityType = Record<TemplateType, ActivityTable>
 export const TableNameByActivityType: TableNameByActivityType = {
 	'feeds': 'news_feed',
 	'notifications': 'notifications',

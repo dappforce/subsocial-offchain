@@ -1,11 +1,9 @@
 import { createTransport, getTestMessageUrl } from 'nodemailer'
 import { emailHost, emailPort, emailUser, emailPassword, appsUrl, emailFrom } from '../../env';
 import { newLogger } from '@subsocial/utils';
-import { ActivityType } from './utils';
-import { readFileSync } from 'fs';
-import { join } from 'path';
-import { compile, registerHelper } from 'handlebars';
+import { registerHelper } from 'handlebars';
 import { NotificationTemplateProp, ConfirmationProp, FeedTemplateProp } from './types';
+import templates, { TemplateType } from './templates';
 
 const log = newLogger('Email Sender')
 
@@ -28,17 +26,20 @@ registerHelper('notEq', function (v1, v2, options) {
 	return options.inverse(this);
 });
 
-export const sendEmail = async (email: string, data: DataTemplateProp, type: ActivityType) => {
-	const source = readFileSync(join(__dirname, `templates/${type}/html.hbs`), 'utf8');
+type SendEmailProps = {
+	email: string,
+	data: DataTemplateProp,
+	type: TemplateType,
+	title?: string
+}
 
-	// TODO Do not compile every time
-	const template = compile(source)
+export const sendEmail = async ({ email, type, data, title }: SendEmailProps) => {
 
 	const info = await transporter.sendMail({
 		from: emailFrom,
 		to: email,
-		subject: `New ${type}`,
-		html: template({ data, appsUrl })
+		subject: title || `New ${type}`,
+		html: templates[type]({ data, appsUrl })
 	})
 
 	log.debug("Message sent:", info.messageId);
