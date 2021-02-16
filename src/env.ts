@@ -12,13 +12,16 @@ export const ipfsClusterUrl = process.env.IPFS_CLUSTER_URL || 'http://localhost:
 export const port = process.env.OFFCHAIN_SERVER_PORT || 3001
 
 export const emailHost = process.env.EMAIL_HOST
-export const emailPort = process.env.EMAIL_PORT
+export const emailPort = parseInt(process.env.EMAIL_PORT)
 export const emailUser = process.env.EMAIL_USER
 export const emailPassword = process.env.EMAIL_PASSWORD
+export const emailFrom = process.env.EMAIL_FROM
 
 export const recatchaKey = process.env.RECAPTCHA_KEY
 
 export const subsocialLogo = `https://app.subsocial.network/ipfs/ipfs/Qmasp4JHhQWPkEpXLHFhMAQieAH1wtfVRNHWZ5snhfFeBe`
 
 export const faucetMnemonic = process.env.FAUCET_MNEMONIC
-export const faucetDripAmount = new BN(parseFloat(process.env.FAUCET_DRIP_AMOUNT || '0') * 10 ** 12)
+
+// TODO replace '12' with a const from blockchain
+export const faucetAmount = new BN(parseFloat(process.env.FAUCET_DRIP_AMOUNT || '0') * 10 ** 12)
