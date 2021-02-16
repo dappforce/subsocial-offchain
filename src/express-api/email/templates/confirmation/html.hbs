@@ -5,82 +5,81 @@
   <title>Notifications</title>
   <meta charset="utf-8">
   <style type="text/css">
-    .background {
-      padding-bottom: 1rem;
-      padding-top: 1rem;
-    }
 
-    .image {
-      margin-top: 10px;
-      width: 30px;
+    body, td, th, a, div {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     }
 
     .buttonLink {
-      color: rgb(255, 255, 255) !important;
-      text-decoration: none;
-      display: inline-block;
-      cursor: pointer;
-    }
-
-    button {
-      color: #fff;
+      color: #fff !important;
       background: #eb2f96;
       border-color: #eb2f96;
-      text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
-      line-height: 1.5715;
-      position: relative;
-      display: inline-block;
       font-weight: 400;
       white-space: nowrap;
       text-align: center;
       border: 1px solid transparent;
-      box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
-      cursor: pointer;
       touch-action: manipulation;
       height: 32px;
       padding: 4px 15px;
       font-size: 14px;
       border-radius: 2px;
-      color: rgba(0, 0, 0, 0.85);
       margin-bottom: 10px;
+      cursor: pointer;
+      text-decoration: none;
     }
 
-    p {
+    td, th {
+      padding: .5rem;
+      line-height: 1.5rem;
+    }
+
+    td {
       font-size: 1rem;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     }
 
-    .confirmation-item {
+    th {
+      font-size: 1.5rem;
+    }
+
+    table {
+      padding-bottom: 1rem;
+      padding-top: 1rem;
       text-align: center;
-      width: 100%;
-      color: #222222;
-      min-height: 60px;
-    }
-
-    .confirmation-content {
-      position: absolute;
       width: 500px;
       margin-left: auto;
       margin-right: auto;
     }
+
+    .image {
+      margin-bottom: 1rem;
+    }
+    
   </style>
 </head>
 
 <body>
-  <div class='background'>
-    <div class='confirmation-item'>
-      <div class='confirmation-content'>
-        <img src="{{data.image}}" class='image' />
-        <p style="font-size: 1.5rem;">Thank you for using Subsocial.</p>
-        <p>{{data.message}}</p>
-        <p>This link will expire in 1 hour</p>
-        <button>
-          <a href="{{data.link}}" class='buttonLink'>{{data.buttonText}}</a>
-        </button>
-      </div>
-
-    </div>
-  </div>
+  <table cellspacing="1">
+    <tr>
+      <th>
+        <img src="{{data.image}}" width="80" height="80" class='image' />
+        <div>Thank you for using Subsocial</div>
+      </th>
+    </tr>
+    <tr>
+      <td>
+        <div>{{data.message}}</div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <a href="{{data.link}}" class='buttonLink'>{{data.buttonText}}</a>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div>Or follow this link: {{data.link}}, link will expire in 1 hour</div>
+      </td>
+    </tr>
+   </table>
 </body>
 <html>
