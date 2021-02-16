@@ -23,5 +23,5 @@ export const subsocialLogo = `https://app.subsocial.network/ipfs/ipfs/Qmasp4JHhQ
 
 export const faucetMnemonic = process.env.FAUCET_MNEMONIC
 
-// TODO replace '12' with a const from blockchain
-export const faucetAmount = new BN(parseFloat(process.env.FAUCET_DRIP_AMOUNT || '0') * 10 ** 12)
+// TODO: replace '12' with a const from blockchain
+export const faucetDripAmount = new BN(parseFloat(process.env.FAUCET_DRIP_AMOUNT || '0') * 10 ** 12)
