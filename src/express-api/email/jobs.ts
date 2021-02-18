@@ -74,7 +74,7 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
     }
 
     if (send_feeds) {
-      const activityType = 'feeds'
+      const activityType = 'feed'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
       await sendActivitiesEmail(email, { activityType, activities }, createFeedEmailMessage)
