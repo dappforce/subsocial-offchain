@@ -33,13 +33,15 @@ type SendEmailProps = {
 	title?: string
 }
 
-export const sendEmail = async ({ email, type, data, title }: SendEmailProps) => {
+export const sendEmail = async ({ email, type, data, title: customTitle }: SendEmailProps) => {
+
+	const title = customTitle || type
 
 	const info = await transporter.sendMail({
 		from: emailFrom,
 		to: email,
-		subject: title || `New ${type}`,
-		html: templates[type]({ data, appsUrl })
+		subject: title,
+		html: templates[type]({ data, appsUrl, title })
 	})
 
 	log.debug("Message sent:", info.messageId);
