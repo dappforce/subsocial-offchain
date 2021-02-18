@@ -1,11 +1,22 @@
 export type NotificationTemplateProp = {
 	date: string,
-	performerAccountUrl: string,
 	performerAccountName: string,
+	relatedEntityUrl: string,
 	avatar: string,
 	message: string,
-	relatedEntityUrl: string,
-	relatedEntityName: string
+	relatedEntityName: string,
+	image?: string
+}
+
+export type FeedTemplateProp = {
+	ownerName: string,
+	avatar: string
+	spaceName: string,
+	postName: string,
+	postLink: string,
+	postSummary: string,
+	date: string,
+	image?: string
 }
 
 export type ConfirmationProp = {
@@ -15,14 +26,4 @@ export type ConfirmationProp = {
 	buttonText?: string
 }
 
-export type FeedTemplateProp = {
-	ownerName: string,
-	ownerLink: string,
-	avatar: string
-	spaceName: string,
-	spaceLink: string,
-	postName: string,
-	postLink: string,
-	postBody: string,
-	date: string
-}
+
