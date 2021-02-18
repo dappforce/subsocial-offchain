@@ -28,20 +28,17 @@
       text-decoration: none;
     }
 
-    td, th {
+    .text {
       padding: .5rem;
       line-height: 1.5rem;
-    }
-
-    td {
       font-size: 1rem;
     }
 
-    th {
+    .header {
       font-size: 1.5rem;
     }
 
-    table {
+    .item {
       padding-bottom: 1rem;
       padding-top: 1rem;
       text-align: center;
@@ -58,26 +55,28 @@
 </head>
 
 <body>
-  <table cellspacing="1">
+  <table cellspacing="1" class="item">
     <tr>
-      <th>
+      <th class="header">
         <img src="{{data.image}}" width="80" height="80" class='image' />
         <div>Thank you for using Subsocial</div>
       </th>
     </tr>
     <tr>
-      <td>
+      <td class="text">
         <div>{{data.message}}</div>
       </td>
     </tr>
     <tr>
-      <td>
+      <td class="text">
         <a href="{{data.link}}" class='buttonLink'>{{data.buttonText}}</a>
       </td>
     </tr>
     <tr>
-      <td>
-        <div>Or follow this link: {{data.link}}, link will expire in 1 hour</div>
+      <td class="text">
+        <div>Or follow this link:</div>
+        <div>{{data.link}}</div>
+        <div>The link will expire in 1 hour</div>
       </td>
     </tr>
    </table>

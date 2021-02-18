@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Feed</title>
+  <meta charset="utf-8"> 
+    <style type="text/css">
+    h3 {
+      margin: 0;
+      margin-bottom: .5rem;
+    }
+
+    .top {
+      vertical-align: top;
+    }
+
+    .avatar {
+      border-radius: 50%;
+    }
+
+    .author {
+      font-weight: bold;
+      color: #2d2d2d;
+    }
+
+    .details {
+      color: #888;
+    }
+
+    .main {
+      width: 712px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .notif-item {
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .notif-image {
+      width: 80;
+      height: 80;
+    }
+
+    .pageTitle {
+      color: #888;
+      font-size: 22px;
+      font-weight: 300;
+      margin-bottom: .5rem;
+      padding: .25rem;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .link {
+      color: #2d2d2d;
+      text-decoration: none;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .buttonLink {
+      color: #fff !important;
+      background: #eb2f96;
+      border-color: #eb2f96;
+      font-weight: 400;
+      white-space: nowrap;
+      text-align: center;
+      border: 1px solid transparent;
+      touch-action: manipulation;
+      height: 32px;
+      padding: 4px 15px;
+      font-size: 14px;
+      border-radius: 2px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <table class="main">
+    <tr>
+      <td>
+        <h3 class="pageTitle">{{title}}</h3>
+      </td>
+    </tr>
+    {{#each data}}
+    <tr>
+      <td class="top">
+        <a class="link" href="{{ relatedEntityUrl }}">
+          <table class="notif-item">
+            <tr>
+              <td class="top">
+                <table>
+                  {{#if avatar}}
+                    <td>
+                      <img width="36" height="36" class="avatar" src="{{avatar}}" >
+                    </td>
+                  {{/if}}
+                  <td>
+                    <img width="36" height="36" class="avatar" src="{{ avatar }}" >
+                  </td>
+                  <td>
+                    <div class="author">
+                      <span>{{performerAccountName}}</span>
+                      <span>{{message}}</span>
+                      <span>{{relatedEntityName}}</span>
+                    </div>
+                    <div class="details">{{ date }}</div>
+                  </td>
+                </table>
+              </td>
+              {{#if image}}
+                <td class="top notif-image">
+                  <img class="notif-image" src="{{image}}" >
+                </td>
+              {{/if}}
+            </tr>
+          </table>
+        </a>
+      </td>
+    </tr>
+    {{/each}}
+    <tr class="center">
+      <a href="{{appsUrl}}" class='buttonLink'>See more on the website</a>
+    </tr>
+  </table>
+</body>
+<html>
