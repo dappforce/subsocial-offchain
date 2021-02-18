@@ -1,22 +1,23 @@
 import { ipfsNodeUrl } from './../../env';
 import { SpaceId } from '@subsocial/types/substrate/interfaces';
-import { newLogger } from '@subsocial/utils';
+import { newLogger, nonEmptyStr } from '@subsocial/utils';
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import { appsUrl } from '../../env';
 import { ActivityTable } from '../../postgres/queries/feed-and-notifs';
 import { Activity } from '../telegramWS';
 import { NotificationTemplateProp, FeedTemplateProp } from './types';
-import dayjs from 'dayjs'
 import { AnyAccountId } from '@subsocial/types';
 import { TemplateType } from './templates';
-
+import dayjs from 'dayjs'
+import LocalizedFormat from 'dayjs/plugin/localizedFormat'
+dayjs.extend(LocalizedFormat)
 export const log = newLogger("Email")
 
 // FIXME: export these to JS libs
 
 type TableNameByActivityType = Record<TemplateType, ActivityTable>
 export const TableNameByActivityType: TableNameByActivityType = {
-	'feeds': 'news_feed',
+	'feed': 'news_feed',
 	'notifications': 'notifications',
 	'confirmation': null
 }
@@ -46,7 +47,7 @@ export const toShortAddress = (_address: AnyAccountId) => {
 }
 
 export const resolveIpfsUrl = (cid: string) => {
-    return `${ipfsNodeUrl}/ipfs/${cid}`
+    return nonEmptyStr(cid) ? `${ipfsNodeUrl}/ipfs/${cid}` : ''
 }
 
 export const DEFAULT_DATE_FORMAT = 'D MMM, YYYY h:mm A'
