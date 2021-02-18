@@ -1,10 +1,11 @@
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import messages from './emailMessages';
-import { getAccountContent, createHrefForPost, createHrefForAccount, createHrefForSpace, getFormatDate } from './utils';
+import { getAccountContent, createHrefForPost, createHrefForAccount, createHrefForSpace, getFormatDate, resolveIpfsUrl } from './utils';
 import { EventsName } from '@subsocial/types';
 import { Activity } from '../telegramWS';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
 import { NotificationTemplateProp } from './types';
+import { summarizeMd } from '@subsocial/utils';
 
 export const createNotifsEmailMessage = async (activity: Activity): Promise<NotificationTemplateProp> => {
 	const { account, event, space_id, post_id, date, following_id, comment_id } = activity
@@ -31,14 +32,12 @@ const getAccountPreview = async (account: string, following_id: string, message:
 	const actionDate = getFormatDate(date)
 
 	const { name: followingName, avatar } = await getAccountContent(following_id)
-	const followingUrl = createHrefForAccount(following_id)
 
 	const { name: accountName } = await getAccountContent(account)
 	const accountUrl = createHrefForAccount(account)
 
 	return {
 		date: actionDate,
-		performerAccountUrl: followingUrl,
 		performerAccountName: followingName,
 		avatar,
 		message,
@@ -53,21 +52,20 @@ const getSpacePreview = async (account: string, spaceId: string, message: string
 	const actionDate = getFormatDate(date)
 
 	const space = await subsocial.findSpace({ id: spaceId as unknown as SpaceId })
-	const content = space.content.name
+	const { name, image } = space.content || {}
 
-	const { name: accountName, avatar } = await getAccountContent(account)
-	const accountUrl = createHrefForAccount(account)
+	const { name: accountName, avatar = '' } = await getAccountContent(account)
 
 	const spaceUrl = createHrefForSpace(spaceId.toString())
 
 	return {
 		date: actionDate,
-		performerAccountUrl: accountUrl,
 		performerAccountName: accountName,
 		avatar,
 		message,
 		relatedEntityUrl: spaceUrl,
-		relatedEntityName: content
+		relatedEntityName: name,
+		image: resolveIpfsUrl(image)
 	}
 
 }
@@ -84,16 +82,14 @@ const getCommentPreview = async (account: string, commentId: string, message: st
 	const { name: accountName, avatar } = await getAccountContent(account)
 
 	const postUrl = createHrefForPost(spaceId.toString(), postId.toString())
-	const accountUrl = createHrefForAccount(account)
 
 	return {
 		date: actionDate,
-		performerAccountUrl: accountUrl,
 		performerAccountName: accountName,
 		avatar,
 		message,
 		relatedEntityUrl: postUrl,
-		relatedEntityName: content
+		relatedEntityName: summarizeMd(content).summary
 	}
 
 }
@@ -105,21 +101,19 @@ const getPostPreview = async (account: string, postId: string, message: string, 
 
 	const post = await subsocial.findPost({ id: postId as unknown as PostId })
 	const spaceId = post.struct.space_id
-	const content = post.content.body
+	const { title, image = '' } = post.content || {}
 
 	const { name: accountName, avatar } = await getAccountContent(account)
 
 	const postUrl = createHrefForPost(spaceId.toString(), postId.toString())
-	const accountUrl = createHrefForAccount(account)
 
 	return {
 		date: actionDate,
-		performerAccountUrl: accountUrl,
 		performerAccountName: accountName,
 		avatar,
 		message,
 		relatedEntityUrl: postUrl,
-		relatedEntityName: content
+		relatedEntityName: title,
+		image: resolveIpfsUrl(image)
 	}
 }
-
