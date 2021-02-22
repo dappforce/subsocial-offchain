@@ -89,7 +89,7 @@ const getCommentPreview = async (account: string, commentId: string, message: st
 		avatar,
 		message,
 		relatedEntityUrl: postUrl,
-		relatedEntityName: summarizeMd(content).summary
+		relatedEntityName: summarizeMd(content, { limit: 60 }).summary
 	}
 
 }

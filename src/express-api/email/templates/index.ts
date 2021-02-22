@@ -1,5 +1,5 @@
 import { readFileSync } from "fs";
-import { compile } from "handlebars";
+import { compile, registerPartial } from "handlebars";
 // import { FeedTemplateProp } from "../types";
 
 export type TemplateType = 'notifications' | 'feed' | 'confirmation'
@@ -11,20 +11,14 @@ const getTemplate = (path) => {
 
 const getGeneralTemplate = (type: 'confirmation' | 'activity') => getTemplate(`${type}/html`)
 
-// const activityTemplate = getGeneralTemplate('activity')
+const getActivityTemplate = (type: 'feed' | 'notifications') => getTemplate(`activity/${type}`)
 
-const getActivity = (type: 'feed' | 'notifications') => getTemplate(`activity/${type}`)
-// {
-//   const template = getTemplate(`activity/${type}`)
-
-//   return (data: FeedTemplateProp) => activityTemplate({
-//     data: template({ data })
-//   })
-// }
+registerPartial('feed', getActivityTemplate('feed'));
+registerPartial('notifications', getActivityTemplate('notifications'));
 
 export const templates: Record<TemplateType, HandlebarsTemplateDelegate<any>> = { 
-  notifications: getActivity('notifications'),
-  feed: getActivity('feed'),
+  notifications: getGeneralTemplate('activity'),
+  feed: getGeneralTemplate('activity'),
   confirmation: getGeneralTemplate('confirmation')
 }
 
