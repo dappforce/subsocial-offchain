@@ -26,21 +26,24 @@ registerHelper('notEq', function (v1, v2, options) {
 	return options.inverse(this);
 });
 
-type SendEmailProps = {
-	email: string,
-	data: DataTemplateProp,
-	type: TemplateType,
+export type LetterParams = {
+	fromName?: string,
+	subject: string,
 	title?: string
 }
 
-export const sendEmail = async ({ email, type, data, title: customTitle }: SendEmailProps) => {
+type SendEmailProps = LetterParams & {
+	email: string,
+	data: DataTemplateProp,
+	type: TemplateType,
+}
 
-	const title = customTitle || type.charAt(0).toUpperCase() + type.slice(1)
+export const sendEmail = async ({ email, type, data, fromName = 'Subsocial', subject, title = subject }: SendEmailProps) => {
 
 	const info = await transporter.sendMail({
-		from: emailFrom,
+		from: `${fromName} <${emailFrom}>`,
 		to: email,
-		subject: title,
+		subject,
 		html: templates[type]({ data, appsUrl, title, [type]: true })
 	})
 

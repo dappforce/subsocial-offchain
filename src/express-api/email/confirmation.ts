@@ -1,4 +1,4 @@
-import { sendEmail } from './emailSender';
+import { LetterParams, sendEmail } from './emailSender';
 import { v4 } from 'uuid'
 import { appsUrl, subsocialLogo } from '../../env';
 import { setConfirmationCode } from '../../postgres/updates/setConfirmationCode';
@@ -7,10 +7,9 @@ import { ConfirmationProp } from './types';
 import { newLogger } from '@subsocial/utils';
 import { FaucetFormData } from '../faucet/types';
 
-type SendConfirmationLetterParams = {
+type SendConfirmationLetterParams = LetterParams & {
 	email: string,
 	url: string,
-	title: string,
 	customTemplate?: Partial<ConfirmationProp>,
 	args?: Record<string,string>
 }
@@ -22,7 +21,7 @@ const confirmationMsg = `Now you need to confirm your email address by clicking 
 
 const log = newLogger(sendConfirmationLetter.name)
 
-export async function sendConfirmationLetter ({ email, url, title, args, customTemplate }: SendConfirmationLetterParams) {
+export async function sendConfirmationLetter ({ email, url, args, customTemplate, ...params }: SendConfirmationLetterParams) {
 	const confirmationCode = v4()
 
 	const argsStr = args ? Object.entries(args).map(([ name, value ]) => `&${name}=${value}`).join() : ''
@@ -35,7 +34,7 @@ export async function sendConfirmationLetter ({ email, url, title, args, customT
 	}, customTemplate)
 
 	try {
-		await sendEmail({ email, data, type: 'confirmation', title })
+		await sendEmail({ email, data, type: 'confirmation', ...params })
 		return confirmationCode
 	} catch (err) {
 		log.error("Failed send confirmation:", err)
@@ -49,9 +48,9 @@ export const sendNotifConfirmationLetter = async (sessionCall: SessionCall<Confi
 
 	try {
 		const confirmationCode = await sendConfirmationLetter({
-			title: 'Confirm your email',
+			subject: 'Confirm your email',
 			email, url: 'settings/email/confirm-email',
-			customTemplate: { message: confirmationMsgForSetting }
+			customTemplate: { message: confirmationMsgForSetting },
 		})
 		confirmationCode && await setConfirmationCode(sessionCall, confirmationCode)
 	} catch (err) {
@@ -63,7 +62,7 @@ export const sendFaucetConfirmationLetter = async ({ email, account }: FaucetFor
 	try {
 		const confirmationCode = await sendConfirmationLetter({
 			email,
-			title: 'Claim your tokens',
+			subject: 'Claim your tokens',
 			url: `faucet/drop`,
 			args: { account },
 			customTemplate: { buttonText: 'Claim tokens' }

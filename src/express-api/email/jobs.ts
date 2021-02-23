@@ -3,14 +3,15 @@ import { getAllEmailSettings } from '../../postgres/selects/getAllEmailSettings'
 import { EmailSettings } from '../utils';
 import { getActivitiesForEmailSender } from '../../postgres/selects/getActivitiesForEmailSender'
 import { createNotifsEmailMessage } from './notifications';
-import { sendEmail } from './emailSender';
+import { LetterParams, sendEmail } from './emailSender';
 import { createFeedEmailMessage } from './feed';
 import { newLogger, nonEmptyArr, isEmptyArray } from '@subsocial/utils';
 import { updateLastPush } from '../../postgres/updates/updateLastActivities';
-import { TableNameByActivityType, CreateEmailMessageFn } from './utils';
+import { TableNameByActivityType, CreateEmailMessageFn, getWeeklyDayDate } from './utils';
 import { Activity } from '@subsocial/types'
 import BN from 'bn.js';
 import { TemplateType } from './templates';
+import { getCountOfUnreadNotifications } from '../../postgres/selects/getCountOfUnreadNotifications';
 
 const log = newLogger('Cron job')
 
@@ -44,7 +45,7 @@ const compareActivities = (a: Activity, b: Activity) => (
   new BN(a.block_number).sub(new BN(b.block_number)).toNumber() || a.event_index - b.event_index
 )
 
-const sendActivitiesEmail = async (email: string, activitiesWithType: ActivitiesWithType, createEmailFn: CreateEmailMessageFn) => {
+const sendActivitiesEmail = async (email: string, activitiesWithType: ActivitiesWithType, createEmailFn: CreateEmailMessageFn, params: LetterParams) => {
   const { activityType, activities } = activitiesWithType
   let message = []
   for (const activity of activities.slice(0, 10)) {
@@ -52,9 +53,23 @@ const sendActivitiesEmail = async (email: string, activitiesWithType: Activities
   }
 
   if (!isEmptyArray(message)) {
-    await sendEmail({ email, data: message, type: activityType })
+    await sendEmail({ email, data: message, type: activityType, ...params })
   }
 }
+
+
+const createNofitParams = (count): LetterParams => ({
+  fromName: 'Subsocial Notifications',
+  title: `Notifications for ${getWeeklyDayDate()}`,
+  subject: `You have ${count} unread notifications on Subsocial`
+})
+
+const createFeedParams = (): LetterParams => ({
+  fromName: 'Subsocial Feed Updates',
+  title: `Notifications for ${getWeeklyDayDate()}`,
+  subject: 'You have new posts in your feed on Subsocial'
+})
+
 
 const sendNotificationsAndFeeds = async (periodicity: string) => {
   const emailSettingsArray: EmailSettings[] = await getAllEmailSettings(periodicity)
@@ -62,13 +77,13 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
   for (const setting of emailSettingsArray) {
     const { account, last_block_bumber, last_event_index, email, send_notifs, send_feeds } = setting
     let lastActivities: Activity[] = []
-
     // TODO: maybe there's a way to simplify this code and remove potential copy-paste
     if (send_notifs) {
+      const unreadCount = await getCountOfUnreadNotifications(account)
       const activityType = 'notifications'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      await sendActivitiesEmail(email, { activityType, activities }, createNotifsEmailMessage)
+      await sendActivitiesEmail(email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
       if (nonEmptyArr(activities))
         lastActivities.push(activities.pop())
     }
@@ -77,7 +92,7 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
       const activityType = 'feed'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      await sendActivitiesEmail(email, { activityType, activities }, createFeedEmailMessage)
+      await sendActivitiesEmail(email, { activityType, activities }, createFeedEmailMessage, createFeedParams())
       if (nonEmptyArr(activities))
         lastActivities.push(activities.pop())
     }

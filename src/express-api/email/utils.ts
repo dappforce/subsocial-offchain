@@ -76,3 +76,13 @@ export const getSpaceName = async (spaceId: SpaceId): Promise<string> => {
 export const getExpiresOnDate = () => dayjs().add(1, 'hours').format('YYYY-MM-DDTHH:mm:ss').toString()
 
 export const getFormatDate = (date: string) => dayjs(date).format('lll')
+
+/**
+ * Format date:
+ * DD - 01-31
+ * MMMM - January-December
+ * YYYY - 2000
+ * dddd - Monday-Subday
+ * Full example: 01 January 2000 (Monday)
+ */
+export const getWeeklyDayDate = () => dayjs().format('DD MMMM YYYY (dddd)')

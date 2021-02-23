@@ -4,58 +4,11 @@
 <head>
   <title>Notifications</title>
   <meta charset="utf-8">
-  <style type="text/css">
-
-    body, td, th, a, div {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    }
-
-    .buttonLink {
-      color: #fff !important;
-      background: #eb2f96;
-      border-color: #eb2f96;
-      font-weight: 400;
-      white-space: nowrap;
-      text-align: center;
-      border: 1px solid transparent;
-      touch-action: manipulation;
-      height: 32px;
-      padding: 4px 15px;
-      font-size: 14px;
-      border-radius: 2px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    .text {
-      padding: .5rem;
-      line-height: 1.5rem;
-      font-size: 1rem;
-    }
-
-    .header {
-      font-size: 1.5rem;
-    }
-
-    .item {
-      padding-bottom: 1rem;
-      padding-top: 1rem;
-      text-align: center;
-      width: 500px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .image {
-      margin-bottom: 1rem;
-    }
-    
-  </style>
+  <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
-  <table cellspacing="1" class="item">
+  <table cellspacing="1" class="main">
     <tr>
       <th class="header">
         <img src="{{data.image}}" width="80" height="80" class='image' />
@@ -63,17 +16,17 @@
       </th>
     </tr>
     <tr>
-      <td class="text">
+      <td class="normal-text">
         <div>{{data.message}}</div>
       </td>
     </tr>
     <tr>
-      <td class="text">
+      <td class="normal-text">
         <a href="{{data.link}}" class='buttonLink'>{{data.buttonText}}</a>
       </td>
     </tr>
     <tr>
-      <td class="text">
+      <td class="normal-text">
         <div>Or follow this link:</div>
         <div>{{data.link}}</div>
         <div>The link will expire in 1 hour</div>

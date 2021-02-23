@@ -1,10 +1,10 @@
 export type NotificationTemplateProp = {
 	date: string,
-	performerAccountName: string,
+	ownerName: string,
 	relatedEntityUrl: string,
 	avatar: string,
 	message: string,
-	relatedEntityName: string,
+	entityName: string,
 	image?: string
 }
 
@@ -12,7 +12,7 @@ export type FeedTemplateProp = {
 	ownerName: string,
 	avatar: string
 	spaceName: string,
-	postName: string,
+	postTitle: string,
 	postLink: string,
 	postSummary: string,
 	date: string,

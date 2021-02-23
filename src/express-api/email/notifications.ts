@@ -1,6 +1,6 @@
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import messages from './emailMessages';
-import { getAccountContent, createHrefForPost, createHrefForAccount, createHrefForSpace, getFormatDate, resolveIpfsUrl } from './utils';
+import { getAccountContent, createHrefForPost, createHrefForAccount, createHrefForSpace, getFormatDate, resolveIpfsUrl, toShortAddress } from './utils';
 import { EventsName } from '@subsocial/types';
 import { Activity } from '../telegramWS';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
@@ -38,11 +38,11 @@ const getAccountPreview = async (account: string, following_id: string, message:
 
 	return {
 		date: actionDate,
-		performerAccountName: followingName,
+		ownerName: followingName,
 		avatar,
 		message,
 		relatedEntityUrl: accountUrl,
-		relatedEntityName: accountName
+		entityName: accountName
 	}
 }
 
@@ -60,11 +60,11 @@ const getSpacePreview = async (account: string, spaceId: string, message: string
 
 	return {
 		date: actionDate,
-		performerAccountName: accountName,
+		ownerName: accountName,
 		avatar,
 		message,
 		relatedEntityUrl: spaceUrl,
-		relatedEntityName: name,
+		entityName: name,
 		image: resolveIpfsUrl(image)
 	}
 
@@ -85,11 +85,11 @@ const getCommentPreview = async (account: string, commentId: string, message: st
 
 	return {
 		date: actionDate,
-		performerAccountName: accountName,
+		ownerName: accountName,
 		avatar,
 		message,
 		relatedEntityUrl: postUrl,
-		relatedEntityName: summarizeMd(content, { limit: 60 }).summary
+		entityName: summarizeMd(content, { limit: 60 }).summary
 	}
 
 }
@@ -109,11 +109,11 @@ const getPostPreview = async (account: string, postId: string, message: string, 
 
 	return {
 		date: actionDate,
-		performerAccountName: accountName,
+		ownerName: accountName || toShortAddress(account),
 		avatar,
 		message,
 		relatedEntityUrl: postUrl,
-		relatedEntityName: title,
+		entityName: title,
 		image: resolveIpfsUrl(image)
 	}
 }

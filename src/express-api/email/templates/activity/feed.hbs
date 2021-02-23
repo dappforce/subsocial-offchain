@@ -10,11 +10,18 @@
               <tr>
                 <td class="top">
                   <table>
-                    {{#if avatar}}
-                      <td class="avatar">
-                        <img width="36" height="36" class="avatar" src="{{avatar}}" >
-                      </td>
-                    {{/if}}
+                    <td>
+                      <img
+                        width="36"
+                        height="36"
+                        class="
+                        {{#if avatar == ''}}
+                          hidden
+                        {{/if}}
+                        avatar
+                        mr-avatar" src="{{avatar}}"
+                      >
+                    </td>
                     <td>
                       <div class="author">{{ownerName}}</div>
                       <div class="details">
@@ -28,7 +35,7 @@
               </tr>
               <tr>
                 <td>
-                  <h3 class="text">{{ postName }}</h3>
+                  <h3 class="text">{{ postTitle }}</h3>
                   <div class="text">{{ postSummary }}</div>
                 </td>
               </tr>
