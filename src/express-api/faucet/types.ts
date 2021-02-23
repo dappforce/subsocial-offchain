@@ -1,7 +1,10 @@
+import { Periodicity } from "../utils"
+
 export type FaucetFormData = {
   account: string,
   email: string,
-  token: string
+  token: string,
+  periodicity?: Periodicity,
 }
 
 export type TokenDropsColumns = {

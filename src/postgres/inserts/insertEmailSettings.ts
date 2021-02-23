@@ -3,6 +3,7 @@ import { log } from '../postges-logger'
 import { SessionCall, SetUpEmailArgs } from '../types/sessionKey';
 import { updateNonce } from '../updates/updateNonce';
 import { getExpiresOnDate } from '../../express-api/email/utils';
+import { Periodicity } from '../../express-api/utils';
 
 type RequireEmailSettingsParams = {
 	account: string,
@@ -46,21 +47,22 @@ export const addEmailSettings = async (sessionCall: SessionCall<SetUpEmailArgs>)
 }
 
 type AddEmailWithConfirmCodeParams = RequireEmailSettingsParams & {
-	confirmationCode: string
+	confirmationCode: string,
+	periodicity?: Periodicity
 }
 
 const addEmailWithConfirmCodeQuery = `
-  INSERT INTO df.email_settings (account, email, confirmation_code, expires_on)
-  VALUES(:account, :email, :confirmationCode, :expiresOn)
+  INSERT INTO df.email_settings (account, email, periodicity, confirmation_code, expires_on)
+  VALUES(:account, :email, :periodicity, :confirmationCode, :expiresOn)
   ON CONFLICT (account) DO UPDATE
-  SET email = :email,
+	SET email = :email,
 	confirmation_code = :confirmationCode,
 	expires_on = :expiresOn`
 
-export const addEmailWithConfirmCode = async (params: AddEmailWithConfirmCodeParams) => {
+export const addEmailWithConfirmCode = async ({ periodicity = 'Never', ...params }: AddEmailWithConfirmCodeParams) => {
 	const expiresOn = getExpiresOnDate()
 	try {
-		await runQuery(addEmailWithConfirmCodeQuery, { ...params, expiresOn })
+		await runQuery(addEmailWithConfirmCodeQuery, { ...params, periodicity, expiresOn })
 		log.debug(`Insert email settings in database: ${params.account}`)
 	} catch (err) {
 		log.error(`Failed to insert email settings for account: ${params.account}`, err.stack)

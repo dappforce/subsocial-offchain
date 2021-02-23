@@ -7,10 +7,12 @@ export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 2
 
 export type HandlerFn = (req: express.Request, res: express.Response) => Promise<any>
 
+export type Periodicity = 'Immediately' | 'Daily' | 'Weekly' | 'Never'
+
 export type EmailSettings = {
 	account: string,
 	email: string,
-	periodicity: string,
+	periodicity: Periodicity,
 	send_feeds: boolean,
 	send_notifs: boolean,
 	last_block_bumber: number,
