@@ -52,8 +52,8 @@ type AddEmailWithConfirmCodeParams = RequireEmailSettingsParams & {
 }
 
 const addEmailWithConfirmCodeQuery = `
-  INSERT INTO df.email_settings (account, email, periodicity, confirmation_code, expires_on)
-  VALUES(:account, :email, :periodicity, :confirmationCode, :expiresOn)
+  INSERT INTO df.email_settings (account, email, periodicity, send_feeds, send_notifs, confirmation_code, expires_on)
+  VALUES(:account, :email, :periodicity, :send_feeds, :send_notifs, :confirmationCode, :expiresOn)
   ON CONFLICT (account) DO UPDATE
 	SET email = :email,
 	confirmation_code = :confirmationCode,
@@ -62,7 +62,12 @@ const addEmailWithConfirmCodeQuery = `
 export const addEmailWithConfirmCode = async ({ periodicity = 'Never', ...params }: AddEmailWithConfirmCodeParams) => {
 	const expiresOn = getExpiresOnDate()
 	try {
-		await runQuery(addEmailWithConfirmCodeQuery, { ...params, periodicity, expiresOn })
+		await runQuery(addEmailWithConfirmCodeQuery, { ...params,
+			periodicity,
+			expiresOn,
+			send_feeds: true, // TODO: maybe dont do hardcode
+			send_notifs: true
+		})
 		log.debug(`Insert email settings in database: ${params.account}`)
 	} catch (err) {
 		log.error(`Failed to insert email settings for account: ${params.account}`, err.stack)
