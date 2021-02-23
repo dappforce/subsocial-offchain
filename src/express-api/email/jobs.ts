@@ -15,10 +15,10 @@ import { getCountOfUnreadNotifications } from '../../postgres/selects/getCountOf
 
 const log = newLogger('Cron job')
 
-schedule('*/1 * * * *', async () => {
-  log.log('Running a task every 5 minutes');
-  await sendNotificationsAndFeeds('Immediately')
-});
+// schedule('*/1 * * * *', async () => {
+//   log.log('Running a task every 5 minutes');
+//   await sendNotificationsAndFeeds('Immediately')
+// });
 
 schedule('0 23 * * *', async () => {
   log.log('Running a task every day at 23:00 ');
