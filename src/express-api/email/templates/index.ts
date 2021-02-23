@@ -15,6 +15,7 @@ const getActivityTemplate = (type: 'feed' | 'notifications') => getTemplate(`act
 
 registerPartial('feed', getActivityTemplate('feed'));
 registerPartial('notifications', getActivityTemplate('notifications'));
+registerPartial('css', readFileSync(`${__dirname}/style.css`, 'utf8'))
 
 export const templates: Record<TemplateType, HandlebarsTemplateDelegate<any>> = { 
   notifications: getGeneralTemplate('activity'),

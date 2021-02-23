@@ -2,8 +2,10 @@
 <html>
 <head>
   <title>{{ title }}</title>
-  <meta charset="utf-8"> 
-  <link rel="stylesheet" href="../style.css">
+  <meta charset="utf-8">
+  <style>
+    {{> css }}
+  </style>
 </head>
 <body>
   <table class="main">
@@ -18,8 +20,10 @@
     {{#if feed}}
       {{> feed data=data }}
     {{/if}}
-    <tr class="td-button">
-      <a href="{{appsUrl}}" class='buttonLink'>See more on the website</a>
+    <tr>
+      <td class="td-button">
+        <a href="{{appsUrl}}" class='buttonLink'>See more on the website</a>
+      </td>
     </tr>
   </table>
 </body>

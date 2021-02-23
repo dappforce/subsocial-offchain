@@ -13,10 +13,8 @@ h3 {
 
 .avatar {
   border-radius: 50%;
-}
-
-.hidden {
-  visibility: hidden;
+  width: 36px;
+  height: 36px;
 }
 
 .mr-avatar {
@@ -32,12 +30,13 @@ h3 {
 }
 
 .main {
-  padding-bottom: 1rem;
-  padding-top: 1rem;
-  text-align: center;
   width: 712px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.center {
+  text-align: center;
 }
 
 .feed-item {
@@ -75,13 +74,13 @@ h3 {
   border-color: #eb2f96;
   font-weight: 500;
   height: 36px;
-  padding: 4px 16px;
+  padding: 8px 16px;
   white-space: nowrap;
   text-align: center;
   border: 1px solid transparent;
   touch-action: manipulation;
   font-size: .875rem;
-  border-radius: 2px;
+  border-radius: 4px;
   margin-bottom: 10px;
   cursor: pointer;
   text-decoration: none;

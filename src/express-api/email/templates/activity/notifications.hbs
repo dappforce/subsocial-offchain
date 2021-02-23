@@ -7,18 +7,18 @@
         <tr>
           <td class="top">
             <table>
-                <td>
+              <td class="mr-avatar">
+                {{#if avatar}}
                   <img
                     width="36"
                     height="36"
-                    class="
-                    {{#if avatar == ''}}
-                      hidden
-                    {{/if}}
-                    avatar
-                    mr-avatar" src="{{avatar}}"
-                  >
-                </td>
+                    src="{{avatar}}"
+                    class="avatar"
+                  />
+                {{else}}
+                  <div class="avatar"></div>
+                {{/if}}
+              </td>
               <td>
                 <div class="author">
                   <span>{{ownerName}}</span>
