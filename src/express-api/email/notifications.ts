@@ -1,6 +1,6 @@
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import messages from './emailMessages';
-import { getAccountContent, createHrefForPost, createHrefForAccount, createHrefForSpace, getFormatDate, resolveIpfsUrl, toShortAddress } from './utils';
+import { getAccountContent, createHrefForPost, createHrefForAccount, createHrefForSpace, getFormatDate, resolveIpfsUrl } from './utils';
 import { EventsName } from '@subsocial/types';
 import { Activity } from '../telegramWS';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
@@ -109,7 +109,7 @@ const getPostPreview = async (account: string, postId: string, message: string, 
 
 	return {
 		date: actionDate,
-		ownerName: accountName || toShortAddress(account),
+		ownerName: accountName,
 		avatar,
 		message,
 		relatedEntityUrl: postUrl,

@@ -38,7 +38,7 @@ app.use(haltOnTimedout)
 
 // for parsing multipart/form-data
 const upload = multer({ limits: { fieldSize: maxFileSizeBytes } })
-app.use(express.static('public'))
+app.use(express.static('./email/templates'))
 
 // IPFS API
 

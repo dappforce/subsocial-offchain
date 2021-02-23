@@ -55,12 +55,13 @@ export const DEFAULT_DATE_FORMAT = 'D MMM, YYYY h:mm A'
 export const getAccountContent = async (account: string) => {
 	const subsocial = await resolveSubsocialApi()
 	const profile = await subsocial.findProfile(account)
+	const shortAddress = toShortAddress(account)
 	if (profile?.content) {
-		const name = profile.content.name
+		const name = profile.content.name || shortAddress
 		const avatar = profile.content.avatar ? resolveIpfsUrl(profile.content.avatar) : ''
-		return {name, avatar}
+		return { name, avatar }
 	}
-	else return {name: toShortAddress(account), avatar: ''}
+	else return { name: shortAddress, avatar: '' }
 }
 
 export const getSpaceName = async (spaceId: SpaceId): Promise<string> => {
