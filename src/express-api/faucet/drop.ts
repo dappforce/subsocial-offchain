@@ -11,6 +11,7 @@ import { BaseConfirmData, FaucetFormData } from "./types";
 import { resolveSubsocialApi } from '../../connections';
 import { newLogger } from '@subsocial/utils';
 import { faucetPair } from './faucetPair';
+import { getFaucetDripAmount } from './utils';
 
 const log = newLogger(dropTx.name)
 
@@ -53,7 +54,7 @@ export const tokenDrop = async ({ account, email }: Omit<FaucetFormData, 'token'
       event_index,
       faucet: getFaucetPublicKey(),
       account,
-      amount: faucetDripAmount.toNumber(),
+      amount: getFaucetDripAmount().toNumber(),
       email,
       captcha_solved: true
     }))
