@@ -11,10 +11,14 @@ const getTemplate = (path) => {
 
 const getGeneralTemplate = (type: 'confirmation' | 'activity') => getTemplate(`${type}/html`)
 
-const getActivityTemplate = (type: 'feed' | 'notifications') => getTemplate(`activity/${type}`)
+const getActivityTemplate = (path: string) => getTemplate(`activity/${path}`)
 
 registerPartial('feed', getActivityTemplate('feed'));
 registerPartial('notifications', getActivityTemplate('notifications'));
+registerPartial('feedItem', getActivityTemplate('feed-item'));
+registerPartial('postAuthor', getActivityTemplate('post/post-author'));
+registerPartial('postContent', getActivityTemplate('post/post-content'));
+registerPartial('postImg', getActivityTemplate('post/post-image'));
 registerPartial('css', readFileSync(`${__dirname}/style.css`, 'utf8'))
 
 export const templates: Record<TemplateType, HandlebarsTemplateDelegate<any>> = { 
