@@ -1,6 +1,6 @@
 import { LetterParams, sendEmail } from './emailSender';
 import { v4 } from 'uuid'
-import { appsUrl, subsocialLogo } from '../../env';
+import { appBaseUrl, subsocialLogo } from '../../env';
 import { setConfirmationCode } from '../../postgres/updates/setConfirmationCode';
 import { SessionCall, ConfirmLetter } from '../../postgres/types/sessionKey';
 import { ConfirmationProp } from './types';
@@ -27,7 +27,7 @@ export async function sendConfirmationLetter ({ email, url, args, customTemplate
 	const argsStr = args ? Object.entries(args).map(([ name, value ]) => `&${name}=${value}`).join() : ''
 
 	const data: ConfirmationProp = Object.assign({
-		link: `${appsUrl}/${url}?confirmationCode=${confirmationCode}${argsStr}`, // TODO: use getFullUrl ?
+		link: `${appBaseUrl}/${url}?confirmationCode=${confirmationCode}${argsStr}`, // TODO: use getFullUrl ?
 		image: subsocialLogo,
 		message: confirmationMsg,
 		buttonText: 'Confirm email'
