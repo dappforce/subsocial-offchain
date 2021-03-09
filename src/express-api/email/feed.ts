@@ -32,7 +32,6 @@ export const createFeedEmailMessage = async (activity: Activity): Promise<FeedTe
 	const { extension } = post.post.struct
 
 	const postData = await createPostData(post)
-	console.log('extension', JSON.stringify(extension), extension.isSharedPost)
 	if (extension.isSharedPost) {
 		const extPost = await subsocial.findPostWithAllDetails(extension.asSharedPost)
 
