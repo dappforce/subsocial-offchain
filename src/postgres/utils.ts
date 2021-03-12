@@ -9,6 +9,8 @@ import { log as postgresLog } from './postges-logger';
 
 const named = require('yesql').pg
 
+export type Tables = 'activities' | 'token_drops'
+
 export type action = 'SpaceCreated' | 'SpaceUpdated' | 'SpaceFollowed' | 'SpaceUnfollowed' | 'AccountFollowed' | 'AccountUnfollowed' | 'PostCreated' | 'PostUpdated' | 'PostShared' | 'CommentCreated' | 'CommentUpdated' | 'CommentShared' | 'CommentDeleted' | 'CommentReplyCreated' | 'PostReactionCreated' | 'PostReactionUpdated' | 'CommentReactionCreated' | 'CommentReactionUpdated';
 
 export const newPgError = (err: Error, fn: Function) =>
