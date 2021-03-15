@@ -12,6 +12,7 @@ import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
 import './email/jobs'
 import { port } from '../env';
+import { isEmptyStr } from '@subsocial/utils';
 
 require('dotenv').config()
 
@@ -129,9 +130,14 @@ app.post('/v1/offchain/faucet/drop', faucetReqHandlers.tokenDropHandler)
 
 app.get('/v1/offchain/faucet/status', faucetReqHandlers.getFaucetStatus)
 
-// TODO Rename to '/v1/parseSite'
-app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
-  const data = await parseSitePreview(req.body.url)
+app.post('/v1/parseSite', async (req: express.Request, res: express.Response) => {
+  const url = req.body.url
+
+  if (isEmptyStr(url)) {
+    res.status(400).send();
+  }
+
+  const data = await parseSitePreview(url)
   res.send(data);
 })
 
