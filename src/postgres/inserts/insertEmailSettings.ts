@@ -5,6 +5,7 @@ import { updateNonce } from '../updates/updateNonce';
 import { getExpiresOnDate } from '../../express-api/email/utils';
 import { Periodicity } from '../../express-api/utils';
 import { formatEmail } from '@subsocial/utils/email';
+import { clearConfirmationDate } from '../updates/clearConfirmationDate';
 
 type RequireEmailSettingsParams = {
 	account: string,
@@ -37,6 +38,8 @@ export const addEmailSettings = async (sessionCall: SessionCall<SetUpEmailArgs>)
 
 		log.debug(`Signature verified`)
 		try {
+			await clearConfirmationDate(rootAddress, email)
+
 			const formatted_email = formatEmail(email)
 			const res = await runQuery(addEmailSettingsQuery, { account: rootAddress, email, formatted_email, periodicity, send_feeds, send_notifs })
 			await updateNonce(account, message.nonce + 1)
@@ -68,7 +71,8 @@ export const addEmailWithConfirmCode = async ({ periodicity = 'Never', email, ..
 	const formatted_email = formatEmail(email)
 
 	try {
-		await runQuery(addEmailWithConfirmCodeQuery, { ...params,
+		await runQuery(addEmailWithConfirmCodeQuery, {
+			...params,
 			email,
 			formatted_email,
 			periodicity,
