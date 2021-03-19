@@ -4,11 +4,11 @@ import { join } from 'path';
 import { asyncReadFile, stateDirPath } from '../../utils';
 
 const CHANGE = 'change'
-const blockListFilePath = join(stateDirPath, 'block-list.json')
+const blockListFilePath = join(stateDirPath, 'moderation.json')
 
-const log = newLogger('Block list watcher')
+const log = newLogger('Moderation watcher')
 
-class BlockListApi {
+class ModerationApi {
   private data;
 
   constructor (data) { this.data = data }
@@ -30,7 +30,7 @@ const parseReadFile = (file: Buffer) => {
   }
 }
 
-export const blockListApi = new BlockListApi(parseReadFile(readFileSync(blockListFilePath)))
+export const moderationApi = new ModerationApi(parseReadFile(readFileSync(blockListFilePath)))
 
 log.info('Start watching')
 
@@ -39,6 +39,6 @@ watch(blockListFilePath, async (type) => {
 
     const buffer = await asyncReadFile(blockListFilePath)
 
-    blockListApi.set(parseReadFile(buffer))
+    moderationApi.set(parseReadFile(buffer))
   }
 });
