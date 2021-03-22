@@ -59,7 +59,7 @@ type AddEmailWithConfirmCodeParams = RequireEmailSettingsParams & {
 
 const addEmailWithConfirmCodeQuery = `
   INSERT INTO df.email_settings (account, original_email, formatted_email, periodicity, send_feeds, send_notifs, confirmation_code, expires_on)
-  VALUES(:account, :email, :formatted_email :periodicity, :send_feeds, :send_notifs, :confirmationCode, :expiresOn)
+  VALUES(:account, :email, :formatted_email, :periodicity, :send_feeds, :send_notifs, :confirmationCode, :expiresOn)
   ON CONFLICT (account) DO UPDATE
 	SET original_email = :email,
 	formatted_email = :formatted_email,
