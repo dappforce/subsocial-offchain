@@ -10,6 +10,9 @@ import { registry } from '@subsocial/types/substrate/registry';
 import isEmpty from 'lodash.isempty'
 import { getConfirmationData } from '../../postgres/selects/getConfirmationCode';
 import { checkFaucetIsActive } from '../faucet/status';
+import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
+import { nonEmptyStr } from '@subsocial/utils';
+import { asAccountId } from '@subsocial/api';
 
 const getSubsocialAccountId = (account: string) => new GenericAccountId(registry, account).toString()
 
@@ -72,11 +75,26 @@ export const tokenDropHandler: HandlerFn = async (req, res) => {
   }
 }
 
-export const getFaucetStatus: HandlerFn = async (_req, res) => {
+export const getFaucetStatus: HandlerFn = async (req, res) => {
   const { ok, errors } = await checkFaucetIsActive()
 
   if (ok) {
-    res.status(200).send({ ok })
+    const account = asAccountId(req.query.account as string).toString()
+
+    console.log('account', account)
+
+    let email = null
+    
+    if (nonEmptyStr(account)) {
+      const { original_email, expires_on } = await getEmailSettingsByAccount(account)
+      email = !!expires_on ? original_email : null 
+    }
+    res.status(200).send({
+      ok,
+      data: !!email
+        ? { email, dropped: true }
+        : undefined
+    })
   } else {
     res.status(403).send({ errors })
   }
