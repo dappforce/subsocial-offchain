@@ -115,9 +115,6 @@ app.post('/v1/offchain/email/sendConfirmationLetter', pgReqHandlers.sendConfirma
 
 app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailForSettingsHandler)
 
-app.post('/v1/offchain/email/clearConfirmDate', pgReqHandlers.clearConfirmationDateHandler)
-
-
 app.get('/v1/offchain/stats/getStatisticData', pgReqHandlers.getStatisticDataHandler)
 
 app.get('/v1/offchain/stats/getActivityCount', pgReqHandlers.getActivityCountByEventHandler)

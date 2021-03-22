@@ -1,6 +1,5 @@
 import { GenericAccountId } from '@polkadot/types/generic';
 import { registry } from '@subsocial/types/substrate/registry';
-import { faucetDripAmount } from '../../env';
 import { insertTokenDrop } from '../../postgres/inserts/insertTokenDrop';
 import { getConfirmationData } from '../../postgres/selects/getConfirmationCode';
 import { setConfirmationDate } from '../../postgres/updates/setConfirmationDate';
@@ -18,15 +17,15 @@ const log = newLogger(dropTx.name)
 export async function dropTx (toAddress: string, insertToDb: (blockNumber: BigInt, eventIndex: number) => void) {
 	const { api } = await resolveSubsocialApi()
 
-	const drip = api.tx.faucets.drip(toAddress, faucetDripAmount);
+	const drip = api.tx.faucets.drip(toAddress, getFaucetDripAmount());
 
 	const unsub = await drip.signAndSend(faucetPair, ({ events = [], status }) => {
 		log.debug('Transaction status:', status.type);
-  
+
 		if (status.isInBlock) {
       const blockHash = status.asInBlock.toHex()
 		  log.debug('Included at block hash', blockHash);
-  
+
 			events.forEach(({ event: { method } }, eventIndex) => {
 
         if (method === 'Transfer') { // TODO: replace on 'TokenDrop' event
@@ -65,7 +64,7 @@ export const tokenDrop = async ({ account, email }: Omit<FaucetFormData, 'token'
 export const confirmAndTokenDrop = async ({ account: clientSideAccount, confirmationCode }: BaseConfirmData): Promise<OkOrError> => {
   const account = new GenericAccountId(registry, clientSideAccount).toString()
   try {
-    const { email } = await getConfirmationData(account)
+    const { original_email: email } = await getConfirmationData(account)
     const { ok, errors } = await setConfirmationDate({ account, confirmationCode })
 
     if (ok) {
