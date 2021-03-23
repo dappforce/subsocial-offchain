@@ -34,14 +34,14 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
   const { ok, errors } = await checkWasTokenDrop(data)
 
   if (ok) {
-    const { confirmed_on, email } = await getConfirmationData(account)
+    const { confirmed_on } = await getConfirmationData(account) || {}
 
     if (confirmed_on) {
 
-      const { ok, errors } = await tokenDrop({ account, email })
+      const { ok, errors } = await tokenDrop({ account, email: data.email })
       if (ok) {
         res.status(301);
-        res.json({ ok, data: { message: 'droped' } });
+        res.json({ ok, data: { message: 'dropped' } });
       } else {
         res.status(401).json({ errors })
       }
@@ -76,17 +76,15 @@ export const tokenDropHandler: HandlerFn = async (req, res) => {
 }
 
 export const getFaucetStatus: HandlerFn = async (req, res) => {
-  const { ok, errors } = await checkFaucetIsActive()
+  const account = asAccountId(req.query.account as string).toString()
+
+  const { ok, errors } = await checkFaucetIsActive(account)
 
   if (ok) {
-    const account = asAccountId(req.query.account as string).toString()
-
-    console.log('account', account)
-
     let email = null
     
     if (nonEmptyStr(account)) {
-      const { original_email, expires_on } = await getEmailSettingsByAccount(account)
+      const { original_email, expires_on } = await getEmailSettingsByAccount(account) || {}
       email = !!expires_on ? original_email : null 
     }
     res.status(200).send({

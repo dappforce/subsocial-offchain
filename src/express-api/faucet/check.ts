@@ -4,7 +4,7 @@ import { isValidEmailProvider } from '@subsocial/utils/email';
 import { OkOrError } from '../utils';
 import { checkFaucetIsActive } from './status';
 import { FaucetFormData } from "./types";
-import { getFaucetDripAmount } from './utils';
+import { getFaucetMaxAmountTopUp } from './utils';
 
 export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData, 'token'>): Promise<OkOrError> {
   
@@ -26,20 +26,20 @@ export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData,
 
   // if (foundAccount === account) { 
   //   ok = false
-  //   errors.account = 'On this account already had droped tokens'
+  //   errors.account = 'On this account already had dropped tokens'
   // }
 
   // if (foundEmail === formattedEmail) { 
   //   ok = false
-  //   errors.email = `On this email "${original_email}" already had droped tokens`
+  //   errors.email = `On this email "${original_email}" already had dropped tokens`
   // }
 
   const { api } = await resolveSubsocialApi()
 
   const { freeBalance } = await api.derive.balances.all(account)
-  const faucetDripAmount = getFaucetDripAmount()
+  const faucetMaxAmountTopUp = getFaucetMaxAmountTopUp()
   
-  if (freeBalance.gte(faucetDripAmount)) { // TODO: check lt(maxBalanceForDrip)
+  if (freeBalance.gte(faucetMaxAmountTopUp)) {
     ok = false
     errors.account = 'There are still enough coins in this account'
   }

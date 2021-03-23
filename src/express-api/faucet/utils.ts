@@ -1,13 +1,19 @@
-import { faucetDripAmount } from "../../env";
+import { faucetDripAmount, faucetMaxAmountTopUp } from "../../env";
 import BN from 'bn.js'
 import { formatBalance } from '@polkadot/util'
 
-let faucetDripAmountBN = new BN(0)
 
-export const getFaucetDripAmount = () => {
-  if (faucetDripAmountBN.eqn(0)) {
-    faucetDripAmountBN = new BN(faucetDripAmount * 10 ** formatBalance.getDefaults().decimals)
+const createAmountBn = (amount) => {
+  let amountBn = new BN(0)
+
+  return () => {
+    if (amountBn.eqn(0)) {
+      amountBn = new BN(amount * 10 ** formatBalance.getDefaults().decimals)
+    }
+  
+    return amountBn
   }
-
-  return faucetDripAmountBN
 }
+
+export const getFaucetDripAmount = createAmountBn(faucetDripAmount)
+export const getFaucetMaxAmountTopUp = createAmountBn(faucetMaxAmountTopUp)

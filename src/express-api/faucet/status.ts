@@ -9,7 +9,7 @@ import dayjs from "dayjs"
 import relativeTime from 'dayjs/plugin/relativeTime'
 import BN from "bn.js"
 import { newLogger } from "@subsocial/utils"
-import { getFaucetDripAmount } from "./utils"
+import { getFaucetDripAmount, getFaucetMaxAmountTopUp } from "./utils"
 dayjs.extend(relativeTime)
 
 const errors = { faucet: 'FaucetDisabled' } as Record<string, any>
@@ -25,15 +25,14 @@ const calculateComeBackTime = (nextPeriodAt: BlockNumber, currentBlock: BN) => {
 
 const log = newLogger('Drop tokens')
 
-export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
+export const checkFaucetIsActive = async (account?: string): Promise<OkOrError<null>> => {
   const faucetDripAmount = getFaucetDripAmount()
-
+  
   const failedRes = { ok: false, errors }
   if (faucetDripAmount.eqn(0)) {
     log.warn('Faucet drip amount is equal zero')
     return failedRes
   }
-
 
   const faucetAddress = getFaucetPublicKey()
 
@@ -79,6 +78,23 @@ export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
         faucet: {
           status: 'PeriodLimitReached',
           data: calculateComeBackTime(next_period_at, currentBlock)
+        }
+      }
+    }
+  }
+
+  if (account) {
+    const { freeBalance } = await api.derive.balances.all(account)
+    const faucetMaxAmountTopUp = getFaucetMaxAmountTopUp()
+
+    if (freeBalance.gte(faucetMaxAmountTopUp)) {
+      return {
+        ok: false,
+        errors: {
+          faucet: {
+            status: 'ThereAreTokensYet',
+            data: faucetMaxAmountTopUp.toString(),
+          }
         }
       }
     }
