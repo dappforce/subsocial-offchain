@@ -21,7 +21,6 @@ export async function getDateAndCountByActivities(eventName: string, period: str
 
   try {
     const res = await runQuery(query, params)
-    console.log(events, res.rows)
     return res.rows;
   } catch (err) {
     log.error('Failed to get date and count by event:', err.stack)

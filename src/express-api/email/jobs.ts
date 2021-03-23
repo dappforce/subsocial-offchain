@@ -80,7 +80,6 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
     // TODO: maybe there's a way to simplify this code and remove potential copy-paste
     if (send_notifs) {
       const unreadCount = await getCountOfUnreadNotifications(account)
-      console.log('unreadCount', unreadCount, unreadCount > 0)
       if (unreadCount > 0) {
         const activityType = 'notifications'
         const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
