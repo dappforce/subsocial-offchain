@@ -1,10 +1,11 @@
 import { resolveSubsocialApi } from '../../connections';
 // import { checkDropByAccountAndEmail } from '../../postgres/selects/checkDropByAccountAndEmail';
-import { isValidEmailProvider } from '@subsocial/utils/email';
+import { formatEmail, isValidEmailProvider } from '@subsocial/utils/email';
 import { OkOrError } from '../utils';
 import { checkFaucetIsActive } from './status';
 import { FaucetFormData } from "./types";
 import { getFaucetMaxAmountTopUp } from './utils';
+import { checkDropByAccountAndEmail } from '../../postgres/selects/checkDropByAccountAndEmail';
 
 export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData, 'token'>): Promise<OkOrError> {
   
@@ -13,26 +14,21 @@ export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData,
     errors: { email: 'This email domain is not supported, sorry' }
   }
 
-  // const formattedEmail = formatEmail(email)
+  const formattedEmail = formatEmail(email)
 
-  // const {
-  //   account: foundAccount,
-  //   original_email,
-  //   formatted_email: foundEmail
-  // } = await checkDropByAccountAndEmail(account, formattedEmail)
+  const {
+    account: foundAccount,
+    original_email,
+    formatted_email: foundEmail
+  } = await checkDropByAccountAndEmail(formattedEmail)
 
   const errors: Record<string, string> = {}
   let ok = true
 
-  // if (foundAccount === account) { 
-  //   ok = false
-  //   errors.account = 'On this account already had dropped tokens'
-  // }
-
-  // if (foundEmail === formattedEmail) { 
-  //   ok = false
-  //   errors.email = `On this email "${original_email}" already had dropped tokens`
-  // }
+  if (foundEmail === formattedEmail && foundAccount !== account) { 
+    ok = false
+    errors.email = `On this email "${original_email}" already had dropped tokens`
+  }
 
   const { api } = await resolveSubsocialApi()
 
