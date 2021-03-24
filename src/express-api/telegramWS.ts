@@ -1,5 +1,5 @@
 import * as WebSocket from 'ws'
-import { newLogger } from '@subsocial/utils'
+import { newLogger, isEmptyArray } from '@subsocial/utils';
 import { EVENT_SEND_FOR_TELEGRAM, eventEmitter, Type } from './events';
 import { offchainTWSPort } from '../env';
 import BN from 'bn.js';
@@ -43,12 +43,13 @@ export function startNotificationsServerForTelegram() {
 
 		eventEmitter.addListener(EVENT_SEND_FOR_TELEGRAM, async (account: string, whom: string, blockNumber: BN, eventIndex: number, type: Type) => {
 			const activity = await getActivity(account, blockNumber, eventIndex)
-			const chatId = await getChatIdByAccount(whom)
-			if (chatId && activity)
-				ws.send(JSON.stringify({ activity, chatId, type }))
+			const chats = await getChatIdByAccount(whom)
 
-
-			// sendActivity(account, activity, chatId, client)
+			if (!isEmptyArray(chats) && activity) {
+				Promise.all([
+					chats.map((chat) => ws.send(JSON.stringify({ activity, chatId: chat.chat_id, type })))
+				])
+			}
 		})
 
 		ws.on('close', (ws: WebSocket) => {

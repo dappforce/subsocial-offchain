@@ -9,7 +9,7 @@ export async function getChatIdByAccount(account: string) {
 
     try {
       const res = await runQuery(getChatQuery, params)
-      return res.rows[0]?.chat_id
+      return res.rows
     } catch (err) {
       throw newPgError(err, getChatIdByAccount)
     }
