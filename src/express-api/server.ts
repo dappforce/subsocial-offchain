@@ -105,6 +105,7 @@ app.get('/v1/offchain/telegram/getTelegramChat', pgReqHandlers.getTelegramChatHa
 
 app.post('/v1/offchain/telegram/updateTelegramChat', pgReqHandlers.updateTelegramChatHandler)
 
+
 app.post('/v1/offchain/email/addEmailSettings', pgReqHandlers.addEmailSettingsHandler)
 
 app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHandler)
