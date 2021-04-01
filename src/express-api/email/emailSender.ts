@@ -1,5 +1,5 @@
 import { createTransport, getTestMessageUrl } from 'nodemailer'
-import { emailHost, emailPort, emailUser, emailPassword, appsUrl, emailFrom } from '../../env';
+import { emailHost, emailPort, emailUser, emailPassword, appsUrl, emailFrom, PAUSE_BETWEEN_EMAILS_IN_MILLIS } from '../../env';
 import { newLogger } from '@subsocial/utils';
 import { registerHelper } from 'handlebars';
 import { NotificationTemplateProp, ConfirmationProp, FeedTemplateProp } from './types';
@@ -38,7 +38,35 @@ type SendEmailProps = LetterParams & {
 	type: TemplateType,
 }
 
-export const sendEmail = async ({ email, type, data, fromName = 'Subsocial', subject, title = subject }: SendEmailProps) => {
+// true if busy sending queued emails
+let isBusy = false
+
+const emailReqs: SendEmailProps[] = []
+
+export const sendEmail = async (req: SendEmailProps) => {
+	emailReqs.push(req)
+
+	if (!isBusy) {
+		isBusy = true
+		sendNextEmail()
+	}
+}
+
+const sendNextEmail = async () => {
+	if (!emailReqs.length) return
+	
+	const req = emailReqs.shift()
+	await doSendEmail(req)
+
+	if (emailReqs.length) {
+		setTimeout(sendNextEmail, PAUSE_BETWEEN_EMAILS_IN_MILLIS)
+	} else {
+		isBusy = false
+	}
+}
+
+const doSendEmail = async (req: SendEmailProps) => {
+	const { email, type, data, fromName = 'Subsocial', subject, title = subject } = req
 
 	const info = await transporter.sendMail({
 		from: `${fromName} <${emailFrom}>`,
@@ -47,6 +75,6 @@ export const sendEmail = async ({ email, type, data, fromName = 'Subsocial', sub
 		html: templates[type]({ data, appsUrl, title, [type]: true })
 	})
 
-	log.debug("Message sent:", info.messageId);
-	log.debug("Preview URL:", getTestMessageUrl(info));
+	log.debug("Message sent:", info.messageId)
+	log.debug("Preview URL:", getTestMessageUrl(info))
 }
