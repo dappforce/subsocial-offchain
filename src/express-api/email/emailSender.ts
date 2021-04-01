@@ -5,6 +5,9 @@ import { registerHelper } from 'handlebars';
 import { NotificationTemplateProp, ConfirmationProp, FeedTemplateProp } from './types';
 import templates, { TemplateType } from './templates';
 
+// See rate limits for SendPulse
+// https://sendpulse.com/knowledge-base/smtp/limits
+
 const log = newLogger('Email Sender')
 
 type DataTemplateProp = NotificationTemplateProp[] | FeedTemplateProp[] | ConfirmationProp
