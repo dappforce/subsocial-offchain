@@ -80,12 +80,14 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
     // TODO: maybe there's a way to simplify this code and remove potential copy-paste
     if (send_notifs) {
       const unreadCount = await getCountOfUnreadNotifications(account)
-      const activityType = 'notifications'
-      const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
-
-      await sendActivitiesEmail(email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
-      if (nonEmptyArr(activities))
-        lastActivities.push(activities.pop())
+      if (unreadCount > 0) {
+        const activityType = 'notifications'
+        const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
+  
+        await sendActivitiesEmail(email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
+        if (nonEmptyArr(activities))
+          lastActivities.push(activities.pop())
+      }
     }
 
     if (send_feeds) {

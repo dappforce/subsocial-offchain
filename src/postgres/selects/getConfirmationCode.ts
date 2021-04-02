@@ -2,7 +2,7 @@ import { runQuery } from '../utils';
 import { log } from '../postges-logger';
 
 const query = `
-  SELECT confirmation_code, expires_on, confirmed_on, email FROM df.email_settings
+  SELECT confirmation_code, expires_on, confirmed_on, original_email FROM df.email_settings
   WHERE account = :account`
 
 export const getConfirmationData = async (account: string) => {
