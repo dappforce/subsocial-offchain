@@ -11,7 +11,7 @@ export type Periodicity = 'Immediately' | 'Daily' | 'Weekly' | 'Never'
 
 export type EmailSettings = {
 	account: string,
-	email: string,
+	original_email: string,
 	periodicity: Periodicity,
 	send_feeds: boolean,
 	send_notifs: boolean,
