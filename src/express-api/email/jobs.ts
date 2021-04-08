@@ -83,8 +83,8 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
       const activityType = 'notifications'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      await sendActivitiesEmail(original_email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
       if (nonEmptyArr(activities)) {
+        await sendActivitiesEmail(original_email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
         lastActivities.push(activities.pop())
       }
     }
@@ -93,8 +93,8 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
       const activityType = 'feed'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      await sendActivitiesEmail(original_email, { activityType, activities }, createFeedEmailMessage, createFeedParams())
       if (nonEmptyArr(activities)) {
+        await sendActivitiesEmail(original_email, { activityType, activities }, createFeedEmailMessage, createFeedParams())
         lastActivities.push(activities.pop())
       }
     }
