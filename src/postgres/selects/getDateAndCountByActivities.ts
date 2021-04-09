@@ -4,7 +4,7 @@ import { runQuery, Tables, Period, isPeriod } from '../utils'
 const createQuery = (period: Period, table: Tables) => {
   const event = table === 'activities' ? 'event = any(:event::df.action[]) AND' : ''
 
-  return `SELECT to_char(date, 'YYYY-MM-DD') as format_date, count(*) FROM df.${table}
+  return `SELECT to_char(date_trunc('day', date), 'YYYY-MM-DD') as format_date, count(*) FROM df.${table}
     WHERE ${event} date > (now() - interval '${period} days')
     GROUP BY format_date`
 }
