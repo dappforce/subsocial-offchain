@@ -4,7 +4,7 @@ import BN from 'bn.js';
 import { Activity } from '@subsocial/types';
 import { ActivityTable } from '../queries/feed-and-notifs';
 
-const createQuery = (type: string) => `
+const createQuery = (type: ActivityTable) => `
 SELECT DISTINCT *
 FROM df.activities
 WHERE aggregated = true AND (block_number, event_index) IN (

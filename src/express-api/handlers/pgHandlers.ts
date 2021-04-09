@@ -24,6 +24,7 @@ import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCo
 import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
 import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
 import { setConfirmationDateForSettings } from '../../postgres/updates/setConfirmationDate';
+import { Period } from '../../postgres/utils';
 
 
 const activityHandler = (
@@ -161,12 +162,12 @@ export const confirmEmailForSettingsHandler: HandlerFn = (req, res) => {
 
 export const getStatisticDataHandler: HandlerFn = (req, res) => {
   const {event, period} = req.query
-  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event.toString(), period.toString()))
+  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event.toString(), period as Period))
 }
 
 export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
   const {event, period} = req.query
-  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event.toString(), period.toString()))
+  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event.toString(), period as Period))
 }
 
 export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {
