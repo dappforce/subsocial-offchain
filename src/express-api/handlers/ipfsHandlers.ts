@@ -3,7 +3,7 @@ import { newLogger, nonEmptyStr } from '@subsocial/utils'
 import { ipfsCluster } from '../../connections/ipfs'
 import { maxFileSizeBytes, maxFileSizeMB } from '../config'
 import { resolveSubsocialApi } from '../../connections'
-import { asIpfsCid } from '@subsocial/api/utils'
+import { asIpfsCid } from '@subsocial/api'
 
 const log = newLogger('IPFS req handler')
 

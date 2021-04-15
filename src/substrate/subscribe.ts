@@ -3,7 +3,7 @@ import { shouldHandleEvent, eventsFilterMethods } from './utils';
 import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
-import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
+import { SubsocialSubstrateApi } from '@subsocial/api'
 require('dotenv').config()
 
 let blockTime = 6
