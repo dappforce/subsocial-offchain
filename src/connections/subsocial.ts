@@ -1,5 +1,5 @@
-import { SubsocialApi } from '@subsocial/api/subsocial'
-import { Api } from '@subsocial/api/substrateConnect'
+import { SubsocialApi } from '@subsocial/api'
+import { Api } from '@subsocial/api'
 import { registry } from '@subsocial/types/substrate/registry'
 import { ipfsConfig } from './ipfs'
 import { ApiPromise } from '@polkadot/api'

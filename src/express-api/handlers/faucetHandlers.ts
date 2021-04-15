@@ -12,7 +12,7 @@ import { getConfirmationData } from '../../postgres/selects/getConfirmationCode'
 import { checkFaucetIsActive } from '../faucet/status';
 import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
 import { nonEmptyStr } from '@subsocial/utils';
-import { asAccountId } from '@subsocial/api';
+import { asAccountId } from '@subsocial/api'
 
 const getSubsocialAccountId = (account: string) => new GenericAccountId(registry, account).toString()
 

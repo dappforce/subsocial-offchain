@@ -5,12 +5,12 @@ import { BlockNumber } from '@polkadot/types/interfaces';
 import { u32 } from '@polkadot/types/primitive'
 import registry from '@subsocial/types/substrate/registry'
 import { readFileSync } from 'fs';
-import { SubsocialSubstrateApi } from '@subsocial/api/substrate';
+import { SubsocialSubstrateApi } from '@subsocial/api'
 import { newLogger } from '@subsocial/utils';
 import { join } from 'path';
 import { OffchainState, CommonDbState, SubstrateEvent } from './types';
 import { writeOffchainState } from '../substrate/offchain-state';
-import { getUniqueIds } from '@subsocial/api';
+import { getUniqueIds } from '@subsocial/api'
 import { TEST_MODE } from '../env';
 import { stateDirPath } from '../utils';
 

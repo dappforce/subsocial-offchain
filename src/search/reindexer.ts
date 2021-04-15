@@ -1,4 +1,4 @@
-import { SubsocialSubstrateApi } from '@subsocial/api/substrate'
+import { SubsocialSubstrateApi } from '@subsocial/api'
 import { resolveSubsocialApi } from '../connections/subsocial'
 import { indexPostContent, indexProfileContent, indexSpaceContent } from './indexer'
 import { elasticLog as log } from '../connections/loggers'
