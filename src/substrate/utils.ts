@@ -1,5 +1,5 @@
 import { Option } from '@polkadot/types'
-import { Event } from '@polkadot/types/interfaces';;
+import { Event } from '@polkadot/types/interfaces'
 import { newLogger } from '@subsocial/utils'
 import { SubstrateEvent } from './types'
 import BN from 'bn.js';

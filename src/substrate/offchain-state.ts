@@ -1,14 +1,8 @@
 import { substrateLog as log } from '../connections/loggers';
 import { OffchainState } from './types';
-import { readFile, writeFile, mkdir } from 'fs';
 import { join } from 'path'
-import { promisify } from 'util'
+import { asyncMkdir, asyncReadFile, asyncWriteFile, stateDirPath } from '../utils';
 
-const asyncReadFile = promisify(readFile)
-const asyncWriteFile = promisify(writeFile)
-const asyncMkdir = promisify(mkdir)
-
-export const stateDirPath = join(__dirname, '../../state')
 const stateFilePath = join(stateDirPath, 'state.json')
 
 const defaultOffchainState = (): OffchainState => ({

@@ -17,7 +17,6 @@ export type EmailSettings = {
 	send_notifs: boolean,
 	last_block_bumber: number,
 	last_event_index: number,
-	next_leter_date: Dayjs,
 	confirmation_code: string,
 	confirmed_on: Dayjs
 }

@@ -1,8 +1,7 @@
-import { ipfsNodeUrl } from './../../env';
 import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { newLogger, nonEmptyStr } from '@subsocial/utils';
 import { resolveSubsocialApi } from '../../connections/subsocial';
-import { appsUrl } from '../../env';
+import { appBaseUrl, ipfsGatewayUrl } from '../../env';
 import { ActivityTable } from '../../postgres/queries/feed-and-notifs';
 import { Activity } from '../telegramWS';
 import { NotificationTemplateProp, FeedTemplateProp } from './types';
@@ -25,15 +24,15 @@ export const TableNameByActivityType: TableNameByActivityType = {
 export type CreateEmailMessageFn = (activity: Activity) => Promise<NotificationTemplateProp | FeedTemplateProp>
 
 export const createHrefForPost = (spaceId: string, postId: string) => {
-	return `${appsUrl}/${spaceId}/${postId}`
+	return `${appBaseUrl}/${spaceId}/${postId}`
 }
 
 export const createHrefForSpace = (spaceId: string) => {
-	return `${appsUrl}/${spaceId}`
+	return `${appBaseUrl}/${spaceId}`
 }
 
 export const createHrefForAccount = (followingId: string) => {
-	return `${appsUrl}/accounts/${followingId}`
+	return `${appBaseUrl}/accounts/${followingId}`
 }
 
 export const createMessageForFeeds = (link: string, account: string, spaceName: string, date: string) => {
@@ -47,7 +46,7 @@ export const toShortAddress = (_address: AnyAccountId) => {
 }
 
 export const resolveIpfsUrl = (cid: string) => {
-    return nonEmptyStr(cid) ? `${ipfsNodeUrl}/ipfs/${cid}` : ''
+    return nonEmptyStr(cid) ? `${ipfsGatewayUrl}/ipfs/${cid}` : ''
 }
 
 export const DEFAULT_DATE_FORMAT = 'D MMM, YYYY h:mm A'

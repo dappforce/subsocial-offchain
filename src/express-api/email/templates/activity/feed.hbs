@@ -3,51 +3,15 @@
 <tr>
   <td>
     <a class="text" href="{{postLink}}">
-      <table class="feed-item">
-        <tr>
-          <td class="top">
-            <table>
-              <tr>
-                <td class="top">
-                  <table>
-                    <td class="mr-avatar">
-                      {{#if avatar}}
-                        <img
-                          width="36"
-                          height="36"
-                          src="{{avatar}}"
-                          class="avatar"
-                        />
-                      {{else}}
-                        <div class="avatar"></div>
-                      {{/if}}
-                    </td>
-                    <td>
-                      <div class="author">{{ownerName}}</div>
-                      <div class="details">
-                        <span>{{ spaceName }}</span>
-                        <span> • </span>
-                        <span>{{ date }}</span>
-                      </div>
-                    </td>
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <h3 class="text">{{ postTitle }}</h3>
-                  <div class="text">{{ postSummary }}</div>
-                </td>
-              </tr>
-            </table>
-          </td>
-          {{#if image}}
-            <td class="top feed-image">
-              <img class="feed-image" src="{{ image }}" >
-            </td>
-          {{/if}}
-        </tr>
-      </table>
+      {{> feedItem
+        avatar=avatar
+        ownerName=ownerName
+        spaceName=spaceName
+        date=date
+        postTitle=postTitle
+        postSummary=postSummary
+        image=image
+      }}
     </a>
   </td>
 </tr>
