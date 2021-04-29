@@ -60,11 +60,8 @@ export function startNotificationsServer() {
 eventEmitter.addListener(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, unreadCount: number) => {
 	console.log('wsClients', Object.keys(wsClients))
 	const client = wsClients[account]
-	if (!client) return
+	if (!client || client.readyState !== WebSocket.OPEN) return
 
-	if (client.readyState !== WebSocket.OPEN) {
-		return
-	}
 	log.debug('EVENT_UPDATE_NOTIFICATIONS_COUNTER', account)
 
 	sendUnreadCount(account, unreadCount, client)
