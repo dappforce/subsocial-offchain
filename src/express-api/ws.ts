@@ -1,9 +1,9 @@
 import * as WebSocket from 'ws'
 import { newLogger } from '@subsocial/utils'
 import { getCountOfUnreadNotifications } from '../postgres/selects/getCountOfUnreadNotifications'
-import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from './events'
 import { SessionCall, ReadAllMessage } from '../postgres/types/sessionKey';
 import { markAllNotifsAsRead } from '../postgres/updates/markAllNotifsAsRead';
+import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from './events';
 require('dotenv').config()
 
 export const log = newLogger('Notif. Counter WS')
@@ -20,7 +20,7 @@ export const resolveWebSocketServer = () => {
 	return wss
 }
 
-export const wsClients: { [account: string]: WebSocket } = {}
+export const wsClients: Record<string, WebSocket> = {}
 
 export function sendUnreadCount(account: string, count: number, client: WebSocket) {
 	const msg = count.toString()
@@ -29,8 +29,9 @@ export function sendUnreadCount(account: string, count: number, client: WebSocke
 }
 
 export function startNotificationsServer() {
-	resolveWebSocketServer()
+	const wss = resolveWebSocketServer()
 	wss.on('connection', (ws: WebSocket) => {
+
 		ws.on('message', async (data: string) => {
 			log.debug('Received a message with data:', data)
 			try {
@@ -43,27 +44,23 @@ export function startNotificationsServer() {
 
 				sendUnreadCount(data, unreadCount, wsClients[data])
 			}
-			wss.removeAllListeners(EVENT_UPDATE_NOTIFICATIONS_COUNTER)
-		})
-
-		eventEmitter.on(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, unreadCount: number) => {
-			const client = wsClients[account]
-			if (!client) return
-
-			if (client.readyState !== WebSocket.OPEN) {
-				return
-			}
-			sendUnreadCount(account, unreadCount, client)
-			wss.removeAllListeners(EVENT_UPDATE_NOTIFICATIONS_COUNTER)
 		})
 
 		ws.on('close', (ws: WebSocket) => {
 			log.info('Closed web socket server:', ws)
-			wss.removeAllListeners(EVENT_UPDATE_NOTIFICATIONS_COUNTER)
 		})
 	})
 
 	wss.on('close', () => {
 		log.info('Closed web socket server')
+		eventEmitter.removeAllListeners(EVENT_UPDATE_NOTIFICATIONS_COUNTER)
 	})
 }
+
+eventEmitter.addListener(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, unreadCount: number) => {
+	console.log('wsClients', Object.keys(wsClients))
+	const client = wsClients[account]
+	if (!client || client.readyState !== WebSocket.OPEN) return
+
+	sendUnreadCount(account, unreadCount, client)
+})
