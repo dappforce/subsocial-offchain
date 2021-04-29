@@ -62,7 +62,5 @@ eventEmitter.addListener(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, u
 	const client = wsClients[account]
 	if (!client || client.readyState !== WebSocket.OPEN) return
 
-	log.debug('EVENT_UPDATE_NOTIFICATIONS_COUNTER', account)
-
 	sendUnreadCount(account, unreadCount, client)
 })
