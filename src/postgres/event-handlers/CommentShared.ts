@@ -3,15 +3,13 @@ import { asNormalizedComment, NormalizedComment } from '../../substrate/normaliz
 import { SubstrateEvent } from '../../substrate/types';
 import { VirtualEvents } from '../../substrate/utils';
 import { parseCommentEvent } from '../../substrate/utils';
-import { fillNewsFeedWithAccountFollowers } from '../fills/fillNewsFeedWithAccountFollowers';
-import { fillNewsFeedWithSpaceFollowers } from '../fills/fillNewsFeedWithSpaceFollowers';
 import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
 import { fillNotificationsWithCommentFollowers } from '../fills/fillNotificationsWithCommentFollowers';
 import { insertActivityForComment } from '../inserts/insertActivityForComment';
 import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
 
 export const onCommentShared = async (eventAction: SubstrateEvent, comment: NormalizedComment) => {
-  const { author, commentId } = parseCommentEvent(eventAction)
+  const { commentId } = parseCommentEvent(eventAction)
 
   const { rootPostId } = asNormalizedComment(comment)
   const rootPost = await findPost(rootPostId);
@@ -27,8 +25,7 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Norm
 
   await fillNotificationsWithCommentFollowers(commentId, { account, ...insertResult });
   await fillNotificationsWithAccountFollowers({ account, ...insertResult });
-  await fillNewsFeedWithSpaceFollowers(spaceId, { account: author, ...insertResult });
-  await fillNewsFeedWithAccountFollowers({ account: author, ...insertResult })
+
   informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), account, insertResult.blockNumber, insertResult.eventIndex, 'notification')
   informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), account, insertResult.blockNumber, insertResult.eventIndex, 'feed')
 
