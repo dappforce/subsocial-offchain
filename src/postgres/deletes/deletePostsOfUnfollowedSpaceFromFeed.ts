@@ -4,7 +4,9 @@ import { encodeStructId } from '../../substrate/utils';
 
 const query = `
 DELETE FROM df.news_feed
-WHERE (block_number, event_index) IN (SELECT block_number, event_index FROM df.activities WHERE space_id = :spaceId) AND account = :account
+  WHERE (block_number, event_index)
+    IN (SELECT block_number, event_index FROM df.activities WHERE space_id = :spaceId)
+    AND account = :account
 RETURNING *`
 
 export async function deletePostsOfUnfollowedSpaceFromFeed(data: GenericEventData) {
