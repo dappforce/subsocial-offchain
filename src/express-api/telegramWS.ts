@@ -28,8 +28,6 @@ export const resolveWebSocketServer = () => {
 	return wss
 }
 
-export const wsClients: { [account: string]: WebSocket } = {}
-
 export function sendActivity(account: string, activity: Activity, chatId: number, client: WebSocket) {
 	const msg = JSON.stringify({ activity, chatId })
 	client.send(msg)
@@ -43,7 +41,7 @@ export function startNotificationsServerForTelegram() {
 			log.debug('Received a message with data:', data)
 		})
 
-		eventEmitter.on(EVENT_SEND_FOR_TELEGRAM, async (account: string, whom: string, blockNumber: BN, eventIndex: number, type: Type) => {
+		eventEmitter.addListener(EVENT_SEND_FOR_TELEGRAM, async (account: string, whom: string, blockNumber: BN, eventIndex: number, type: Type) => {
 			const activity = await getActivity(account, blockNumber, eventIndex)
 			const chatId = await getChatIdByAccount(whom)
 			if (chatId && activity)
@@ -55,7 +53,7 @@ export function startNotificationsServerForTelegram() {
 
 		ws.on('close', (ws: WebSocket) => {
 			log.info('Closed web socket server:', ws)
-			wss.removeAllListeners(EVENT_SEND_FOR_TELEGRAM)
+			eventEmitter.removeAllListeners(EVENT_SEND_FOR_TELEGRAM)
 		})
 	})
 
