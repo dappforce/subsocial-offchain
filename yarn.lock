@@ -423,7 +423,7 @@
     "@polkadot/x-rxjs" "^5.9.2"
     bn.js "^4.11.9"
 
-"@polkadot/api@3.11.1", "@polkadot/api@^4.3.1":
+"@polkadot/api@3.11.1", "@polkadot/api@~3.11.1":
   version "3.11.1"
   resolved "https://registry.yarnpkg.com/@polkadot/api/-/api-3.11.1.tgz#854ee9686942a4be736932d61bf7ddb1242a0966"
   integrity sha512-VqEh2n13ESLxnTUKujUfZ3Spct+lTycNgrX+IWD7/f05GsMwhCZLYtt708K8nqGFH2OKDl8xzwuGCvRN/05U1Q==
@@ -508,7 +508,7 @@
     "@polkadot/util" "^5.9.2"
     bn.js "^4.11.9"
 
-"@polkadot/types@3.11.1":
+"@polkadot/types@3.11.1", "@polkadot/types@~3.11.1":
   version "3.11.1"
   resolved "https://registry.yarnpkg.com/@polkadot/types/-/types-3.11.1.tgz#c0188390dfda84d746d57f7818ad622ac6b1de8b"
   integrity sha512-+BWsmveYVkLFx/csvPmU+NhNFhf+0srAt2d0f+7y663nitc/sng1AcEDPbrbXHSQVyPdvI20Mh4Escl4aR+TLw==
@@ -684,13 +684,13 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@^0.5.0-substrate2.0":
-  version "0.5.0-substrate2.0"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.5.0-substrate2.0.tgz#b63adf803c203011ba68048041a504c69a7e3f99"
-  integrity sha512-JJr/XwFTRyPnkt1FPcJ2prI91DhVxOgowzcHK+ryEbtR2kL6AFDMTUoHd7r+OVzt/ZPT+UuRZGxBa5tvJzAveA==
+"@subsocial/api@^0.5.1-sub-2.0.1":
+  version "0.5.1-sub-2.0.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.5.1-sub-2.0.1.tgz#ecd11241695e3fd9c2af0633520f2fefa38589de"
+  integrity sha512-U/RQ3psoOhe+ddBSte6EWGjcZj5bTRkgyyub4IC5tjOAqwK8fIGgqot8KEOzmixrW7F0qMF4SB4qZln4DoKeQg==
   dependencies:
-    "@polkadot/api" "^4.3.1"
-    "@subsocial/types" "^0.5.0-substrate2.0"
+    "@polkadot/api" "~3.11.1"
+    "@subsocial/types" "0.5.1-sub-2.0.1"
     "@subsocial/utils" "^0.4.39"
     axios "^0.21.1"
 
@@ -699,11 +699,12 @@
   resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.25.tgz#2a5060bce66db2a6a778916dbc6936042645313d"
   integrity sha512-iCwiWneWbbYdOELjCzUshfelsYvD6Rnhmcz+FU0DCOIQaXFTS2JBfBsK1TYLhYOjJEluhpBmxE7vKZPhO7isbw==
 
-"@subsocial/types@^0.5.0-substrate2.0":
-  version "0.5.0-substrate2.0"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.5.0-substrate2.0.tgz#75974eab6b216456955865cb02e3d06caa1c87c9"
-  integrity sha512-AwJqDt68YBhFfbzahsp+d4Y7TapA9Z41Kbo10++IDeyd+5dmSp4OYEx8RVsV2JDHubYYyZ4UgnDiDRHT4zLEBg==
+"@subsocial/types@0.5.1-sub-2.0.1", "@subsocial/types@^0.5.1-sub-2.0.1":
+  version "0.5.1-sub-2.0.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.5.1-sub-2.0.1.tgz#a32fc2c2e5eb94cdde867cd78a94070803fb3aed"
+  integrity sha512-cw8wcp7tQfhLYICSpQFiFZyVi4KcLtQLG8mektPJ+MyqY+TazpffZPgNNtixbOvxESVBfepMvoYN2lNPa4VCLg==
   dependencies:
+    "@polkadot/types" "~3.11.1"
     "@subsocial/utils" "^0.4.39"
     cids "^0.7.1"
 
