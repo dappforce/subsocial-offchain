@@ -1,4 +1,4 @@
-FROM node:12-slim as builder
+FROM node:14-slim as builder
 
 RUN apt update && apt install cpio -y
 
@@ -11,7 +11,7 @@ RUN yarn && yarn cache clean --force
 COPY localhost.env .env
 RUN NODE_ENV=production yarn build
 
-FROM node:12-alpine
+FROM node:14-alpine
 
 WORKDIR /app
 COPY --from=builder package.json tsconfig.json .env yarn.lock ./
