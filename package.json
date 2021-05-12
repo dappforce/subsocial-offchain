@@ -6,7 +6,7 @@
   "license": "GPL-3.0-only",
   "homepage": "https://github.com/dappforce/dappforce-subsocial-offchain",
   "engines": {
-    "node": ">= 12.13"
+    "node": ">= 14"
   },
   "scripts": {
     "start": "concurrently \"node ./build/src/index.js\" \"yarn init-search\"",
@@ -50,8 +50,8 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
-    "@subsocial/api": "^0.5.1-sub-2.0.1",
-    "@subsocial/types": "^0.5.1-sub-2.0.1",
+    "@subsocial/api": "^0.5.2",
+    "@subsocial/types": "^0.5.2",
     "@subsocial/utils": "^0.4.39",
     "@types/email-templates": "^8.0.0",
     "@types/handlebars": "^4.1.0",
