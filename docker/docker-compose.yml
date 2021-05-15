@@ -3,7 +3,7 @@ version: "3"
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
-    container_name: subsocial-elasticsearch
+    container_name: $ELASTIC_CONTAINER
     restart: on-failure
     environment:
       ES_JAVA_OPTS: "-Xms512m -Xmx1024m"
@@ -23,7 +23,7 @@ services:
 
   postgres:
     image: postgres:12.4
-    container_name: subsocial-postgres
+    container_name: $POSTGRES_CONTAINER
     restart: on-failure
     environment:
       POSTGRES_DB: subsocial
@@ -38,7 +38,7 @@ services:
 
   ipfs-node:
     image: ipfs/go-ipfs:v0.5.1
-    container_name: subsocial-ipfs-node
+    container_name: $IPFS_NODE_CONTAINER
     restart: on-failure
     ports:
       - "4001:4001"
@@ -50,7 +50,7 @@ services:
 
   ipfs-cluster:
     image: ipfs/ipfs-cluster:v0.13.0
-    container_name: subsocial-ipfs-cluster
+    container_name: $IPFS_CLUSTER_CONTAINER
     depends_on:
       - ipfs-node
     environment:
@@ -66,32 +66,9 @@ services:
     volumes:
       - ./ipfs-data/cluster:/data/ipfs-cluster
 
-#################################################
-#################################################
-
-  offchain:
-    build:
-      context: ..
-      dockerfile: ./docker/Dockerfile
-    image: dappforce/subsocial-offchain:latest
-    container_name: subsocial-offchain
-    depends_on:
-      - postgres
-      - elasticsearch
-      - ipfs-cluster
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-    network_mode: "host"
-
 volumes:
   es_data:
-    driver: local
   postgres_data:
-    driver: local
   peer_staging:
-    driver: local
   peer_data:
-    driver: local
   peer_cluster:
-    driver: local
