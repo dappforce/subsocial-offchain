@@ -20,6 +20,11 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     network_mode: "host"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "$ES_NODE_URL"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
 
   postgres:
     image: postgres:12.4
