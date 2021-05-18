@@ -52,7 +52,7 @@ export function startNotificationsServerForTelegram() {
 		})
 
 		ws.on('close', (ws: WebSocket) => {
-			log.info('Closed web socket server:', ws)
+			log.debug('Closed web socket server:', ws)
 			eventEmitter.removeAllListeners(EVENT_SEND_FOR_TELEGRAM)
 		})
 	})
