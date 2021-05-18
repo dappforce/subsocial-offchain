@@ -40,7 +40,7 @@ yarn start
 Run PostgreSQL, IPFS Node, IPFS Cluster and ElasticSearch in docker containers with one command:
 
 ```sh
-./docker/start-infra.sh
+./docker/run.sh
 ```
 
 Additional options to provide to the development script mentioned above:

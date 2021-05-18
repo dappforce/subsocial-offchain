@@ -57,11 +57,11 @@ case $1 in
     ;;
   -?*)
     printf "Invalid argument provided.\n\nExamples:\n"
-    printf "Start all:\n./start-infra.sh\n\n"
-    printf "Stop all:\n./start-infra.sh --stop\n\n"
-    printf "Clean all:\n./start-infra.sh --stop --clean\n"
-    printf "Add peer to IPFS:\n./start-infra.sh +peers /ip4/<IP_ADDRESS>/tcp/4001/p2p/<PEER_ID>"
-    printf "Add several peers to IPFS:\n./start-infra.sh +peers \"/ip4/<IP_1_ADDRESS>/tcp/4001/p2p/<PEER_1_ID> /ip4/<IP_2_ADDRESS>/tcp/4001/p2p/<PEER_2_ID>\""
+    printf "Start all:\n./run.sh\n\n"
+    printf "Stop all:\n./run.sh --stop\n\n"
+    printf "Clean all:\n./run.sh --stop --clean\n"
+    printf "Add peer to IPFS:\n./run.sh +peers /ip4/<IP_ADDRESS>/tcp/4001/p2p/<PEER_ID>"
+    printf "Add several peers to IPFS:\n./run.sh +peers \"/ip4/<IP_1_ADDRESS>/tcp/4001/p2p/<PEER_1_ID> /ip4/<IP_2_ADDRESS>/tcp/4001/p2p/<PEER_2_ID>\""
 
     exit 1
     ;;
