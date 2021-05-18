@@ -3,7 +3,7 @@ version: "3"
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.1
-    container_name: subsocial-elasticsearch
+    container_name: $ELASTIC_CONTAINER
     restart: on-failure
     environment:
       ES_JAVA_OPTS: "-Xms512m -Xmx1024m"
@@ -20,10 +20,15 @@ services:
     volumes:
       - es_data:/usr/share/elasticsearch/data
     network_mode: "host"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "$ES_NODE_URL"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
 
   postgres:
-    image: postgres
-    container_name: subsocial-postgres
+    image: postgres:12.4
+    container_name: $POSTGRES_CONTAINER
     restart: on-failure
     environment:
       POSTGRES_DB: subsocial
@@ -36,87 +41,39 @@ services:
 ## IPFS Cluster #################################
 #################################################
 
-  ipfs0:
+  ipfs-node:
     image: ipfs/go-ipfs:v0.5.1
-    container_name: subsocial-ipfs0
+    container_name: $IPFS_NODE_CONTAINER
     restart: on-failure
     ports:
       - "4001:4001"
-      - "127.0.0.1:5001:5001"
+      - "5001:5001"
       - "8080:8080"
     volumes:
       - ./ipfs-data/daemon/staging:/export
       - ./ipfs-data/daemon/data:/data/ipfs
 
   ipfs-cluster:
-    image: ipfs/ipfs-cluster:latest
-    container_name: subsocial-ipfs-cluster
+    image: ipfs/ipfs-cluster:v0.13.0
+    container_name: $IPFS_CLUSTER_CONTAINER
     depends_on:
-      - ipfs0
+      - ipfs-node
     environment:
       CLUSTER_PEERNAME: "Subsocial Cluster"
       CLUSTER_SECRET: ${CLUSTER_SECRET} # From shell variable if set
-      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs0/tcp/5001
+      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs-node/tcp/5001
       CLUSTER_CRDT_TRUSTERPEERS: '*' # Trust all peers in Cluster (initially)
       CLUSTER_RESTAPI_CORSALLOWEDORIGINS: '*'
       CLUSTER_RESTAPI_HTTPLISTENMULTIADDRESS: /ip4/0.0.0.0/tcp/9094 # Expose API
-      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
+      CLUSTER_MONITORPINGINTERVAL: 1s # Speed up peer discovery
     ports:
-      - "127.0.0.1:9094:9094"
-      # - "9096:9096"
+      - "9094:9094"
     volumes:
       - ./ipfs-data/cluster:/data/ipfs-cluster
 
-#################################################
-
-  ipfs1:
-    image: ipfs/go-ipfs:v0.5.1
-    container_name: subsocial-ipfs1
-    restart: on-failure
-    volumes:
-      - peer_staging:/export
-      - peer_data:/data/ipfs
-
-  ipfs-peer:
-    image: ipfs/ipfs-cluster:latest
-    container_name: subsocial-ipfs-peer
-    depends_on:
-      - ipfs1
-    environment:
-      CLUSTER_PEERNAME: "Subsocial Peer"
-      CLUSTER_SECRET: ${CLUSTER_SECRET}
-      CLUSTER_IPFSHTTP_NODEMULTIADDRESS: /dns4/ipfs1/tcp/5001
-      CLUSTER_CRDT_TRUSTERPEERS: '*'
-      CLUSTER_MONITORPINGINTERVAL: 2s # Speed up peer discovery
-    volumes:
-      - peer_cluster:/data/ipfs-cluster
-
-#################################################
-#################################################
-
-  offchain:
-    build:
-      context: ..
-      dockerfile: ./docker/Dockerfile
-    image: dappforce/subsocial-offchain:latest
-    container_name: subsocial-offchain
-    depends_on:
-      - postgres
-      - elasticsearch
-      - ipfs-cluster
-    restart: on-failure
-    environment:
-      - NODE_ENV=production
-    network_mode: "host"
-
 volumes:
   es_data:
-    driver: local
   postgres_data:
-    driver: local
   peer_staging:
-    driver: local
   peer_data:
-    driver: local
   peer_cluster:
-    driver: local
