@@ -9,7 +9,7 @@ import * as pgReqHandlers from './handlers/pgHandlers'
 import * as faucetReqHandlers from './handlers/faucetHandlers'
 import { expressApiLog as log } from '../connections/loggers';
 import timeout from 'connect-timeout';
-import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
+import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigins } from './config';
 import './email/jobs'
 import { port } from '../env';
 
@@ -18,7 +18,7 @@ require('dotenv').config()
 const app = express()
 
 app.use(cors((req, callback) => {
-  const origin = req.method === 'GET' ? '*' : allowedOrigin
+  const origin = req.method === 'GET' ? '*' : allowedOrigins
   callback(null, { origin })
 }))
 

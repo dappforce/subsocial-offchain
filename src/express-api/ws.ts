@@ -47,7 +47,7 @@ export function startNotificationsServer() {
 		})
 
 		ws.on('close', (ws: WebSocket) => {
-			log.info('Closed web socket server:', ws)
+			log.debug('Closed web socket server:', ws)
 		})
 	})
 
