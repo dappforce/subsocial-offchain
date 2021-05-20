@@ -30,7 +30,9 @@
     "index-blocks": "node ./build/src/substrate/indexBlocksFromFile.js",
     "export-events": "node ./build/src/substrate/exportEventsToFile.js",
     "export-storages": "node ./build/src/substrate/exportSubstrateStoragesToFiles.js",
-    "clean-start-subscribe": "yarn clear-postgres && yarn init-postgres && yarn init-search && yarn index-blocks && yarn reindex-content && yarn subscribe"
+    "clean-start-subscribe": "yarn clear-postgres && yarn init-postgres && yarn init-search && yarn index-blocks && yarn reindex-content && yarn subscribe",
+    "export-ipfs-data": "node ./build/src/ipfs/exportIpfsData.js",
+    "import-ipfs-data": "node ./build/src/ipfs/importIpfsData.js"
   },
   "devDependencies": {
     "@subsocial/config": "^0.4.25",
@@ -83,7 +85,7 @@
     "node-cron": "^2.0.3",
     "nodemailer": "^6.4.17",
     "pg": "^8.5.1",
-    "request-promise": "^4.2.5",
+    "request-promise": "^4.2.6",
     "ts-jest": "^26.4.4",
     "uuid": "^8.3.2",
     "yesql": "^4.1.3"

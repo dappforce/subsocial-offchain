@@ -70,3 +70,5 @@ build/
 
 # local docker volumes directory
 docker/ipfs-data
+
+backup
