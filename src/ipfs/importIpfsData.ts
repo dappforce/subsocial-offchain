@@ -1,20 +1,20 @@
 import { readFileSync, readdirSync  } from 'fs'
 import { ipfsCluster } from '../connections/ipfs'
 import request from 'request-promise'
-import { ipfsClusterUrl } from '../env'
+import { backupPath, ipfsClusterUrl } from '../env'
 import { ipfsLog as log } from '../connections/loggers'
 
 const importIpfsData = async () => {
-  const content = JSON.parse(readFileSync('./backup/content.json', 'utf8'))
+  const content = JSON.parse(readFileSync(`${backupPath}/content.json`, 'utf8'))
   try {
     for (const [_key, value] of Object.entries(content)) {
       await ipfsCluster.addContent(JSON.stringify(value))
     }
 
-    const files = readdirSync('./backup/files')
+    const files = readdirSync(`${backupPath}/files`)
 
     for (const file of files) {
-      const uploadImg = readFileSync(`./backup/files/${file}`)
+      const uploadImg = readFileSync(`${backupPath}/files/${file}`)
       if (Buffer.isBuffer(uploadImg)) {
         const data = {
           value: uploadImg,
