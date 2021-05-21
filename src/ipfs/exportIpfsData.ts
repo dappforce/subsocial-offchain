@@ -1,16 +1,15 @@
 import { resolveSubsocialApi } from '../connections/subsocial'
-import { mkdirSync, existsSync, writeFileSync } from 'fs'
+import { writeFileSync } from 'fs'
 import request from 'request-promise'
-import { ipfsNodeUrl, ipfsReadOnlyNodeUrl, backupPath } from '../env';
+import { ipfsNodeUrl, backupPath } from '../env';
 import { CommonContent } from '@subsocial/types/offchain'
 import { ipfsLog as log } from '../connections/loggers'
 import { exit } from 'process';
-
-const createDirIfNotExist = (path: string) => !existsSync(path) && mkdirSync(path)
+import { createDirsIfNotExist, downloadFile } from './utils';
 
 const exportIpfsData = async () => {
   try {
-    createDirIfNotExist(backupPath)
+    createDirsIfNotExist([backupPath, `${backupPath}/files`])
 
     const res = JSON.parse(await request(`${ipfsNodeUrl}/api/v0/pin/ls`, {method: "POST"}))
     const ipfsCids = Object.keys(res.Keys)
@@ -19,13 +18,10 @@ const exportIpfsData = async () => {
 
     const contents: Record<string, CommonContent> = {}
 
-    createDirIfNotExist(`${backupPath}/files`)
-
     for (const  cid of ipfsCids) {
       if (cid.length === 46) {
-        const uploadImg = await request(`${ipfsReadOnlyNodeUrl}/ipfs/${cid}`, { encoding: null })
+        await downloadFile(cid)
 
-        writeFileSync(`${backupPath}/files/${cid}`, uploadImg)
         log.debug(`Loaded file by cid ${cid}`)
       } else {
         const content = await ipfs.getContent(cid)
