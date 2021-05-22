@@ -37,9 +37,10 @@ export const exportProfiles: ExportFn = async (substrate, ipfs) => {
         const cid = profile.unwrap().content.asIpfs.toString()
 
         const content: ProfileContent = await ipfs.getContent(cid)
-
-        await downloadFile(content.avatar)
-        profileContents[cid] = content
+        if(content) {
+          await downloadFile(content.avatar)
+          profileContents[cid] = content
+        }
       }
     }
   })
@@ -65,9 +66,10 @@ export const exportSpaces: ExportFn = async (substrate, ipfs) => {
     if (space.content.isIpfs) {
       const cid = space.content.asIpfs
       const content: SpaceContent = await ipfs.getContent(cid)
-
-      await downloadFile(content.image)
-      spaceContents[cid.toString()] = content
+      if(content) {
+        await downloadFile(content.image)
+        spaceContents[cid.toString()] = content
+      }
     }
   })
 
@@ -90,13 +92,13 @@ export const exportPosts: ExportFn = async (substrate, ipfs) => {
     log.info(`Export post content # ${postId} out of ${lastPostIdStr}`)
 
     if (post.content.isIpfs) {
-      const cid = post.content.asIpfs.toString()
+      const cid = post.content.asIpfs
 
       const content: PostContent = await ipfs.getContent(cid)
-
-      await downloadFile(content.image)
-
-      postsContent[cid] = content
+      if(content) {
+        await downloadFile(content.image)
+        postsContent[cid.toString()] = content
+      }
     }
   })
 
