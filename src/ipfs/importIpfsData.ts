@@ -1,35 +1,21 @@
-import { readFileSync, readdirSync  } from 'fs'
+import { readFileSync } from 'fs'
 import { ipfsCluster } from '../connections/ipfs'
-import request from 'request-promise'
-import { backupPath, ipfsClusterUrl } from '../env'
+import { backupPath } from '../env'
 import { ipfsLog as log } from '../connections/loggers'
+import { CommonContent } from '@subsocial/types/offchain';
+import { entities } from './utils';
 
 const importIpfsData = async () => {
-  const content = JSON.parse(readFileSync(`${backupPath}/content.json`, 'utf8'))
-  try {
-    for (const [_key, value] of Object.entries(content)) {
-      await ipfsCluster.addContent(JSON.stringify(value))
-    }
-
-    const files = readdirSync(`${backupPath}/files`)
-
-    for (const file of files) {
-      const uploadImg = readFileSync(`${backupPath}/files/${file}`)
-      if (Buffer.isBuffer(uploadImg)) {
-        const data = {
-          value: uploadImg,
-          options: { filename: file, contentType: '' }
-        }
-
-        const res = await request(`${ipfsClusterUrl}/add`, { method: 'POST', formData: { '': data } })
-        const body = JSON.parse(res)
-        const cid = body.cid['/']
-        log.debug('Content added and pinned under CID:', cid)
+  for (const entity of entities) {
+    const content: CommonContent = JSON.parse(readFileSync(`${backupPath}/${entity}/content.json`, 'utf8'))
+    log.info(`Load ${entity} content`)
+    for (const [key, value] of Object.entries(content)) {
+      try {
+        await ipfsCluster.addContent(JSON.stringify(value))
+      } catch (err) {
+        log.error(key, err)
       }
     }
-
-  } catch (err) {
-    log.error(err)
   }
 }
 

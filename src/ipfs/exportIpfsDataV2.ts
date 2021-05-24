@@ -5,40 +5,41 @@ import BN from 'bn.js';
 import { exit } from 'process'
 import { GenericAccountId } from '@polkadot/types'
 import { CommonContent, SpaceContent } from '@subsocial/types/offchain';
-import { backupPath } from '../env'
+import { backupPath, ipfsReadOnlyNodeUrl } from '../env'
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { PostContent, ProfileContent } from '@subsocial/types';
 import { downloadFile } from './utils';
+import request from 'request-promise'
 
 const createDirsIfNotExist = (path: string[]) => path.map(path => !existsSync(path) && mkdirSync(path))
 
 const one = new BN(1)
 
-type ExportFn = (substrate: SubsocialSubstrateApi, ipfs: SubsocialIpfsApi) => Promise<Record<string, CommonContent>>
+type ExportFn = (substrate: SubsocialSubstrateApi, ipfs: SubsocialIpfsApi) => Promise<void>
 
-
-
-export const exportProfiles: ExportFn = async (substrate, ipfs) => {
+export const exportProfiles: ExportFn = async (substrate) => {
   const api = await substrate.api
   const storageKeys = await api.query.profiles.socialAccountById.keys()
   const profileContents: Record<string, CommonContent> = {}
 
   const profileIndexators = storageKeys.map(async (key) => {
+  // for (const key of storageKeys) {
     const addressEncoded = '0x' + key.toHex().substr(-64)
     const account = new GenericAccountId(key.registry, addressEncoded)
 
     const res = await substrate.findSocialAccount(account)
     const { profile } = res
 
-    if (profile.isSome) {
+    if (profile?.isSome) {
       log.info(`Export profile content of account ${account.toString()}`)
 
-      if (profile.unwrap().content.isIpfs) {
+      if (profile.unwrap().content?.isIpfs) {
         const cid = profile.unwrap().content.asIpfs.toString()
+        const content: ProfileContent = JSON.parse(await request(`${ipfsReadOnlyNodeUrl}/api/v0/dag/get?arg=${cid}`, { method: 'get' }))
+        log.info(`Load profile content from ipfs by cid ${cid}`)
 
-        const content: ProfileContent = await ipfs.getContent(cid)
         if(content) {
-          await downloadFile(content.avatar)
+          await downloadFile(`${backupPath}/profiles`, content.avatar)
           profileContents[cid] = content
         }
       }
@@ -47,10 +48,10 @@ export const exportProfiles: ExportFn = async (substrate, ipfs) => {
 
   await Promise.all(profileIndexators)
 
-  return profileContents
+  writeFileSync(`${backupPath}/profiles/content.json`, JSON.stringify(profileContents, null, 2))
 }
 
-export const exportSpaces: ExportFn = async (substrate, ipfs) => {
+export const exportSpaces: ExportFn = async (substrate) => {
   const lastSpaceId = (await substrate.nextSpaceId()).sub(one)
   const lastSpaceIdStr = lastSpaceId.toString()
   const spaceContents: Record<string, CommonContent> = {}
@@ -59,15 +60,17 @@ export const exportSpaces: ExportFn = async (substrate, ipfs) => {
   const spaceIds = Array.from({ length: lastSpaceId.toNumber() }, (_, i) => i + 1)
 
   const spaceIndexators = spaceIds.map(async (spaceId) => {
+  // for (const spaceId of spaceIds) {
     const id = new BN(spaceId)
     const space = await substrate.findSpace({ id })
     log.info(`Export space content # ${spaceId} out of ${lastSpaceIdStr}`)
 
     if (space.content.isIpfs) {
       const cid = space.content.asIpfs
-      const content: SpaceContent = await ipfs.getContent(cid)
+      const content: SpaceContent = JSON.parse(await request(`${ipfsReadOnlyNodeUrl}/api/v0/dag/get?arg=${cid}`, { method: 'get' }))
+      log.info(`Load space content from ipfs by cid ${cid}`)
       if(content) {
-        await downloadFile(content.image)
+        await downloadFile(`${backupPath}/spaces` ,content.image)
         spaceContents[cid.toString()] = content
       }
     }
@@ -75,10 +78,10 @@ export const exportSpaces: ExportFn = async (substrate, ipfs) => {
 
   await Promise.all(spaceIndexators)
 
-  return spaceContents
+  writeFileSync(`${backupPath}/spaces/content.json`, JSON.stringify(spaceContents, null, 2))
 }
 
-export const exportPosts: ExportFn = async (substrate, ipfs) => {
+export const exportPosts: ExportFn = async (substrate) => {
   const lastPostId = (await substrate.nextPostId()).sub(one)
   const lastPostIdStr = lastPostId.toString()
   const postsContent: Record<string, CommonContent> = {}
@@ -94,9 +97,10 @@ export const exportPosts: ExportFn = async (substrate, ipfs) => {
     if (post.content.isIpfs) {
       const cid = post.content.asIpfs
 
-      const content: PostContent = await ipfs.getContent(cid)
+      const content: PostContent = JSON.parse(await request(`${ipfsReadOnlyNodeUrl}/api/v0/dag/get?arg=${cid}`, { method: 'get' }))
+      log.info(`Load post content from ipfs by cid ${cid}`)
       if(content) {
-        await downloadFile(content.image)
+        await downloadFile(`${backupPath}/posts`, content.image)
         postsContent[cid.toString()] = content
       }
     }
@@ -104,7 +108,7 @@ export const exportPosts: ExportFn = async (substrate, ipfs) => {
 
   await Promise.all(postIndexators)
 
-  return postsContent
+  writeFileSync(`${backupPath}/posts/content.json`, JSON.stringify(postsContent, null, 2))
 }
 
 type IExportFunction = Record<string, ExportFn>
@@ -116,18 +120,20 @@ const ExportFunction: IExportFunction = {
 const AllReindexerFunctions = Object.values(ExportFunction)
 
 async function exportIpfsDataV2(substrate: SubsocialSubstrateApi, ipfs: SubsocialIpfsApi) {
-  let contents: Record<string, CommonContent> = {}
 
-  createDirsIfNotExist([backupPath, `${backupPath}/files`])
+  createDirsIfNotExist([
+    backupPath,
+    `${backupPath}/profiles/`,
+    `${backupPath}/spaces/`,
+    `${backupPath}/posts/`,
+    `${backupPath}/profiles/files/`,
+    `${backupPath}/spaces/files/`,
+    `${backupPath}/posts/files/`
+  ])
 
-  let exportPromises = AllReindexerFunctions.map(async fn => {
-      const content = await fn(substrate, ipfs)
-      contents = { ...contents, ...content }
-  })
-
-  await Promise.all(exportPromises)
-
-  writeFileSync(`${backupPath}/content.json`, JSON.stringify(contents, null, 2))
+  for (const fn of AllReindexerFunctions) {
+      await fn(substrate, ipfs)
+  }
 
   exit(0)
 }

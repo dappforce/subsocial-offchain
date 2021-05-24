@@ -20,7 +20,7 @@ const exportIpfsData = async () => {
 
     for (const  cid of ipfsCids) {
       if (cid.length === 46) {
-        await downloadFile(cid)
+        await downloadFile(backupPath, cid)
 
         log.debug(`Loaded file by cid ${cid}`)
       } else {
