@@ -33,7 +33,7 @@
     "clean-start-subscribe": "yarn clear-postgres && yarn init-postgres && yarn init-search && yarn index-blocks && yarn reindex-content && yarn subscribe",
     "export-ipfs-data": "node ./build/src/ipfs/exportIpfsData.js",
     "export-ipfs-data-v2": "node ./build/src/ipfs/exportIpfsDataV2.js",
-    "import-ipfs-data": "node ./build/src/ipfs/importFiles.js && node ./build/src/ipfs/importIpfsData.js"
+    "import-ipfs-data": "node ./build/src/ipfs/importContents.js && node ./build/src/ipfs/importFiles.js"
   },
   "devDependencies": {
     "@subsocial/config": "^0.4.25",
