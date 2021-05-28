@@ -84,6 +84,6 @@ export async function indexBlocksFromFile(substrate: SubsocialSubstrateApi) {
 
   let state: OffchainState = { postgres: lastBlock, elastic: lastBlock }
   await writeOffchainState(state)
-  log.info('Final state is:', lastBlock)
+  log.info('Final indexed state is:', lastBlock)
   process.exit(0)
 }
