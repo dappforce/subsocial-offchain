@@ -6,6 +6,7 @@ import BN from 'bn.js';
 import { getActivity } from '../postgres/selects/getActivity';
 import { Activity as OldActivity } from '@subsocial/types'
 import { getChatIdByAccount } from '../postgres/selects/getChatIdByAccount';
+import { ChatIdType } from './utils';
 
 require('dotenv').config()
 
@@ -43,12 +44,11 @@ export function startNotificationsServerForTelegram() {
 
 		eventEmitter.addListener(EVENT_SEND_FOR_TELEGRAM, async (account: string, whom: string, blockNumber: BN, eventIndex: number, type: Type) => {
 			const activity = await getActivity(account, blockNumber, eventIndex)
-			const chats = await getChatIdByAccount(whom)
+			const chats: ChatIdType[] = await getChatIdByAccount(whom)
 
 			if (!isEmptyArray(chats) && activity) {
-				Promise.all([
-					chats.map((chat) => ws.send(JSON.stringify({ activity, chatId: chat.chat_id, type })))
-				])
+				const chatIds = chats.map((chat) => chat.chat_id)
+				ws.send(JSON.stringify({ activity, chatIds, type }))
 			}
 		})
 

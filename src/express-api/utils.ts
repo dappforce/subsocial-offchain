@@ -33,6 +33,10 @@ export type OkOrError<T = null> = {
   data?: T
 }
 
+export type ChatIdType = {
+  chat_id: number
+}
+
 const getNumberFromRequest = (
   req: express.Request,
   value: 'limit' | 'offset',
