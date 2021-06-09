@@ -1,0 +1,22 @@
+<table>
+  <td class="mr-avatar">
+    {{#if avatar}}
+      <img
+        width="36"
+        height="36"
+        src="{{avatar}}"
+        class="avatar"
+      />
+    {{else}}
+      <div class="avatar"></div>
+    {{/if}}
+  </td>
+  <td>
+    <div class="author">{{ownerName}}</div>
+    <div class="details">
+      <span>{{ spaceName }}</span>
+      <span> • </span>
+      <span>{{ date }}</span>
+    </div>
+  </td>
+</table>

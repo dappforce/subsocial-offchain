@@ -1,35 +1,21 @@
-import { runQuery, newPgError, isValidSignature, upsertNonce } from '../utils';
-import { log } from '../postges-logger';
-import { ConfirmLetter, SessionCall, ClearConfirmDateArgs } from '../types/sessionKey';
-import { updateNonce } from './updateNonce';
+import { runQuery, newPgError } from '../utils';
+import { formatEmail } from '@subsocial/utils/email';
 
 const query = `
   UPDATE df.email_settings
   SET confirmed_on = NULL
-  WHERE account = :account
+  WHERE account = :account AND formatted_email != :formattedEmail
   RETURNING *`
 
-export async function clearConfirmationDate(sessionCall: SessionCall<ClearConfirmDateArgs>) {
-  const { account, signature, message } = sessionCall
-
-  const { nonce, rootAddress } = await upsertNonce(account, message)
-
-  if (parseInt(nonce.toString()) === message.nonce) {
-    const isValid = isValidSignature({ account, signature, message } as SessionCall<ConfirmLetter>)
-    if (!isValid) {
-      log.error("Signature is not valid: function setConfirmationCode ")
-      return
-    }
-    log.debug(`Signature verified`)
-
-    try {
-      const params = { account: rootAddress };
-      const res = await runQuery(query, params)
-      await updateNonce(account, message.nonce + 1)
-      return res.rows[0]
-
-    } catch (err) {
-      throw newPgError(err, clearConfirmationDate)
-    }
+export async function clearConfirmationDate(account: string, email: string) {
+  const formattedEmail = formatEmail(email)
+  try {
+    const params = { account, formattedEmail };
+    const res = await runQuery(query, params)
+    if (!res?.rows[0])
+      return false
+    return true
+  } catch (err) {
+    throw newPgError(err, clearConfirmationDate)
   }
 }

@@ -34,7 +34,6 @@ export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
     return failedRes
   }
 
-
   const faucetAddress = getFaucetPublicKey()
 
   const { api } = await resolveSubsocialApi()
@@ -79,6 +78,23 @@ export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
         faucet: {
           status: 'PeriodLimitReached',
           data: calculateComeBackTime(next_period_at, currentBlock)
+        }
+      }
+    }
+  }
+
+  if (account) {
+    const { freeBalance } = await api.derive.balances.all(account)
+    const faucetMaxAmountTopUp = getFaucetMaxAmountTopUp()
+
+    if (freeBalance.gte(faucetMaxAmountTopUp)) {
+      return {
+        ok: false,
+        errors: {
+          faucet: {
+            status: 'ThereAreTokensYet',
+            data: faucetMaxAmountTopUp.toString(),
+          }
         }
       }
     }

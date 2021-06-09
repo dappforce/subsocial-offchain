@@ -1,5 +1,5 @@
 import { createTransport, getTestMessageUrl } from 'nodemailer'
-import { emailHost, emailPort, emailUser, emailPassword, appsUrl, emailFrom } from '../../env';
+import { emailHost, emailPort, emailUser, emailPassword, appBaseUrl, emailFrom } from '../../env';
 import { newLogger } from '@subsocial/utils';
 import { registerHelper } from 'handlebars';
 import { NotificationTemplateProp, ConfirmationProp, FeedTemplateProp } from './types';
@@ -44,7 +44,7 @@ export const sendEmail = async ({ email, type, data, fromName = 'Subsocial', sub
 		from: `${fromName} <${emailFrom}>`,
 		to: email,
 		subject,
-		html: templates[type]({ data, appsUrl, title, [type]: true })
+		html: templates[type]({ data, appBaseUrl, title, [type]: true })
 	})
 
 	log.debug("Message sent:", info.messageId);

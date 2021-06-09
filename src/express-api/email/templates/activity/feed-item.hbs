@@ -1,0 +1,52 @@
+<table class="feed-item">
+  <tr>
+    <td class="top">
+      <table {{#if ext }}class="w-100"{{/if}}>
+        <tr>
+          <td class="top">
+            {{> postAuthor
+              avatar=avatar
+              ownerName=ownerName
+              spaceName=spaceName
+              date=date
+            }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            {{> postContent title=postTitle summary=postSummary }}
+            {{#if ext }}
+              <table class="feed-item">
+                <tr>
+                  <td class="top">
+                    <table>
+                      <tr>
+                        <td class="top">
+                          {{> postAuthor
+                            avatar=ext.avatar
+                            ownerName=ext.ownerName
+                            spaceName=ext.spaceName
+                            date=ext.date
+                          }}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          {{> postContent title=ext.postTitle summary=ext.postSummary }}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                    {{> postImg image=ext.image }}
+                </tr>
+              </table>
+            {{/if}}
+          </td>
+        </tr>
+      </table>
+    </td>
+    {{#unless ext}}
+      {{> postImg image=image }}
+    {{/unless}}
+  </tr>
+</table>

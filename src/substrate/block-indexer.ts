@@ -12,7 +12,7 @@ import { OffchainState, CommonDbState, SubstrateEvent } from './types';
 import { writeOffchainState } from '../substrate/offchain-state';
 import { getUniqueIds } from '@subsocial/api'
 import { TEST_MODE } from '../env';
-import { stateDirPath } from './offchain-state';
+import { stateDirPath } from '../utils';
 
 const log = newLogger('BlockIndexer')
 

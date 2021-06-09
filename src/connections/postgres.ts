@@ -1,4 +1,4 @@
-import { Pool} from 'pg'
+import { Pool } from 'pg'
 import { postgesLog as log } from './loggers';
 
 require('dotenv').config();

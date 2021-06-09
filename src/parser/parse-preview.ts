@@ -88,18 +88,22 @@ const setPrettyPreviewString = (obj: Meta | Og | Fb | Twitter, propName: string,
 type PressMeta = {
   generated: boolean, // TODO delete 'generated' field
   url: string,
-  title: string,
-  desc: string,
-  image: string,
-  date: string,
-  author: string
+  title?: string,
+  desc?: string,
+  image?: string,
+  date?: string,
+  author?: string
 }
 
-export default function parse (siteUrls: string[]) {
+const multiSourceKeys = ['title', 'description', 'image']
+
+export default function parse (siteUrls: string[] | string) {
+
+  let urls = Array.isArray(siteUrls) ? siteUrls : [ siteUrls ]
 
   const parseSitePromises: Promise<ParsedSite>[] = []
-  siteUrls = siteUrls.map(x => nonEmptyStr(x) ? x.trim() : x)
-  siteUrls.forEach(url => {
+  urls = urls.map(x => nonEmptyStr(x) ? x.trim() : x)
+  urls.forEach(url => {
     if (nonEmptyStr(url)) {
       parseSitePromises.push(
         parseSiteWithRequest(url, parseSiteHtml)
@@ -120,56 +124,27 @@ export default function parse (siteUrls: string[]) {
       });
 
       const parsedPress: PressMeta[] = [];
-      siteUrls.forEach(pressUrl => {
+      urls.forEach(pressUrl => {
         if (typeof pressUrl === 'object') {
           parsedPress.push(pressUrl);
           return;
         }
 
-        const pressMeta = {
+        const pressMeta: PressMeta = {
           generated: true,
           url: pressUrl,
-          title: '',
-          desc: '',
-          image: '',
-          date: '',
-          author: ''
         };
 
         if (urlToMetaMap.has(pressUrl)) {
           const sm = urlToMetaMap.get(pressUrl);
 
-          if (sm.og && sm.og.title) {
-            pressMeta.title = sm.og.title;
-          } else if (sm.twitter && sm.twitter.title) {
-            pressMeta.title = sm.twitter.title;
-          } else if (sm.title) {
-            pressMeta.title = sm.title;
-          }
+          multiSourceKeys.forEach(key => {
+            pressMeta[key] = sm?.og[key] || sm?.twitter[key] || sm[key]
+          })
 
-          if (sm.og && sm.og.description) {
-            pressMeta.desc = sm.og.description;
-          } else if (sm.twitter && sm.twitter.description) {
-            pressMeta.desc = sm.twitter.description;
-          } else if (sm.description) {
-            pressMeta.desc = sm.description;
-          }
+          pressMeta.date = sm?.og?.updated_time;
+          pressMeta.author = sm?.author || sm?.twitter?.creator;
 
-          if (sm.og && sm.og.image) {
-            pressMeta.image = sm.og.image;
-          } else if (sm.twitter && sm.twitter.image) {
-            pressMeta.image = sm.twitter.image;
-          }
-
-          if (sm.og && sm.og.updated_time) {
-            pressMeta.date = sm.og.updated_time;
-          }
-
-          if (sm.author) {
-            pressMeta.author = sm.author;
-          } else if (sm.twitter && sm.twitter.creator) {
-            pressMeta.author = sm.twitter.creator;
-          }
         }
         parsedPress.push(pressMeta);
       });
