@@ -16,11 +16,11 @@ export const eventEmitter = new events.EventEmitter()
 const log = newLogger('Event emitter')
 
 export function informClientAboutUnreadNotifications (account: string, unreadCount: number) {
-  log.debug(`Inform client about unread notifications account ${account}, unread count ${unreadCount}`)
-  eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, unreadCount);
+	log.debug(`Inform client about unread notifications account ${account}, unread count ${unreadCount}`)
+	eventEmitter.emit(EVENT_UPDATE_NOTIFICATIONS_COUNTER, account, unreadCount);
 }
   
 export function informTelegramClientAboutNotifOrFeed (account: string, whom: string, blockNumber: BN, eventIndex: number, type: Type) {
-  log.debug(`Inform client about notififiction or feed account ${whom}`)
-  eventEmitter.emit(EVENT_SEND_FOR_TELEGRAM, account, whom, blockNumber, eventIndex, type);
+	log.debug(`Inform client about notififiction or feed account ${whom}`)
+	eventEmitter.emit(EVENT_SEND_FOR_TELEGRAM, account, whom, blockNumber, eventIndex, type);
 }
