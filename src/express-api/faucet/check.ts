@@ -4,7 +4,6 @@ import { formatEmail, isValidEmailProvider } from '@subsocial/utils/email';
 import { OkOrError } from '../utils';
 import { checkFaucetIsActive } from './status';
 import { FaucetFormData } from "./types";
-import { getFaucetMaxAmountTopUp } from './utils';
 import { checkDropByAccountAndEmail } from '../../postgres/selects/checkDropByAccountAndEmail';
 
 export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData, 'token'>): Promise<OkOrError> {
@@ -33,9 +32,9 @@ export async function checkWasTokenDrop({ account, email }: Omit<FaucetFormData,
   const { api } = await resolveSubsocialApi()
 
   const { freeBalance } = await api.derive.balances.all(account)
-  const faucetMaxAmountTopUp = getFaucetMaxAmountTopUp()
+  // const faucetMaxAmountTopUp = getFaucetMaxAmountTopUp()
   
-  if (freeBalance.gte(faucetMaxAmountTopUp)) {
+  if (freeBalance.gten(0)) {
     ok = false
     errors.account = 'There are still enough coins in this account'
   }

@@ -11,6 +11,7 @@ import { resolveSubsocialApi } from '../../connections';
 import { newLogger } from '@subsocial/utils';
 import { faucetPair } from './faucetPair';
 import { getFaucetDripAmount } from './utils';
+import BN from 'bn.js';
 
 const log = newLogger(dropTx.name)
 
@@ -53,7 +54,7 @@ export const tokenDrop = async ({ account, email }: Omit<FaucetFormData, 'token'
   if (!noTokenDrop) return { ok: false, errors }
 
   await dropTx(account,
-    (block_number, event_index, amount) => insertTokenDrop({
+    (block_number, event_index) => insertTokenDrop({
       block_number,
       event_index,
       faucet: getFaucetPublicKey(),
