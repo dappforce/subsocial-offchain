@@ -75,19 +75,17 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
   const emailSettingsArray: EmailSettings[] = await getAllEmailSettings(periodicity)
 
   for (const setting of emailSettingsArray) {
-    const { account, last_block_bumber, last_event_index, email, send_notifs, send_feeds } = setting
+    const { account, last_block_bumber, last_event_index, original_email, send_notifs, send_feeds } = setting
     let lastActivities: Activity[] = []
     // TODO: maybe there's a way to simplify this code and remove potential copy-paste
     if (send_notifs) {
       const unreadCount = await getCountOfUnreadNotifications(account)
-      console.log('unreadCount', unreadCount, unreadCount > 0)
-      if (unreadCount > 0) {
-        const activityType = 'notifications'
-        const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
-  
-        await sendActivitiesEmail(email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
-        if (nonEmptyArr(activities))
-          lastActivities.push(activities.pop())
+      const activityType = 'notifications'
+      const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
+
+      if (nonEmptyArr(activities)) {
+        await sendActivitiesEmail(original_email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
+        lastActivities.push(activities.pop())
       }
     }
 
@@ -95,9 +93,10 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
       const activityType = 'feed'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      await sendActivitiesEmail(email, { activityType, activities }, createFeedEmailMessage, createFeedParams())
-      if (nonEmptyArr(activities))
+      if (nonEmptyArr(activities)) {
+        await sendActivitiesEmail(original_email, { activityType, activities }, createFeedEmailMessage, createFeedParams())
         lastActivities.push(activities.pop())
+      }
     }
 
     if (nonEmptyArr(lastActivities)) {

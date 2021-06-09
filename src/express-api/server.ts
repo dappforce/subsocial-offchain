@@ -10,7 +10,7 @@ import * as faucetReqHandlers from './handlers/faucetHandlers'
 import * as moderationsHandlers from './handlers/moderationHandlers'
 import { expressApiLog as log } from '../connections/loggers';
 import timeout from 'connect-timeout';
-import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigin } from './config';
+import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigins } from './config';
 import './email/jobs'
 import { port } from '../env';
 import { isEmptyStr } from '@subsocial/utils';
@@ -20,7 +20,7 @@ require('dotenv').config()
 const app = express()
 
 app.use(cors((req, callback) => {
-  const origin = req.method === 'GET' ? '*' : allowedOrigin
+  const origin = req.method === 'GET' ? '*' : allowedOrigins
   callback(null, { origin })
 }))
 
@@ -106,6 +106,7 @@ app.get('/v1/offchain/telegram/getAccountByChatId/:chatId', pgReqHandlers.getAcc
 app.get('/v1/offchain/telegram/getTelegramChat', pgReqHandlers.getTelegramChatHandler)
 
 app.post('/v1/offchain/telegram/updateTelegramChat', pgReqHandlers.updateTelegramChatHandler)
+
 
 app.post('/v1/offchain/email/addEmailSettings', pgReqHandlers.addEmailSettingsHandler)
 
