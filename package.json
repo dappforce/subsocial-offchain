@@ -50,8 +50,8 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
-    "@subsocial/api": "^0.5.2",
-    "@subsocial/types": "^0.5.2",
+    "@subsocial/api": "^0.5.4",
+    "@subsocial/types": "^0.5.4",
     "@subsocial/utils": "^0.4.39",
     "@types/email-templates": "^8.0.0",
     "@types/handlebars": "^4.1.0",

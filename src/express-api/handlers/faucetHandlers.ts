@@ -22,7 +22,7 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
   if (isEmpty(formData)) {
     res.status(400).send({ errors: { account: 'Invalid data' } })
   }
-  
+
   const account = getSubsocialAccountId(formData.account)
   const data = { ...formData, account }
 
@@ -46,7 +46,7 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
         res.status(401).json({ errors })
       }
 
-    } 
+    }
 
     const confirmationCode = await sendFaucetConfirmationLetter(data)
     confirmationCode && await addEmailWithConfirmCode({ ...data, confirmationCode })
@@ -76,16 +76,16 @@ export const tokenDropHandler: HandlerFn = async (req, res) => {
 }
 
 export const getFaucetStatus: HandlerFn = async (req, res) => {
-  const account = asAccountId(req.query.account as string).toString()
+  const account = asAccountId(req.query.account as string)
 
   const { ok, errors } = await checkFaucetIsActive()
 
   if (ok) {
     let email = null
-    
-    if (nonEmptyStr(account)) {
+
+    if (!account && nonEmptyStr(account)) {
       const { original_email, expires_on } = await getEmailSettingsByAccount(account) || {}
-      email = !!expires_on ? original_email : null 
+      email = !!expires_on ? original_email : null
     }
     res.status(200).send({
       ok,
