@@ -21,7 +21,7 @@ export async function getAggregationCount(props: AggCountProps) {
 
   try {
     const res = await runQuery<IQueryParams>(query, params)
-    log.info(`Get ${res.rows[0].count} distinct activities by post id: ${post_id}`)
+    log.debug(`Get ${res.rows[0].count} distinct activities by post id: ${post_id}`)
     return res.rows[0].count as number;
   } catch (err) {
     log.error('Failed to getAggregationCount:', err.stack)
