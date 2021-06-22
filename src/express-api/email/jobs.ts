@@ -30,11 +30,6 @@ schedule('0 23 * * 0', async () => {
   await sendNotificationsAndFeeds('Weekly')
 });
 
-const insertEmailTemplatesImages = () => {
-}
-
-insertEmailTemplatesImages()
-
 type ActivitiesWithType = {
   activityType: TemplateType,
   activities: Activity[]
