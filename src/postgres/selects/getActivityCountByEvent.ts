@@ -1,12 +1,14 @@
 import { log } from '../postges-logger'
 import { runQuery, Tables, Period, isPeriod } from '../utils'
 
-const createQuery = (period: Period, table: Tables) => {
-  const event = table === 'activities' ? 'event = any(:event::df.action[]) AND' : ''
+const createQuery = (period?: string) => `
+  SELECT count(*) FROM df.activities
+  WHERE event = any(:event::df.action[]) ${period ? `AND date > (now() - interval '${period} days')`: ''}`
 
-  return `SELECT count(*) FROM df.${table}
-  WHERE ${event} date > (now() - interval '${period} days')`
-}
+export async function getActivityCountByEvent(eventName: string, period: string) {
+  const params = { event: eventName.split(',') };
+  const query = createQuery(period)
+  const allTimeQuery = createQuery()
 
 export async function getActivityCountByEvent(eventName: string, period: Period) {
   if (!isPeriod(period)) return
@@ -22,7 +24,9 @@ export async function getActivityCountByEvent(eventName: string, period: Period)
 
   try {
     const res = await runQuery(query, params)
-    return res.rows[0]?.count
+    const allTimeRes = await runQuery(allTimeQuery, params)
+
+    return { countByPeriod: res.rows[0]?.count, totalCount: allTimeRes.rows[0]?.count };
   } catch (err) {
     log.error('Failed to get activity count by event:', err.stack)
     throw err
