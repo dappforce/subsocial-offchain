@@ -1,17 +1,20 @@
 import { log } from '../postges-logger'
 import { runQuery, Tables, Period, isPeriod } from '../utils'
 
-const createQuery = (period?: string) => `
-  SELECT count(*) FROM df.activities
-  WHERE event = any(:event::df.action[]) ${period ? `AND date > (now() - interval '${period} days')`: ''}`
+const createQuery = (table: string, period?: string) => {
+  const isActivities = table === 'activities'
+  const hasMorePart = period ? 'and' : ''
 
-export async function getActivityCountByEvent(eventName: string, period: string) {
-  const params = { event: eventName.split(',') };
-  const query = createQuery(period)
-  const allTimeQuery = createQuery()
+  const event = isActivities ? `event = any(:event::df.action[]) ${hasMorePart}` : ''
+  const whereQueryPart = `${event} ${period ? `date > (now() - interval '${period} days')`: ''}`
+
+  return `
+    SELECT count(*) FROM df.${table}
+    ${!period && !isActivities ? '' : `where ${whereQueryPart}`}`
+}
 
 export async function getActivityCountByEvent(eventName: string, period: Period) {
-  if (!isPeriod(period)) return
+  if (!isPeriod(period)) return undefined
 
   const events = eventName.split(',')
 
@@ -20,7 +23,8 @@ export async function getActivityCountByEvent(eventName: string, period: Period)
 
   const params = { event: events }
 
-  const query = createQuery(period, table)
+  const query = createQuery(table, period)
+  const allTimeQuery = createQuery(table)
 
   try {
     const res = await runQuery(query, params)
