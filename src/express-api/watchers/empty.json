@@ -1,0 +1,13 @@
+{
+  "blockedPosts": [],
+  "blockedSpaces": [] ,
+  "blockedAccounts": {
+    "spam": [],
+    "violence": [],
+    "scam": [],
+    "fake": [],
+    "nudity": [],
+    "child_abuse": [],
+    "copyright": []
+  }
+}

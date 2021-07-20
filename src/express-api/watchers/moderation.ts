@@ -1,7 +1,8 @@
 import { newLogger } from '@subsocial/utils';
-import { watch, readFileSync } from 'fs';
+import { watch, readFileSync, existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { asyncReadFile, stateDirPath } from '../../utils';
+import emptyModerationList from './empty.json'
 
 const CHANGE = 'change'
 const blockListFilePath = join(stateDirPath, 'moderation.json')
@@ -30,15 +31,26 @@ const parseReadFile = (file: Buffer) => {
   }
 }
 
-export const moderationApi = new ModerationApi(parseReadFile(readFileSync(blockListFilePath)))
-
-log.info('Start watching')
-
-watch(blockListFilePath, async (type) => {
-  if (type === CHANGE) {
-
-    const buffer = await asyncReadFile(blockListFilePath)
-
-    moderationApi.set(parseReadFile(buffer))
+const startModerationWatcher = (): ModerationApi => {
+  if (!existsSync(blockListFilePath)) {
+    log.warn('Moderation file is not found')
+    writeFileSync(blockListFilePath, JSON.stringify(emptyModerationList))
   }
-});
+
+  const moderationApi = new ModerationApi(parseReadFile(readFileSync(blockListFilePath)))
+
+  log.info('Start watching')
+  
+  watch(blockListFilePath, async (type) => {
+    if (type === CHANGE) {
+  
+      const buffer = await asyncReadFile(blockListFilePath)
+  
+      moderationApi.set(parseReadFile(buffer))
+    }
+  });
+
+  return moderationApi
+}
+
+export const moderationApi = startModerationWatcher()
