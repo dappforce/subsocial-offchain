@@ -26,5 +26,3 @@ export type ConfirmationProp = {
 	image?: string,
 	buttonText?: string
 }
-
-

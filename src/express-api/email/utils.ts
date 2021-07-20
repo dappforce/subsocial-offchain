@@ -3,9 +3,8 @@ import { newLogger, nonEmptyStr } from '@subsocial/utils';
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import { appBaseUrl, ipfsGatewayUrl } from '../../env';
 import { ActivityTable } from '../../postgres/queries/feed-and-notifs';
-import { Activity } from '../telegramWS';
 import { NotificationTemplateProp, FeedTemplateProp } from './types';
-import { AnyAccountId } from '@subsocial/types';
+import { Activity, AnyAccountId } from '@subsocial/types';
 import { TemplateType } from './templates';
 import dayjs from 'dayjs'
 import LocalizedFormat from 'dayjs/plugin/localizedFormat'

@@ -4,16 +4,11 @@ import { EVENT_SEND_FOR_TELEGRAM, eventEmitter, Type } from './events';
 import { offchainTWSPort } from '../env';
 import BN from 'bn.js';
 import { getActivity } from '../postgres/selects/getActivity';
-import { Activity as OldActivity } from '@subsocial/types'
 import { getChatIdByAccount } from '../postgres/selects/getChatIdByAccount';
-import { ChatIdType } from './utils';
+import { ChatIdType } from './types';
+import { Activity } from '@subsocial/types';
 
 require('dotenv').config()
-
-export type Activity = Omit<OldActivity, 'id'> & {
-	block_number: string,
-	event_index: number
-}
 
 export const log = newLogger('Telegram WS')
 

@@ -1,8 +1,7 @@
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import messages from './emailMessages';
 import { getAccountContent, createHrefForPost, createHrefForAccount, createHrefForSpace, getFormatDate, resolveIpfsUrl } from './utils';
-import { EventsName } from '@subsocial/types';
-import { Activity } from '../telegramWS';
+import { Activity, EventsName } from '@subsocial/types';
 import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces';
 import { NotificationTemplateProp } from './types';
 import { summarizeMd } from '@subsocial/utils';

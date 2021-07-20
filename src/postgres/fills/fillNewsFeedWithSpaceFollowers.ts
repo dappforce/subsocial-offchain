@@ -4,7 +4,7 @@ import { encodeStructId } from '../../substrate/utils';
 import { newPgError, runQuery } from '../utils';
 import { updateCountOfUnreadNotifications } from '../updates/updateCountOfUnreadNotifications';
 import { IQueryParams } from '../types/fillNewsFeedWithSpaceFollowers.queries';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 import { isEmptyArray } from '@subsocial/utils';
 
 export async function fillNewsFeedWithSpaceFollowers(spaceId: string, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {

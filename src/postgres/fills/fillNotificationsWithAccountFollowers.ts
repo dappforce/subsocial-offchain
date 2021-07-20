@@ -5,7 +5,7 @@ import { updateCountOfUnreadNotifications } from '../updates/updateCountOfUnread
 import { IQueryParams } from '../types/fillNotificationsWithAccountFollowers.queries';
 import { encodeStructId } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 
 export async function fillNotificationsWithAccountFollowers({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
   const query = fillAccountFollowerQuery("notifications")

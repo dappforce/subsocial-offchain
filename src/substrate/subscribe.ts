@@ -4,6 +4,8 @@ import { readOffchainState, writeOffchainState } from './offchain-state';
 import { handleEventForElastic } from './handle-elastic';
 import { handleEventForPostgres } from './handle-postgres';
 import { SubsocialSubstrateApi } from '@subsocial/api'
+import { resolveSubsocialApi } from '../connections';
+import { startWebSockets } from '../ws';
 require('dotenv').config()
 
 let blockTime = 6
@@ -128,8 +130,18 @@ async function main (substrate: SubsocialSubstrateApi) {
   }
 }
 
-export const startSubstrateSubscriber = (substrate: SubsocialSubstrateApi) => 
+export const startSubstrateSubscriber = async (substrate?: SubsocialSubstrateApi) => {
+  if (!substrate) {
+    const subsocial = await resolveSubsocialApi()
+    substrate = subsocial.substrate
+  }
+
   main(substrate).catch((error) => {
     log.error('Unexpected error during processing of Substrate events:', error)
   })
-
+}
+  
+export const startSubstrateSubscriberWithWebSockets = async (substrate?: SubsocialSubstrateApi) => {
+  startSubstrateSubscriber(substrate)
+  startWebSockets()
+}

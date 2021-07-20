@@ -1,10 +1,9 @@
-import { Activity } from '../telegramWS';
 import { resolveSubsocialApi } from '../../connections/subsocial';
 import { PostId } from '@subsocial/types/substrate/interfaces';
 import { createHrefForPost, getAccountContent, getFormatDate, resolveIpfsUrl, toShortAddress } from './utils';
 import { FeedTemplateProp } from './types';
 import { summarizeMd } from '@subsocial/utils/summarize'
-import { PostWithAllDetails } from '@subsocial/types';
+import { Activity, PostWithAllDetails } from '@subsocial/types';
 
 const createPostData = async ({ post, space }: PostWithAllDetails) => {
   const { id, owner, space_id, created: { time } } = post.struct

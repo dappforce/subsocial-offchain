@@ -1,4 +1,4 @@
-import { informClientAboutUnreadNotifications } from '../../express-api/events';
+import { informClientAboutUnreadNotifications } from '../../ws/events';
 import { log } from '../postges-logger';
 import { runQuery, isValidSignature, upsertNonce } from '../utils';
 import { SessionCall, ReadAllMessage } from '../types/sessionKey';

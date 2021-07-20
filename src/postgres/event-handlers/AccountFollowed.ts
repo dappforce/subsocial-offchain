@@ -3,7 +3,7 @@ import { insertAccountFollower } from '../inserts/insertAccountFollower';
 import { insertActivityForAccount } from '../inserts/insertActivityForAccount';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { findSocialAccount } from '../../substrate/api-wrappers';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 
 export const onAccountFollowed: EventHandlerFn = async (eventAction) => {
   const { data } = eventAction;

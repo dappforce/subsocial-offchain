@@ -3,7 +3,7 @@ import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
 import { insertActivityForPostReaction } from '../inserts/insertActivityForPostReaction';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 
 export const onRootPostReactionCreated = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
   const { author: voter, postId } = parsePostEvent(eventAction)
