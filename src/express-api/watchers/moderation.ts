@@ -1,5 +1,5 @@
 import { newLogger } from '@subsocial/utils';
-import { watch, readFileSync, existsSync, writeFileSync } from 'fs';
+import { watch, readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { asyncReadFile, stateDirPath } from '../../utils';
 import emptyModerationList from './empty.json'
@@ -34,6 +34,7 @@ const parseReadFile = (file: Buffer) => {
 const startModerationWatcher = (): ModerationApi => {
   if (!existsSync(blockListFilePath)) {
     log.warn('Moderation file is not found')
+    mkdirSync(stateDirPath)
     writeFileSync(blockListFilePath, JSON.stringify(emptyModerationList))
   }
 
