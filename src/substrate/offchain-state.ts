@@ -8,7 +8,7 @@ const asyncReadFile = promisify(readFile)
 const asyncWriteFile = promisify(writeFile)
 const asyncMkdir = promisify(mkdir)
 
-const stateDirPath = join(__dirname, '../../state')
+export const stateDirPath = join(__dirname, '../../state')
 const stateFilePath = join(stateDirPath, 'state.json')
 
 const defaultOffchainState = (): OffchainState => ({

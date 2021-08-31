@@ -17,10 +17,11 @@
     "noUnusedParameters": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "esModuleInterop": true,
   },
   "include": [
     "src/**/*",
-    "__tests__/**/*"
+    "tests/**/*"
   ]
 }

@@ -2,10 +2,10 @@ import { Activity } from '@subsocial/types'
 import { execPgQuery } from './utils'
 import { ActivitiesParams, GetActivitiesFn, GetCountFn } from './types'
 
-type Table = 'news_feed' | 'notifications'
+export type ActivityTable = 'news_feed' | 'notifications'
 
-const buildPageQuery = (table: Table) => 
-  `SELECT DISTINCT * 
+const buildPageQuery = (table: ActivityTable) =>
+  `SELECT DISTINCT *
     FROM df.activities
     WHERE aggregated = true AND (block_number, event_index) IN (
       SELECT block_number, event_index
@@ -16,7 +16,7 @@ const buildPageQuery = (table: Table) =>
     OFFSET $2
     LIMIT $3`
 
-const buildCountQuery = (table: Table) => 
+const buildCountQuery = (table: ActivityTable) =>
   `SELECT COUNT(*)
     FROM df.activities
     WHERE aggregated = true AND (block_number, event_index) IN (
@@ -25,7 +25,7 @@ const buildCountQuery = (table: Table) =>
       WHERE account = $1
     )`
 
-const queryPage = (table: Table, params: ActivitiesParams): Promise<Activity[]> => {
+const queryPage = (table: ActivityTable, params: ActivitiesParams): Promise<Activity[]> => {
   const { account, offset, limit } = params
   return execPgQuery(
     buildPageQuery(table),
@@ -34,7 +34,7 @@ const queryPage = (table: Table, params: ActivitiesParams): Promise<Activity[]> 
   )
 }
 
-const queryCount = async (table: Table, account: string) => {
+const queryCount = async (table: ActivityTable, account: string) => {
   const data = await execPgQuery(
     buildCountQuery(table),
     [ account ],

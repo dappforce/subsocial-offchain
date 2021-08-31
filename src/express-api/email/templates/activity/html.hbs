@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{{ title }}</title>
+  <meta charset="utf-8">
+  <style>
+    {{> css }}
+  </style>
+</head>
+<body>
+  <table class="main">
+    <tr>
+      <td>
+        <h3 class="pageTitle">{{title}}</h3>
+      </td>
+    </tr>
+    {{#if notifications }}
+      {{> notifications data=data }}
+    {{/if}}
+    {{#if feed}}
+      {{> feed data=data }}
+    {{/if}}
+    <tr>
+      <td class="td-button">
+        <a href="{{appsUrl}}" class='buttonLink'>See more on the website</a>
+      </td>
+    </tr>
+  </table>
+</body>
+<html>

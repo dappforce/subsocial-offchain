@@ -1,0 +1,42 @@
+
+{{#each data}}
+<tr>
+  <td>
+    <a class="link" href="{{ relatedEntityUrl }}">
+      <table class="notif-item">
+        <tr>
+          <td class="top">
+            <table>
+              <td class="mr-avatar">
+                {{#if avatar}}
+                  <img
+                    width="36"
+                    height="36"
+                    src="{{avatar}}"
+                    class="avatar"
+                  />
+                {{else}}
+                  <div class="avatar"></div>
+                {{/if}}
+              </td>
+              <td>
+                <div class="author">
+                  <span>{{ownerName}}</span>
+                  <span>{{message}}</span>
+                  <span>{{entityName}}</span>
+                </div>
+                <div class="details">{{ date }}</div>
+              </td>
+            </table>
+          </td>
+          {{#if image}}
+            <td class="top notif-image">
+              <img class="notif-image" src="{{image}}" >
+            </td>
+          {{/if}}
+        </tr>
+      </table>
+    </a>
+  </td>
+</tr>
+{{/each}}

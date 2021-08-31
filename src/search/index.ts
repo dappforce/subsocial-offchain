@@ -1,7 +1,7 @@
 import { elasticIndexer } from '../connections/elastic'
-import * as SpacesMapping from './mappings/spaces.json'
-import * as PostsMapping from './mappings/posts.json'
-import * as ProfilesMapping from './mappings/profiles.json'
+import SpacesMapping from './mappings/spaces.json'
+import PostsMapping from './mappings/posts.json'
+import ProfilesMapping from './mappings/profiles.json'
 import { ES_INDEX_SPACES, ES_INDEX_POSTS, ES_INDEX_PROFILES } from './config'
 import { elasticLog as log } from '../connections/loggers';
 

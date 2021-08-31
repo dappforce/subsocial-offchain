@@ -1,18 +1,20 @@
-import { pg } from '../../connections';
-import { newPgError } from '../utils';
+import { newPgError, runQuery } from '../utils';
 import { ActivitiesParamsWithAccount } from '../queries/types';
 import { updateCountOfUnreadNotifications } from '../updates/updateCountOfUnreadNotifications';
+import { IQueryParams } from '../types/insertNotificationForOwner.queries';
+import { encodeStructId } from '../../substrate/utils';
 
 const query = `
   INSERT INTO df.notifications
-    VALUES($1, $2, $3) 
+    VALUES(:account, :blockNumber, :eventIndex)
   RETURNING *`
 
 export async function insertNotificationForOwner({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
-  const params = [account, blockNumber, eventIndex]
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
+  const params = { account, blockNumber: encodedBlockNumber, eventIndex }
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
     throw newPgError(err, insertNotificationForOwner)

@@ -1,14 +1,17 @@
-import { newPgError } from '../utils';
+import { newPgError, runQuery } from '../utils';
 import { fillAccountFollowerQuery } from './fillTableQueries';
 import { ActivitiesParamsWithAccount } from '../queries/types';
-import { pg } from '../../connections/postgres';
+import { IQueryParams } from '../types/fillNewsFeedWithAccountFollowers.queries';
+import { encodeStructId } from '../../substrate/utils';
 
 export async function fillNewsFeedWithAccountFollowers({ account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
   const query = fillAccountFollowerQuery("news_feed")
-  const params = [account, blockNumber, eventIndex];
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
+
+  const params = { account, blockNumber: encodedBlockNumber, eventIndex };
 
   try {
-    pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
   } catch (err) {
     throw newPgError(err, fillNewsFeedWithAccountFollowers)
   }

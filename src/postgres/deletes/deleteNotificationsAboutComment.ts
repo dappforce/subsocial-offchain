@@ -1,25 +1,24 @@
-import { PostId } from '@subsocial/types/substrate/interfaces';
 import { encodeStructId } from '../../substrate/utils';
-import { newPgError } from '../utils';
-import { pg } from '../../connections/postgres';
+import { newPgError, runQuery } from '../utils';
+import { IQueryParams } from '../types/deleteNotificationsAboutComment.queries';
 
 const query = `
   DELETE FROM df.notifications
-  WHERE account = $1 AND (block_number, event_index) IN (
+  WHERE account = :account AND (block_number, event_index) IN (
     SELECT block_number, event_index
     FROM df.activities
-    LEFT JOIN df.account_followers
-    ON df.activities.account = df.account_followers.following_comment_id
-    WHERE comment_id = $2
+    LEFT JOIN df.comment_followers
+      ON df.activities.account = df.comment_followers.follower_account
+    WHERE comment_id = :commentId
   )
   RETURNING *`
 
-export async function deleteNotificationsAboutComment (userId: string, commentId: PostId) {
+export async function deleteNotificationsAboutComment (userId: string, commentId: string) {
   const encodedCommentId = encodeStructId(commentId);
-  const params = [ userId, encodedCommentId ];
+  const params = { account: userId, commentId: encodedCommentId };
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
   } catch (err) {
     throw newPgError(err, deleteNotificationsAboutComment)
   }

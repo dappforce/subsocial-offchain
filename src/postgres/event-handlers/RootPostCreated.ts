@@ -1,21 +1,23 @@
-import { Post } from '@subsocial/types/substrate/interfaces/subsocial';
+import { NormalizedPost } from '../../substrate/normalizers';
 import { SubstrateEvent } from '../../substrate/types';
 import { parsePostEvent } from '../../substrate/utils';
 import { fillNewsFeedWithAccountFollowers } from '../fills/fillNewsFeedWithAccountFollowers';
 import { fillNewsFeedWithSpaceFollowers } from '../fills/fillNewsFeedWithSpaceFollowers';
 import { insertActivityForPost } from '../inserts/insertActivityForPost';
 import { insertPostFollower } from '../inserts/insertPostFollower';
+import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
 
-export const onRootCreated = async (eventAction: SubstrateEvent, post: Post) => {
+export const onRootCreated = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
   const { author, postId } = parsePostEvent(eventAction)
 
   await insertPostFollower(eventAction.data);
 
-  const spaceId = post.space_id.unwrap()
+  const spaceId = post.spaceId
   const ids = [spaceId, postId ];
   const insertResult = await insertActivityForPost(eventAction, ids, 0);
   if (insertResult === undefined) return;
 
   await fillNewsFeedWithSpaceFollowers(spaceId, { account: author, ...insertResult });
   await fillNewsFeedWithAccountFollowers({ account: author, ...insertResult });
+  informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), author, insertResult.blockNumber, insertResult.eventIndex, 'feed')
 }

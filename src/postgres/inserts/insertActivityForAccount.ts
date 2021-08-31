@@ -1,22 +1,22 @@
 import { updateCountLog } from '../postges-logger';
-import { newPgError } from '../utils';
+import { newPgError, runQuery, action } from '../utils';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
-import { getValidDate } from '../../substrate/subscribe';
-import { pg } from '../../connections/postgres';
+import { blockNumberToApproxDate, encodeStructId } from '../../substrate/utils';
+import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForAccount.queries';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, following_id, date, agg_count)
-    VALUES($1, $2, $3, $4, $5, $6, $7)
+    VALUES(:blockNumber, :eventIndex, :account, :event, :followingId, :date, :aggCount)
   RETURNING *`
 
 const queryUpdate = `
   UPDATE df.activities
-    SET aggregated = false
-      WHERE aggregated = true
-        AND NOT (block_number = $1 AND event_index = $2)
-        AND event = $3
-        AND following_id = $4
+  SET aggregated = false
+  WHERE aggregated = true
+    AND NOT (block_number = :blockNumber AND event_index = :eventIndex)
+    AND event = :event
+    AND following_id = :followingId
   RETURNING *`;
 
 export async function insertActivityForAccount(eventAction: SubstrateEvent, count: number): InsertActivityPromise {
@@ -24,16 +24,25 @@ export async function insertActivityForAccount(eventAction: SubstrateEvent, coun
   const accountId = data[0].toString();
   const followingId = data[1].toString();
 
-  const date = await getValidDate(blockNumber)
+  const date = await blockNumberToApproxDate(blockNumber)
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
 
-  const params = [blockNumber, eventIndex, accountId, eventName, followingId, date, count];
+  const params = {
+    blockNumber: encodedBlockNumber,
+    eventIndex,
+    account: accountId,
+    event: eventName as action,
+    followingId,
+    date,
+    aggCount: count
+  };
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
 
-    const paramsUpdate = [ blockNumber, eventIndex, eventName, followingId ];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
+    const paramsUpdate = { blockNumber: encodedBlockNumber, eventIndex, event: eventName as action, followingId };
+    const resUpdate = await runQuery<IQueryUpdateParams>(queryUpdate, paramsUpdate);
+    updateCountLog(resUpdate.rowsCount)
   } catch (err) {
     throw newPgError(err, insertActivityForAccount)
   }

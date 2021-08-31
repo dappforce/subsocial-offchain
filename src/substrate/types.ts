@@ -1,7 +1,7 @@
-import { EventData } from '@polkadot/types/generic/Event'
+import { GenericEventData } from '@polkadot/types';
 import BN from 'bn.js';
 
-type CommonDbState = {
+export type CommonDbState = {
   lastBlock: number
   lastError?: string
 }
@@ -13,7 +13,7 @@ export type OffchainState = {
 
 export type SubstrateEvent = {
   eventName: string
-  data: EventData
+  data: GenericEventData
   blockNumber: BN
   eventIndex: number
 }

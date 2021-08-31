@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS df;
+
 -- Create custom types
 DO $$
 BEGIN
@@ -94,28 +96,40 @@ CREATE TABLE IF NOT EXISTS df.comment_followers
     following_comment_id bigint NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_follower_account 
+CREATE TABLE IF NOT EXISTS df.schema_version
+(
+    value integer DEFAULT 0 NOT NULL
+);
+
+INSERT INTO df.schema_version
+(
+    -- Note that the value '0' means a DEFAULT value of the "value" field.
+    SELECT 0
+    WHERE NOT EXISTS(SELECT * FROM df.schema_version)
+);
+
+CREATE INDEX IF NOT EXISTS idx_follower_account
 ON df.account_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_following_account 
+CREATE INDEX IF NOT EXISTS idx_following_account
 ON df.account_followers(following_account);
 
-CREATE INDEX IF NOT EXISTS idx_post_follower_account 
+CREATE INDEX IF NOT EXISTS idx_post_follower_account
 ON df.post_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_space_follower_account 
+CREATE INDEX IF NOT EXISTS idx_space_follower_account
 ON df.space_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_comment_follower_account 
+CREATE INDEX IF NOT EXISTS idx_comment_follower_account
 ON df.comment_followers(follower_account);
 
-CREATE INDEX IF NOT EXISTS idx_following_post_id 
+CREATE INDEX IF NOT EXISTS idx_following_post_id
 ON df.post_followers(following_post_id);
 
-CREATE INDEX IF NOT EXISTS idx_following_space_id 
+CREATE INDEX IF NOT EXISTS idx_following_space_id
 ON df.space_followers(following_space_id);
 
-CREATE INDEX IF NOT EXISTS idx_following_comment_id 
+CREATE INDEX IF NOT EXISTS idx_following_comment_id
 ON df.comment_followers(following_comment_id);
 
 CREATE INDEX IF NOT EXISTS idx_account

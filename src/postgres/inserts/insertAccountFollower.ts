@@ -1,17 +1,17 @@
-import { EventData } from '@polkadot/types/generic/Event';
-import { newPgError } from '../utils';
-import { pg } from '../../connections/postgres';
+import { GenericEventData } from '@polkadot/types';
+import { newPgError, runQuery } from '../utils';
+import { IQueryParams } from '../types/insertAccountFollower.queries';
 
 const query = `
   INSERT INTO df.account_followers(follower_account, following_account)
-    VALUES($1, $2)
+    VALUES(:followerAccount, :followingAccount)
   RETURNING *`;
 
-export async function insertAccountFollower(data: EventData) {
-  const params = [ data[0].toString(), data[1].toString() ];
+export async function insertAccountFollower(data: GenericEventData) {
+  const params = { followerAccount: data[0].toString(), followingAccount: data[1].toString() };
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
   } catch (err) {
     throw newPgError(err, insertAccountFollower)
   }

@@ -1,21 +1,20 @@
-import { EventData } from '@polkadot/types/generic/Event';
-import { SpaceId } from '@subsocial/types/substrate/interfaces';
+import { GenericEventData } from '@polkadot/types';
 import { encodeStructId } from '../../substrate/utils';
-import { pg } from '../../connections/postgres';
-import { newPgError } from '../utils';
+import { newPgError, runQuery } from '../utils';
+import { IQueryParams } from '../types/deleteSpaceFollower.queries';
 
 const query = `
   DELETE from df.space_followers
-  WHERE follower_account = $1
-    AND following_space_id = $2
+  WHERE follower_account = :followerAccount
+    AND following_space_id = :followingSpaceId
   RETURNING *`
 
-export async function deleteSpaceFollower (data: EventData) {
-  const spaceId = encodeStructId(data[1] as SpaceId);
-  const params = [ data[0].toString(), spaceId ];
+export async function deleteSpaceFollower (data: GenericEventData) {
+  const spaceId = encodeStructId(data[1].toString());
+  const params = { followerAccount: data[0].toString(), followingSpaceId: spaceId };
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
   } catch (err) {
     throw newPgError(err, deleteSpaceFollower)
   }

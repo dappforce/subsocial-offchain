@@ -1,7 +1,7 @@
 import * as express from 'express'
-import { getOffsetFromRequest, getLimitFromRequest, HandlerFn, resolvePromiseAndReturnJson } from '../utils'
+import { getOffsetFromRequest, getLimitFromRequest, HandlerFn } from '../utils'
 import { nonEmptyStr, nonEmptyArr } from '@subsocial/utils'
-import { buildElasticSearchQuery, loadSubsocialDataByESIndex } from '../../search/reader'
+import { buildElasticSearchQuery } from '../../search/reader'
 import { ElasticQueryParams } from '@subsocial/types/offchain/search'
 import { elasticReader } from '../../connections/elastic'
 import { elasticLog } from '../../connections/loggers'
@@ -46,9 +46,5 @@ const queryElastic = async (req: express.Request, res: express.Response) => {
 
 export const searchHandler: HandlerFn = async (req, res) => {
   const searchResults = await queryElastic(req, res)
-  if (searchResults) {
-    return resolvePromiseAndReturnJson(res, loadSubsocialDataByESIndex(searchResults))
-  } else {
-    res.json([])
-  }
+  res.json(searchResults || [])
 }

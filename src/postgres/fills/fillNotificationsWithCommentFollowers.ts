@@ -1,18 +1,18 @@
-import { PostId } from '@subsocial/types/substrate/interfaces';
 import { ActivitiesParamsWithAccount } from '../queries/types';
 import { fillTableWith } from './fillTableQueries';
 import { encodeStructId } from '../../substrate/utils';
-import { newPgError } from '../utils';
-import { pg } from '../../connections/postgres';
+import { newPgError, runQuery } from '../utils';
 import { updateCountOfUnreadNotifications } from '../updates/updateCountOfUnreadNotifications';
+import { IQueryParams } from '../types/fillNotificationsWithCommentFollowers.queries';
 
-export async function fillNotificationsWithCommentFollowers(commentId: PostId, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
+export async function fillNotificationsWithCommentFollowers(commentId: string, { account, blockNumber, eventIndex }: ActivitiesParamsWithAccount) {
   const query = fillTableWith("notifications", "comment")
   const encodedCommentId = encodeStructId(commentId);
-  const params = [encodedCommentId, account, blockNumber, eventIndex];
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
+  const params = { commentId: encodedCommentId, account, blockNumber: encodedBlockNumber, eventIndex };
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
     await updateCountOfUnreadNotifications(account)
   } catch (err) {
     throw newPgError(err, fillNotificationsWithCommentFollowers)

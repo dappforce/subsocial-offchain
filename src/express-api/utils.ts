@@ -1,10 +1,37 @@
 import * as express from 'express'
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils'
 import { expressApiLog } from '../connections/loggers'
+import { Dayjs } from 'dayjs'
 
 export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 20
 
-export type HandlerFn = (req: express.Request, res: express.Response) => Promise<void>
+export type HandlerFn = (req: express.Request, res: express.Response) => Promise<any>
+
+export type Periodicity = 'Immediately' | 'Daily' | 'Weekly' | 'Never'
+
+export type EmailSettings = {
+	account: string,
+	email: string,
+	periodicity: Periodicity,
+	send_feeds: boolean,
+	send_notifs: boolean,
+	last_block_bumber: number,
+	last_event_index: number,
+	next_leter_date: Dayjs,
+	confirmation_code: string,
+	confirmed_on: Dayjs
+}
+
+type ErrorType = string | {
+  status: string,
+  data: string
+}
+
+export type OkOrError<T = null> = {
+  ok: boolean,
+  errors?: Record<string, ErrorType>
+  data?: T
+}
 
 const getNumberFromRequest = (
   req: express.Request,

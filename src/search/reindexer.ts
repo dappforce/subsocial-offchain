@@ -1,35 +1,90 @@
-import { SubsocialSubstrateApi } from '@subsocial/api/substrate'
+import { SubsocialSubstrateApi } from '@subsocial/api'
 import { resolveSubsocialApi } from '../connections/subsocial'
-import { PostId, SpaceId } from '@subsocial/types/substrate/interfaces'
-import { indexPostContent, indexSpaceContent } from './indexer'
+import { indexPostContent, indexProfileContent, indexSpaceContent } from './indexer'
 import { elasticLog as log } from '../connections/loggers'
-import { exit } from 'process'
+import BN from 'bn.js';
+import { argv, exit } from 'process'
+import { GenericAccountId } from '@polkadot/types'
+import { isEmptyArray } from '@subsocial/utils';
+import { getUniqueIds } from '@subsocial/api'
 
-const BN = require('bn.js')
 const one = new BN(1)
 
-async function reindexContentFromIpfs(substrate: SubsocialSubstrateApi) {
-  const lastSpaceId = (await substrate.nextSpaceId()).sub(one)
-  const lastPostId = (await substrate.nextPostId()).sub(one)
+type ReindexerFn = (substrate: SubsocialSubstrateApi) => Promise<void>
 
+const reindexProfiles: ReindexerFn = async (substrate) => {
+  const api = await substrate.api
+  const storageKeys = await api.query.profiles.socialAccountById.keys()
+
+  const profileIndexators = storageKeys.map(async (key) => {
+    const addressEncoded = '0x' + key.toHex().substr(-64)
+    const account = new GenericAccountId(key.registry, addressEncoded)
+
+    const res = await substrate.findSocialAccount(account)
+    const { profile } = res
+    if (profile.isSome) {
+      log.info(`Index profile of account ${account.toString()}`)
+      await indexProfileContent(profile.unwrap())
+    }
+  })
+
+  await Promise.all(profileIndexators)
+}
+
+const reindexSpaces: ReindexerFn = async (substrate) => {
+  const lastSpaceId = (await substrate.nextSpaceId()).sub(one)
   const lastSpaceIdStr = lastSpaceId.toString()
+
+  // Create an array with space ids from 1 to lastSpaceId
+  const spaceIds = Array.from({ length: lastSpaceId.toNumber() }, (_, i) => i + 1)
+
+  const spaceIndexators = spaceIds.map(async (spaceId) => {
+    const id = new BN(spaceId)
+    const space = await substrate.findSpace({ id })
+    log.info(`Index space # ${spaceId} out of ${lastSpaceIdStr}`)
+    await indexSpaceContent(space)
+  })
+
+  await Promise.all(spaceIndexators)
+}
+
+const reindexPosts: ReindexerFn = async (substrate) => {
+  const lastPostId = (await substrate.nextPostId()).sub(one)
   const lastPostIdStr = lastPostId.toString()
 
-  for (let i = one; lastSpaceId.gte(i); i = i.add(one)) {
-    const id: SpaceId = i as unknown as SpaceId
-    const space = await substrate.findSpace({ id })
+  // Create an array with space ids from 1 to lastSpaceId
+  const postIds = Array.from({ length: lastPostId.toNumber() }, (_, i) => i + 1)
 
-    log.info(`Index space # ${id.toString()} out of ${lastSpaceIdStr}`)
-    indexSpaceContent(space)
-  }
-
-  for (let i = one; lastPostId.gte(i); i = i.add(one)) {
-    const id: PostId = i as unknown as PostId
+  const postIndexators = postIds.map(async (postId) => {
+    const id = new BN(postId)
     const post = await substrate.findPost({ id })
-    
-    log.info(`Index post # ${id.toString()} out of ${lastPostIdStr}`)
-    indexPostContent(post)
-  }
+    log.info(`Index post # ${postId} out of ${lastPostIdStr}`)
+    await indexPostContent(post)
+  })
+
+  await Promise.all(postIndexators)
+}
+
+type IReindexerFunction = Record<string, ReindexerFn>
+const ReindexerFunction: IReindexerFunction = {
+  profiles: reindexProfiles,
+  spaces: reindexSpaces,
+  posts: reindexPosts,
+}
+const AllReindexerFunctions = Object.values(ReindexerFunction)
+
+async function reindexContentFromIpfs(substrate: SubsocialSubstrateApi) {
+  const uniqueArguments = getUniqueIds(argv)
+  let reindexPromises = uniqueArguments.filter(arg => ReindexerFunction[arg])
+    .map(async argument => {
+      const func = ReindexerFunction[argument]
+      await func(substrate)
+    })
+
+  if (isEmptyArray(reindexPromises) || argv.includes('all'))
+    reindexPromises = AllReindexerFunctions.map(fn => fn(substrate))
+
+  await Promise.all(reindexPromises)
 
   exit(0)
 }

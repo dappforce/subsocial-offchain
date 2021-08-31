@@ -1,20 +1,19 @@
-import { EventData } from '@polkadot/types/generic/Event';
-import { PostId } from '@subsocial/types/substrate/interfaces';
+import { GenericEventData } from '@polkadot/types';
 import { encodeStructId } from '../../substrate/utils';
-import { newPgError } from '../utils';
-import { pg } from '../../connections/postgres';
+import { newPgError, runQuery } from '../utils';
+import { IQueryParams } from '../types/insertCommentFollower.queries';
 
 const query = `
   INSERT INTO df.comment_followers(follower_account, following_comment_id)
-    VALUES($1, $2)
+    VALUES(:followerAccount, :followingCommentId)
   RETURNING *`
 
-export async function insertCommentFollower(data: EventData) {
-  const commentId = encodeStructId(data[1] as PostId);
-  const params = [ data[0].toString(), commentId ];
+export async function insertCommentFollower(data: GenericEventData) {
+  const commentId = encodeStructId(data[1].toString());
+  const params = { followerAccount: data[0].toString(), followingCommentId: commentId };
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
   } catch (err) {
     throw newPgError(err, insertCommentFollower)
   }

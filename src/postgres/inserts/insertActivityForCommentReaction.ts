@@ -1,29 +1,28 @@
-import { SubstrateId } from '@subsocial/types';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
-import { encodeStructIds } from '../../substrate/utils';
+import { encodeStructIds, encodeStructId } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { emptyParamsLogError, updateCountLog } from '../postges-logger';
-import { getValidDate } from '../../substrate/subscribe';
-import { newPgError } from '../utils';
-import { pg } from '../../connections/postgres';
+import { blockNumberToApproxDate } from '../../substrate/utils';
+import { newPgError, runQuery, action } from '../utils';
+import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForCommentReaction.queries';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, date, agg_count, aggregated)
-    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    VALUES(:blockNumber, :eventIndex, :account, :event, :postId, :commentId, :date, :aggCount, :aggregated)
   RETURNING *`
 
 const queryUpdate = `
   UPDATE df.activities
-    SET aggregated = false
-    WHERE aggregated = true
-      AND NOT (block_number = $1 AND event_index = $2)
-      AND event = $3
-      AND post_id = $4
-      AND comment_id = $5
+  SET aggregated = false
+  WHERE aggregated = true
+    AND NOT (block_number = :blockNumber AND event_index = :eventIndex)
+    AND event = :event
+    AND post_id = :postId
+    AND comment_id = :commentId
   RETURNING *`;
 
-export async function insertActivityForCommentReaction(eventAction: SubstrateEvent, count: number, ids: SubstrateId[], creator: string): InsertActivityPromise {
+export async function insertActivityForCommentReaction(eventAction: SubstrateEvent, count: number, ids: string[], creator: string): InsertActivityPromise {
   const paramsIds = encodeStructIds(ids)
 
   if (isEmptyArray(paramsIds)) {
@@ -31,19 +30,32 @@ export async function insertActivityForCommentReaction(eventAction: SubstrateEve
     return undefined
   }
 
+  const [postId, commentId] = paramsIds
   const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
   const aggregated = accountId !== creator;
 
-  const date = await getValidDate(blockNumber)
-  const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, count, aggregated];
-  
-  try {
-    await pg.query(query, params)
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
 
-    const paramsUpdate = [blockNumber, eventIndex, eventName, ...paramsIds];
-    const resUpdate = await pg.query(queryUpdate, paramsUpdate);
-    updateCountLog(resUpdate.rowCount)
+  const date = await blockNumberToApproxDate(blockNumber)
+  const params = {
+    blockNumber: encodedBlockNumber,
+    eventIndex,
+    account: accountId,
+    event: eventName as action,
+    postId,
+    commentId,
+    date,
+    aggCount: count,
+    aggregated
+  };
+
+  try {
+    await runQuery<IQueryParams>(query, params)
+
+    const paramsUpdate = { blockNumber:encodedBlockNumber, eventIndex, event: eventName as action, postId, commentId};
+    const resUpdate = await runQuery<IQueryUpdateParams>(queryUpdate, paramsUpdate);
+    updateCountLog(resUpdate.rowsCount)
   } catch (err) {
     throw newPgError(err, insertActivityForCommentReaction)
   }

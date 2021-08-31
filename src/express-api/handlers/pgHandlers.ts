@@ -1,13 +1,31 @@
 import * as express from 'express'
-import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
 import * as pgQueries from '../../postgres/queries';
-import * as pgNotifs from '../../postgres/updates/markAllNotifsAsRead';
+import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries/types';
+import { setTelegramData } from '../../postgres/inserts/insertTelegramData'
+import { addSessionKey } from '../../postgres/inserts/insertSessionKey'
+import { getNonce } from '../../postgres/selects/getNonce'
+import { SessionCall, AddSessionKeyArgs, SetUpEmailArgs, ConfirmEmail, ClearConfirmDateArgs } from '../../postgres/types/sessionKey';
+import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
+import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
+import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
+import { changeCurrentAccount } from '../../postgres/updates/changeCurrentAccount';
+import { updateLastPush } from '../../postgres/updates/updateLastPush';
+import { getSessionKey } from '../../postgres/selects/getSessionKey';
+import { addEmailSettings } from '../../postgres/inserts/insertEmailSettings';
+import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
+import { sendNotifConfirmationLetter } from '../email/confirmation';
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
   resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
+import { clearConfirmationDate } from '../../postgres/updates/clearConfirmationDate';
+import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCountByActivities';
+import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
+import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
+import { setConfirmationDateForSettings } from '../../postgres/updates/setConfirmationDate';
+
 
 const activityHandler = (
   req: express.Request,
@@ -80,7 +98,83 @@ export const spaceActivitiesCountHandler: HandlerFn = (req, res) =>
 export const activityCountsHandler: HandlerFn = (req, res) =>
   countHandler(req, res, pgQueries.getActivityCounts)
 
-export const markAllNotifsAsRead: HandlerFn = (req, res) => {
-  const account = req.params.id
-  return resolvePromiseAndReturnJson(res, pgNotifs.markAllNotifsAsRead(account))
-} 
+
+export const setSessionKeyHandler: HandlerFn = (req, res) =>
+  resolvePromiseAndReturnJson(res, addSessionKey(req.body.sessionCall as SessionCall<AddSessionKeyArgs>))
+
+export const getSessionKeyHandler: HandlerFn = (req, res) => {
+  const account = req.query.account as string
+  return resolvePromiseAndReturnJson(res, getSessionKey(account))
+}
+
+export const getNonceHandler: HandlerFn = (req, res) => {
+  const account = req.query.account as string
+  return resolvePromiseAndReturnJson(res, getNonce(account))
+}
+
+
+export const setTelegramDataHandler: HandlerFn = (req, res) => {
+  const { account, chatId } = req.body
+  return resolvePromiseAndReturnJson(res, setTelegramData(account, Number(chatId)))
+}
+
+export const setCurrentAccountHandler: HandlerFn = (req, res) => {
+  const { account, chatId } = req.body;
+  return resolvePromiseAndReturnJson(res, changeCurrentAccount(account.toString(), Number(chatId)))
+}
+
+export const setLastPushHandler: HandlerFn = (req, res) => {
+  const { account, chatId, blockNumber, eventIndex } = req.body;
+  return resolvePromiseAndReturnJson(res, updateLastPush(account.toString(), Number(chatId), blockNumber, eventIndex))
+}
+
+export const getAccountByChatIdHandler: HandlerFn = (req, res) => {
+  const { chatId } = req.params
+  return resolvePromiseAndReturnJson(res, getAccountByChatId(Number(chatId)))
+}
+
+export const getTelegramChatHandler: HandlerFn = (req, res) => {
+  const { account, chatId } = req.query;
+  return resolvePromiseAndReturnJson(res, getTelegramChat(account.toString(), Number(chatId)))
+}
+
+export const updateTelegramChatHandler: HandlerFn = (req, res) => {
+  const { account, chatId, push_notifs, push_feeds } = req.body;
+  return resolvePromiseAndReturnJson(res, updateTelegramChat(account.toString(), Number(chatId), push_notifs, push_feeds))
+}
+
+export const addEmailSettingsHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, addEmailSettings(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
+}
+
+export const getEmailSettingsHandler: HandlerFn = (req, res) => {
+  const account = req.query.account as string
+  return resolvePromiseAndReturnJson(res, getEmailSettingsByAccount(account))
+}
+
+export const sendConfirmationLetterHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, sendNotifConfirmationLetter(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
+}
+
+export const confirmEmailForSettingsHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, setConfirmationDateForSettings(req.body.sessionCall as SessionCall<ConfirmEmail>))
+}
+
+export const clearConfirmationDateHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, clearConfirmationDate(req.body.sessionCall as SessionCall<ClearConfirmDateArgs>))
+}
+
+export const getStatisticDataHandler: HandlerFn = (req, res) => {
+  const {event, period} = req.query
+  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event.toString(), period.toString()))
+}
+
+export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
+  const {event, period} = req.query
+  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event.toString(), period.toString()))
+}
+
+export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {
+  const event = req.query.event
+  return resolvePromiseAndReturnJson(res, getActivityCountForToday(event.toString()))
+}

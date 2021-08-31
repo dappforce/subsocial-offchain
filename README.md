@@ -33,18 +33,27 @@ yarn start
 + `api` - run only express-api server,
 + `subscribe` - run only subscribe server
 
-## Building from Docker
+## Interaction with off-chain repository via Docker
 
-### Easiest start
+### Start infrastructure
 
-To start Subsocial offchain storage separately (you should have docker-compose):
+Run PostgreSQL, IPFS Node, IPFS Cluster and ElasticSearch in docker containers with one command:
 
 ```sh
-cd docker/
-./compose.sh
+./docker/run.sh
 ```
 
-It will start 3 containers: postgres, elasticsearch and offchain itself.
+Additional options to provide to the development script mentioned above:
+
+- `--stop` - just kills containers, data won't be lost.
+- `--stop --clean` - stops the containers and removes all related docker volumes (data). At the end asks whether to delete `ipfs-data` folder in `./docker/` directory.
+- `+peers` - add an IPFS peer to the starting node. (e.g. `+peers /ip4/<IP_ADDRESS>/tcp/4001/p2p/<PEER_ID>`) 
+
+### Build your own docker image
+
+```sh
+docker build . -f docker/Dockerfile -t subsocial-offchain:latest
+```
 
 ### Start all parts of Subsocial at once with [Subsocial Starter](https://github.com/dappforce/dappforce-subsocial-starter)
 

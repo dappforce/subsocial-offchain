@@ -1,20 +1,19 @@
-import { SubstrateId } from '@subsocial/types';
 import { SubstrateEvent } from '../../substrate/types';
 import { InsertActivityPromise } from '../queries/types';
-import { encodeStructIds } from '../../substrate/utils';
+import { encodeStructIds, encodeStructId } from '../../substrate/utils';
 import { isEmptyArray } from '@subsocial/utils';
 import { emptyParamsLogError } from '../postges-logger';
-import { getValidDate } from '../../substrate/subscribe';
-import { newPgError } from '../utils';
-import { pg } from '../../connections/postgres';
+import { blockNumberToApproxDate } from '../../substrate/utils';
+import { newPgError, runQuery, action } from '../utils';
 import { getAggregationCount } from '../selects/getAggregationCount';
+import { IQueryParams } from '../types/insertActivityForPost.queries';
 
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, space_id, post_id, date, agg_count)
-    VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+    VALUES(:blockNumber, :eventIndex, :account, :event, :spaceId, :postId, :date, :aggCount)
   RETURNING *`
 
-export async function insertActivityForPost(eventAction: SubstrateEvent, ids: SubstrateId[], count?: number): InsertActivityPromise {
+export async function insertActivityForPost(eventAction: SubstrateEvent, ids: string[], count?: number): InsertActivityPromise {
 
   const paramsIds = encodeStructIds(ids)
 
@@ -23,19 +22,29 @@ export async function insertActivityForPost(eventAction: SubstrateEvent, ids: Su
     return undefined
   }
 
-  const [, postId] = paramsIds;
+  const [spaceId, postId] = paramsIds;
   const { eventName, data, blockNumber, eventIndex } = eventAction;
   const accountId = data[0].toString();
+  const encodedBlockNumber = encodeStructId(blockNumber.toString())
 
-  const date = await getValidDate(blockNumber)
+  const date = await blockNumberToApproxDate(blockNumber)
   const newCount = eventName === 'PostShared'
     ? await getAggregationCount({ eventName: eventName, account: accountId, post_id: postId })
     : count;
 
-  const params = [blockNumber, eventIndex, accountId, eventName, ...paramsIds, date, newCount];
+  const params = {
+    blockNumber: encodedBlockNumber,
+    eventIndex,
+    account: accountId,
+    event: eventName as action,
+    spaceId,
+    postId,
+    date,
+    aggCount: newCount
+  };
 
   try {
-    await pg.query(query, params)
+    await runQuery<IQueryParams>(query, params)
   } catch (err) {
     throw newPgError(err, insertActivityForPost)
   }
