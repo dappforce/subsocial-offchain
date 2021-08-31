@@ -14,18 +14,31 @@ import { getSessionKey } from '../../postgres/selects/getSessionKey';
 import { addEmailSettings } from '../../postgres/inserts/insertEmailSettings';
 import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
 import { sendNotifConfirmationLetter } from '../email/confirmation';
+import { clearConfirmationDate } from '../../postgres/updates/clearConfirmationDate';
+import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCountByActivities';
+import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
+import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
+import { setConfirmationDateForSettings } from '../../postgres/updates/setConfirmationDate';
+import { asAccountId } from '@subsocial/api';
+
 import {
   getOffsetFromRequest,
   getLimitFromRequest,
   resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
-import { clearConfirmationDate } from '../../postgres/updates/clearConfirmationDate';
-import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCountByActivities';
-import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
-import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
-import { setConfirmationDateForSettings } from '../../postgres/updates/setConfirmationDate';
 
+type Params = {
+  account: string
+  [key: string]: any
+}
+
+const parseParamsWithAccount = ({ account, ...params }: Record<string, any>): Params => {
+  return {
+    account: asAccountId(account).toString(),
+    ...params
+  }
+}
 
 const activityHandler = (
   req: express.Request,
@@ -34,7 +47,7 @@ const activityHandler = (
 ) => {
   const offset = getOffsetFromRequest(req)
   const limit = getLimitFromRequest(req)
-  const account = req.params.id
+  const { account } = parseParamsWithAccount(req.params)
   return resolvePromiseAndReturnJson(res, method({ account, offset, limit }))
 }
 
@@ -43,7 +56,7 @@ const countHandler = async (
   res: express.Response,
   method: GetCountFn | GetCountsFn
 ) => {
-  const account = req.params.id
+  const { account } = parseParamsWithAccount(req.params)
   return resolvePromiseAndReturnJson(res, method(account))
 }
 
@@ -103,28 +116,28 @@ export const setSessionKeyHandler: HandlerFn = (req, res) =>
   resolvePromiseAndReturnJson(res, addSessionKey(req.body.sessionCall as SessionCall<AddSessionKeyArgs>))
 
 export const getSessionKeyHandler: HandlerFn = (req, res) => {
-  const account = req.query.account as string
+  const { account } = parseParamsWithAccount(req.query)
   return resolvePromiseAndReturnJson(res, getSessionKey(account))
 }
 
 export const getNonceHandler: HandlerFn = (req, res) => {
-  const account = req.query.account as string
+  const { account } = parseParamsWithAccount(req.query)
   return resolvePromiseAndReturnJson(res, getNonce(account))
 }
 
 
 export const setTelegramDataHandler: HandlerFn = (req, res) => {
-  const { account, chatId } = req.body
+  const { account, chatId } = parseParamsWithAccount(req.body)
   return resolvePromiseAndReturnJson(res, setTelegramData(account, Number(chatId)))
 }
 
 export const setCurrentAccountHandler: HandlerFn = (req, res) => {
-  const { account, chatId } = req.body;
+  const { account, chatId } = parseParamsWithAccount(req.body)
   return resolvePromiseAndReturnJson(res, changeCurrentAccount(account.toString(), Number(chatId)))
 }
 
 export const setLastPushHandler: HandlerFn = (req, res) => {
-  const { account, chatId, blockNumber, eventIndex } = req.body;
+  const { account, chatId, blockNumber, eventIndex } = parseParamsWithAccount(req.body)
   return resolvePromiseAndReturnJson(res, updateLastPush(account.toString(), Number(chatId), blockNumber, eventIndex))
 }
 
@@ -134,12 +147,12 @@ export const getAccountByChatIdHandler: HandlerFn = (req, res) => {
 }
 
 export const getTelegramChatHandler: HandlerFn = (req, res) => {
-  const { account, chatId } = req.query;
+  const { account, chatId } = parseParamsWithAccount(req.query)
   return resolvePromiseAndReturnJson(res, getTelegramChat(account.toString(), Number(chatId)))
 }
 
 export const updateTelegramChatHandler: HandlerFn = (req, res) => {
-  const { account, chatId, push_notifs, push_feeds } = req.body;
+  const { account, chatId, push_notifs, push_feeds } = parseParamsWithAccount(req.body)
   return resolvePromiseAndReturnJson(res, updateTelegramChat(account.toString(), Number(chatId), push_notifs, push_feeds))
 }
 
@@ -148,7 +161,7 @@ export const addEmailSettingsHandler: HandlerFn = (req, res) => {
 }
 
 export const getEmailSettingsHandler: HandlerFn = (req, res) => {
-  const account = req.query.account as string
+  const { account } = parseParamsWithAccount(req.query)
   return resolvePromiseAndReturnJson(res, getEmailSettingsByAccount(account))
 }
 
@@ -165,12 +178,12 @@ export const clearConfirmationDateHandler: HandlerFn = (req, res) => {
 }
 
 export const getStatisticDataHandler: HandlerFn = (req, res) => {
-  const {event, period} = req.query
+  const { event, period } = req.query
   return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event.toString(), period.toString()))
 }
 
 export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
-  const {event, period} = req.query
+  const { event, period } = req.query
   return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event.toString(), period.toString()))
 }
 
