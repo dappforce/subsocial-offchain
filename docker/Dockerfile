@@ -9,7 +9,6 @@ COPY . .
 
 COPY localhost.env .env
 RUN NODE_ENV=production yarn build
-RUN yarn cache clean --force
 
 FROM node:14-alpine
 
