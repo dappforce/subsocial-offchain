@@ -14,7 +14,6 @@ import { getSessionKey } from '../../postgres/selects/getSessionKey';
 import { addEmailSettings } from '../../postgres/inserts/insertEmailSettings';
 import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
 import { sendNotifConfirmationLetter } from '../email/confirmation';
-import { clearConfirmationDate } from '../../postgres/updates/clearConfirmationDate';
 import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCountByActivities';
 import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
 import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
