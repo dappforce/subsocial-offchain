@@ -34,7 +34,11 @@ const parseReadFile = (file: Buffer) => {
 const startModerationWatcher = (): ModerationApi => {
   if (!existsSync(blockListFilePath)) {
     log.warn('Moderation file is not found')
-    mkdirSync(stateDirPath)
+
+    if (!existsSync(stateDirPath)) {
+      mkdirSync(stateDirPath)
+    }
+
     writeFileSync(blockListFilePath, JSON.stringify(emptyModerationList))
   }
 
