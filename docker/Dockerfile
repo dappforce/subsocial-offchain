@@ -17,9 +17,9 @@ COPY --from=builder package.json tsconfig.json .env yarn.lock ./
 COPY --from=builder build/ ./build
 COPY --from=builder node_modules/ ./node_modules
 
-RUN yarn add -G concurrently pm2
+RUN yarn global add concurrently pm2
 
 EXPOSE 3001 3011 3012
 
-ENTRYPOINT [ "yarn", "pm2", "start", "--no-daemon" ]
+ENTRYPOINT [ "pm2", "start", "--no-daemon" ]
 CMD [ "yarn init-postgres && yarn start" ]
