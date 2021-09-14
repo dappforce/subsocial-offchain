@@ -9,7 +9,6 @@ COPY . .
 
 COPY localhost.env .env
 RUN NODE_ENV=production yarn build
-RUN yarn cache clean --force
 
 FROM node:14-alpine
 
@@ -17,7 +16,6 @@ WORKDIR /app
 COPY --from=builder package.json tsconfig.json .env yarn.lock ./
 COPY --from=builder build/ ./build
 COPY --from=builder node_modules/ ./node_modules
-COPY block-numbers.csv /app/build
 
 RUN yarn add -G concurrently pm2
 

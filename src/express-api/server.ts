@@ -61,31 +61,31 @@ app.get('/v1/offchain/search', esReqHandlers.searchHandler)
 
 // API endpoints for personal user feed, notifications and all types of activities.
 
-app.get('/v1/offchain/feed/:id', pgReqHandlers.feedHandler)
-app.get('/v1/offchain/feed/:id/count', pgReqHandlers.feedCountHandler)
+app.get('/v1/offchain/feed/:account', pgReqHandlers.feedHandler)
+app.get('/v1/offchain/feed/:account/count', pgReqHandlers.feedCountHandler)
 
-app.get('/v1/offchain/notifications/:id', pgReqHandlers.notificationsHandler)
-app.get('/v1/offchain/notifications/:id/count', pgReqHandlers.notificationsCountHandler)
+app.get('/v1/offchain/notifications/:account', pgReqHandlers.notificationsHandler)
+app.get('/v1/offchain/notifications/:account/count', pgReqHandlers.notificationsCountHandler)
 
-app.get('/v1/offchain/activities/:id', pgReqHandlers.activitiesHandler)
-app.get('/v1/offchain/activities/:id/count', pgReqHandlers.activitiesCountHandler)
+app.get('/v1/offchain/activities/:account', pgReqHandlers.activitiesHandler)
+app.get('/v1/offchain/activities/:account/count', pgReqHandlers.activitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/comments', pgReqHandlers.commentActivitiesHandler)
-app.get('/v1/offchain/activities/:id/comments/count', pgReqHandlers.commentActivitiesCountHandler)
+app.get('/v1/offchain/activities/:account/comments', pgReqHandlers.commentActivitiesHandler)
+app.get('/v1/offchain/activities/:account/comments/count', pgReqHandlers.commentActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/posts', pgReqHandlers.postActivitiesHandler)
-app.get('/v1/offchain/activities/:id/posts/count', pgReqHandlers.postActivitiesCountHandler)
+app.get('/v1/offchain/activities/:account/posts', pgReqHandlers.postActivitiesHandler)
+app.get('/v1/offchain/activities/:account/posts/count', pgReqHandlers.postActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/follows', pgReqHandlers.followActivitiesHandler)
-app.get('/v1/offchain/activities/:id/follows/count', pgReqHandlers.followActivitiesCountHandler)
+app.get('/v1/offchain/activities/:account/follows', pgReqHandlers.followActivitiesHandler)
+app.get('/v1/offchain/activities/:account/follows/count', pgReqHandlers.followActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/reactions', pgReqHandlers.reactionActivitiesHandler)
-app.get('/v1/offchain/activities/:id/reactions/count', pgReqHandlers.reactionActivitiesCountHandler)
+app.get('/v1/offchain/activities/:account/reactions', pgReqHandlers.reactionActivitiesHandler)
+app.get('/v1/offchain/activities/:account/reactions/count', pgReqHandlers.reactionActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/spaces', pgReqHandlers.spaceActivitiesHandler)
-app.get('/v1/offchain/activities/:id/spaces/count', pgReqHandlers.spaceActivitiesCountHandler)
+app.get('/v1/offchain/activities/:account/spaces', pgReqHandlers.spaceActivitiesHandler)
+app.get('/v1/offchain/activities/:account/spaces/count', pgReqHandlers.spaceActivitiesCountHandler)
 
-app.get('/v1/offchain/activities/:id/counts', pgReqHandlers.activityCountsHandler)
+app.get('/v1/offchain/activities/:account/counts', pgReqHandlers.activityCountsHandler)
 
 
 app.post('/v1/offchain/accounts/setSessionKey', pgReqHandlers.setSessionKeyHandler)
