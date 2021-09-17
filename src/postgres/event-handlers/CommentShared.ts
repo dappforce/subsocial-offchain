@@ -6,7 +6,7 @@ import { parseCommentEvent } from '../../substrate/utils';
 import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';
 import { fillNotificationsWithCommentFollowers } from '../fills/fillNotificationsWithCommentFollowers';
 import { insertActivityForComment } from '../inserts/insertActivityForComment';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 
 export const onCommentShared = async (eventAction: SubstrateEvent, comment: NormalizedComment) => {
   const { commentId } = parseCommentEvent(eventAction)

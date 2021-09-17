@@ -1,4 +1,4 @@
-import { informClientAboutUnreadNotifications } from '../../express-api/events';
+import { informClientAboutUnreadNotifications } from '../../ws/events';
 import { log } from '../postges-logger';
 import { getCountOfUnreadNotifications } from '../selects/getCountOfUnreadNotifications';
 import { runQuery } from '../utils';

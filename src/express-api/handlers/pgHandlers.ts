@@ -4,7 +4,7 @@ import { GetActivitiesFn, GetCountFn, GetCountsFn } from '../../postgres/queries
 import { setTelegramData } from '../../postgres/inserts/insertTelegramData'
 import { addSessionKey } from '../../postgres/inserts/insertSessionKey'
 import { getNonce } from '../../postgres/selects/getNonce'
-import { SessionCall, AddSessionKeyArgs, SetUpEmailArgs, ConfirmEmail, ClearConfirmDateArgs } from '../../postgres/types/sessionKey';
+import { SessionCall, AddSessionKeyArgs, SetUpEmailArgs, ConfirmEmail, ConfirmLetter } from '../../postgres/types/sessionKey';
 import { updateTelegramChat } from '../../postgres/updates/updateTelegramChat';
 import { getTelegramChat } from '../../postgres/selects/getTelegramChat';
 import { getAccountByChatId } from '../../postgres/selects/getAccountByChatId';
@@ -14,7 +14,6 @@ import { getSessionKey } from '../../postgres/selects/getSessionKey';
 import { addEmailSettings } from '../../postgres/inserts/insertEmailSettings';
 import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
 import { sendNotifConfirmationLetter } from '../email/confirmation';
-import { clearConfirmationDate } from '../../postgres/updates/clearConfirmationDate';
 import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCountByActivities';
 import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
 import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
@@ -27,6 +26,7 @@ import {
   resolvePromiseAndReturnJson,
   HandlerFn,
 } from '../utils'
+import { Period } from '../../postgres/utils';
 
 type Params = {
   account: string
@@ -166,25 +166,21 @@ export const getEmailSettingsHandler: HandlerFn = (req, res) => {
 }
 
 export const sendConfirmationLetterHandler: HandlerFn = (req, res) => {
-  return resolvePromiseAndReturnJson(res, sendNotifConfirmationLetter(req.body.sessionCall as SessionCall<SetUpEmailArgs>))
+  return resolvePromiseAndReturnJson(res, sendNotifConfirmationLetter(req.body.sessionCall as SessionCall<ConfirmLetter>))
 }
 
 export const confirmEmailForSettingsHandler: HandlerFn = (req, res) => {
   return resolvePromiseAndReturnJson(res, setConfirmationDateForSettings(req.body.sessionCall as SessionCall<ConfirmEmail>))
 }
 
-export const clearConfirmationDateHandler: HandlerFn = (req, res) => {
-  return resolvePromiseAndReturnJson(res, clearConfirmationDate(req.body.sessionCall as SessionCall<ClearConfirmDateArgs>))
-}
-
 export const getStatisticDataHandler: HandlerFn = (req, res) => {
-  const { event, period } = req.query
-  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event.toString(), period.toString()))
+  const {event, period} = req.query
+  return resolvePromiseAndReturnJson(res, getDateAndCountByActivities(event.toString(), period as Period))
 }
 
 export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
-  const { event, period } = req.query
-  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event.toString(), period.toString()))
+  const {event, period} = req.query
+  return resolvePromiseAndReturnJson(res, getActivityCountByEvent(event.toString(), period as Period))
 }
 
 export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {

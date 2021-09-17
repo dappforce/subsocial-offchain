@@ -4,7 +4,7 @@ import { EventHandlerFn } from '../../substrate/types';
 import { insertActivityForSpace } from '../inserts/insertActivityForSpace';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { insertSpaceFollower } from '../inserts/insertSpaceFollower';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 
 export const onSpaceFollowed: EventHandlerFn = async (eventAction) => {
   const { data } = eventAction;

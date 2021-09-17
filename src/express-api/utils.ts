@@ -11,13 +11,12 @@ export type Periodicity = 'Immediately' | 'Daily' | 'Weekly' | 'Never'
 
 export type EmailSettings = {
 	account: string,
-	email: string,
+	original_email: string,
 	periodicity: Periodicity,
 	send_feeds: boolean,
 	send_notifs: boolean,
 	last_block_bumber: number,
 	last_event_index: number,
-	next_leter_date: Dayjs,
 	confirmation_code: string,
 	confirmed_on: Dayjs
 }

@@ -4,7 +4,7 @@ import { parseCommentEvent } from '../../substrate/utils';
 import { VirtualEvents } from '../../substrate/utils';
 import { insertActivityForCommentReaction } from '../inserts/insertActivityForCommentReaction';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 
 export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
   const { author: voter, commentId } = parseCommentEvent(eventAction)

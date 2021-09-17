@@ -4,7 +4,7 @@ import { fillNotificationsWithAccountFollowers } from '../fills/fillNotification
 import { insertActivityForPost } from '../inserts/insertActivityForPost';
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { NormalizedPost } from '../../substrate/normalizers';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 
 export const onRootPostShared = async (eventAction: SubstrateEvent, post: NormalizedPost) => {
   const { author, postId } = parsePostEvent(eventAction)

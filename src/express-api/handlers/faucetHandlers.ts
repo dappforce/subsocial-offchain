@@ -10,6 +10,9 @@ import { registry } from '@subsocial/types/substrate/registry';
 import isEmpty from 'lodash.isempty'
 import { getConfirmationData } from '../../postgres/selects/getConfirmationCode';
 import { checkFaucetIsActive } from '../faucet/status';
+import { getEmailSettingsByAccount } from '../../postgres/selects/getEmailSettings';
+import { nonEmptyStr } from '@subsocial/utils';
+import { asAccountId } from '@subsocial/api'
 
 const getSubsocialAccountId = (account: string) => new GenericAccountId(registry, account).toString()
 
@@ -19,7 +22,7 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
   if (isEmpty(formData)) {
     res.status(400).send({ errors: { account: 'Invalid data' } })
   }
-  
+
   const account = getSubsocialAccountId(formData.account)
   const data = { ...formData, account }
 
@@ -31,19 +34,19 @@ export const confirmEmailHandler: HandlerFn = async (req, res) => {
   const { ok, errors } = await checkWasTokenDrop(data)
 
   if (ok) {
-    const { confirmed_on, email } = await getConfirmationData(account)
+    const { confirmed_on } = await getConfirmationData(account) || {}
 
     if (confirmed_on) {
 
-      const { ok, errors } = await tokenDrop({ account, email })
+      const { ok, errors } = await tokenDrop({ account, email: data.email })
       if (ok) {
         res.status(301);
-        res.json({ ok, data: { message: 'droped' } });
+        res.json({ ok, data: { message: 'dropped' } });
       } else {
         res.status(401).json({ errors })
       }
 
-    } 
+    }
 
     const confirmationCode = await sendFaucetConfirmationLetter(data)
     confirmationCode && await addEmailWithConfirmCode({ ...data, confirmationCode })
@@ -72,11 +75,24 @@ export const tokenDropHandler: HandlerFn = async (req, res) => {
   }
 }
 
-export const getFaucetStatus: HandlerFn = async (_req, res) => {
+export const getFaucetStatus: HandlerFn = async (req, res) => {
+  const account = asAccountId(req.query.account as string)
+
   const { ok, errors } = await checkFaucetIsActive()
 
   if (ok) {
-    res.status(200).send({ ok })
+    let email = null
+
+    if (!account && nonEmptyStr(account)) {
+      const { original_email, expires_on } = await getEmailSettingsByAccount(account) || {}
+      email = !!expires_on ? original_email : null
+    }
+    res.status(200).send({
+      ok,
+      data: !!email
+        ? { email, dropped: true }
+        : undefined
+    })
   } else {
     res.status(403).send({ errors })
   }

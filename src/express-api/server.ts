@@ -7,11 +7,13 @@ import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
 import * as faucetReqHandlers from './handlers/faucetHandlers'
+import * as moderationsHandlers from './handlers/moderationHandlers'
 import { expressApiLog as log } from '../connections/loggers';
 import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigins } from './config';
 import './email/jobs'
 import { port } from '../env';
+import { isEmptyStr } from '@subsocial/utils';
 
 require('dotenv').config()
 
@@ -105,6 +107,7 @@ app.get('/v1/offchain/telegram/getTelegramChat', pgReqHandlers.getTelegramChatHa
 
 app.post('/v1/offchain/telegram/updateTelegramChat', pgReqHandlers.updateTelegramChatHandler)
 
+
 app.post('/v1/offchain/email/addEmailSettings', pgReqHandlers.addEmailSettingsHandler)
 
 app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHandler)
@@ -112,9 +115,6 @@ app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHan
 app.post('/v1/offchain/email/sendConfirmationLetter', pgReqHandlers.sendConfirmationLetterHandler)
 
 app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailForSettingsHandler)
-
-app.post('/v1/offchain/email/clearConfirmDate', pgReqHandlers.clearConfirmationDateHandler)
-
 
 app.get('/v1/offchain/stats/getStatisticData', pgReqHandlers.getStatisticDataHandler)
 
@@ -129,12 +129,19 @@ app.post('/v1/offchain/faucet/drop', faucetReqHandlers.tokenDropHandler)
 
 app.get('/v1/offchain/faucet/status', faucetReqHandlers.getFaucetStatus)
 
-// TODO Rename to '/v1/parseSite'
-app.post('/offchain/parser/', async (req: express.Request, res: express.Response) => {
-  const data = await parseSitePreview(req.body.url)
+app.post('/v1/parseSite', async (req: express.Request, res: express.Response) => {
+  const url = req.body.url
+
+  if (isEmptyStr(url)) {
+    res.status(400).send();
+  }
+
+  const data = await parseSitePreview(url)
   res.send(data);
 })
 
 export const startHttpServer = () => app.listen(port, () => {
   log.info(`HTTP server started on port ${port}`)
 })
+
+app.get('/v1/offchain/moderations/list', moderationsHandlers.getModerationHandler)

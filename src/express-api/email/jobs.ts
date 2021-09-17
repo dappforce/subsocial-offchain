@@ -30,11 +30,6 @@ schedule('0 23 * * 0', async () => {
   await sendNotificationsAndFeeds('Weekly')
 });
 
-const insertEmailTemplatesImages = () => {
-}
-
-insertEmailTemplatesImages()
-
 type ActivitiesWithType = {
   activityType: TemplateType,
   activities: Activity[]
@@ -75,7 +70,7 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
   const emailSettingsArray: EmailSettings[] = await getAllEmailSettings(periodicity)
 
   for (const setting of emailSettingsArray) {
-    const { account, last_block_bumber, last_event_index, email, send_notifs, send_feeds } = setting
+    const { account, last_block_bumber, last_event_index, original_email, send_notifs, send_feeds } = setting
     let lastActivities: Activity[] = []
     // TODO: maybe there's a way to simplify this code and remove potential copy-paste
     if (send_notifs) {
@@ -83,18 +78,20 @@ const sendNotificationsAndFeeds = async (periodicity: string) => {
       const activityType = 'notifications'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      await sendActivitiesEmail(email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
-      if (nonEmptyArr(activities))
+      if (nonEmptyArr(activities)) {
+        await sendActivitiesEmail(original_email, { activityType, activities }, createNotifsEmailMessage, createNofitParams(unreadCount))
         lastActivities.push(activities.pop())
+      }
     }
 
     if (send_feeds) {
       const activityType = 'feed'
       const activities = await getActivitiesForEmailSender(account, new BN(last_block_bumber), last_event_index, TableNameByActivityType[activityType])
 
-      await sendActivitiesEmail(email, { activityType, activities }, createFeedEmailMessage, createFeedParams())
-      if (nonEmptyArr(activities))
+      if (nonEmptyArr(activities)) {
+        await sendActivitiesEmail(original_email, { activityType, activities }, createFeedEmailMessage, createFeedParams())
         lastActivities.push(activities.pop())
+      }
     }
 
     if (nonEmptyArr(lastActivities)) {

@@ -1,6 +1,5 @@
 import { GenericAccountId } from '@polkadot/types/generic';
 import { registry } from '@subsocial/types/substrate/registry';
-import { faucetDripAmount } from '../../env';
 import { insertTokenDrop } from '../../postgres/inserts/insertTokenDrop';
 import { getConfirmationData } from '../../postgres/selects/getConfirmationCode';
 import { setConfirmationDate } from '../../postgres/updates/setConfirmationDate';
@@ -11,26 +10,33 @@ import { BaseConfirmData, FaucetFormData } from "./types";
 import { resolveSubsocialApi } from '../../connections';
 import { newLogger } from '@subsocial/utils';
 import { faucetPair } from './faucetPair';
+import { getFaucetDripAmount } from './utils';
+import BN from 'bn.js';
 
 const log = newLogger(dropTx.name)
 
-export async function dropTx (toAddress: string, insertToDb: (blockNumber: BigInt, eventIndex: number) => void) {
+export async function dropTx (toAddress: string, insertToDb: (blockNumber: BigInt, eventIndex: number, amount: BN) => void) {
 	const { api } = await resolveSubsocialApi()
 
-	const drip = api.tx.faucets.drip(toAddress, faucetDripAmount);
+  const { freeBalance } = await api.derive.balances.all(toAddress)
+  const faucetDripAmount = getFaucetDripAmount()
+
+  const tokenDifference = faucetDripAmount.sub(freeBalance)
+
+	const drip = api.tx.faucets.drip(toAddress, tokenDifference);
 
 	const unsub = await drip.signAndSend(faucetPair, ({ events = [], status }) => {
 		log.debug('Transaction status:', status.type);
-  
+
 		if (status.isInBlock) {
       const blockHash = status.asInBlock.toHex()
 		  log.debug('Included at block hash', blockHash);
-  
+
 			events.forEach(({ event: { method } }, eventIndex) => {
 
         if (method === 'Transfer') { // TODO: replace on 'TokenDrop' event
           api.rpc.chain.getBlock(blockHash).then(({ block: { header: { number }} }) => {
-            insertToDb(BigInt(number.toString()), eventIndex)
+            insertToDb(BigInt(number.toString()), eventIndex, tokenDifference)
           })
 				}
 			});
@@ -53,7 +59,7 @@ export const tokenDrop = async ({ account, email }: Omit<FaucetFormData, 'token'
       event_index,
       faucet: getFaucetPublicKey(),
       account,
-      amount: faucetDripAmount.toNumber(),
+      amount: getFaucetDripAmount().toNumber(),
       email,
       captcha_solved: true
     }))
@@ -64,7 +70,7 @@ export const tokenDrop = async ({ account, email }: Omit<FaucetFormData, 'token'
 export const confirmAndTokenDrop = async ({ account: clientSideAccount, confirmationCode }: BaseConfirmData): Promise<OkOrError> => {
   const account = new GenericAccountId(registry, clientSideAccount).toString()
   try {
-    const { email } = await getConfirmationData(account)
+    const { original_email: email } = await getConfirmationData(account)
     const { ok, errors } = await setConfirmationDate({ account, confirmationCode })
 
     if (ok) {

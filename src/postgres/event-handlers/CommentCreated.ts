@@ -9,7 +9,7 @@ import { fillNotificationsWithAccountFollowers } from '../fills/fillNotification
 import { insertNotificationForOwner } from '../inserts/insertNotificationForOwner';
 import { asNormalizedComment, NormalizedComment } from '../../substrate/normalizers';
 import { findPost } from '../../substrate/api-wrappers';
-import { informTelegramClientAboutNotifOrFeed } from '../../express-api/events';
+import { informTelegramClientAboutNotifOrFeed } from '../../ws/events';
 
 export const onCommentCreated = async (eventAction: SubstrateEvent, post: NormalizedComment) => {
   const { author, commentId } = parseCommentEvent(eventAction)

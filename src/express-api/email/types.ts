@@ -16,7 +16,8 @@ export type FeedTemplateProp = {
 	postLink: string,
 	postSummary: string,
 	date: string,
-	image?: string
+	image?: string,
+	ext?: FeedTemplateProp
 }
 
 export type ConfirmationProp = {
@@ -25,5 +26,3 @@ export type ConfirmationProp = {
 	image?: string,
 	buttonText?: string
 }
-
-
