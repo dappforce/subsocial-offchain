@@ -17,7 +17,7 @@ export const checkDropByAccountAndEmail = async (formatted_email: string): Promi
 		const data = await runQuery(query, { formatted_email })
 		return data.rows[0] || {} as Result
 	} catch (err) {
-		log.error(`Failed to check drop by email(${formatted_email}):`, err.stack)
+		log.error(`Failed to check drop by email (${formatted_email}):`, err.stack)
 		throw err
 	}
 }

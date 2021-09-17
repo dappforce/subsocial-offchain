@@ -1,7 +1,7 @@
 import { LetterParams, sendEmail } from './emailSender';
 import { v4 } from 'uuid'
 import { appBaseUrl, subsocialLogo } from '../../env';
-import { setConfirmationCode } from '../../postgres/updates/setConfirmationCode';
+import { setConfirmationCodeForNewEmail } from '../../postgres/updates/setConfirmationCode';
 import { SessionCall, ConfirmLetter } from '../../postgres/types/sessionKey';
 import { ConfirmationProp } from './types';
 import { newLogger } from '@subsocial/utils';
@@ -52,7 +52,7 @@ export const sendNotifConfirmationLetter = async (sessionCall: SessionCall<Confi
 			email, url: 'settings/email/confirm-email',
 			customTemplate: { message: confirmationMsgForSetting },
 		})
-		confirmationCode && await setConfirmationCode(sessionCall, confirmationCode)
+		confirmationCode && await setConfirmationCodeForNewEmail(sessionCall, confirmationCode)
 	} catch (err) {
     log.error("Error", err)
   }
