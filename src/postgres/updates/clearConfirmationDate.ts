@@ -7,15 +7,15 @@ const query = `
   WHERE account = :account AND formatted_email != :formattedEmail
   RETURNING *`
 
-export async function clearConfirmationDate(account: string, email: string) {
+/** Clear confirmation date for old emails of this account. */
+export async function clearConfirmationForOldEmails(account: string, email: string) {
   const formattedEmail = formatEmail(email)
   try {
     const params = { account, formattedEmail };
     const res = await runQuery(query, params)
-    if (!res?.rows[0])
-      return false
+    if (!res?.rows[0]) return false
     return true
   } catch (err) {
-    throw newPgError(err, clearConfirmationDate)
+    throw newPgError(err, clearConfirmationForOldEmails)
   }
 }

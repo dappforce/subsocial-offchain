@@ -5,7 +5,7 @@ import { updateNonce } from '../updates/updateNonce';
 import { getExpiresOnDate } from '../../express-api/email/utils';
 import { Periodicity } from '../../express-api/utils';
 import { formatEmail } from '@subsocial/utils/email';
-import { clearConfirmationDate } from '../updates/clearConfirmationDate';
+import { clearConfirmationForOldEmails } from '../updates/clearConfirmationDate';
 
 type RequireEmailSettingsParams = {
 	account: string,
@@ -14,9 +14,9 @@ type RequireEmailSettingsParams = {
 
 const addEmailSettingsQuery = `
   INSERT INTO df.email_settings (account, original_email, formatted_email, periodicity, send_feeds, send_notifs)
-  VALUES(:account, :email, :formatted_email, :periodicity, :send_feeds, :send_notifs)
+  VALUES(:account, :original_email, :formatted_email, :periodicity, :send_feeds, :send_notifs)
   ON CONFLICT (account) DO UPDATE
-  SET original_email = :email,
+  SET original_email = :original_email,
 	formatted_email = :formatted_email,
 	periodicity = :periodicity,
 	send_feeds = :send_feeds,
@@ -38,10 +38,10 @@ export const addEmailSettings = async (sessionCall: SessionCall<SetUpEmailArgs>)
 
 		log.debug(`Signature verified`)
 		try {
-			await clearConfirmationDate(rootAddress, email)
+			await clearConfirmationForOldEmails(rootAddress, email)
 
 			const formatted_email = formatEmail(email)
-			const res = await runQuery(addEmailSettingsQuery, { account: rootAddress, email, formatted_email, periodicity, send_feeds, send_notifs })
+			const res = await runQuery(addEmailSettingsQuery, { account: rootAddress, original_email: email, formatted_email, periodicity, send_feeds, send_notifs })
 			await updateNonce(account, message.nonce + 1)
 			log.debug(`Insert email settings in database: ${rootAddress}`)
 			return res.rows
@@ -59,9 +59,9 @@ type AddEmailWithConfirmCodeParams = RequireEmailSettingsParams & {
 
 const addEmailWithConfirmCodeQuery = `
   INSERT INTO df.email_settings (account, original_email, formatted_email, periodicity, send_feeds, send_notifs, confirmation_code, expires_on)
-  VALUES(:account, :email, :formatted_email, :periodicity, :send_feeds, :send_notifs, :confirmationCode, :expiresOn)
+  VALUES(:account, :original_email, :formatted_email, :periodicity, :send_feeds, :send_notifs, :confirmationCode, :expiresOn)
   ON CONFLICT (account) DO UPDATE
-	SET original_email = :email,
+	SET original_email = :original_email,
 	formatted_email = :formatted_email,
 	confirmation_code = :confirmationCode,
 	expires_on = :expiresOn`
@@ -73,7 +73,7 @@ export const addEmailWithConfirmCode = async ({ periodicity = 'Never', email, ..
 	try {
 		await runQuery(addEmailWithConfirmCodeQuery, {
 			...params,
-			email,
+			original_email: email,
 			formatted_email,
 			periodicity,
 			expiresOn,

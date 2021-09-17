@@ -18,12 +18,9 @@ const log = newLogger(dropTx.name)
 export async function dropTx (toAddress: string, insertToDb: (blockNumber: BigInt, eventIndex: number, amount: BN) => void) {
 	const { api } = await resolveSubsocialApi()
 
-  const { freeBalance } = await api.derive.balances.all(toAddress)
   const faucetDripAmount = getFaucetDripAmount()
 
-  const tokenDifference = faucetDripAmount.sub(freeBalance)
-
-	const drip = api.tx.faucets.drip(toAddress, tokenDifference);
+	const drip = api.tx.faucets.drip(toAddress, faucetDripAmount);
 
 	const unsub = await drip.signAndSend(faucetPair, ({ events = [], status }) => {
 		log.debug('Transaction status:', status.type);
@@ -36,7 +33,7 @@ export async function dropTx (toAddress: string, insertToDb: (blockNumber: BigIn
 
         if (method === 'Transfer') { // TODO: replace on 'TokenDrop' event
           api.rpc.chain.getBlock(blockHash).then(({ block: { header: { number }} }) => {
-            insertToDb(BigInt(number.toString()), eventIndex, tokenDifference)
+            insertToDb(BigInt(number.toString()), eventIndex, faucetDripAmount)
           })
 				}
 			});

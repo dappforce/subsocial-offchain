@@ -4,7 +4,7 @@ import { EVENT_SEND_FOR_TELEGRAM, eventEmitter, Type } from './events';
 import { offchainTWSPort } from '../env';
 import BN from 'bn.js';
 import { getActivity } from '../postgres/selects/getActivity';
-import { getChatIdByAccount } from '../postgres/selects/getChatIdByAccount';
+import { getChatDataByAccount } from '../postgres/selects/getChatIdByAccount';
 import { ChatIdType } from './types';
 import { Activity } from '@subsocial/types';
 
@@ -39,7 +39,7 @@ export function startNotificationsServerForTelegram() {
 
 		eventEmitter.addListener(EVENT_SEND_FOR_TELEGRAM, async (account: string, whom: string, blockNumber: BN, eventIndex: number, type: Type) => {
 			const activity = await getActivity(account, blockNumber, eventIndex)
-			const chats: ChatIdType[] = await getChatIdByAccount(whom)
+			const chats: ChatIdType[] = await getChatDataByAccount(whom)
 
 			if (!isEmptyArray(chats) && activity) {
 				const chatIds = chats.map((chat) => chat.chat_id)

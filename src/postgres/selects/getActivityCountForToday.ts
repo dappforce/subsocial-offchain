@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 const createQuery = (table: Tables) => {
   const event = table === 'activities' ? 'event = any(:event::df.action[]) AND' : ''
 
-  return `SELECT  count(*) FROM df.${table}
+  return `SELECT count(*) FROM df.${table}
     WHERE ${event} to_char(date_trunc('day', date), 'YYYY-MM-DD') = :date`
 }
 

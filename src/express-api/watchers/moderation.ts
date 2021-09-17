@@ -44,7 +44,7 @@ const startModerationWatcher = (): ModerationApi => {
 
   const moderationApi = new ModerationApi(parseReadFile(readFileSync(blockListFilePath)))
 
-  log.info('Start watching')
+  log.info('Start watching of moderation config file')
   
   watch(blockListFilePath, async (type) => {
     if (type === CHANGE) {

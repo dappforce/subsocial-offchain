@@ -11,7 +11,7 @@ const query = `
   WHERE account = :account AND formatted_email = :formattedEmail
   RETURNING *`
 
-export async function setConfirmationCode(sessionCall: SessionCall<ConfirmLetter>, confirmationCode: string) {
+export async function setConfirmationCodeForNewEmail(sessionCall: SessionCall<ConfirmLetter>, confirmationCode: string) {
   const { account, signature, message } = sessionCall
 
   const { nonce, rootAddress } = await upsertNonce(account, message)
@@ -34,7 +34,7 @@ export async function setConfirmationCode(sessionCall: SessionCall<ConfirmLetter
       return res.rows[0]
 
     } catch (err) {
-      throw newPgError(err, setConfirmationCode)
+      throw newPgError(err, setConfirmationCodeForNewEmail)
     }
   }
 }
