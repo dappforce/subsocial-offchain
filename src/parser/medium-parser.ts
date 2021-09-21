@@ -19,7 +19,7 @@ type TableItem = {
 const parse = async () => {
   const dataArr = await csv().fromFile(CSV_PATH) as TableItem[]
   const mediumUrls = dataArr.map(({ Medium }) => Medium).filter(x => nonEmptyStr(x) && x !== '-')
-  log.info('Parsed medium urls: %o', mediumUrls)
+  log.debug('Parsed medium urls: %o', mediumUrls)
   const abouts = await parseMedium(mediumUrls)
 
   if (isEmptyArray(abouts)) throw abouts
