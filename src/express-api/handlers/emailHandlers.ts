@@ -5,8 +5,8 @@ import { GenericAccountId } from '@polkadot/types';
 import registry from '@subsocial/types/substrate/registry'
 
 type EmailSettingsParams = {
-	account: string,
-	email: string,
+  account: string,
+  email: string,
   periodicity?: Periodicity
 }
 
