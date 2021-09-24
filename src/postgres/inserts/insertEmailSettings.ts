@@ -7,7 +7,7 @@ import { Periodicity } from '../../express-api/utils';
 import { formatEmail } from '@subsocial/utils/email';
 import { clearConfirmationForOldEmails } from '../updates/clearConfirmationDate';
 
-type RequireEmailSettingsParams = {
+export type RequireEmailSettingsParams = {
 	account: string,
 	email: string,
 }

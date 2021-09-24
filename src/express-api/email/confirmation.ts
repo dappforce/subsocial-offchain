@@ -14,7 +14,7 @@ type SendConfirmationLetterParams = LetterParams & {
 	args?: Record<string,string>
 }
 
-const confirmationMsgForSetting = `Now you need to confirm your email address by clicking the button below. After confirmation, you will be able
+export const confirmationMsgForSetting = `Now you need to confirm your email address by clicking the button below. After confirmation, you will be able
 to receive notifications and feed updates depending on the settings on the Settings page.`
 
 const confirmationMsg = `Now you need to confirm your email address by clicking the button below.`
@@ -40,7 +40,7 @@ export async function sendConfirmationLetter ({ email, url, args, customTemplate
 		log.error("Failed send confirmation:", err)
 		return undefined
   }
-  
+
 }
 
 export const sendNotifConfirmationLetter = async (sessionCall: SessionCall<ConfirmLetter>)  => {
