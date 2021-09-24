@@ -69,7 +69,6 @@ const addEmailWithConfirmCodeQuery = `
 export const addEmailWithConfirmCode = async ({ periodicity = 'Never', email, ...params }: AddEmailWithConfirmCodeParams) => {
 	const expiresOn = getExpiresOnDate()
 	const formatted_email = formatEmail(email)
-	console.log(expiresOn)
 
 	try {
 		await runQuery(addEmailWithConfirmCodeQuery, {
