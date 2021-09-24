@@ -7,7 +7,7 @@ import { Periodicity } from '../../express-api/utils';
 import { formatEmail } from '@subsocial/utils/email';
 import { clearConfirmationForOldEmails } from '../updates/clearConfirmationDate';
 
-type RequireEmailSettingsParams = {
+export type RequireEmailSettingsParams = {
 	account: string,
 	email: string,
 }
@@ -69,6 +69,7 @@ const addEmailWithConfirmCodeQuery = `
 export const addEmailWithConfirmCode = async ({ periodicity = 'Never', email, ...params }: AddEmailWithConfirmCodeParams) => {
 	const expiresOn = getExpiresOnDate()
 	const formatted_email = formatEmail(email)
+	console.log(expiresOn)
 
 	try {
 		await runQuery(addEmailWithConfirmCodeQuery, {

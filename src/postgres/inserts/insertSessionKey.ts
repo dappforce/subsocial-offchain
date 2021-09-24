@@ -25,6 +25,7 @@ export async function addSessionKey(sessionCall: SessionCall<AddSessionKeyArgs>)
   }
   if (parseInt(selectedNonce.toString()) === message.nonce) {
     const isValid = isValidSignature(sessionCall)
+    console.log(isValid)
     if (!isValid) {
       log.error("Signature is not valid: function addSessionKey")
       return

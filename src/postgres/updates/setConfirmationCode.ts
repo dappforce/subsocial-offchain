@@ -24,6 +24,7 @@ export async function setConfirmationCodeForNewEmail(sessionCall: SessionCall<Co
     }
     log.debug(`Signature verified`)
     const expiresOn = getExpiresOnDate()
+    console.log(expiresOn)
 
     const formattedEmail = formatEmail(message.args.email)
 

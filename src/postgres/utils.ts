@@ -43,7 +43,9 @@ export const runQuery = async <T>(query: string, params?: T) => {
 
 export const isValidSignature = (sessionCall: SessionCall<MessageGenericExtends>) => {
   const { message, signature, account } = sessionCall
+  console.log(message, signature, account)
   const signedMessage = JSON.stringify(sortObj(message))
+  console.log(message, signedMessage)
   return signatureVerify(signedMessage, signature, account).isValid
 }
 

@@ -6,13 +6,14 @@ import multer from 'multer';
 import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
+import * as emailHandlers from './handlers/emailHandlers'
 import * as faucetReqHandlers from './handlers/faucetHandlers'
 import * as moderationHandlers from './handlers/getBlockListHandler'
 import { expressApiLog as log } from '../connections/loggers';
 import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigins } from './config';
 import './email/jobs'
-import { port } from '../env';
+import { port } from '../env'
 import { isEmptyStr } from '@subsocial/utils';
 
 require('dotenv').config()
@@ -115,6 +116,9 @@ app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHan
 app.post('/v1/offchain/email/sendConfirmationLetter', pgReqHandlers.sendConfirmationLetterHandler)
 
 app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailForSettingsHandler)
+
+app.post('/v1/offchain/email/confirm', emailHandlers.confirmEmailHandler)
+
 
 app.get('/v1/offchain/stats/getStatisticData', pgReqHandlers.getStatisticDataHandler)
 
