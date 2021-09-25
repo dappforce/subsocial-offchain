@@ -14,8 +14,8 @@ type SendConfirmationLetterParams = LetterParams & {
 	args?: Record<string,string>
 }
 
-export const confirmationMsgForSetting = `Now you need to confirm your email address by clicking the button below. After confirmation, you will be able
-to receive notifications and feed updates depending on the settings on the Settings page.`
+export const confirmationMsgForSetting = `Please confirm your email address by clicking on the button below.
+	After confirmation, you will be able to receive notifications and feed updates, depending on your settings.`
 
 const confirmationMsg = `Now you need to confirm your email address by clicking the button below.`
 
