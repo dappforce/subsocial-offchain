@@ -35,7 +35,7 @@ type Params = {
 
 const parseParamsWithAccount = ({ account, ...params }: Record<string, any>): Params => {
   return {
-    account: asAccountId(account).toString(),
+    account: asAccountId(account)?.toString(),
     ...params
   }
 }
