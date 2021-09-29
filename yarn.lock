@@ -274,13 +274,6 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.15.3", "@babel/runtime@^7.15.4":
-  version "7.15.4"
-  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.15.4.tgz#fd17d16bfdf878e6dd02d19753a39fa8a8d9c84a"
-  integrity sha512-99catp6bHCaxr4sJ/DbTGgHS4+Rs2RVd2g7iOap6SLGPDknRK9ztKNsE/Fg6QhSeh1FGE5f6gHGQmvvn3I3xhw==
-  dependencies:
-    regenerator-runtime "^0.13.4"
-
 "@babel/template@^7.12.13", "@babel/template@^7.4.0":
   version "7.12.13"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.12.13.tgz#530265be8a2589dbb37523844c5bcb55947fb327"
@@ -826,35 +819,35 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@6.0.3-dev.1":
-  version "6.0.3-dev.1"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-6.0.3-dev.1.tgz#75bd125e737f215d1a719d580a8f97ccac4b6f1c"
-  integrity sha512-RyLKSFYhYyKWVdrgimE2fMW0qKndWaYTlY3sRqmrxRONclN8y4dYXsgq8uok1c9ccq7zAb3hc4+6qPtjpnwIYQ==
+"@subsocial/api@0.6.3-dev.1":
+  version "0.6.3-dev.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.6.3-dev.1.tgz#c52bb3d7703a264e1b2c9135169195988511d72d"
+  integrity sha512-Ie8eIgCpEi6v/XPfvazmDZsOHiRkLaqXYx6C8ZoZNR+l0ganSq2ZeoBFEu9V4aejbNdg7fjEfbVb6Y3FAAcrfg==
   dependencies:
     "@polkadot/api" "6.0.5"
-    "@subsocial/types" "^6.0.3-dev.1"
-    "@subsocial/utils" "^6.0.3-dev.1"
+    "@subsocial/types" "^0.6.3-dev.1"
+    "@subsocial/utils" "^0.6.3-dev.1"
     axios "^0.21.2"
 
-"@subsocial/config@^0.4.25":
-  version "0.4.25"
-  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.4.25.tgz#2a5060bce66db2a6a778916dbc6936042645313d"
-  integrity sha512-iCwiWneWbbYdOELjCzUshfelsYvD6Rnhmcz+FU0DCOIQaXFTS2JBfBsK1TYLhYOjJEluhpBmxE7vKZPhO7isbw==
+"@subsocial/config@0.6.3-dev.1":
+  version "0.6.3-dev.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.6.3-dev.1.tgz#b412602753284b4e671efbd281c8315a9b37999b"
+  integrity sha512-LgBQMaiBwAr8zJ9LGddFHmNOnukE+rVzntB8OLn+a4LVQQOgqrkeXjptNEHJPCK5gg+ftt8rvkLH08HiRI0TKA==
 
-"@subsocial/types@6.0.3-dev.1", "@subsocial/types@^6.0.3-dev.1":
-  version "6.0.3-dev.1"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-6.0.3-dev.1.tgz#b22a879f664391a61605ab6913f0477b2b2db0ee"
-  integrity sha512-+iZPFoqj/bhkymuf4e2pGoMKvSwPgII7NeLlAHodLgFRcaBaV+Uk0DOzBhOIcc2Zp6OVhjfzp1hfhv4xyrE5rQ==
+"@subsocial/types@0.6.3-dev.1", "@subsocial/types@^0.6.3-dev.1":
+  version "0.6.3-dev.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.6.3-dev.1.tgz#cd2a1d9b2d8c08a12d9c98e253a17dc363ec8ae1"
+  integrity sha512-mBTghOs2nme7SXpmnDc0uELSi+o4hyFSgD69NpHSrU+rQVr4Tv5u0CbS8GleZJR7SR9YaElsVeDVmOhf5vDxiw==
   dependencies:
     "@polkadot/types" "^6.0.5"
     "@polkadot/types-known" "^6.0.5"
-    "@subsocial/utils" "^6.0.3-dev.1"
+    "@subsocial/utils" "^0.6.3-dev.1"
     cids "^0.7.1"
 
-"@subsocial/utils@6.0.3-dev.1", "@subsocial/utils@^6.0.3-dev.1":
-  version "6.0.3-dev.1"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-6.0.3-dev.1.tgz#abbc7f1e1626d347a54fdb42fb7bd6e8b46a7f98"
-  integrity sha512-lo9zoLFWkreJWr+uxAcPWp17HJJeAf9pl253J0fT+6DO85lWWJAI8hEp3D75LPAgPleZibF9a8XVyVFE4saTUw==
+"@subsocial/utils@0.6.3-dev.1", "@subsocial/utils@^0.6.3-dev.1":
+  version "0.6.3-dev.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.6.3-dev.1.tgz#9d7d05e2c3c75ef04fcad78bc09d8cf615270916"
+  integrity sha512-9g/yNFvS1XVewjHycmuVsmwNlfVTnPZ0GqCImlwfPJJzQ6iXqTGxx1XkHwPeTpL4WSQ45z+Is9zM16GOUxRxgQ==
   dependencies:
     "@sindresorhus/slugify" "^1.1.0"
     bn.js "^5.1.1"
