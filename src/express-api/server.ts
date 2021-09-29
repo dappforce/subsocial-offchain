@@ -11,19 +11,29 @@ import * as faucetReqHandlers from './handlers/faucetHandlers'
 import * as moderationHandlers from './handlers/getBlockListHandler'
 import { expressApiLog as log } from '../connections/loggers';
 import timeout from 'connect-timeout';
-import { reqTimeoutSecs, maxFileSizeBytes, allowedOrigins } from './config';
+import { reqTimeoutSecs, maxFileSizeBytes } from './config';
 import './email/jobs'
-import { port } from '../env'
+import { corsAllowedList, isAllCorsAllowed, port } from '../env'
 import { isEmptyStr } from '@subsocial/utils';
 
 require('dotenv').config()
 
 const app = express()
 
-app.use(cors((req, callback) => {
-  const origin = req.method === 'GET' ? '*' : allowedOrigins
-  callback(null, { origin })
-}))
+const corsOpts = function (req: express.Request, callback) {
+  const corsOptions = { origin: false };
+
+  if (isAllCorsAllowed ||
+    req.method === 'GET' ||
+    corsAllowedList.indexOf(req.header('Origin')) !== -1
+  ) {
+    corsOptions.origin = true // reflect (enable) the requested origin in the CORS response
+  }
+
+  callback(null, corsOptions) // callback expects two parameters: error and options
+}
+
+app.use(cors(corsOpts))
 
 function haltOnTimedout(req: express.Request, _res: express.Response, next) {
   if (!req.timedout) next()

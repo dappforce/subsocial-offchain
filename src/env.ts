@@ -25,3 +25,6 @@ export const subsocialLogo = `https://app.subsocial.network/ipfs/ipfs/Qmasp4JHhQ
 export const faucetMnemonic = process.env.FAUCET_MNEMONIC
 
 export const faucetDripAmount = parseFloat(process.env.FAUCET_DRIP_AMOUNT || '0')
+
+export const corsAllowedList = process.env.CORS_ALLOWED_ORIGIN.split(',')
+export const isAllCorsAllowed = corsAllowedList[0] === '*'
