@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS df.moderation
   entity_id varchar(54) NULL,
   blocked boolean NULL default false,
   scope_id bigint NOT NULL,
-  PRIMARY KEY (entity_kind, entity_num_id, entity_str_id, scope_id)
+  PRIMARY KEY (entity_kind, entity_id, scope_id)
 );
 
 ALTER TYPE df.action ADD VALUE 'EntityReported';
