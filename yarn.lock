@@ -819,40 +819,68 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@0.6.3-dev.1":
-  version "0.6.3-dev.1"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.6.3-dev.1.tgz#c52bb3d7703a264e1b2c9135169195988511d72d"
-  integrity sha512-Ie8eIgCpEi6v/XPfvazmDZsOHiRkLaqXYx6C8ZoZNR+l0ganSq2ZeoBFEu9V4aejbNdg7fjEfbVb6Y3FAAcrfg==
+"@subsocial/api@0.6.4-moderation.1":
+  version "0.6.4-moderation.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.6.4-moderation.1.tgz#8049e710c00d320bcd909630e396c05036db5e6a"
+  integrity sha512-Bq1wL8Pd8q3SAv3Sz36JDKh97S8Ld/2TvCAyQ670Ckq0ZmPdZwCfl7gWofLhQ3PnsdnEaexaOklkMwgnWMDRig==
   dependencies:
     "@polkadot/api" "6.0.5"
-    "@subsocial/types" "^0.6.3-dev.1"
-    "@subsocial/utils" "^0.6.3-dev.1"
+    "@subsocial/types" "^0.6.4-moderation.1"
+    "@subsocial/utils" "^0.6.4-moderation.1"
     axios "^0.21.2"
 
-"@subsocial/config@0.6.3-dev.1":
-  version "0.6.3-dev.1"
-  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.6.3-dev.1.tgz#b412602753284b4e671efbd281c8315a9b37999b"
-  integrity sha512-LgBQMaiBwAr8zJ9LGddFHmNOnukE+rVzntB8OLn+a4LVQQOgqrkeXjptNEHJPCK5gg+ftt8rvkLH08HiRI0TKA==
+"@subsocial/config@0.6.4-moderation.1":
+  version "0.6.4-moderation.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.6.4-moderation.1.tgz#bd7ec49660a0fbd5b3b3170e27c66687ce20f899"
+  integrity sha512-ORful5lLFlPIrKMFDTHT2HizB3j7Rat1YqlFETV2routA2LsYLrPKtNbJokBDUCvwqV32TbQH7nbC0ywLEc0IQ==
 
-"@subsocial/types@0.6.3-dev.1", "@subsocial/types@^0.6.3-dev.1":
-  version "0.6.3-dev.1"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.6.3-dev.1.tgz#cd2a1d9b2d8c08a12d9c98e253a17dc363ec8ae1"
-  integrity sha512-mBTghOs2nme7SXpmnDc0uELSi+o4hyFSgD69NpHSrU+rQVr4Tv5u0CbS8GleZJR7SR9YaElsVeDVmOhf5vDxiw==
+"@subsocial/types@0.6.4-moderation.1":
+  version "0.6.4-moderation.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.6.4-moderation.1.tgz#77f173630cbfa19e9cb03e4fc470bb424756cfba"
+  integrity sha512-uxsDdBa1VTngKNkDwkdoNwtL46nTdljSFizLWkDhjcSED4Q/0dzWa2dXseS+f1DbIWLwwELmJxDZUf9Ob+sdoA==
   dependencies:
     "@polkadot/types" "^6.0.5"
     "@polkadot/types-known" "^6.0.5"
-    "@subsocial/utils" "^0.6.3-dev.1"
+    "@subsocial/utils" "^0.6.4-moderation.1"
     cids "^0.7.1"
 
-"@subsocial/utils@0.6.3-dev.1", "@subsocial/utils@^0.6.3-dev.1":
-  version "0.6.3-dev.1"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.6.3-dev.1.tgz#9d7d05e2c3c75ef04fcad78bc09d8cf615270916"
-  integrity sha512-9g/yNFvS1XVewjHycmuVsmwNlfVTnPZ0GqCImlwfPJJzQ6iXqTGxx1XkHwPeTpL4WSQ45z+Is9zM16GOUxRxgQ==
+"@subsocial/types@^0.6.4-moderation.1":
+  version "0.6.4-rn.2"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.6.4-rn.2.tgz#29b8a11f053e0f6cdb47b208d56943a4218c2e66"
+  integrity sha512-tJMUucVS3U7CaBrTiDAeeEo+Eo8Zc4XY9iID//sy3u9ybFgAe/dxFGtzWy2vdQaXKQOQyDoDLo2hEDxqVChpFQ==
+  dependencies:
+    "@polkadot/types" "^6.0.5"
+    "@polkadot/types-known" "^6.0.5"
+    "@subsocial/utils" "^0.6.4-rn.2"
+    cids "^0.7.1"
+
+"@subsocial/utils@0.6.4-moderation.1":
+  version "0.6.4-moderation.1"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.6.4-moderation.1.tgz#b82c64da22a589904c22069eca4857e4183f584c"
+  integrity sha512-JEL4cyEF11rc94hqJZhO21EktcgVotmwLUeyhHLpQyUMP/1nEETgRVZaABenV30xBP+XlUmAo4bWf8+nox0lIA==
   dependencies:
     "@sindresorhus/slugify" "^1.1.0"
     bn.js "^5.1.1"
     chalk "^3.0.0"
     dotenv "^8.0.0"
+    lodash.isempty "^4.4.0"
+    lodash.memoize "^4.1.2"
+    lodash.truncate "^4.4.2"
+    loglevel "^1.7.0"
+    loglevel-plugin-prefix "^0.8.4"
+    remark "^13.0.0"
+    remark-gfm "^1.0.0"
+    remark-html "^13.0.1"
+    strip-markdown "^4.0.0"
+
+"@subsocial/utils@^0.6.4-moderation.1", "@subsocial/utils@^0.6.4-rn.2":
+  version "0.6.4-rn.2"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.6.4-rn.2.tgz#587a627cc43c8b47b4965bf1b90ec21b95270b56"
+  integrity sha512-XjwrSgQ/pnkLa6IiLLX5F+NTkaKRCXeLP8hB/lc9AHGotUbTyLWy97vgRayVE94Cb8EbnLjANSXRAyKpaPcx2w==
+  dependencies:
+    "@sindresorhus/slugify" "^1.1.0"
+    bn.js "^5.1.1"
+    chalk "^3.0.0"
     lodash.isempty "^4.4.0"
     lodash.memoize "^4.1.2"
     lodash.truncate "^4.4.2"

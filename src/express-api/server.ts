@@ -8,7 +8,7 @@ import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
 import * as emailHandlers from './handlers/emailHandlers'
 import * as faucetReqHandlers from './handlers/faucetHandlers'
-import * as moderationHandlers from './handlers/getBlockListHandler'
+import * as moderationHandlers from './handlers/moderationHandlers'
 import { expressApiLog as log } from '../connections/loggers';
 import timeout from 'connect-timeout';
 import { reqTimeoutSecs, maxFileSizeBytes } from './config';
@@ -158,4 +158,4 @@ export const startHttpServer = () => app.listen(port, () => {
   log.info(`HTTP server started on port ${port}`)
 })
 
-app.get('/v1/offchain/moderation/list', moderationHandlers.getBlockListHandler)
+app.get('/v1/offchain/moderation/status/:kind/:id', moderationHandlers.getEntityStatusByEntityKindHandler)

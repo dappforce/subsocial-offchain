@@ -18,4 +18,9 @@ export type SubstrateEvent = {
   eventIndex: number
 }
 
+export type EntityKind = 'Space'
+  | 'Post'
+  | 'Account'
+  | 'Content'
+
 export type EventHandlerFn = (event: SubstrateEvent) => Promise<void>

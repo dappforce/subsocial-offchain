@@ -1,7 +1,7 @@
 import { Option } from '@polkadot/types'
 import { Event } from '@polkadot/types/interfaces'
 import { newLogger } from '@subsocial/utils'
-import { SubstrateEvent } from './types'
+import { EntityKind, SubstrateEvent } from './types'
 import BN from 'bn.js';
 import { resolveSubsocialApi } from '../connections/subsocial';
 import dayjs from 'dayjs'
@@ -86,4 +86,22 @@ export const blockNumberToApproxDate = async (eventBlock: BN) => {
   const result = currentTimestamp.sub(lastBlockNumber.sub(new BN(eventBlock)).muln(blockTime))
 
   return dayjs(result.toNumber())
+}
+
+const entityWithNumId = [ 'Post', 'Space' ] as EntityKind[]
+
+export const parseModerationEntity = (entityKind: EntityKind, entityValue: string) => {
+  let entityNumId: bigint | null = null
+  let entityStrId: string | null = null
+
+  if (entityWithNumId.includes(entityKind)) {
+    entityNumId = encodeStructId(entityValue)
+  } else {
+    entityStrId = entityValue
+  }
+
+  return {
+    entityNumId,
+    entityStrId
+  }
 }
