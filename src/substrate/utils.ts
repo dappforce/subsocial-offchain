@@ -5,6 +5,7 @@ import { EntityKind, SubstrateEvent } from './types'
 import BN from 'bn.js';
 import { resolveSubsocialApi } from '../connections/subsocial';
 import dayjs from 'dayjs'
+import { EntityId } from '@subsocial/types/substrate/interfaces';
 
 require('dotenv').config()
 
@@ -88,20 +89,9 @@ export const blockNumberToApproxDate = async (eventBlock: BN) => {
   return dayjs(result.toNumber())
 }
 
-const entityWithNumId = [ 'Post', 'Space' ] as EntityKind[]
-
-export const parseModerationEntity = (entityKind: EntityKind, entityValue: string) => {
-  let entityNumId: bigint | null = null
-  let entityStrId: string | null = null
-
-  if (entityWithNumId.includes(entityKind)) {
-    entityNumId = encodeStructId(entityValue)
-  } else {
-    entityStrId = entityValue
-  }
-
+export const parseEntity = (entityEnum: EntityId) => {
   return {
-    entityNumId,
-    entityStrId
+    entityKind: entityEnum.type as EntityKind,
+    entityId: entityEnum.value.toString()
   }
 }

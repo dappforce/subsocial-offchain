@@ -3,8 +3,7 @@
 /** 'Query' parameters type */
 export interface IQueryParams {
   entityKind: string,
-  entityNumId: bigint | null,
-  entityStrId: string | null,
+  entityId: string | null,
   scopeId: bigint,
   blocked: boolean | null
 }
