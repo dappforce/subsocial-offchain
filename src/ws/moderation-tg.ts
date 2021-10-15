@@ -36,7 +36,7 @@ export function startModerationWs() {
 
 		ws.on('close', (ws: WebSocket) => {
 			log.debug('Closed web socket server:', ws)
-      // TODO: remove clients
+      delete wsClients[ws.url]
 		})
 	})
 
