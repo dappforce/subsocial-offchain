@@ -1,5 +1,5 @@
 ALTER TABLE df.activities ADD column report_id bigint NULL;
-ALTER TABLE df.activities ADD column scopeId bigint NULL;
+ALTER TABLE df.activities ADD column scope_id bigint NULL;
 
 DO $$
 BEGIN

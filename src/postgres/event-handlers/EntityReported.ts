@@ -15,19 +15,25 @@ const findEntityOwner = async (entity: EntityId) => {
 
   const api = await resolveSubsocialApi()
 
-  const findEntity = entityKind === 'Post' ? api.findPost : api.findSpace
+  let owner = ''
 
-  const { struct: { owner }} = await findEntity({ id: idToBn(entityId) })
+  if (entityKind === 'Post') {
+    const { struct: { owner: postOwner }} = await api.findPost({id: idToBn(entityId)})
+    owner = postOwner.toString()
+  } else {
+    const { struct: { owner: spaceOwner }} = await api.findSpace({id: idToBn(entityId)})
+    owner = spaceOwner.toString()
+  }
 
   return owner.toString()
-} 
+}
 
 export const onEntityReported: EventHandlerFn = async (event) => {
   const insertResult = await insertActivityForReport(event)
   if (!insertResult) return
 
   const owner = await findEntityOwner(event.data[2] as EntityId)
-  if (!owner) return 
+  if (!owner) return
 
   insertNotificationForOwner({ account: owner, ...event })
 }
