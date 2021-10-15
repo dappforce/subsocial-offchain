@@ -2,12 +2,13 @@ import { updateCountLog } from '../postges-logger'
 import { newPgError, runQuery, action } from '../utils'
 import { SubstrateEvent } from '../../substrate/types'
 import { InsertActivityPromise } from '../queries/types'
-import { blockNumberToApproxDate, encodeStructIds } from '../../substrate/utils'
+import { blockNumberToApproxDate, encodeStructIds, parseActivityFromEntity, parseEntity } from '../../substrate/utils'
 import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForReport.queries'
+import { EntityId } from '@subsocial/types/substrate/interfaces'
 
 const query = `
-  INSERT INTO df.activities(block_number, event_index, account, event, report_id, scope_id, date)
-    VALUES(:blockNumber, :eventIndex, :account, :event, :reportId, :scopeId, :date)
+  INSERT INTO df.activities(block_number, event_index, account, event, following_id, space_id, post_id, report_id, scope_id, date)
+    VALUES(:blockNumber, :eventIndex, :account, :event, :followingId, :spaceId, :postId, :reportId, :scopeId, :date)
   RETURNING *`
 
 const queryUpdate = `
@@ -22,7 +23,7 @@ const queryUpdate = `
 
 export async function insertActivityForReport(eventAction: SubstrateEvent): InsertActivityPromise {
   const { eventName, data, blockNumber, eventIndex } = eventAction
-  const [accountId, scopeIdBn, _, reportIdBn] = data // TODO: add entity to activity
+  const [accountId, scopeIdBn, entity, reportIdBn] = data
 
   const date = await blockNumberToApproxDate(blockNumber)
 
@@ -39,7 +40,8 @@ export async function insertActivityForReport(eventAction: SubstrateEvent): Inse
     event: eventName as action,
     scopeId,
     reportId,
-    date
+    date,
+    ...parseActivityFromEntity(parseEntity(entity as EntityId))
   }
 
   try {

@@ -89,9 +89,45 @@ export const blockNumberToApproxDate = async (eventBlock: BN) => {
   return dayjs(result.toNumber())
 }
 
-export const parseEntity = (entityEnum: EntityId) => {
+type ParsedEntity = {
+  entityKind: EntityKind,
+  entityId: string
+}
+
+export const parseEntity = (entityEnum: EntityId): ParsedEntity => {
   return {
     entityKind: entityEnum.type as EntityKind,
     entityId: entityEnum.value.toString()
   }
+}
+
+type ActivityIds = {
+  followingId: string | null,
+  postId: bigint| null,
+  spaceId: bigint | null
+}
+
+export const parseActivityFromEntity = ({ entityId, entityKind }: ParsedEntity): ActivityIds => {
+  const ids = {
+    followingId: null,
+    postId: null,
+    spaceId: null
+  }
+  
+  switch(entityKind) {
+    case 'Account': {
+      ids.followingId = entityId
+      break
+    }
+    case 'Post': {
+      ids.postId = encodeStructId(entityId)
+      break
+    }
+    case 'Space': {
+      ids.spaceId = encodeStructId(entityId)
+      break
+    }
+  }
+
+  return ids
 }

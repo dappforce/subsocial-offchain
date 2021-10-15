@@ -11,7 +11,6 @@ export interface IQueryParams {
   spaceId: bigint | null | void;
   postId: bigint | null | void;
   event: action | null | void;
-  reportId: bigint | null | void;
   scopeId: bigint | null | void;
   date: Dayjs | null | void;
 }
