@@ -3,7 +3,8 @@ import { newLogger } from '@subsocial/utils'
 import { getCountOfUnreadNotifications } from '../postgres/selects/getCountOfUnreadNotifications'
 import { SessionCall, ReadAllMessage } from '../postgres/types/sessionKey';
 import { markAllNotifsAsRead } from '../postgres/updates/markAllNotifsAsRead';
-import { eventEmitter, EVENT_UPDATE_NOTIFICATIONS_COUNTER } from './events';
+import { eventEmitter, events } from './events';
+import { socketPorts } from '../env';
 require('dotenv').config()
 
 export const log = newLogger('Notif. Counter WS')
@@ -12,7 +13,7 @@ export let wss: WebSocket.Server
 
 export const resolveWebSocketServer = () => {
 	if (!wss) {
-		const port = parseInt(process.env.OFFCHAIN_WS_PORT) || 3011
+		const port = parseInt(socketPorts.unreadCount)
 		wss = new WebSocket.Server({ port }, () => {
 			log.info(`Started web socket server for Notifications Counter on port ${port}`)
 		})
@@ -28,7 +29,7 @@ export function sendUnreadCount(account: string, count: number, client: WebSocke
 	log.debug(`Message '${msg}' sent to account`, account)
 }
 
-export function startNotificationsServer() {
+export function startUnreadCountWs() {
 	const wss = resolveWebSocketServer()
 	wss.on('connection', (ws: WebSocket) => {
 
@@ -53,11 +54,11 @@ export function startNotificationsServer() {
 
 	wss.on('close', () => {
 		log.info('Closed web socket server')
-		eventEmitter.removeAllListeners(EVENT_UPDATE_NOTIFICATIONS_COUNTER)
+		eventEmitter.removeAllListeners(events.updateNotifCounter)
 	})
 }
 
-eventEmitter.addListener(EVENT_UPDATE_NOTIFICATIONS_COUNTER, (account: string, unreadCount: number) => {
+eventEmitter.addListener(events.updateNotifCounter, (account: string, unreadCount: number) => {
 	const client = wsClients[account]
 	if (!client || client.readyState !== WebSocket.OPEN) return
 

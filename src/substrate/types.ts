@@ -23,4 +23,9 @@ export type EntityKind = 'Space'
   | 'Account'
   | 'Content'
 
+export type ParsedEntity = {
+  entityKind: EntityKind,
+  entityId: string
+}
+
 export type EventHandlerFn = (event: SubstrateEvent) => Promise<void>

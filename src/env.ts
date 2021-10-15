@@ -1,6 +1,15 @@
-export const TEST_MODE = process.env.TEST_MODE?.toLocaleLowerCase() === 'true'
+function getEnv (varName: string): string | undefined {
+  const { env } = process
+  return env[varName]
+}
 
-export const offchainTWSPort = process.env.OFFCHAIN_TELEGRAM_WS_PORT
+export const TEST_MODE = getEnv('TEST_MODE')?.toLocaleLowerCase() === 'true'
+
+export const socketPorts = {
+  unreadCount: getEnv('OFFCHAIN_WS_UNREAD_COUNT_PORT'),
+  activity: getEnv('OFFCHAIN_WS_ACTIVITY_TG_PORT'),
+  moderation: getEnv('OFFCHAIN_WS_MODERATION_TG_PORT')
+}
 
 export const appBaseUrl = process.env.APP_BASE_URL
 

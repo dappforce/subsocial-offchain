@@ -1,8 +1,8 @@
-import { startNotificationsServer } from "./notifications"
-import { startNotificationsServerForTelegram } from "./telegram"
+import { startUnreadCountWs } from "./notifications"
+import { startActivityWs } from "./activity-tg"
 
 /** Start web sockets for web app and Telegram notifications. */
 export const startWebSockets = () => {
-  startNotificationsServerForTelegram()
-  startNotificationsServer()
+  startActivityWs()
+  startUnreadCountWs()
 }
