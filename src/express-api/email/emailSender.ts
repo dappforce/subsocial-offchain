@@ -1,7 +1,6 @@
 import { createTransport, getTestMessageUrl } from 'nodemailer'
 import { emailHost, emailPort, emailUser, emailPassword, appBaseUrl, emailFrom } from '../../env';
 import { newLogger } from '@subsocial/utils';
-import { registerHelper } from 'handlebars';
 import { NotificationTemplateProp, ConfirmationProp, FeedTemplateProp } from './types';
 import templates, { TemplateType } from './templates';
 
@@ -17,13 +16,6 @@ const transporter = createTransport({
 		user: emailUser,
 		pass: emailPassword,
 	},
-});
-
-registerHelper('notEq', function (v1, v2, options) {
-	if (v1 !== v2) {
-		return options.fn(this);
-	}
-	return options.inverse(this);
 });
 
 export type LetterParams = {

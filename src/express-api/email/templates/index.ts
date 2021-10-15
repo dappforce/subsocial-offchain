@@ -1,25 +1,29 @@
 import { readFileSync } from "fs";
-import { compile, registerPartial } from "handlebars";
+import handlebars from "handlebars";
 // import { FeedTemplateProp } from "../types";
 
 export type TemplateType = 'notifications' | 'feed' | 'confirmation'
 
 const getTemplate = (path) => {
   const source = readFileSync(`${__dirname}/${path}.hbs`, 'utf8');
-	return compile(source)
+	return handlebars.compile(source)
 }
 
 const getGeneralTemplate = (type: 'confirmation' | 'activity') => getTemplate(`${type}/html`)
 
 const getActivityTemplate = (path: string) => getTemplate(`activity/${path}`)
 
-registerPartial('feed', getActivityTemplate('feed'));
-registerPartial('notifications', getActivityTemplate('notifications'));
-registerPartial('feedItem', getActivityTemplate('feed-item'));
-registerPartial('postAuthor', getActivityTemplate('post/post-author'));
-registerPartial('postContent', getActivityTemplate('post/post-content'));
-registerPartial('postImg', getActivityTemplate('post/post-image'));
-registerPartial('css', readFileSync(`${__dirname}/style.css`, 'utf8'))
+const partials = {
+  'feed': getActivityTemplate('feed'),
+  'notifications': getActivityTemplate('notifications'),
+  'feedItem': getActivityTemplate('feed-item'),
+  'postAuthor': getActivityTemplate('post/post-author'),
+  'postContent': getActivityTemplate('post/post-content'),
+  'postImg': getActivityTemplate('post/post-image'),
+  'css': handlebars.compile(readFileSync(`${__dirname}/style.css`, 'utf8'))
+}
+
+handlebars.registerPartial(partials)
 
 export const templates: Record<TemplateType, HandlebarsTemplateDelegate<any>> = { 
   notifications: getGeneralTemplate('activity'),

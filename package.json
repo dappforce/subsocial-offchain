@@ -47,7 +47,7 @@
     "@types/ws": "^7.2.3",
     "@types/yesql": "^4.1.0",
     "jest": "~24.8.0",
-    "typescript": "^4.1.2"
+    "typescript": "^4.4.1"
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
