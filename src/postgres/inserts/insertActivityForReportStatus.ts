@@ -6,7 +6,7 @@ import { IQueryParams } from '../types/insertActivityForReportStatus.queries'
 import { EntityId } from '@subsocial/types/substrate/interfaces'
 
 const query = `
-  INSERT INTO df.activities(block_number, event_index, account, event, following_id, space_id, post_id, report_id, scope_id, date)
+  INSERT INTO df.activities(block_number, event_index, account, event, following_id, space_id, post_id, scope_id, date)
     VALUES(:blockNumber, :eventIndex, :account, :event, :followingId, :spaceId, :postId, :scopeId, :date)
   RETURNING *`
 
