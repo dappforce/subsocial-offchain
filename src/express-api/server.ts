@@ -159,3 +159,4 @@ export const startHttpServer = () => app.listen(port, () => {
 })
 
 app.get('/v1/offchain/moderation/status/:kind/:id', moderationHandlers.getEntityStatusByEntityKindHandler)
+app.get('/v1/offchain/moderation/reports/:scopeId', moderationHandlers.getReportIdsByScopeId)
