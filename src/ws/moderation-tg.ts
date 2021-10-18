@@ -2,6 +2,7 @@ import * as WebSocket from 'ws'
 import { newLogger } from '@subsocial/utils'
 import { eventEmitter, events, ReportInfo } from './events';
 import { socketPorts } from '../env';
+import { swapAndPop } from '../utils';
 
 export const log = newLogger('Moderation WS')
 
@@ -17,7 +18,7 @@ export const resolveWebSocketServer = () => {
 	return wss
 }
 
-export const wsClients: Record<string, WebSocket> = {}
+const wsClients: WebSocket[] = []
 
 export function sendReport(client: WebSocket, info: ReportInfo) {
 	const msg = JSON.stringify(info)
@@ -31,12 +32,11 @@ export function startModerationWs() {
 
 		ws.on('open', async () => {
 			log.debug('Received a message with data:', ws.url)
-      wsClients[ws.url] = ws
+      wsClients.push(ws)
 		})
 
 		ws.on('close', (ws: WebSocket) => {
 			log.debug('Closed web socket server:', ws)
-      delete wsClients[ws.url]
 		})
 	})
 
@@ -47,8 +47,11 @@ export function startModerationWs() {
 }
 
 eventEmitter.addListener(events.sendReport, (info: ReportInfo) => {
-	Object.values(wsClients).forEach(client => {
-    if (!client || client.readyState !== WebSocket.OPEN) return
-    sendReport(client, info)
+	wsClients.forEach((client, i) => {
+    if (!client || client.readyState !== WebSocket.OPEN) {
+			swapAndPop(wsClients, i)
+		} {
+			sendReport(client, info)
+		}
   })
 })

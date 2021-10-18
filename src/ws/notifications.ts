@@ -21,7 +21,7 @@ export const resolveWebSocketServer = () => {
 	return wss
 }
 
-export const wsClients: Record<string, WebSocket> = {}
+const wsClients: Record<string, WebSocket> = {}
 
 export function sendUnreadCount(account: string, count: number, client: WebSocket) {
 	const msg = count.toString()
@@ -39,7 +39,10 @@ export function startUnreadCountWs() {
 				const dataParsed = JSON.parse(data) as SessionCall<ReadAllMessage>
 				await markAllNotifsAsRead(dataParsed)
 			} catch {
-				wsClients[data] = ws
+				if (!wsClients[data]) {
+					wsClients[data] = ws
+				}
+
 				const unreadCount = await getCountOfUnreadNotifications(data)
 				if(!unreadCount) return
 
@@ -60,6 +63,7 @@ export function startUnreadCountWs() {
 
 eventEmitter.addListener(events.updateNotifCounter, (account: string, unreadCount: number) => {
 	const client = wsClients[account]
+	
 	if (!client || client.readyState !== WebSocket.OPEN) return
 
 	sendUnreadCount(account, unreadCount, client)

@@ -7,12 +7,15 @@ import { getActivity } from '../postgres/selects/getActivity';
 import { getChatDataByAccount } from '../postgres/selects/getChatIdByAccount';
 import { ChatIdType } from './types';
 import { Activity } from '@subsocial/types';
+import { swapAndPop } from '../utils';
 
 require('dotenv').config()
 
 export const log = newLogger('Telegram WS')
 
 export let wss: WebSocket.Server
+
+const wsClients: WebSocket[] = [] 
 
 export const resolveWebSocketServer = () => {
 	if (!wss) {
@@ -33,27 +36,39 @@ export function sendActivity(account: string, activity: Activity, chatId: number
 export function startActivityWs() {
 	resolveWebSocketServer()
 	wss.on('connection', (ws: WebSocket) => {
-		ws.on('message', async (data: string) => {
-			log.debug('Received a message with data:', data)
+		ws.on('open', async () => {
+			log.debug('Received a message with data:', ws.url)
+      wsClients.push(ws)
 		})
 
-		eventEmitter.addListener(events.sendActivity, async (account: string, whom: string, blockNumber: BN, eventIndex: number, type: Type) => {
-			const activity = await getActivity(account, blockNumber, eventIndex)
-			const chats: ChatIdType[] = await getChatDataByAccount(whom)
-
-			if (!isEmptyArray(chats) && activity) {
-				const chatIds = chats.map((chat) => chat.chat_id)
-				ws.send(JSON.stringify({ activity, chatIds, type }))
-			}
-		})
+		// ws.on('message', async (data: string) => {
+		// 	log.debug('Received a message with data:', data)
+		// })
 
 		ws.on('close', (ws: WebSocket) => {
 			log.debug('Closed web socket server:', ws)
-			eventEmitter.removeAllListeners(events.sendActivity)
 		})
 	})
 
 	wss.on('close', () => {
 		log.info('Closed web socket server')
+		eventEmitter.removeAllListeners(events.sendActivity)
 	})
 }
+
+eventEmitter.addListener(events.sendActivity, async (account: string, whom: string, blockNumber: BN, eventIndex: number, type: Type) => {
+	const activity = await getActivity(account, blockNumber, eventIndex)
+	const chats: ChatIdType[] = await getChatDataByAccount(whom)
+
+	if (!isEmptyArray(chats) && activity) {
+		const chatIds = chats.map((chat) => chat.chat_id)
+		const json = JSON.stringify({ activity, chatIds, type })
+		wsClients.forEach((client, i) => {
+			if (!client || client.readyState !== WebSocket.OPEN) {
+				swapAndPop(wsClients, i)
+			} {
+				client.send(json)
+			}
+		})
+	}
+})
