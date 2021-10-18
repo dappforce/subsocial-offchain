@@ -9,7 +9,7 @@ const query = `
   INSERT INTO df.moderation(entity_kind, entity_id, scope_id, blocked)
     VALUES(:entityKind, :entityId, :scopeId, :blocked)
     ON CONFLICT (entity_kind, entity_id, scope_id) DO UPDATE
-    SET blocked = :blocked,
+    SET blocked = :blocked
   RETURNING *`
 
 type EventTuple = [AnyAccountId, SpaceId, EntityId, EntityStatus]
