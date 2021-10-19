@@ -1,6 +1,5 @@
 import { log } from '../postges-logger';
 import { runQuery } from '../utils';
-import { Activity } from '@subsocial/types';
 import { encodeStructId } from '../../substrate/utils';
 
 const query = `
@@ -21,7 +20,7 @@ export async function getReportIdsByScope(scopeId: string) {
 
   try {
     const res = await runQuery(query, params)
-    return res.rows[0] as Activity;
+    return res.rows;
   } catch (err) {
     log.error('Failed to get activities:', err.stack)
     throw err

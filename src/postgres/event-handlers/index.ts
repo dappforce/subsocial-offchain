@@ -12,4 +12,5 @@ export { onCommentDeleted } from './CommentDeleted';
 export { onPostReactionCreated } from './PostReactionCreated';
 export { onCommentReactionCreated } from './CommentReactionCreated';
 export { onEntityStatusUpdated } from './EntityStatusUpdated'
+export { onEntityStatusDeleted } from './EntityStatusDeleted'
 export { onEntityReported } from './EntityReported'
