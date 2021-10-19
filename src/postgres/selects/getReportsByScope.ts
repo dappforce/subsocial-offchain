@@ -20,7 +20,7 @@ export async function getReportIdsByScope(scopeId: string) {
 
   try {
     const res = await runQuery(query, params)
-    return res.rows;
+    return res.rows || [];
   } catch (err) {
     log.error('Failed to get activities:', err.stack)
     throw err

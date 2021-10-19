@@ -9,7 +9,7 @@ const query = `
 export const getEntityStatusByEntityKind = async (entityKind: EntityKind, entityId: string) => {
 	try {
 		const data = await runQuery(query, { entityKind, entityId })
-		return data.rows[0] || {}
+		return data.rows || []
 	} catch (err) {
 		log.error(`Failed to get EntityStatus by ${entityKind}: ${entityId}`, err.stack)
 		throw err

@@ -12,7 +12,7 @@ const query = `
     SET blocked = :blocked
   RETURNING *`
 
-type EventTuple = [AnyAccountId, SpaceId, EntityId, EntityStatus ]
+type EventTuple = [AnyAccountId, SpaceId, EntityId, EntityStatus]
 
 export async function insertModerationEntityStatus(data: GenericEventData) {
   const [_, scopeIdBn, entity, entityStatus] = data as unknown as EventTuple
