@@ -31,7 +31,8 @@ export function informTelegramClientAboutNotifOrFeed (account: string, whom: str
 export type ReportInfo = {
 	who: string,
 	entity: ParsedEntity,
-	scopeId: string
+	scopeId: string,
+	reportId: string
 }
 
 export function informTelegramClientAboutReport (info: ReportInfo) {

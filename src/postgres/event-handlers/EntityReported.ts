@@ -10,7 +10,7 @@ export const onEntityReported: EventHandlerFn = async (event) => {
   const insertResult = await insertActivityForReport(event)
   if (!insertResult) return
 
-  const [accountId, scopeIdBn, entity] = event.data
+  const [accountId, scopeIdBn, entity, reportId ] = event.data
 
   const owner = await findEntityOwner(event.data[2] as EntityId)
   if (!owner) return
@@ -20,6 +20,7 @@ export const onEntityReported: EventHandlerFn = async (event) => {
   informTelegramClientAboutReport({
     who: accountId.toString(),
     entity: parseEntity(entity as EntityId),
-    scopeId: scopeIdBn.toString()
+    scopeId: scopeIdBn.toString(),
+    reportId: reportId.toString()
   })
 }
