@@ -29,11 +29,7 @@ export function sendReport(client: WebSocket, info: ReportInfo) {
 export function startModerationWs() {
 	const wss = resolveWebSocketServer()
 	wss.on('connection', (ws: WebSocket) => {
-
-		ws.on('open', async () => {
-			log.debug('Received a message with data:', ws.url)
-      wsClients.push(ws)
-		})
+		wsClients.push(ws)
 
 		ws.on('close', (ws: WebSocket) => {
 			log.debug('Closed web socket server:', ws)

@@ -36,10 +36,7 @@ export function sendActivity(account: string, activity: Activity, chatId: number
 export function startActivityWs() {
 	resolveWebSocketServer()
 	wss.on('connection', (ws: WebSocket) => {
-		ws.on('open', async () => {
-			log.debug('Received a message with data:', ws.url)
-      wsClients.push(ws)
-		})
+		wsClients.push(ws)
 
 		// ws.on('message', async (data: string) => {
 		// 	log.debug('Received a message with data:', data)
