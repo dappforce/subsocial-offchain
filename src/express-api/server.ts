@@ -1,29 +1,30 @@
 import express from 'express'
 import bodyParser from 'body-parser'
-import cors from 'cors';
+import cors from 'cors'
 import parseSitePreview from '../parser/parse-preview'
-import multer from 'multer';
+import multer from 'multer'
 import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
 import * as emailHandlers from './handlers/emailHandlers'
 import * as faucetReqHandlers from './handlers/faucetHandlers'
 import * as moderationHandlers from './handlers/getBlockListHandler'
-import { expressApiLog as log } from '../connections/loggers';
-import timeout from 'connect-timeout';
-import { reqTimeoutSecs, maxFileSizeBytes } from './config';
+import { expressApiLog as log } from '../connections/loggers'
+import timeout from 'connect-timeout'
+import { reqTimeoutSecs, maxFileSizeBytes } from './config'
 import './email/jobs'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
-import { isEmptyStr } from '@subsocial/utils';
+import { isEmptyStr } from '@subsocial/utils'
 
 require('dotenv').config()
 
 const app = express()
 
 const corsOpts = function (req: express.Request, callback) {
-  const corsOptions = { origin: false };
+  const corsOptions = { origin: false }
 
-  if (isAllCorsAllowed ||
+  if (
+    isAllCorsAllowed ||
     req.method === 'GET' ||
     corsAllowedList.indexOf(req.header('Origin')) !== -1
   ) {
@@ -82,29 +83,36 @@ app.get('/v1/offchain/activities/:account', pgReqHandlers.activitiesHandler)
 app.get('/v1/offchain/activities/:account/count', pgReqHandlers.activitiesCountHandler)
 
 app.get('/v1/offchain/activities/:account/comments', pgReqHandlers.commentActivitiesHandler)
-app.get('/v1/offchain/activities/:account/comments/count', pgReqHandlers.commentActivitiesCountHandler)
+app.get(
+  '/v1/offchain/activities/:account/comments/count',
+  pgReqHandlers.commentActivitiesCountHandler
+)
 
 app.get('/v1/offchain/activities/:account/posts', pgReqHandlers.postActivitiesHandler)
 app.get('/v1/offchain/activities/:account/posts/count', pgReqHandlers.postActivitiesCountHandler)
 
 app.get('/v1/offchain/activities/:account/follows', pgReqHandlers.followActivitiesHandler)
-app.get('/v1/offchain/activities/:account/follows/count', pgReqHandlers.followActivitiesCountHandler)
+app.get(
+  '/v1/offchain/activities/:account/follows/count',
+  pgReqHandlers.followActivitiesCountHandler
+)
 
 app.get('/v1/offchain/activities/:account/reactions', pgReqHandlers.reactionActivitiesHandler)
-app.get('/v1/offchain/activities/:account/reactions/count', pgReqHandlers.reactionActivitiesCountHandler)
+app.get(
+  '/v1/offchain/activities/:account/reactions/count',
+  pgReqHandlers.reactionActivitiesCountHandler
+)
 
 app.get('/v1/offchain/activities/:account/spaces', pgReqHandlers.spaceActivitiesHandler)
 app.get('/v1/offchain/activities/:account/spaces/count', pgReqHandlers.spaceActivitiesCountHandler)
 
 app.get('/v1/offchain/activities/:account/counts', pgReqHandlers.activityCountsHandler)
 
-
 app.post('/v1/offchain/accounts/setSessionKey', pgReqHandlers.setSessionKeyHandler)
 
 app.get('/v1/offchain/accounts/getSessionKey', pgReqHandlers.getSessionKeyHandler)
 
 app.get('/v1/offchain/accounts/getNonce', pgReqHandlers.getNonceHandler)
-
 
 app.post('/v1/offchain/telegram/setTelegramData', pgReqHandlers.setTelegramDataHandler)
 
@@ -118,7 +126,6 @@ app.get('/v1/offchain/telegram/getTelegramChat', pgReqHandlers.getTelegramChatHa
 
 app.post('/v1/offchain/telegram/updateTelegramChat', pgReqHandlers.updateTelegramChatHandler)
 
-
 app.post('/v1/offchain/email/addEmailSettings', pgReqHandlers.addEmailSettingsHandler)
 
 app.get('/v1/offchain/email/getEmailSettings', pgReqHandlers.getEmailSettingsHandler)
@@ -129,13 +136,14 @@ app.post('/v1/offchain/email/setConfirmationDate', pgReqHandlers.confirmEmailFor
 
 app.post('/v1/offchain/email/confirm', emailHandlers.confirmEmailHandler)
 
-
 app.get('/v1/offchain/stats/getStatisticData', pgReqHandlers.getStatisticDataHandler)
 
 app.get('/v1/offchain/stats/getActivityCount', pgReqHandlers.getActivityCountByEventHandler)
 
-app.get('/v1/offchain/stats/getActivityCountForToday', pgReqHandlers.getActivityCountForTodayHandler)
-
+app.get(
+  '/v1/offchain/stats/getActivityCountForToday',
+  pgReqHandlers.getActivityCountForTodayHandler
+)
 
 app.post('/v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
 
@@ -143,19 +151,24 @@ app.post('/v1/offchain/faucet/drop', faucetReqHandlers.tokenDropHandler)
 
 app.get('/v1/offchain/faucet/status', faucetReqHandlers.getFaucetStatus)
 
+app.post('/v1/offchain/contributions/set', pgReqHandlers.addContributionHandler)
+
+app.get('/v1/offchain/contributions/:refCode', pgReqHandlers.getContributionsByRefIdHandler)
+
 app.post('/v1/parseSite', async (req: express.Request, res: express.Response) => {
   const url = req.body.url
 
   if (isEmptyStr(url)) {
-    res.status(400).send();
+    res.status(400).send()
   }
 
   const data = await parseSitePreview(url)
-  res.send(data);
+  res.send(data)
 })
 
-export const startHttpServer = () => app.listen(port, () => {
-  log.info(`HTTP server started on port ${port}`)
-})
+export const startHttpServer = () =>
+  app.listen(port, () => {
+    log.info(`HTTP server started on port ${port}`)
+  })
 
 app.get('/v1/offchain/moderation/list', moderationHandlers.getBlockListHandler)

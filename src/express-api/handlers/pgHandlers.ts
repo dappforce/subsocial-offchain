@@ -27,6 +27,8 @@ import {
   HandlerFn,
 } from '../utils'
 import { Period } from '../../postgres/utils';
+import { insertContribution } from '../../postgres/inserts/insertContribution'
+import { getContributionsByRefId } from '../../postgres/selects/getContributionsByRefId';
 
 type Params = {
   account: string
@@ -186,4 +188,13 @@ export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
 export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {
   const event = req.query.event
   return resolvePromiseAndReturnJson(res, getActivityCountForToday(event.toString()))
+}
+
+export const addContributionHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, insertContribution(req.body))
+}
+
+export const getContributionsByRefIdHandler: HandlerFn = (req, res) => {
+  const { refCode } = req.params
+  return resolvePromiseAndReturnJson(res, getContributionsByRefId(refCode))
 }
