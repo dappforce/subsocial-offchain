@@ -2,6 +2,8 @@ import * as express from 'express'
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils'
 import { expressApiLog } from '../connections/loggers'
 import { Dayjs } from 'dayjs'
+import { SessionCall } from '../postgres/types/sessionKey'
+import { isValidSignature } from '../postgres/utils'
 
 export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 20
 
@@ -50,7 +52,7 @@ export const resolvePromiseAndReturnJson = async (
     res.json(data)
   } catch (err) {
     expressApiLog.error(err)
-    res.status(err.statusCode).send(err)
+    res.status(err?.statusCode || 400).send(err)
   }
 }
 
@@ -67,5 +69,21 @@ export const getOffsetFromRequest = (
   defaultOffset?: number
 ): number => {
   return getNumberFromRequest(req, 'offset', defaultOffset)
+}
+
+// TODO: add check message.action
+export const checkSignature = (req: express.Request, res: express.Response, next) => {
+  const sessionCall = req.body.sessionCall as SessionCall<any>
+
+  if (!sessionCall) {
+    res.status(403).send('Invalid input data')
+  }
+
+  const isValid = isValidSignature(sessionCall)
+  if (!isValid) {
+    res.status(403).send("Signature is not valid")
+  }
+
+  next()
 }
 
