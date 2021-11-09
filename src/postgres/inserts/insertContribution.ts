@@ -22,8 +22,6 @@ export async function insertContribution({ message, account }: SessionCall<Contr
   const { refCode, blockHash } = message.args
   const { rootAddress: contributor, nonce } = await upsertNonce(account, message)
 
-  console.log('message.nonce !== nonce', message.nonce, nonce)
-  
   if (message.nonce != nonce) {
     throw 'Nonce is different'
   }
@@ -44,8 +42,6 @@ export async function insertContribution({ message, account }: SessionCall<Contr
       eventIndex = i
     }
   })
-
-  console.log('event', JSON.stringify(eventData), eventIndex)
 
   if (!eventData) return
 
