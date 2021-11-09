@@ -18,7 +18,6 @@ import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCo
 import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
 import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
 import { setConfirmationDateForSettings } from '../../postgres/updates/setConfirmationDate';
-import { asAccountId } from '@subsocial/api';
 
 import {
   getOffsetFromRequest,
@@ -27,8 +26,9 @@ import {
   HandlerFn,
 } from '../utils'
 import { Period } from '../../postgres/utils';
-import { insertContribution } from '../../postgres/inserts/insertContribution'
+import { Contribution, insertContribution } from '../../postgres/inserts/insertContribution'
 import { getContributionsByRefId } from '../../postgres/selects/getContributionsByRefId';
+import { toSubsocialAddress } from '@subsocial/utils';
 
 type Params = {
   account: string
@@ -37,7 +37,7 @@ type Params = {
 
 const parseParamsWithAccount = ({ account, ...params }: Record<string, any>): Params => {
   return {
-    account: asAccountId(account)?.toString(),
+    account: toSubsocialAddress(account)?.toString(),
     ...params
   }
 }
@@ -127,7 +127,6 @@ export const getNonceHandler: HandlerFn = (req, res) => {
   return resolvePromiseAndReturnJson(res, getNonce(account))
 }
 
-
 export const setTelegramDataHandler: HandlerFn = (req, res) => {
   const { account, chatId } = parseParamsWithAccount(req.body)
   return resolvePromiseAndReturnJson(res, setTelegramData(account, Number(chatId)))
@@ -191,7 +190,7 @@ export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {
 }
 
 export const addContributionHandler: HandlerFn = (req, res) => {
-  return resolvePromiseAndReturnJson(res, insertContribution(req.body))
+  return resolvePromiseAndReturnJson(res, insertContribution(req.body.sessionCall as SessionCall<Contribution>))
 }
 
 export const getContributionsByRefIdHandler: HandlerFn = (req, res) => {
