@@ -4,6 +4,7 @@ import { equalAddresses } from '../../utils'
 import { SessionCall } from '../types/sessionKey'
 import { updateNonce } from '../updates/updateNonce'
 import { encodeAddress } from '@polkadot/util-crypto'
+import {toSubsocialAddress} from "@subsocial/utils";
 
 export type Contribution = {
   refCode: string
@@ -33,7 +34,7 @@ const parseEvents = (events, contributor: string) => {
           break
         }
         case 'MemoUpdated': {
-          refCode = encodeAddress(data[1].toString())
+          refCode = toSubsocialAddress(encodeAddress(data[2].toString()))
         }
       }
     }
@@ -70,6 +71,8 @@ export async function insertContribution({ message, account }: SessionCall<Contr
   if (!parsedData) return
 
   const { refCode, paraId, amount, eventIndex } = parsedData
+
+  if (!refCode) return
 
   if (paraId.toNumber() !== SUBSOCIAL_PARA_ID) {
     throw 'The no Subsocial contribute'
