@@ -3,6 +3,7 @@ import { getApi } from '@subsocial/api'
 import { equalAddresses } from '../../utils'
 import { SessionCall } from '../types/sessionKey'
 import { updateNonce } from '../updates/updateNonce'
+import { encodeAddress } from '@polkadot/util-crypto'
 
 export type Contribution = {
   refCode: string
@@ -14,12 +15,47 @@ const query = `
   VALUES(:blockNumber, :eventIndex, :contributor, :refCode, :amount, :date)
   RETURNING *`
 
-const SUBSOCIAL_PARA_ID = 2000
+const SUBSOCIAL_PARA_ID = 2100 // TODO: extract to .env
 
-const getKusamaApi = () => getApi('wss://staging.subsocial.network/kusama')
+const parseEvents = (events, contributor: string) => {
+  let refCode: string
+  let eventData: any[] = undefined
+  let eventIndex = 0
+
+  events.forEach(({ event: { method, section, data }}, i) => {
+    if (section === 'crowdloan'
+        && equalAddresses(data[0].toString(), contributor)
+    ){
+      switch (method) {
+        case 'Contributed': {
+          eventData = data
+          eventIndex = i
+          break
+        }
+        case 'MemoUpdated': {
+          refCode = encodeAddress(data[1].toString())
+        }
+      }
+    }
+  })
+
+  if (!eventData) return undefined
+
+  const paraId = eventData[1]
+  const amount = eventData[2].toString()
+
+  return {
+    paraId,
+    amount,
+    refCode,
+    eventIndex
+  }
+}
+
+const getKusamaApi = () => getApi('wss://staging.subsocial.network/kusama') // TODO: extract to .env
 
 export async function insertContribution({ message, account }: SessionCall<Contribution>) {
-  const { refCode, blockHash } = message.args
+  const { blockHash } = message.args
   const { rootAddress: contributor, nonce } = await upsertNonce(account, message)
 
   if (message.nonce != nonce) {
@@ -30,27 +66,10 @@ export async function insertContribution({ message, account }: SessionCall<Contr
 
   const events = await kusamaApi.query.system.events.at(blockHash)
 
-  let eventData: any[] = undefined
-  let eventIndex = 0
+  const parsedData = parseEvents(events, contributor)
+  if (!parsedData) return
 
-  events.forEach(({ event: { method, section, data }}, i) => {
-    if (section === 'crowdloan'
-      && method === 'Contributed'
-      && equalAddresses(data[0].toString(), contributor)
-    ){
-      eventData = data
-      eventIndex = i
-    }
-  })
-
-  if (!eventData) return
-
-  const paraId = eventData[1]
-  const amount = eventData[2].toString()
-
-  if(contributor === refCode) {
-    throw `Contributor and referral code are equal ${refCode}`
-  }
+  const { refCode, paraId, amount, eventIndex } = parsedData
 
   if (paraId.toNumber() !== SUBSOCIAL_PARA_ID) {
     throw 'The no Subsocial contribute'
