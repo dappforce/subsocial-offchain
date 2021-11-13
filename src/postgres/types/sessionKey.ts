@@ -1,6 +1,6 @@
 import { BlockNumber } from '@polkadot/types/interfaces';
 
-type Action = 'readAll' | 'addSessionKey' | 'setUpEmail' | 'confirmEmail' | 'setRef' | 'addContent'
+type Action = 'readAll' | 'addSessionKey' | 'setUpEmail' | 'confirmEmail' | 'addRefContribution' | 'addContent'
 
 export type AddSessionKeyArgs = {
   sessionKey: string

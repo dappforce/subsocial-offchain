@@ -12,6 +12,7 @@ export const asyncMkdir = promisify(mkdir)
 
 type MaybeAccAddr = undefined | AnyAccountId
 
+// TODO: copypasta
 export function equalAddresses (addr1: MaybeAccAddr, addr2: MaybeAccAddr): boolean {
   if (addr1 === addr2) {
     return true

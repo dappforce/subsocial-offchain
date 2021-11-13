@@ -2,9 +2,10 @@ import { newPgError, runQuery, upsertNonce } from '../utils'
 import { getApi } from '@subsocial/api'
 import { equalAddresses } from '../../utils'
 import { SessionCall } from '../types/sessionKey'
-import { updateNonce } from '../updates/updateNonce'
+import { incNonce } from '../updates/updateNonce'
 import { encodeAddress } from '@polkadot/util-crypto'
 import {toSubsocialAddress} from "@subsocial/utils";
+import {kusamaNodeUrl, subsocialParaId} from "../../env";
 
 export type Contribution = {
   refCode: string
@@ -15,8 +16,6 @@ const query = `
   INSERT INTO df.referral_contributions(block_number, event_index, contributor, ref_code, amount, date)
   VALUES(:blockNumber, :eventIndex, :contributor, :refCode, :amount, :date)
   RETURNING *`
-
-const SUBSOCIAL_PARA_ID = 2100 // TODO: extract to .env
 
 const parseEvents = (events, contributor: string) => {
   let refCode: string
@@ -53,7 +52,7 @@ const parseEvents = (events, contributor: string) => {
   }
 }
 
-const getKusamaApi = () => getApi('wss://staging.subsocial.network/kusama') // TODO: extract to .env
+const getKusamaApi = () => getApi(kusamaNodeUrl)
 
 export async function insertContribution({ message, account }: SessionCall<Contribution>) {
   const { blockHash } = message.args
@@ -74,7 +73,7 @@ export async function insertContribution({ message, account }: SessionCall<Contr
 
   if (!refCode) return
 
-  if (paraId.toNumber() !== SUBSOCIAL_PARA_ID) {
+  if (paraId.toNumber() !== subsocialParaId) {
     throw 'The no Subsocial contribute'
   }
 
@@ -91,7 +90,7 @@ export async function insertContribution({ message, account }: SessionCall<Contr
 
   try {
     runQuery(query, params)
-    updateNonce(account, nonce + 1)
+    incNonce(account, nonce)
   } catch (err) {
     throw newPgError(err, insertContribution)
   }

@@ -6,7 +6,7 @@ import { AddSessionKeyArgs, SessionCall } from '../types/sessionKey'
 import { IQueryParams } from '../types/addSessionKey.queries'
 import { getNonce } from '../selects/getNonce'
 import { insertNonce } from './insertNonce'
-import { updateNonce } from '../updates/updateNonce'
+import { incNonce } from '../updates/updateNonce'
 import { toSubsocialAddress } from '@subsocial/utils'
 
 const query = `
@@ -42,7 +42,7 @@ export async function addSessionKey(sessionCall: SessionCall<AddSessionKeyArgs>)
 
       await runQuery<IQueryParams>(query, { mainKey: account, sessionKey: sessionKeyGeneric })
       log.debug(`Insert in nonces table: ${account} session key ${sessionKeyGeneric}`)
-      await updateNonce(account, message.nonce + 1)
+      await incNonce(account, message.nonce)
     } catch (err) {
       log.error(`Failed to insert in session key table by account: ${account}`, err.stack)
       throw err

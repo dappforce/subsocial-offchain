@@ -1,7 +1,7 @@
 import { runQuery, isValidSignature, upsertNonce } from '../utils';
 import { log } from '../postges-logger'
 import { SessionCall, SetUpEmailArgs } from '../types/sessionKey';
-import { updateNonce } from '../updates/updateNonce';
+import {incNonce} from '../updates/updateNonce';
 import { getExpiresOnDate } from '../../express-api/email/utils';
 import { Periodicity } from '../../express-api/utils';
 import { formatEmail } from '@subsocial/utils/email';
@@ -42,7 +42,7 @@ export const addEmailSettings = async (sessionCall: SessionCall<SetUpEmailArgs>)
 
 			const formatted_email = formatEmail(email)
 			const res = await runQuery(addEmailSettingsQuery, { account: rootAddress, original_email: email, formatted_email, periodicity, send_feeds, send_notifs })
-			await updateNonce(account, message.nonce + 1)
+			await incNonce(account, message.nonce)
 			log.debug(`Insert email settings in database: ${rootAddress}`)
 			return res.rows
 		} catch (err) {

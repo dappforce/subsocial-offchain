@@ -133,7 +133,7 @@ app.post('/v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
 app.post('/v1/offchain/faucet/drop', faucetReqHandlers.tokenDropHandler)
 app.get('/v1/offchain/faucet/status', faucetReqHandlers.getFaucetStatus)
 
-app.post('/v1/offchain/contributions/set', checkSignature, pgReqHandlers.addContributionHandler)
+app.post('/v1/offchain/contributions/add', checkSignature, pgReqHandlers.addContributionHandler)
 app.get('/v1/offchain/contributions/:refCode', pgReqHandlers.getContributionsByRefIdHandler)
 
 app.post('/v1/parseSite', async (req: express.Request, res: express.Response) => {

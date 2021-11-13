@@ -6,7 +6,7 @@ const query = `
   SET nonce = :nonce
   WHERE account = :mainKey`
 
-export const updateNonce = async (mainKey: string, nonce: number) => {
+const updateNonce = async (mainKey: string, nonce: number) => {
   try {
     await runQuery(query, { mainKey, nonce })
     log.debug(`Update in session key table: ${mainKey} with nonce ${nonce}`)
@@ -15,3 +15,5 @@ export const updateNonce = async (mainKey: string, nonce: number) => {
     throw err
   }
 }
+
+export const incNonce = (mainKey: string, nonce: number) => updateNonce(mainKey, nonce + 1)
