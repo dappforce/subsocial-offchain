@@ -76,12 +76,12 @@ export const checkSignature = (req: express.Request, res: express.Response, next
   const sessionCall = req.body.sessionCall as SessionCall<any>
 
   if (!sessionCall) {
-    res.status(403).send('Invalid input data')
+    res.status(403).send('No "sessionCall" was found in request body')
   }
 
   const isValid = isValidSignature(sessionCall)
   if (!isValid) {
-    res.status(403).send("Signature is not valid")
+    res.status(403).send('Cannot verify the signature of the "sessionCall"')
   }
 
   next()

@@ -59,7 +59,7 @@ export async function insertContribution({ message, account }: SessionCall<Contr
   const { rootAddress: contributor, nonce } = await upsertNonce(account, message)
 
   if (message.nonce != nonce) {
-    throw 'Nonce is different'
+    throw 'Unexpected nonce for account: ' + account
   }
 
   const kusamaApi = await getKusamaApi()
@@ -74,7 +74,7 @@ export async function insertContribution({ message, account }: SessionCall<Contr
   if (!refCode) return
 
   if (paraId.toNumber() !== subsocialParaId) {
-    throw 'The no Subsocial contribute'
+    throw 'Not Subsocial contribution. Para id is different: ' + paraId
   }
 
   const header = await kusamaApi.rpc.chain.getHeader(blockHash)
