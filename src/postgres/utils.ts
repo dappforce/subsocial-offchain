@@ -1,6 +1,6 @@
 import { pg } from '../connections/postgres'
 import { signatureVerify } from '@polkadot/util-crypto'
-import { SessionCall, MessageGenericExtends, Message } from './types/sessionKey'
+import { SessionCall, Message } from './types/sessionKey'
 import { insertNonce } from './inserts/insertNonce'
 import { getNonce } from './selects/getNonce'
 import { getAccountFromSessionKey } from './selects/getAccountBySessionKey'
@@ -41,7 +41,7 @@ export const runQuery = async <T>(query: string, params?: T) => {
   return result
 }
 
-export const isValidSignature = (sessionCall: SessionCall<MessageGenericExtends>) => {
+export const isValidSignature = (sessionCall: SessionCall<any>) => {
   const { message, signature, account } = sessionCall
   const signedMessage = JSON.stringify(sortObj(message))
   return signatureVerify(signedMessage, signature, account).isValid
@@ -52,7 +52,7 @@ type RootAddressWithNonce = {
   nonce: any
 }
 
-export const upsertNonce = async <T extends MessageGenericExtends>(
+export const upsertNonce = async <T>(
   account: string,
   message: Message<T>
 ): Promise<RootAddressWithNonce> => {

@@ -2,7 +2,7 @@ import { informClientAboutUnreadNotifications } from '../../ws/events';
 import { log } from '../postges-logger';
 import { runQuery, isValidSignature, upsertNonce } from '../utils';
 import { SessionCall, ReadAllMessage } from '../types/sessionKey';
-import { updateNonce } from './updateNonce';
+import { incNonce } from './updateNonce';
 
 const query = `
   WITH last_activity AS (
@@ -40,7 +40,7 @@ export async function markAllNotifsAsRead(sessionCall: SessionCall<ReadAllMessag
       informClientAboutUnreadNotifications(rootAddress, 0)
       log.debug(`Marked all notifications as read by account: ${rootAddress}`)
 
-      await updateNonce(account, message.nonce + 1)
+      await incNonce(account, message.nonce)
 
       return data.rowCount
     } catch (err) {
