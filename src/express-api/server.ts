@@ -15,6 +15,7 @@ import { reqTimeoutSecs, maxFileSizeBytes } from './config';
 import './email/jobs'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
 import { isEmptyStr } from '@subsocial/utils';
+import helmet from 'helmet'
 
 require('dotenv').config()
 
@@ -34,8 +35,9 @@ const corsOpts = function (req: express.Request, callback) {
 }
 
 app.use(cors(corsOpts))
+app.use(helmet())
 
-function haltOnTimedout(req: express.Request, _res: express.Response, next) {
+function haltOnTimeout(req: express.Request, _res: express.Response, next) {
   if (!req.timedout) next()
 }
 
@@ -43,11 +45,11 @@ app.use(timeout(`${reqTimeoutSecs}s`))
 
 // for parsing application/json
 app.use(bodyParser.json({ limit: maxFileSizeBytes }))
-app.use(haltOnTimedout)
+app.use(haltOnTimeout)
 
 // for parsing application/xwww-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }))
-app.use(haltOnTimedout)
+app.use(haltOnTimeout)
 
 // for parsing multipart/form-data
 const upload = multer({ limits: { fieldSize: maxFileSizeBytes } })
