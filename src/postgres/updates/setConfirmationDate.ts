@@ -2,7 +2,7 @@ import { runQuery, newPgError, isValidSignature, upsertNonce } from '../utils';
 import { getConfirmationData } from '../selects/getConfirmationCode';
 import { log } from '../postges-logger';
 import { ConfirmEmail, SessionCall } from '../types/sessionKey';
-import { updateNonce } from './updateNonce';
+import { incNonce } from './updateNonce';
 import { BaseConfirmData } from '../../express-api/faucet/types';
 import dayjs from 'dayjs'
 import { nonEmptyStr } from '@subsocial/utils';
@@ -55,7 +55,7 @@ export async function setConfirmationDateForSettings(sessionCall: SessionCall<Co
 
     const confirmationCode = message.args.confirmationCode
     
-    await updateNonce(account, message.nonce + 1)
+    await incNonce(account, message.nonce)
     const { ok } = await setConfirmationDate({ account: rootAddress, confirmationCode })
     return ok
   }

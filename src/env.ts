@@ -37,3 +37,6 @@ export const faucetDripAmount = parseFloat(process.env.FAUCET_DRIP_AMOUNT || '0'
 
 export const corsAllowedList = process.env.CORS_ALLOWED_ORIGIN.split(',')
 export const isAllCorsAllowed = corsAllowedList[0] === '*'
+
+export const subsocialParaId = 2100
+export const kusamaNodeUrl = process.env.KUSAMA_NODE_URL

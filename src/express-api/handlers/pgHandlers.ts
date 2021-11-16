@@ -18,7 +18,6 @@ import { getDateAndCountByActivities } from '../../postgres/selects/getDateAndCo
 import { getActivityCountByEvent } from '../../postgres/selects/getActivityCountByEvent';
 import { getActivityCountForToday } from '../../postgres/selects/getActivityCountForToday';
 import { setConfirmationDateForSettings } from '../../postgres/updates/setConfirmationDate';
-import { asAccountId } from '@subsocial/api';
 
 import {
   getOffsetFromRequest,
@@ -27,6 +26,9 @@ import {
   HandlerFn,
 } from '../utils'
 import { Period } from '../../postgres/utils';
+import { Contribution, insertContribution } from '../../postgres/inserts/insertContribution'
+import { getContributionsByRefId } from '../../postgres/selects/getContributionsByRefId';
+import { toSubsocialAddress } from '@subsocial/utils';
 
 type Params = {
   account: string
@@ -35,7 +37,7 @@ type Params = {
 
 const parseParamsWithAccount = ({ account, ...params }: Record<string, any>): Params => {
   return {
-    account: asAccountId(account)?.toString(),
+    account: toSubsocialAddress(account)?.toString(),
     ...params
   }
 }
@@ -125,7 +127,6 @@ export const getNonceHandler: HandlerFn = (req, res) => {
   return resolvePromiseAndReturnJson(res, getNonce(account))
 }
 
-
 export const setTelegramDataHandler: HandlerFn = (req, res) => {
   const { account, chatId } = parseParamsWithAccount(req.body)
   return resolvePromiseAndReturnJson(res, setTelegramData(account, Number(chatId)))
@@ -186,4 +187,13 @@ export const getActivityCountByEventHandler: HandlerFn = (req, res) => {
 export const getActivityCountForTodayHandler: HandlerFn = (req, res) => {
   const event = req.query.event
   return resolvePromiseAndReturnJson(res, getActivityCountForToday(event.toString()))
+}
+
+export const addContributionHandler: HandlerFn = (req, res) => {
+  return resolvePromiseAndReturnJson(res, insertContribution(req.body.sessionCall as SessionCall<Contribution>))
+}
+
+export const getContributionsByRefIdHandler: HandlerFn = (req, res) => {
+  const { refCode } = req.params
+  return resolvePromiseAndReturnJson(res, getContributionsByRefId(refCode))
 }

@@ -1,7 +1,7 @@
 import { runQuery, newPgError, isValidSignature, upsertNonce } from '../utils';
 import { log } from '../postges-logger';
 import { ConfirmLetter, SessionCall } from '../types/sessionKey';
-import { updateNonce } from './updateNonce';
+import {incNonce} from './updateNonce';
 import { getExpiresOnDate } from '../../express-api/email/utils';
 import { formatEmail } from '@subsocial/utils/email';
 
@@ -30,7 +30,7 @@ export async function setConfirmationCodeForNewEmail(sessionCall: SessionCall<Co
     const params = { account: rootAddress, expiresOn, confirmationCode, formattedEmail };
     try {
       const res = await runQuery(query, params)
-      await updateNonce(account, message.nonce + 1)
+      await incNonce(account, message.nonce)
       return res.rows[0]
 
     } catch (err) {
