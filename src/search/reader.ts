@@ -1,42 +1,37 @@
 import { newLogger, isEmptyArray } from '@subsocial/utils'
 import { MAX_RESULTS_LIMIT } from '../express-api/utils'
+import { ElasticQueryParamsWithSpaceId } from '../express-api/handlers/esHandlers'
 import {
   ElasticIndex,
   ElasticIndexTypes,
   AllElasticIndexes,
-  ElasticFields,
-  ElasticQueryParams,
+  ElasticFields
 } from '@subsocial/types/offchain/search'
 
 const log = newLogger('Elastic Reader')
 
-const resoloveElasticIndexByType = (type: ElasticIndexTypes) =>
-  ElasticIndex[type]
+const resoloveElasticIndexByType = (type: ElasticIndexTypes) => ElasticIndex[type]
 
 const resoloveElasticIndexes = (indexes: ElasticIndexTypes[]) =>
-  indexes && indexes.includes('all')
-    ? AllElasticIndexes
-    : indexes?.map(resoloveElasticIndexByType)
+  indexes && indexes.includes('all') ? AllElasticIndexes : indexes?.map(resoloveElasticIndexByType)
 
-export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
+export const buildElasticSearchQuery = (params: ElasticQueryParamsWithSpaceId) => {
   const indexes = resoloveElasticIndexes(params.indexes)
   const q = params.q || '*'
   const tags = params.tags || []
   const from = params.offset || 0
   const size = params.limit || MAX_RESULTS_LIMIT
+  const spaceId = params.spaceId
 
   // TODO: support sorting of results
 
   const baseSearchProps = {
     index: indexes,
     from: from,
-    size: size,
+    size: size
   }
 
-  const tagFields = [
-    ElasticFields.space.tags,
-    ElasticFields.post.tags
-  ]
+  const tagFields = [ElasticFields.space.tags, ElasticFields.post.tags]
 
   const searchFields = [
     `${ElasticFields.space.name}^3`,
@@ -51,43 +46,57 @@ export const buildElasticSearchQuery = (params: ElasticQueryParams) => {
     `${ElasticFields.comment.body}^2`,
 
     `${ElasticFields.profile.name}^3`,
-    `${ElasticFields.profile.about}^1`,
+    `${ElasticFields.profile.about}^1`
   ]
 
   const isEmptyQuery = q === '*' || q.trim() === ''
 
-  const searchQueryPart = isEmptyQuery
+  const spaceIdQuery = spaceId
     ? {
-        match_all: {},
+        match: {
+          spaceId: spaceId
+        }
       }
     : {
-        multi_match: {
-          query: q,
-          fields: searchFields,
-        },
+        match_all: {}
+      }
+
+  const searchQueryPart = isEmptyQuery
+    ? {
+        match_all: {}
+      }
+    : {
+        query_string: {
+          query: `*${q}*`,
+          fields: searchFields
+        }
       }
 
   const tagFilterQueryPart = tags.map((tag) => ({
     multi_match: {
       query: tag,
-      fields: tagFields,
-    },
+      fields: tagFields
+    }
   }))
 
   const searchBody = isEmptyArray(tagFilterQueryPart)
-    ? searchQueryPart
+    ? {
+        bool: {
+          must: [searchQueryPart, spaceIdQuery]
+        }
+      }
     : {
         bool: {
           must: searchQueryPart,
-          filter: [tagFilterQueryPart],
-        },
+          filter: [tagFilterQueryPart]
+        }
       }
 
   const searchReq = {
     ...baseSearchProps,
     body: {
-      query: searchBody,
-    },
+      query: searchBody
+    }
   }
 
   log.debug('Final ElasticSearch query:', searchReq)
