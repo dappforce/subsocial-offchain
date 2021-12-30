@@ -35,7 +35,10 @@ const upgradeDbSchema = async (actualSchemaVersion: number) => {
 const init = async () => {
   try {
     const { rows } = await runQuery('SELECT * FROM df.schema_version LIMIT 1')
-    const maxAvailableSchemaVersion = schemaFiles.map(stripSchemaVersion).pop()
+    const maxAvailableSchemaVersion = schemaFiles
+      .map(stripSchemaVersion)
+      .sort((a, b) => a - b)
+      .pop()
 
     const actualSchemaVersion = rows[0]?.value as number || 0
     if (!actualSchemaVersion || actualSchemaVersion < maxAvailableSchemaVersion) {
