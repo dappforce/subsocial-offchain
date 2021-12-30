@@ -4,6 +4,9 @@ import { expressApiLog } from '../connections/loggers'
 import { Dayjs } from 'dayjs'
 import { SessionCall } from '../postgres/types/sessionKey'
 import { isValidSignature } from '../postgres/utils'
+import {kusamaNodeUrl} from "../env";
+import {ApiPromise, WsProvider} from "@polkadot/api";
+import { toSubsocialAddress } from '@subsocial/utils';
 
 export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 20
 
@@ -87,3 +90,23 @@ export const checkSignature = (req: express.Request, res: express.Response, next
   next()
 }
 
+
+export const getKusamaApi = async () => {
+    if (kusamaApi) return kusamaApi
+
+    kusamaApi = await new ApiPromise({ provider: new WsProvider(kusamaNodeUrl) }).isReady
+    return kusamaApi
+}
+
+
+type Params = {
+  account: string
+  [key: string]: any
+}
+
+export const parseParamsWithAccount = ({ account, ...params }: Record<string, any>): Params => {
+  return {
+    account: toSubsocialAddress(account)?.toString(),
+    ...params
+  }
+}

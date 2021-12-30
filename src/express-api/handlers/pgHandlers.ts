@@ -24,23 +24,11 @@ import {
   getLimitFromRequest,
   resolvePromiseAndReturnJson,
   HandlerFn,
+  parseParamsWithAccount,
 } from '../utils'
 import { Period } from '../../postgres/utils';
 import { Contribution, insertContribution } from '../../postgres/inserts/insertContribution'
 import { getContributionsByRefId } from '../../postgres/selects/getContributionsByRefId';
-import { toSubsocialAddress } from '@subsocial/utils';
-
-type Params = {
-  account: string
-  [key: string]: any
-}
-
-const parseParamsWithAccount = ({ account, ...params }: Record<string, any>): Params => {
-  return {
-    account: toSubsocialAddress(account)?.toString(),
-    ...params
-  }
-}
 
 const activityHandler = (
   req: express.Request,

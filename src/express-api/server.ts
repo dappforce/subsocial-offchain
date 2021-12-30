@@ -7,7 +7,8 @@ import * as esReqHandlers from './handlers/esHandlers'
 import * as ipfsReqHandlers from './handlers/ipfsHandlers'
 import * as pgReqHandlers from './handlers/pgHandlers'
 import * as emailHandlers from './handlers/emailHandlers'
-import * as faucetReqHandlers from './handlers/faucetHandlers'
+import * as pollsHandlers from './handlers/votesHandlers'
+// import * as faucetReqHandlers from './handlers/faucetHandlers'
 import * as moderationHandlers from './handlers/getBlockListHandler'
 import { expressApiLog as log } from '../connections/loggers'
 import timeout from 'connect-timeout'
@@ -147,6 +148,9 @@ app.post('/v1/parseSite', async (req: express.Request, res: express.Response) =>
   res.send(data)
 })
 
+app.get(getV1Offchain('/polls/:pollId'), pollsHandlers.getVoteByPollHandler)
+app.get(getV1Offchain('/polls/:pollId/:account'), pollsHandlers.getVoteByAccountAndPollHandler)
+app.post(getV1Offchain('/polls/upsert'), pollsHandlers.upsertVoteHandler)
 export const startHttpServer = () =>
   app.listen(port, () => {
     log.info(`HTTP server started on port ${port}`)
