@@ -1,9 +1,10 @@
 const upsertVoteQuery = `
-  INSERT INTO df.casted_votes (poll_id, account, vote, signature)
-  VALUES(:pollId, :account, :vote, :periodicity, :signature)
-  ON CONFLICT (account) DO UPDATE
-	SET vote = :vote,
-	signature = :signature
+  INSERT INTO df.casted_votes(poll_id, account, vote, signature)
+  VALUES(:pollId, :account, :vote, :signature)
+  ON CONFLICT (poll_id, account) 
+	DO UPDATE SET
+		vote = :vote,
+		signature = :signature;
 `
 
 import { UpsertVote } from '../../models'

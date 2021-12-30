@@ -2,7 +2,7 @@ import { runQuery } from '../utils';
 import { log } from '../postges-logger';
 
 const query = `
-  SELECT DISTINCT account, vote FROM df.casted_votes
+  SELECT DISTINCT account, vote, date FROM df.casted_votes
   WHERE poll_id = :pollId
 `
 
@@ -14,7 +14,7 @@ type Result = {
 export const getVotesByPoll = async (pollId: string): Promise<Result> => {
 	try {
 		const data = await runQuery(query, { pollId })
-		return data.rows[0] || {} as Result
+		return data.rows
 	} catch (err) {
 		log.error(`Failed to select votes by poll #${pollId}:`, err.stack)
 		throw err
