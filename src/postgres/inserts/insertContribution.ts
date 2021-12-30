@@ -1,5 +1,5 @@
 import { newPgError, runQuery, upsertNonce } from '../utils'
-import { getApi } from '@subsocial/api'
+import { getSubstrateApi } from '@subsocial/api'
 import { equalAddresses } from '../../utils'
 import { SessionCall } from '../types/sessionKey'
 import { incNonce } from '../updates/updateNonce'
@@ -52,7 +52,7 @@ const parseEvents = (events, contributor: string) => {
   }
 }
 
-const getKusamaApi = () => getApi(kusamaNodeUrl)
+const getKusamaApi = () => getSubstrateApi(kusamaNodeUrl)
 
 export async function insertContribution({ message, account }: SessionCall<Contribution>) {
   const { blockHash } = message.args
