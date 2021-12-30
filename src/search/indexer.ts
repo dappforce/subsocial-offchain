@@ -40,17 +40,17 @@ async function getPostDoc(post: Post): Promise<ElasticPostDoc | undefined> {
   if (!content) return undefined
 
   const { substrate } = await resolveSubsocialApi()
-  const { space_id, extension } = post
+  const { spaceId: _spaceId, extension } = post
   const { title, body, tags } = content
 
   let spaceId: string
 
   if (extension.isComment) {
-    const rootPostId = extension.asComment.root_post_id
+    const rootPostId = extension.asComment.rootPostId
     const rootPost = await substrate.findPost({ id: rootPostId })
-    spaceId = stringifyOption(rootPost.space_id)
+    spaceId = stringifyOption(rootPost.spaceId)
   } else {
-    spaceId = stringifyOption(space_id)
+    spaceId = stringifyOption(_spaceId)
   }
 
   return {

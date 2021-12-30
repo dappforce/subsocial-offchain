@@ -99,7 +99,7 @@ const getPostPreview = async (account: string, postId: string, message: string, 
 	const actionDate = getFormatDate(date)
 
 	const post = await subsocial.findPost({ id: postId as unknown as PostId })
-	const spaceId = post.struct.space_id
+	const spaceId = post.struct.spaceId
 	const { title, image = '' } = post.content || {}
 
 	const { name: accountName, avatar } = await getAccountContent(account)

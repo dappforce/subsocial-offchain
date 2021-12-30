@@ -6,7 +6,7 @@ import { summarizeMd } from '@subsocial/utils/summarize'
 import { Activity, PostWithAllDetails } from '@subsocial/types';
 
 const createPostData = async ({ post, space }: PostWithAllDetails) => {
-  const { id, owner, space_id, created: { time } } = post.struct
+  const { id, owner, spaceId, created: { time } } = post.struct
 
   const { title: postTitle, body, image } = post.content
 
@@ -18,7 +18,7 @@ const createPostData = async ({ post, space }: PostWithAllDetails) => {
 
   const { name: ownerName = toShortAddress(ownerAddress), avatar } = await getAccountContent(ownerAddress)
 
-  const postLink = createHrefForPost(space_id.toString(), id.toString())
+  const postLink = createHrefForPost(spaceId.toString(), id.toString())
 
   return {
     ownerName,

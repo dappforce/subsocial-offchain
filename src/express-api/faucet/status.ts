@@ -53,19 +53,19 @@ export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
   }
 
 
-  const { period_limit, dripped_in_current_period, drip_limit, next_period_at, enabled } = faucetOpt.unwrap()
+  const { periodLimit, drippedInCurrentPeriod, dripLimit, nextPeriodAt, enabled } = faucetOpt.unwrap()
 
   if (!enabled) {
     log.warn('Faucet is disabled')
     return failedRes
   }
 
-  if (drip_limit.lt(faucetDripAmount)) {
+  if (dripLimit.lt(faucetDripAmount)) {
     log.warn('Drip limmit is less than faucet drip amount')
     return failedRes
   }
 
-  const tokensLeftInCurrentPeriod = period_limit.sub(dripped_in_current_period)
+  const tokensLeftInCurrentPeriod = periodLimit.sub(drippedInCurrentPeriod)
 
   const lastBlock = await api.rpc.chain.getBlock()
   const currentBlock = lastBlock.block.header.number.toBn().addn(1)
@@ -77,7 +77,7 @@ export const checkFaucetIsActive = async (): Promise<OkOrError<null>> => {
       errors: {
         faucet: {
           status: 'PeriodLimitReached',
-          data: calculateComeBackTime(next_period_at, currentBlock)
+          data: calculateComeBackTime(nextPeriodAt, currentBlock)
         }
       }
     }

@@ -18,10 +18,13 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
   "include": [
     "src/**/*",
     "tests/**/*"
-  ]
+  ],
+  "exclude": [
+    "src/substrate/substrate-types.js"
+  ],
 }
