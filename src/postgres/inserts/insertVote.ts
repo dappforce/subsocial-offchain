@@ -7,12 +7,14 @@ const upsertVoteQuery = `
 		signature = :signature;
 `
 
+import { OkOrError } from '../../express-api/utils'
 import { UpsertVote } from '../../models'
 import { newPgError, runQuery } from '../utils'
 
-export async function upsertVote (params: UpsertVote) {
+export async function upsertVote (params: UpsertVote): Promise<OkOrError> {
 	try {
 		await runQuery(upsertVoteQuery, params)
+		return { ok: true }
 	} catch (err) {
 		throw newPgError(err, upsertVote)
 	}

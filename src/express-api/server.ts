@@ -150,8 +150,8 @@ app.post(getV1Offchain('/parseSite'), async (req: express.Request, res: express.
   res.send(data)
 })
 
-app.get(getV1Offchain('/polls/:pollId'), pollsHandlers.getVoteByPollHandler)
-app.get(getV1Offchain('/polls/:pollId/:account'), pollsHandlers.getVoteByAccountAndPollHandler)
+app.get(getV1Offchain('/polls/:pollId/votes'), pollsHandlers.getVoteByPollHandler)
+app.get(getV1Offchain('/polls/:pollId/:account/vote'), pollsHandlers.getVoteByAccountAndPollHandler)
 app.post(getV1Offchain('/polls/upsert'), pollsHandlers.upsertVoteHandler)
 app.get(getV1Offchain('/moderation/list'), moderationHandlers.getBlockListHandler)
 
