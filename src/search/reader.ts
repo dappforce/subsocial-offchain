@@ -13,15 +13,17 @@ const log = newLogger('Elastic Reader')
 const resoloveElasticIndexByType = (type: ElasticIndexTypes) => ElasticIndex[type]
 
 const resoloveElasticIndexes = (indexes: ElasticIndexTypes[]) =>
-  indexes && indexes.includes('all') ? AllElasticIndexes : indexes?.map(resoloveElasticIndexByType)
+  indexes && indexes.includes('all')
+    ? AllElasticIndexes
+    : indexes?.map(resoloveElasticIndexByType)
 
 export const buildElasticSearchQuery = (params: ElasticQueryParamsWithSpaceId) => {
   const indexes = resoloveElasticIndexes(params.indexes)
   const q = params.q || '*'
+  const spaceId = params.spaceId
   const tags = params.tags || []
   const from = params.offset || 0
   const size = params.limit || MAX_RESULTS_LIMIT
-  const spaceId = params.spaceId
 
   // TODO: support sorting of results
 
@@ -31,7 +33,10 @@ export const buildElasticSearchQuery = (params: ElasticQueryParamsWithSpaceId) =
     size: size
   }
 
-  const tagFields = [ElasticFields.space.tags, ElasticFields.post.tags]
+  const tagFields = [
+    ElasticFields.space.tags,
+    ElasticFields.post.tags
+  ]
 
   const searchFields = [
     `${ElasticFields.space.name}^3`,
@@ -54,7 +59,7 @@ export const buildElasticSearchQuery = (params: ElasticQueryParamsWithSpaceId) =
   const spaceIdQuery = spaceId
     ? {
         match: {
-          spaceId: spaceId
+          spaceId
         }
       }
     : {
