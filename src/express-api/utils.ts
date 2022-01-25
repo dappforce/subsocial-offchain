@@ -2,13 +2,14 @@ import * as express from 'express'
 import { nonEmptyStr, parseNumStr } from '@subsocial/utils'
 import { expressApiLog } from '../connections/loggers'
 import { Dayjs } from 'dayjs'
-import { SessionCall } from '../postgres/types/sessionKey'
 import { isValidSignature } from '../postgres/utils'
 import { toSubsocialAddress } from '@subsocial/utils';
+import { SignMessage } from '../models/common'
+import { SessionCall } from '../postgres/types/sessionKey'
 
 export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 20
 
-export type HandlerFn = (req: express.Request, res: express.Response) => Promise<any>
+export type HandlerFn = (req: express.Request, res: express.Response) => any
 
 export type Periodicity = 'Immediately' | 'Daily' | 'Weekly' | 'Never'
 
@@ -72,21 +73,28 @@ export const getOffsetFromRequest = (
   return getNumberFromRequest(req, 'offset', defaultOffset)
 }
 
-// TODO: add check message.action
-export const checkSignature = (req: express.Request, res: express.Response, next) => {
-  const sessionCall = req.body.sessionCall as SessionCall<any>
+type GetDataFnType<T = any> = (req: express.Request) => SignMessage<T>
 
-  if (!sessionCall) {
-    res.status(403).send('No "sessionCall" was found in request body')
+// TODO: add check message.action
+export const buildCheckSignatureFn = (getData: GetDataFnType) => (req: express.Request, res: express.Response, next) => {
+  const signMessage = getData(req)
+
+  if (!signMessage) {
+    res.status(403).send('Sign message object was not found in request body')
+    return
   }
 
-  const isValid = isValidSignature(sessionCall)
+  const isValid = isValidSignature(signMessage)
   if (!isValid) {
-    res.status(403).send('Cannot verify the signature of the "sessionCall"')
+    res.status(403).send('Cannot verify the signature of the sign message')
+    return
   }
 
   next()
 }
+
+export const checkSessionKeySignature = buildCheckSignatureFn(req => req.body.sessionCall as SessionCall<any>)
+export const checkRegularSignature = buildCheckSignatureFn(req => req.body)
 
 type Params = {
   account: string

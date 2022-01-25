@@ -15,7 +15,7 @@ import { reqTimeoutSecs, maxFileSizeBytes } from './config'
 import './email/jobs'
 import {corsAllowedList, isAllCorsAllowed, port} from '../env'
 import { isEmptyStr } from '@subsocial/utils'
-import {checkSignature} from './utils'
+import {checkSessionKeySignature, checkRegularSignature} from './utils'
 
 require('dotenv').config()
 
@@ -136,7 +136,7 @@ app.get(
 // app.post(getV1Offchain('/faucet/drop'), faucetReqHandlers.tokenDropHandler)
 // app.get(getV1Offchain('/faucet/status'), faucetReqHandlers.getFaucetStatus)
 
-app.post(getV1Offchain('/contributions/add'), checkSignature, pgReqHandlers.addContributionHandler)
+app.post(getV1Offchain('/contributions/add'), checkSessionKeySignature, pgReqHandlers.addContributionHandler)
 app.get(getV1Offchain('/contributions/:refCode'), pgReqHandlers.getContributionsByRefIdHandler)
 
 app.post(getV1Offchain('/parseSite'), async (req: express.Request, res: express.Response) => {
@@ -152,7 +152,8 @@ app.post(getV1Offchain('/parseSite'), async (req: express.Request, res: express.
 
 app.get(getV1Offchain('/polls/:pollId/votes'), pollsHandlers.getVoteByPollHandler)
 app.get(getV1Offchain('/polls/:pollId/:account/vote'), pollsHandlers.getVoteByAccountAndPollHandler)
-app.post(getV1Offchain('/polls/upsert'), pollsHandlers.upsertVoteHandler)
+app.get(getV1Offchain('/polls/snapshot/:account'), pollsHandlers.accountFromSnapshotHandler)
+app.post(getV1Offchain('/polls/upsert'), checkRegularSignature, pollsHandlers.upsertVoteHandler)
 app.get(getV1Offchain('/moderation/list'), moderationHandlers.getBlockListHandler)
 
 export const startHttpServer = () =>

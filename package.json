@@ -37,7 +37,7 @@
     "@polkadot/util": "^7.4.1"
   },
   "devDependencies": {
-    "@subsocial/config": "0.6.6-dev.15",
+    "@subsocial/config": "0.6.6-dev.20",
     "@types/bn.js": "^4.11.5",
     "@types/connect-timeout": "^0.0.34",
     "@types/cors": "^2.8.6",
@@ -54,10 +54,10 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
-    "@subsocial/api": "0.6.6-dev.15",
-    "@subsocial/types": "0.6.6-dev.15",
-    "@subsocial/utils": "0.6.6-dev.15",
-    "@subsocial/definitions": "0.6.6-dev.15",
+    "@subsocial/api": "0.6.6-dev.20",
+    "@subsocial/types": "0.6.6-dev.20",
+    "@subsocial/utils": "0.6.6-dev.20",
+    "@subsocial/definitions": "0.6.6-dev.20",
     "@types/email-templates": "^8.0.0",
     "@types/handlebars": "^4.1.0",
     "@types/node-cron": "^2.0.3",

@@ -3,6 +3,7 @@ import { getVotesByPoll } from "../../../postgres/selects/getVotesByPollId"
 import { UpsertVote } from "../../../models"
 import { upsertVote } from "../../../postgres/inserts/insertVote"
 import { HandlerFn, parseParamsWithAccount, resolvePromiseAndReturnJson } from "../../utils"
+import { accountFromSnapshot } from "./utils"
 
 export const getVoteByAccountAndPollHandler: HandlerFn = (req, res) => {
   const { account, pollId } = parseParamsWithAccount(req.params)
@@ -17,4 +18,9 @@ export const getVoteByPollHandler: HandlerFn = (req, res) => {
 export const upsertVoteHandler: HandlerFn = (req, res) => {
   const params = parseParamsWithAccount(req.body) as UpsertVote
   return resolvePromiseAndReturnJson(res, upsertVote(params))
+}
+
+export const accountFromSnapshotHandler: HandlerFn = (req, res) => {
+  const { account } = parseParamsWithAccount(req.params)
+  res.json(accountFromSnapshot(account))
 }
