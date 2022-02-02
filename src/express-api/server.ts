@@ -156,6 +156,8 @@ app.get(getV1Offchain('/polls/snapshot/:account'), pollsHandlers.accountFromSnap
 app.post(getV1Offchain('/polls/upsert'), checkRegularSignature, pollsHandlers.upsertVoteHandler)
 app.get(getV1Offchain('/moderation/list'), moderationHandlers.getBlockListHandler)
 
+
+
 export const startHttpServer = () =>
   app.listen(port, async () => {
     log.info(`HTTP server started on port ${port}`)
