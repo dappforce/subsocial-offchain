@@ -4,8 +4,8 @@ import { startSubstrateSubscriberWithWebSockets } from "./substrate/subscribe"
 
 const startOffchainServices = async () => {
   const { substrate } = await resolveSubsocialApi()
-  startHttpServer()
-  startSubstrateSubscriberWithWebSockets(substrate)
+  await startHttpServer()
+  await startSubstrateSubscriberWithWebSockets(substrate)
 }
 
 startOffchainServices()
