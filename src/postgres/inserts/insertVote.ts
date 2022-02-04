@@ -7,7 +7,7 @@ const upsertVoteQuery = `
 		signature = :signature;
 `
 
-import { accountFromSnapshot } from '../../express-api/handlers/votesHandlers/utils'
+import { accountFromSnapshot } from '../../express-api/handlers/crowdloanHandlers/utils'
 import { OkOrError } from '../../express-api/utils'
 import { UpsertVote } from '../../models'
 import { encodeStructId } from '../../substrate/utils'

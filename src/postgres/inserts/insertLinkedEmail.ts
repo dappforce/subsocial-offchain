@@ -7,13 +7,20 @@ const upsertLinkedEmailQuery = `
 		signature = :signature;
 `
 
+import { accountFromSnapshot } from '../../express-api/handlers/crowdloanHandlers/utils'
 import { OkOrError } from '../../express-api/utils'
 import { UpsertLinkedEmail } from '../../models/linked-emails'
 import { newPgError, runQuery } from '../utils'
 
 export async function upsertLinkedEmail (signMessage: UpsertLinkedEmail): Promise<OkOrError> {
 	try {
-		const { message: { email }, signature, account } = signMessage
+		const { message: { email }, signature } = signMessage
+
+		const snapshotData = accountFromSnapshot(signMessage.account)
+
+		if (!snapshotData) throw new Error('The account dont exist in snapshot')
+
+		const { account } = snapshotData
 
 		await runQuery(upsertLinkedEmailQuery, { account, email, signature })
 		return { ok: true }

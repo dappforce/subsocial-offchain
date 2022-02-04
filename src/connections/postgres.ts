@@ -3,7 +3,7 @@ import { postgesLog as log } from './loggers';
 
 require('dotenv').config();
 
-const pgCert = process.env.PG_CERT
+const enableSsl = process.env.PG_SSL === 'true'
 
 const pgConf: PoolConfig = {
   user: process.env.PGUSER,
@@ -11,9 +11,8 @@ const pgConf: PoolConfig = {
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: parseInt(process.env.PGPORT),
-  ssl: {
-    ca: pgCert,
-    rejectUnauthorized: !!pgCert
+  ssl: enableSsl && {
+    rejectUnauthorized: false
   }
 };
 

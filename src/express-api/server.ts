@@ -6,8 +6,7 @@ import timeout from 'connect-timeout'
 import { reqTimeoutSecs, maxFileSizeBytes } from './config'
 import './email/jobs'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
-import https from 'https'
-import { loadSSL } from '../utils'
+import { createV1Routes } from './routes'
 
 require('dotenv').config()
 
@@ -46,17 +45,12 @@ app.use(haltOnTimedout)
 // add static folder
 app.use(express.static('./email/templates'))
 
-export const startHttpServer = async () => {
-  const ssl = await loadSSL()
+app.use('/v1', createV1Routes())
 
-  https
-  .createServer(ssl, app)
-  .listen(port, async () => {
-app.get(getV1Offchain('/polls/:pollId/:account/vote'), pollsHandlers.getVoteByAccountAndPollHandler)
-app.get(getV1Offchain('/polls/:pollId/votes'), pollsHandlers.getVoteByPollHandler)
-app.get(getV1Offchain('/polls/snapshot/:account'), pollsHandlers.accountFromSnapshotHandler)
-app.post(getV1Offchain('/polls/upsert'), checkRegularSignature, pollsHandlers.upsertVoteHandler)
+export const startHttpServer = async () => {
+  // const ssl = await loadSSL()
+
+  app.listen(port, async () => {
     log.info(`HTTP server started on port ${port}`)
   })
 }
-  

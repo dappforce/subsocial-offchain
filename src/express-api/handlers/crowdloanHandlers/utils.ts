@@ -1,9 +1,15 @@
 import { toSubsocialAddress } from "@subsocial/utils"
-import { readFileSync } from "fs"
+import { readFileSync, existsSync } from "fs"
 import { join } from "path"
 import { stateDirPath } from "../../../utils"
 
-const parseJsonFromState = (fileName: string) => JSON.parse(readFileSync(join(stateDirPath, fileName)).toString())
+const parseJsonFromState = (fileName: string) => {
+  const path = join(stateDirPath, fileName)
+
+  if (!existsSync(path)) return {}
+
+  return JSON.parse(readFileSync(path).toString())
+}
 
 const contributors = parseJsonFromState('contributors.json')
 const investors = parseJsonFromState('investors.json')
