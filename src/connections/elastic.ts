@@ -11,12 +11,20 @@ if (!greeted) {
   log.info(`Connecting to Elasticsearch at ${esUrl}`)
 }
 
+const esCert = process.env.ES_CERT
+
+const ssl = {
+  ca: esCert,
+  rejectUnauthorized: !!esCert, // <-- this is important
+}
+
 export const elasticIndexer = new Client({
   node: esUrl,
   auth: {
     username: process.env.ES_OFFCHAIN_USER,
     password: process.env.ES_OFFCHAIN_PASSWORD
-  }
+  },
+  ssl,
 })
 
 export const elasticReader = new Client({
@@ -24,5 +32,6 @@ export const elasticReader = new Client({
   auth: {
     username: process.env.ES_READONLY_USER,
     password: process.env.ES_READONLY_PASSWORD
-  }
+  },
+  ssl
 })

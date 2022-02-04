@@ -51,12 +51,17 @@ export const addFile = async (req: express.Request, res: express.Response) => {
 /** Aka unpin */
 export const deleteContent = async (req: express.Request, res: express.Response) => {
   const { cid } = req.params
-  if (nonEmptyStr(cid)) {
-    await ipfsCluster.unpinContent(cid)
-    log.debug('Content unpinned from IPFS by CID:', cid)
-  } else {
-    const msg = 'Cannot unpin content: No CID provided'
-    log.warn(msg)
-    res.status(400).json(msg)
+  try {
+    if (nonEmptyStr(cid)) {
+      const result = await ipfsCluster.unpinContent(cid)
+      log.debug('Content unpinned from IPFS by CID:', cid)
+      res.json(result)
+    } else {
+      const msg = 'Cannot unpin content: No CID provided'
+      log.warn(msg)
+      res.status(400).json(msg)
+    }
+  } catch (err) {
+    res.status(500).json(err)
   }
 }

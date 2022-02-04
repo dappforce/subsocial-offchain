@@ -1,6 +1,6 @@
 {
   "name": "dappforce-subsocial-offchain",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "Off-chain services for Subsocial Network.",
   "author": "DappForce contributors",
   "license": "GPL-3.0-only",
@@ -9,7 +9,7 @@
     "node": ">= 14"
   },
   "scripts": {
-    "start": "concurrently \"node ./build/src/index.js\" \"yarn init-search\"",
+    "start": "yarn init-search && node ./build/src/index.js",
     "subscribe": "node ./build/src/substrate/start/index.js",
     "subscribe:with-ws": "node ./build/src/substrate/start/with-ws.js",
     "api": "node ./build/src/express-api/index.js",
