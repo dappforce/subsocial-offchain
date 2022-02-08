@@ -79,13 +79,13 @@ async function main (substrate: SubsocialSubstrateApi) {
     const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
 
     // TODO Improve performance: query events from multiple blocks at a time:
-    const events = await api.query.system.events.at(blockHash)
+    const events = await (await api.at(blockHash)).query.system.events()
 
     log.debug(`Best finalized block: ${bestFinalizedBlock.toString()}`)
     log.debug(`Block number to process: ${blockToProcess} with hash ${blockHash.toHex()}`)
 
     // Process all events of the current block
-      for (let i = 0; i < events.length; i++) {
+    for (let i = 0; i < events.length; i++) {
       const { event } = events[i]
 
       if (shouldHandleEvent(event)) {

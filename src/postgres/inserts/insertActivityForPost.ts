@@ -11,7 +11,7 @@ import { IQueryParams } from '../types/insertActivityForPost.queries';
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, space_id, post_id, date, agg_count)
     VALUES(:blockNumber, :eventIndex, :account, :event, :spaceId, :postId, :date, :aggCount)
-  RETURNING *`
+  ON CONFLICT (block_number, event_index) DO NOTHING;`
 
 export async function insertActivityForPost(eventAction: SubstrateEvent, ids: string[], count?: number): InsertActivityPromise {
 
