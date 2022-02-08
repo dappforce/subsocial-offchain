@@ -10,7 +10,7 @@ import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForPost
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, post_id, date, agg_count, aggregated)
     VALUES(:blockNumber, :eventIndex, :account, :event, :postId, :date, :aggCount, :aggregated)
-  RETURNING *`
+  ON CONFLICT (block_number, event_index) DO NOTHING;`
 
 const queryUpdate = `
   UPDATE df.activities
