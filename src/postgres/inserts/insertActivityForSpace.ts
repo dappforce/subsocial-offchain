@@ -9,7 +9,7 @@ import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForSpac
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, space_id, date, agg_count, aggregated)
     VALUES(:blockNumber, :eventIndex, :account, :event, :spaceId, :date, :aggCount, :aggregated)
-  RETURNING *`
+  ON CONFLICT (block_number, event_index) DO NOTHING;`
 
 const queryUpdate = `
   UPDATE df.activities

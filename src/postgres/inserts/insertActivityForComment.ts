@@ -11,7 +11,7 @@ import { IQueryParams, IQueryUpdateParams } from '../types/insertActivityForComm
 const query = `
   INSERT INTO df.activities(block_number, event_index, account, event, post_id, comment_id, parent_comment_id, date, agg_count, aggregated)
     VALUES(:blockNumber, :eventIndex, :account, :event, :postId, :commentId, :parentCommentId, :date, :aggCount, :aggregated)
-  RETURNING *`
+  ON CONFLICT (block_number, event_index) DO NOTHING;`
 
   const buildQueryUpdate = (parentEq?: string) => `
   UPDATE df.activities
