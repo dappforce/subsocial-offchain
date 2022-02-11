@@ -12,19 +12,32 @@ import { OkOrError } from '../../express-api/utils'
 import { UpsertLinkedEmail } from '../../models/linked-emails'
 import { newPgError, runQuery } from '../utils'
 
-export async function upsertLinkedEmail (signMessage: UpsertLinkedEmail): Promise<OkOrError> {
-	try {
-		const { message: { email }, signature } = signMessage
+enum Errors {
+  AccountIsNotEligible = 'AccountIsNotEligible'
+}
 
-		const snapshotData = accountFromSnapshot(signMessage.account)
+export async function upsertLinkedEmail(signMessage: UpsertLinkedEmail): Promise<OkOrError> {
+  try {
+    const {
+      message: { email },
+      signature
+    } = signMessage
 
-		if (!snapshotData) throw new Error('The account dont exist in snapshot')
+    const snapshotData = accountFromSnapshot(signMessage.account)
 
-		const { account } = snapshotData
+    if (!snapshotData)
+      return {
+        ok: false,
+        errors: {
+          account: Errors.AccountIsNotEligible
+        }
+      }
 
-		await runQuery(upsertLinkedEmailQuery, { account, email, signature })
-		return { ok: true }
-	} catch (err) {
-		throw newPgError(err, upsertLinkedEmail)
-	}
+    const { account } = snapshotData
+
+    await runQuery(upsertLinkedEmailQuery, { account, email, signature })
+    return { ok: true }
+  } catch (err) {
+    throw newPgError(err, upsertLinkedEmail)
+  }
 }
