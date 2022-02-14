@@ -9,13 +9,14 @@ import * as pgReqHandlers from './handlers/pgHandlers'
 import * as emailHandlers from './handlers/emailHandlers'
 import * as faucetReqHandlers from './handlers/faucetHandlers'
 import * as moderationHandlers from './handlers/getBlockListHandler'
+import * as crowdloanHandlers from './handlers/crowdloanHandlers'
 import { expressApiLog as log } from '../connections/loggers'
 import timeout from 'connect-timeout'
 import { reqTimeoutSecs, maxFileSizeBytes } from './config'
 import './email/jobs'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
 import { isEmptyStr } from '@subsocial/utils'
-import { checkSignature } from './utils'
+import { checkRegularSignature, checkSessionKeySignature } from './utils'
 
 require('dotenv').config()
 
@@ -133,7 +134,7 @@ app.post('/v1/offchain/faucet/confirm', faucetReqHandlers.confirmEmailHandler)
 app.post('/v1/offchain/faucet/drop', faucetReqHandlers.tokenDropHandler)
 app.get('/v1/offchain/faucet/status', faucetReqHandlers.getFaucetStatus)
 
-app.post('/v1/offchain/contributions/add', checkSignature, pgReqHandlers.addContributionHandler)
+app.post('/v1/offchain/contributions/add', checkSessionKeySignature, pgReqHandlers.addContributionHandler)
 app.get('/v1/offchain/contributions/:refCode', pgReqHandlers.getContributionsByRefIdHandler)
 
 app.post('/v1/parseSite', async (req: express.Request, res: express.Response) => {
@@ -147,9 +148,17 @@ app.post('/v1/parseSite', async (req: express.Request, res: express.Response) =>
   res.send(data)
 })
 
+app.get('/v1/offchain/moderation/list', moderationHandlers.getBlockListHandler)
+
+app.get('/v1/offchain/tokensale/snapshot/:account', crowdloanHandlers.accountFromSnapshotHandler)
+
+app.get('/v1/offchain/tokensale/email/:account', crowdloanHandlers.getLinkedEmailByAccountHandler)
+app.post('/v1/offchain/tokensale/email/link', checkRegularSignature, crowdloanHandlers.upsertEmailByAccountHandler)
+
 export const startHttpServer = () =>
   app.listen(port, () => {
     log.info(`HTTP server started on port ${port}`)
   })
 
-app.get('/v1/offchain/moderation/list', moderationHandlers.getBlockListHandler)
+
+
