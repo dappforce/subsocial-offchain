@@ -9,7 +9,7 @@ import * as pgReqHandlers from './handlers/pgHandlers'
 import * as emailHandlers from './handlers/emailHandlers'
 import * as faucetReqHandlers from './handlers/faucetHandlers'
 import * as moderationHandlers from './handlers/getBlockListHandler'
-import * as crowdloanHandlers from './handlers/crowdloanHandlers'
+import * as tokensaleHandlers from './handlers/tokensaleHandlers'
 import { expressApiLog as log } from '../connections/loggers'
 import timeout from 'connect-timeout'
 import { reqTimeoutSecs, maxFileSizeBytes } from './config'
@@ -150,10 +150,10 @@ app.post('/v1/parseSite', async (req: express.Request, res: express.Response) =>
 
 app.get('/v1/offchain/moderation/list', moderationHandlers.getBlockListHandler)
 
-app.get('/v1/offchain/tokensale/snapshot/:account', crowdloanHandlers.accountFromSnapshotHandler)
+app.get('/v1/offchain/tokensale/snapshot/:account', tokensaleHandlers.accountFromSnapshotHandler)
 
-app.get('/v1/offchain/tokensale/email/:account', crowdloanHandlers.getLinkedEmailByAccountHandler)
-app.post('/v1/offchain/tokensale/email/link', checkRegularSignature, crowdloanHandlers.upsertEmailByAccountHandler)
+app.get('/v1/offchain/tokensale/email/:account', tokensaleHandlers.getLinkedEmailByAccountHandler)
+app.post('/v1/offchain/tokensale/email/link', checkRegularSignature, tokensaleHandlers.upsertEmailByAccountHandler)
 
 export const startHttpServer = () =>
   app.listen(port, () => {

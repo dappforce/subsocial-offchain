@@ -7,7 +7,7 @@ const upsertLinkedEmailQuery = `
 		signature = :signature;
 `
 
-import { accountFromSnapshot } from '../../express-api/handlers/crowdloanHandlers/utils'
+import { accountFromSnapshot } from '../../express-api/handlers/tokensaleHandlers/utils'
 import { OkOrError } from '../../express-api/utils'
 import { UpsertLinkedEmail } from '../../models/linked-emails'
 import { newPgError, runQuery } from '../utils'
