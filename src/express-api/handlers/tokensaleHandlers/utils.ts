@@ -22,7 +22,7 @@ sources
     eligibleAccountsSet.add(toSubsocialAddress(account))
   })
 
-export const accountFromSnapshot = (account: string) => {
+export const isAccountFromSnapshot = (account: string) => {
   const key = toSubsocialAddress(account)
 
   return eligibleAccountsSet.has(key)

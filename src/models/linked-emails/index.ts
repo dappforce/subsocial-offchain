@@ -1,7 +1,7 @@
-import { SignMessage } from "../common"
+import { SignedMessage } from "../common"
 
 export type UpsertLinkedEmailMessage = {
   email: string
 }
 
-export type UpsertLinkedEmail = SignMessage<UpsertLinkedEmailMessage>
+export type UpsertLinkedEmail = SignedMessage<UpsertLinkedEmailMessage>

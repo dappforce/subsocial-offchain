@@ -2,7 +2,7 @@ import { UpsertLinkedEmail } from "../../../models/linked-emails"
 import { upsertLinkedEmail } from "../../../postgres/inserts/insertLinkedEmail"
 import { getLinkedEmailByAccount } from "../../../postgres/selects/getLinkedEmailByAccount"
 import { HandlerFn, parseParamsWithAccount, resolvePromiseAndReturnJson } from "../../utils"
-import { accountFromSnapshot } from "./utils"
+import { isAccountFromSnapshot } from "./utils"
 
 export const getLinkedEmailByAccountHandler: HandlerFn = (req, res) => {
   const { account } = parseParamsWithAccount(req.params)
@@ -14,7 +14,7 @@ export const upsertEmailByAccountHandler: HandlerFn = (req, res) => {
   return resolvePromiseAndReturnJson(res, upsertLinkedEmail(params))
 }
 
-export const accountFromSnapshotHandler: HandlerFn = (req, res) => {
+export const isAccountFromSnapshotHandler: HandlerFn = (req, res) => {
   const { account } = parseParamsWithAccount(req.params)
-  res.json(accountFromSnapshot(account))
+  res.json(isAccountFromSnapshot(account))
 }

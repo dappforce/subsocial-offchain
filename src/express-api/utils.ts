@@ -4,7 +4,7 @@ import { expressApiLog } from '../connections/loggers'
 import { Dayjs } from 'dayjs'
 import { isValidSignature } from '../postgres/utils'
 import { toSubsocialAddress } from '@subsocial/utils';
-import { SignMessage } from '../models/common'
+import { SignedMessage } from '../models/common'
 import { SessionCall } from '../postgres/types/sessionKey'
 
 export const MAX_RESULTS_LIMIT = parseNumStr(process.env.MAX_RESULTS_LIMIT) || 20
@@ -73,14 +73,14 @@ export const getOffsetFromRequest = (
   return getNumberFromRequest(req, 'offset', defaultOffset)
 }
 
-type GetDataFnType<T = any> = (req: express.Request) => SignMessage<T>
+type GetDataFnType<T = any> = (req: express.Request) => SignedMessage<T>
 
 // TODO: add check message.action
 export const buildCheckSignatureFn = (getData: GetDataFnType) => (req: express.Request, res: express.Response, next) => {
   const signMessage = getData(req)
 
   if (!signMessage) {
-    res.status(403).send('Sign message object was not found in request body')
+    res.status(403).send('No signed message object was not found in the request body')
     return
   }
 
