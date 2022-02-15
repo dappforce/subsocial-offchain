@@ -2,7 +2,8 @@ import { runQuery } from '../utils';
 import { log } from '../postges-logger';
 
 const query = `
-  SELECT DISTINCT account, email FROM df.linked_emails
+  SELECT DISTINCT account, email
+	FROM df.linked_emails
   WHERE account = :account
 `
 

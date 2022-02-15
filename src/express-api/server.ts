@@ -148,9 +148,10 @@ app.post('/v1/parseSite', async (req: express.Request, res: express.Response) =>
   res.send(data)
 })
 
+// TODO Delete? This is a deprecated off-chain moderation.
 app.get('/v1/offchain/moderation/list', moderationHandlers.getBlockListHandler)
 
-app.get('/v1/offchain/tokensale/snapshot/:account', tokensaleHandlers.accountFromSnapshotHandler)
+app.get('/v1/offchain/tokensale/snapshot/:account', tokensaleHandlers.isAccountFromSnapshotHandler)
 
 app.get('/v1/offchain/tokensale/email/:account', tokensaleHandlers.getLinkedEmailByAccountHandler)
 app.post('/v1/offchain/tokensale/email/link', checkRegularSignature, tokensaleHandlers.upsertEmailByAccountHandler)
