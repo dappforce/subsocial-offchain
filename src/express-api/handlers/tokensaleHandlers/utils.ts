@@ -19,7 +19,13 @@ sources
   .map((filename) => filename + '.json')
   .flatMap(parseJsonFromState)
   .forEach((account) => {
-    eligibleAccountsSet.add(toSubsocialAddress(account))
+    try {
+      // Wrapping this line into try/catch, because if some account addresses are be invalid
+      // then the whole app will fail with a parsing error.
+      eligibleAccountsSet.add(toSubsocialAddress(account))
+    } catch (err) {
+      // It's OK.
+    }
   })
 
 export const isAccountFromSnapshot = (account: string) => {
