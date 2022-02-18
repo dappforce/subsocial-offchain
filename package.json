@@ -9,7 +9,7 @@
     "node": ">= 14"
   },
   "scripts": {
-    "start": "concurrently \"node ./build/src/index.js\" \"yarn init-search\" \"yarn init-postgres\" ",
+    "start": "concurrently \"node ./build/src/index.js\" \"yarn init-search\"",
     "subscribe": "node ./build/src/substrate/start/index.js",
     "subscribe:with-ws": "node ./build/src/substrate/start/with-ws.js",
     "api": "node ./build/src/express-api/index.js",

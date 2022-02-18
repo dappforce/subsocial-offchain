@@ -27,9 +27,11 @@ export const readTokenSaleSources = () => {
     .flatMap(parseJsonFromState)
     .forEach((account) => {
       try {
+        // Wrapping this line into try/catch, because if some account addresses are be invalid
+        // then the whole app will fail with a parsing error.
         eligibleAccountsSet.add(toSubsocialAddress(account))
       } catch {
-        // It's ok
+        // It's OK.
       }
     })
   
