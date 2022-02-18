@@ -26,7 +26,11 @@ export const readTokenSaleSources = () => {
   files
     .flatMap(parseJsonFromState)
     .forEach((account) => {
-      eligibleAccountsSet.add(toSubsocialAddress(account))
+      try {
+        eligibleAccountsSet.add(toSubsocialAddress(account))
+      } catch {
+        // It's ok
+      }
     })
   
 }
