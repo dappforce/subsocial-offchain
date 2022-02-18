@@ -1,26 +1,35 @@
 import { toSubsocialAddress } from '@subsocial/utils'
-import { readFileSync, existsSync } from 'fs'
+import { readFileSync, existsSync, mkdirSync, readdirSync } from 'fs'
 import { join } from 'path'
 import { stateDirPath } from '../../../utils'
 
+const eligibleAccountsSet = new Set()
+const sourceFolder = 'tokensale'
+const sourcePath = `${stateDirPath}/${sourceFolder}`
+
 const parseJsonFromState = (fileName: string) => {
-  const path = join(stateDirPath, fileName)
+  const path = join(sourcePath, fileName)
 
   if (!existsSync(path)) return []
 
   return JSON.parse(readFileSync(path).toString())
 }
 
-const sources = ['contributors', 'token-claimers', 'subbaner-owners', 'ambassadors']
+export const readTokenSaleSources = () => {
 
-const eligibleAccountsSet = new Set()
+  if (!existsSync(sourcePath)) {
+    mkdirSync(sourcePath)
+  }
 
-sources
-  .map((filename) => filename + '.json')
-  .flatMap(parseJsonFromState)
-  .forEach((account) => {
-    eligibleAccountsSet.add(toSubsocialAddress(account))
-  })
+  const files = readdirSync(sourcePath)
+
+  files
+    .flatMap(parseJsonFromState)
+    .forEach((account) => {
+      eligibleAccountsSet.add(toSubsocialAddress(account))
+    })
+  
+}
 
 export const isAccountFromSnapshot = (account: string) => {
   const key = toSubsocialAddress(account)
