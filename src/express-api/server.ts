@@ -17,6 +17,7 @@ import './email/jobs'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
 import { isEmptyStr } from '@subsocial/utils'
 import { checkRegularSignature, checkSessionKeySignature } from './utils'
+import { readTokenSaleSources } from './handlers/tokensaleHandlers/utils'
 
 require('dotenv').config()
 
@@ -156,10 +157,14 @@ app.get('/v1/offchain/tokensale/snapshot/:account', tokensaleHandlers.isAccountF
 app.get('/v1/offchain/tokensale/email/:account', tokensaleHandlers.getLinkedEmailByAccountHandler)
 app.post('/v1/offchain/tokensale/email/link', checkRegularSignature, tokensaleHandlers.upsertEmailByAccountHandler)
 
-export const startHttpServer = () =>
+export const startHttpServer = () => {
+  readTokenSaleSources()
+  
   app.listen(port, () => {
     log.info(`HTTP server started on port ${port}`)
   })
+}
+
 
 
 
