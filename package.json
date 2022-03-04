@@ -33,6 +33,9 @@
     "export-storages": "node ./build/src/substrate/exportSubstrateStoragesToFiles.js",
     "clean-start-subscribe": "yarn clear-postgres && yarn init-postgres && yarn init-search && yarn index-blocks && yarn reindex-content && yarn subscribe"
   },
+  "resolutions": {
+    "bn.js": "5.1.0"
+  },
   "devDependencies": {
     "@subsocial/config": "0.6.6-dev.21",
     "@types/bn.js": "^4.11.5",
@@ -52,9 +55,9 @@
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
     "@subsocial/api": "0.6.6-dev.25",
+    "@subsocial/definitions": "0.6.6-dev.25",
     "@subsocial/types": "0.6.6-dev.25",
     "@subsocial/utils": "0.6.6-dev.25",
-    "@subsocial/definitions": "0.6.6-dev.25",
     "@types/email-templates": "^8.0.0",
     "@types/handlebars": "^4.1.0",
     "@types/node-cron": "^2.0.3",
