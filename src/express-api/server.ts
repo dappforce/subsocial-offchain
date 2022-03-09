@@ -7,6 +7,7 @@ import { reqTimeoutSecs, maxFileSizeBytes } from './config'
 import './email/jobs'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
 import { createV1Routes } from './routes'
+import { readTokenSaleSources } from './handlers/tokensaleHandlers/utils'
 
 require('dotenv').config()
 
@@ -51,6 +52,10 @@ export const startHttpServer = async () => {
   // const ssl = await loadSSL()
 
   app.listen(port, async () => {
+  readTokenSaleSources()
+app.get('/v1/offchain/tokensale/snapshot/:account', tokensaleHandlers.isAccountFromSnapshotHandler)
+app.get('/v1/offchain/tokensale/email/:account', tokensaleHandlers.getLinkedEmailByAccountHandler)
+app.post('/v1/offchain/tokensale/email/link', checkRegularSignature, tokensaleHandlers.upsertEmailByAccountHandler)
     log.info(`HTTP server started on port ${port}`)
   })
 }

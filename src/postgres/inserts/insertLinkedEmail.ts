@@ -1,5 +1,5 @@
 const upsertLinkedEmailQuery = `
-  INSERT INTO df.linked_emails(account, email,signature)
+  INSERT INTO df.linked_emails(account, email, signature)
   VALUES(:account, :email, :signature)
   ON CONFLICT (account) 
 	DO UPDATE SET
@@ -7,7 +7,7 @@ const upsertLinkedEmailQuery = `
 		signature = :signature;
 `
 
-import { accountFromSnapshot } from '../../express-api/handlers/crowdloanHandlers/utils'
+import { isAccountFromSnapshot } from '../../express-api/handlers/tokensaleHandlers/utils'
 import { OkOrError } from '../../express-api/utils'
 import { UpsertLinkedEmail } from '../../models/linked-emails'
 import { newPgError, runQuery } from '../utils'
@@ -20,20 +20,19 @@ export async function upsertLinkedEmail(signMessage: UpsertLinkedEmail): Promise
   try {
     const {
       message: { email },
-      signature
+      signature,
+      account
     } = signMessage
 
-    const snapshotData = accountFromSnapshot(signMessage.account)
+    const isEligible = isAccountFromSnapshot(account)
 
-    if (!snapshotData)
+    if (!isEligible)
       return {
         ok: false,
         errors: {
           account: Errors.AccountIsNotEligible
         }
       }
-
-    const { account } = snapshotData
 
     await runQuery(upsertLinkedEmailQuery, { account, email, signature })
     return { ok: true }
