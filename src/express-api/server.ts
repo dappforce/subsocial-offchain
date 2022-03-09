@@ -50,12 +50,8 @@ app.use('/v1', createV1Routes())
 
 export const startHttpServer = async () => {
   // const ssl = await loadSSL()
-
   app.listen(port, async () => {
-  readTokenSaleSources()
-app.get('/v1/offchain/tokensale/snapshot/:account', tokensaleHandlers.isAccountFromSnapshotHandler)
-app.get('/v1/offchain/tokensale/email/:account', tokensaleHandlers.getLinkedEmailByAccountHandler)
-app.post('/v1/offchain/tokensale/email/link', checkRegularSignature, tokensaleHandlers.upsertEmailByAccountHandler)
+    readTokenSaleSources()
     log.info(`HTTP server started on port ${port}`)
   })
 }

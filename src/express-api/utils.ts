@@ -4,9 +4,6 @@ import { expressApiLog } from '../connections/loggers'
 import { Dayjs } from 'dayjs'
 import { isValidSignature } from '../postgres/utils'
 import { toSubsocialAddress } from '@subsocial/utils';
-import { SignMessage } from '../models/common'
-import { isValidSignature } from '../postgres/utils'
-import { toSubsocialAddress } from '@subsocial/utils';
 import { SignedMessage } from '../models/common'
 import { SessionCall } from '../postgres/types/sessionKey'
 
