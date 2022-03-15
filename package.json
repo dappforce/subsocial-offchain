@@ -1,6 +1,6 @@
 {
   "name": "dappforce-subsocial-offchain",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Off-chain services for Subsocial Network.",
   "author": "DappForce contributors",
   "license": "GPL-3.0-only",
@@ -60,10 +60,10 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
-    "@subsocial/api": "0.6.6-dev.25",
-    "@subsocial/definitions": "0.6.6-dev.25",
-    "@subsocial/types": "0.6.6-dev.25",
-    "@subsocial/utils": "0.6.6-dev.25",
+    "@subsocial/api": "0.6.6-dev.27",
+    "@subsocial/definitions": "0.6.6-dev.27",
+    "@subsocial/types": "0.6.6-dev.27",
+    "@subsocial/utils": "0.6.6-dev.27",
     "axios": "^0.21.1",
     "base64-img": "^1.0.4",
     "body-parser": "^1.18.3",
