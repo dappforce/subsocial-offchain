@@ -2,7 +2,8 @@ import { runQuery } from '../utils';
 import { log } from '../postges-logger';
 
 const query = `
-  SELECT DISTINCT account, vote, date FROM df.casted_votes
+  SELECT DISTINCT account, vote, date
+	sFROM df.casted_votes
   WHERE poll_id = :pollId
 `
 

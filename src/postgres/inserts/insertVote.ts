@@ -13,11 +13,11 @@ import { UpsertVote } from '../../models'
 // import { encodeStructId } from '../../substrate/utils'
 import { newPgError, runQuery } from '../utils'
 
-export async function upsertVote (signMessage: UpsertVote): Promise<OkOrError> {
+export async function upsertVote (signedMessage: UpsertVote): Promise<OkOrError> {
 	try {
-		const { message: { vote, pollId }, signature, account } = signMessage
+		const { message: { vote, pollId }, signature, account } = signedMessage
 
-		if (!isAccountFromSnapshot(signMessage.account)) throw new Error('The account dont exist in snapshot')
+		if (!isAccountFromSnapshot(signedMessage.account)) throw new Error('Account was not found in the snapshot')
 
 		// const { account } = snapshotData
 
