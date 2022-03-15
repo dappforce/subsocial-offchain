@@ -1,4 +1,5 @@
 import { BlockNumber } from '@polkadot/types/interfaces';
+import { SignedMessage } from '../../models/common';
 
 type Action = 'readAll' | 'addSessionKey' | 'setUpEmail' | 'confirmEmail' | 'addRefContribution' | 'addContent'
 
@@ -17,11 +18,7 @@ export type Message<T> = {
   args: T
 }
 
-export type SessionCall<T> = {
-  account: string,
-  signature: string,
-  message: Message<T>
-}
+export type SessionCall<T> = SignedMessage<Message<T>>
 
 export type SetUpEmailArgs = {
 	email: string,

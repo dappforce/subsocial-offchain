@@ -126,8 +126,9 @@ export class IpfsClusterApi {
   /** Delete a content from IPFS by unpinning it via IPFS cluster. */
   async unpinContent (cid: IpfsCid) {
     try {
-      await this.ipfsClusterRequest('unpin', cid)
+      const res = await this.ipfsClusterRequest('unpin', cid)
       log.debug(`Unpinned content with CID: ${cid}`)
+      return res
     } catch (err) {
       log.error(`Failed to unpin content with CID '${cid}'. Error: %o`, err)
     }

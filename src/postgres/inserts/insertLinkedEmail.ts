@@ -16,13 +16,13 @@ enum Errors {
   AccountIsNotEligible = 'AccountIsNotEligible'
 }
 
-export async function upsertLinkedEmail(signMessage: UpsertLinkedEmail): Promise<OkOrError> {
+export async function upsertLinkedEmail(signedMessage: UpsertLinkedEmail): Promise<OkOrError> {
   try {
     const {
       message: { email },
       signature,
       account
-    } = signMessage
+    } = signedMessage
 
     const isEligible = isAccountFromSnapshot(account)
 

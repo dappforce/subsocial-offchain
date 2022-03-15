@@ -3,10 +3,11 @@ import { PostId } from '@subsocial/types/substrate/interfaces';
 import { createHrefForPost, getAccountContent, getFormatDate, resolveIpfsUrl, toShortAddress } from './utils';
 import { FeedTemplateProp } from './types';
 import { summarizeMd } from '@subsocial/utils/summarize'
-import { Activity, PostWithAllDetails } from '@subsocial/types';
+import { Activity } from '@subsocial/types';
+import { PostWithAllDetails } from '@subsocial/types/dto/sub';
 
 const createPostData = async ({ post, space }: PostWithAllDetails) => {
-  const { id, owner, space_id, created: { time } } = post.struct
+  const { id, owner, spaceId, created: { time } } = post.struct
 
   const { title: postTitle, body, image } = post.content
 
@@ -18,7 +19,7 @@ const createPostData = async ({ post, space }: PostWithAllDetails) => {
 
   const { name: ownerName = toShortAddress(ownerAddress), avatar } = await getAccountContent(ownerAddress)
 
-  const postLink = createHrefForPost(space_id.toString(), id.toString())
+  const postLink = createHrefForPost(spaceId.toString(), id.toString())
 
   return {
     ownerName,

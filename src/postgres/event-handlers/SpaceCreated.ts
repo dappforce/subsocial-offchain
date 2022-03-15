@@ -1,4 +1,4 @@
-import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
+import { SpaceId } from '@subsocial/types/substrate/interfaces';
 import { findSpace } from '../../substrate/api-wrappers';
 import { EventHandlerFn } from '../../substrate/types';
 import { fillNotificationsWithAccountFollowers } from '../fills/fillNotificationsWithAccountFollowers';

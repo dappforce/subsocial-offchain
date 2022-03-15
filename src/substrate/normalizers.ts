@@ -166,18 +166,18 @@ function normalizeSpaceOrPostStruct(struct: SpaceOrPostStruct): NormalizedSpaceO
 }
 
 export function normalizeSpaceStruct(struct: Space): NormalizedSpace {
-  const totalPostsCount = struct.posts_count.toNumber()
-  const hiddenPostsCount = struct.hidden_posts_count.toNumber()
+  const totalPostsCount = struct.postsCount.toNumber()
+  const hiddenPostsCount = struct.hiddenPostsCount.toNumber()
   const visiblePostsCount = totalPostsCount - hiddenPostsCount
 
   return {
     ...normalizeSpaceOrPostStruct(struct),
-    parentId: struct.parent_id.unwrapOr(undefined)?.toString(),
+    parentId: struct.parentId.unwrapOr(undefined)?.toString(),
     handle: struct.handle.unwrapOr(undefined)?.toString(),
     totalPostsCount,
     hiddenPostsCount,
     visiblePostsCount,
-    followersCount: struct.followers_count.toNumber(),
+    followersCount: struct.followersCount.toNumber(),
     score: struct.score.toNumber()
   }
 }
@@ -187,8 +187,8 @@ export function normalizeSpaceStructs(structs: Space[]): NormalizedSpace[] {
 }
 
 export function normalizePostStruct(struct: Post): NormalizedPost {
-  const totalRepliesCount = parseInt(struct.replies_count.toString())
-  const hiddenRepliesCount = parseInt(struct.hidden_replies_count.toString())
+  const totalRepliesCount = parseInt(struct.repliesCount.toString())
+  const hiddenRepliesCount = parseInt(struct.hiddenRepliesCount.toString())
   const visibleRepliesCount = totalRepliesCount - hiddenRepliesCount
   const { isRegularPost, isSharedPost, isComment } = struct.extension
 
@@ -197,24 +197,24 @@ export function normalizePostStruct(struct: Post): NormalizedPost {
     normExt = { sharedPostId: struct.extension.asSharedPost.toString() }
   }
   else if (isComment) {
-    const { parent_id, root_post_id } = struct.extension.asComment
+    const { parentId, rootPostId } = struct.extension.asComment
     normExt = {
-      parentId: parent_id.unwrapOr(undefined)?.toString(),
-      rootPostId: root_post_id.toString()
+      parentId: parentId.unwrapOr(undefined)?.toString(),
+      rootPostId: rootPostId.toString()
     } as CommentExtension
   }
 
   return {
     ...normalizeSpaceOrPostStruct(struct),
-    spaceId: struct.space_id.unwrapOr(undefined)?.toString(),
+    spaceId: struct.spaceId.unwrapOr(undefined)?.toString(),
 
     totalRepliesCount,
     hiddenRepliesCount,
     visibleRepliesCount,
 
-    sharesCount: parseInt(struct.shares_count.toString()),
-    upvotesCount: parseInt(struct.upvotes_count.toString()),
-    downvotesCount: parseInt(struct.downvotes_count.toString()),
+    sharesCount: parseInt(struct.sharesCount.toString()),
+    upvotesCount: parseInt(struct.upvotesCount.toString()),
+    downvotesCount: parseInt(struct.downvotesCount.toString()),
     score: parseInt(struct.score.toString()),
 
     isRegularPost,
@@ -250,9 +250,9 @@ export function normalizeProfileStruct(account: AnyAccountId, struct: SocialAcco
 
   return {
     id: account.toString(),
-    followersCount: struct.followers_count.toNumber(),
-    followingAccountsCount: struct.following_accounts_count.toNumber(),
-    followingSpacesCount: struct.following_spaces_count.toNumber(),
+    followersCount: struct.followersCount.toNumber(),
+    followingAccountsCount: struct.followingAccountsCount.toNumber(),
+    followingSpacesCount: struct.followingSpacesCount.toNumber(),
     reputation: struct.reputation.toNumber(),
     hasProfile,
     ...maybeProfile

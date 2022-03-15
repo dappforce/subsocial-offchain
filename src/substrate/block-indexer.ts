@@ -32,7 +32,7 @@ export function getBlockNumbersFromFile(): BlockNumber[] {
 
 export async function getBlockEventsFromSubstrate(api: SubstrateApi, blockNumber: BlockNumber): Promise<SubstrateEvent[]> {
   const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
-  const substrateEvents = await api.query.system.events.at(blockHash)
+  const substrateEvents = await (await api.at(blockHash)).query.system.events()
 
   const events: SubstrateEvent[] = []
 

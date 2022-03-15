@@ -75,7 +75,7 @@ async function main (substrate: SubsocialSubstrateApi) {
       continue
     }
 
-    const blockNumber = api.createType('BlockNumber', blockToProcess)
+    const blockNumber: any = api.createType('BlockNumber', blockToProcess)
     const blockHash = await api.rpc.chain.getBlockHash(blockNumber)
 
     // TODO Improve performance: query events from multiple blocks at a time:

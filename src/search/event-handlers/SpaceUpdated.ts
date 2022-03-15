@@ -1,5 +1,5 @@
-import { SpaceId } from '@subsocial/types/substrate/interfaces/subsocial';
-import { resolveSubsocialApi } from '../../connections/subsocial';
+import { SpaceId } from '@subsocial/types/substrate/interfaces';
+import { resolveSubsocialApi } from '../../connections';
 import { EventHandlerFn } from '../../substrate/types';
 import { indexSpaceContent } from '../indexer';
 

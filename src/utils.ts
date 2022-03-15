@@ -22,3 +22,21 @@ export function equalAddresses (addr1: MaybeAccAddr, addr2: MaybeAccAddr): boole
     return asAccountId(addr1)?.eq(asAccountId(addr2)) || false
   }
 }
+
+let sslObj = {}
+
+export const loadSSL = async () => {
+  try {
+    const cert = await asyncReadFile(`${stateDirPath}/certificate.pem`)
+    const key = await asyncReadFile(`${stateDirPath}/privatekey.pem`)
+
+    sslObj = {
+      cert,
+      key
+    }
+
+    return sslObj
+  } catch {
+    return sslObj
+  }
+}

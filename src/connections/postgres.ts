@@ -1,14 +1,19 @@
-import { Pool } from 'pg'
+import { Pool, PoolConfig } from 'pg'
 import { postgesLog as log } from './loggers';
 
 require('dotenv').config();
 
-const pgConf: any = {
+const enableSsl = process.env.PG_SSL === 'true'
+
+const pgConf: PoolConfig = {
   user: process.env.PGUSER,
   host: process.env.PGHOST,
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
-  port: process.env.PGPORT
+  port: parseInt(process.env.PGPORT),
+  ssl: enableSsl && {
+    rejectUnauthorized: false
+  }
 };
 
 let greeted = false

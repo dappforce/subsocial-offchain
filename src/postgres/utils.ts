@@ -1,11 +1,12 @@
 import { pg } from '../connections/postgres'
 import { signatureVerify } from '@polkadot/util-crypto'
-import { SessionCall, Message } from './types/sessionKey'
+import { Message } from './types/sessionKey'
 import { insertNonce } from './inserts/insertNonce'
 import { getNonce } from './selects/getNonce'
 import { getAccountFromSessionKey } from './selects/getAccountBySessionKey'
 import { sortObj } from 'jsonabc'
 import { log as postgresLog } from './postges-logger'
+import { SignedMessage } from '../models/common'
 
 const named = require('yesql').pg
 
@@ -41,7 +42,7 @@ export const runQuery = async <T>(query: string, params?: T) => {
   return result
 }
 
-export const isValidSignature = (sessionCall: SessionCall<any>) => {
+export const isValidSignature = (sessionCall: SignedMessage<any>) => {
   const { message, signature, account } = sessionCall
   const signedMessage = JSON.stringify(sortObj(message))
   return signatureVerify(signedMessage, signature, account).isValid

@@ -77,14 +77,14 @@ type GetDataFnType<T = any> = (req: express.Request) => SignedMessage<T>
 
 // TODO: add check message.action
 export const buildCheckSignatureFn = (getData: GetDataFnType) => (req: express.Request, res: express.Response, next) => {
-  const signMessage = getData(req)
+  const signedMessage = getData(req)
 
-  if (!signMessage) {
+  if (!signedMessage) {
     res.status(403).send('No signed message object was not found in the request body')
     return
   }
 
-  const isValid = isValidSignature(signMessage)
+  const isValid = isValidSignature(signedMessage)
   if (!isValid) {
     res.status(403).send('Cannot verify the signature of the sign message')
     return
