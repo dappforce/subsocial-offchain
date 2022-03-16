@@ -94,7 +94,7 @@ export const buildCheckSignatureFn = (getData: GetDataFnType) => (req: express.R
 }
 
 export const checkSessionKeySignature = buildCheckSignatureFn(req => req.body.sessionCall as SessionCall<any>)
-export const checkRegularSignature = buildCheckSignatureFn(req => req.body)
+export const checkRegularSignature = buildCheckSignatureFn(req => req.body.sessionCall)
 
 type Params = {
   account: string
