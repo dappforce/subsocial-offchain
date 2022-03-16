@@ -936,14 +936,14 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@0.6.6-dev.25":
-  version "0.6.6-dev.25"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.6.6-dev.25.tgz#23a01f19e461826cb5106ef8f4b57cd1aa47d76b"
-  integrity sha512-W27jprzmsG8elDaC/UQAgPvTIO//bqTqWFUTUAFLJhC1kmwocSEZF5zsHXBRbafMGF/fa2/YU4F0W/p/oa8IHg==
+"@subsocial/api@0.6.6-dev.27":
+  version "0.6.6-dev.27"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.6.6-dev.27.tgz#49488a76df2a8c51f21672cb995f1f201721c252"
+  integrity sha512-gOgMvp57vLjrNy0xgASAeJcRTs42FZzuzk6SEL1joO/2xf0SqGxbZtCPqvSiawsJsffPSBRwAjn6gMzcjOtPhg==
   dependencies:
     "@polkadot/api" "^7.10.1"
-    "@subsocial/types" "^0.6.6-dev.25"
-    "@subsocial/utils" "^0.6.6-dev.25"
+    "@subsocial/types" "^0.6.6-dev.27"
+    "@subsocial/utils" "^0.6.6-dev.27"
     axios "^0.24.0"
 
 "@subsocial/config@0.6.6-dev.21":
@@ -951,30 +951,30 @@
   resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.6.6-dev.21.tgz#5994fecf12c0178b4ca964c62f971bf221866da3"
   integrity sha512-D6USM/o1kX9ezJ1wloK8N4tStVXa3i4O80nTMu8xZQ6oKYVgnlsPx7PDq3Udz2y3iE7AhI4nkpQ7N0fnN4DE3w==
 
-"@subsocial/definitions@0.6.6-dev.25", "@subsocial/definitions@^0.6.6-dev.25":
-  version "0.6.6-dev.25"
-  resolved "https://registry.yarnpkg.com/@subsocial/definitions/-/definitions-0.6.6-dev.25.tgz#fd19b3bdc7077270bb0f4507eabdf2567281212e"
-  integrity sha512-AUkEJGQpFIMUNTaj9zu4tVg5N6sjyRjTRtwuhE3AlVxvce6pWWGLSAztGhFpwDapwoF2e1TSU92NeOjSibN/VA==
+"@subsocial/definitions@0.6.6-dev.27", "@subsocial/definitions@^0.6.6-dev.27":
+  version "0.6.6-dev.27"
+  resolved "https://registry.yarnpkg.com/@subsocial/definitions/-/definitions-0.6.6-dev.27.tgz#4fff4f9892e9e3eb5375c0a156eb8498b5f15bb2"
+  integrity sha512-uou1GFFVcv25m3cmievrSn6C+SUnR+EBPbhZyDp6VxFwnWL7LmDTkdaafJ4qN/7LxMCfPHFMg67TGBSCcr2hBw==
   dependencies:
     "@polkadot/api" "^7.10.1"
     lodash.camelcase "^4.3.0"
 
-"@subsocial/types@0.6.6-dev.25", "@subsocial/types@^0.6.6-dev.25":
-  version "0.6.6-dev.25"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.6.6-dev.25.tgz#44992c3058866ddd0e7448690ea816d3e6da3030"
-  integrity sha512-qpBOPcPshu7TrpdBdf9SKZ/54xUWby6EVbRdRFfpmD8Rkfx2VZRhLcT/Md2OXbM91s+NqcOvT21+uZhwGXvD5Q==
+"@subsocial/types@0.6.6-dev.27", "@subsocial/types@^0.6.6-dev.27":
+  version "0.6.6-dev.27"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.6.6-dev.27.tgz#dd6148c204d7e06d84fc2c4ca2394231edc00797"
+  integrity sha512-UOVSZiH9JmWMIfoJpwGUlAdssEqzPPJ6NzUTg5YeDi4FNZmxe3UCn8MkTRcorXZul3hSLYS9FTYjllMZjyL1/w==
   dependencies:
     "@polkadot/types" "^7.10.1"
     "@polkadot/types-known" "^7.10.1"
     "@polkadot/types-support" "^7.10.1"
-    "@subsocial/definitions" "^0.6.6-dev.25"
-    "@subsocial/utils" "^0.6.6-dev.25"
+    "@subsocial/definitions" "^0.6.6-dev.27"
+    "@subsocial/utils" "^0.6.6-dev.27"
     cids "^0.7.1"
 
-"@subsocial/utils@0.6.6-dev.25", "@subsocial/utils@^0.6.6-dev.25":
-  version "0.6.6-dev.25"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.6.6-dev.25.tgz#36c0b14c3675185d1e0c914523c500c3d957e3be"
-  integrity sha512-Ec6orH3y/7n+/yek//1qqzLrmGUSndgNMcNVBmtF4TfpSLkMqpyWw2jTJLPxmK3erwzNabtg/xii5Vr9s5td8A==
+"@subsocial/utils@0.6.6-dev.27", "@subsocial/utils@^0.6.6-dev.27":
+  version "0.6.6-dev.27"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.6.6-dev.27.tgz#7f7fc4a2768816aa0d8b3ac9e1b9e750831ff668"
+  integrity sha512-MVRElcgg4+O5JKf5mrZC476c39Yi8xMtKUnyKsLD/NeXuPAfaL4d9S5Aa3h1Nz+DCSdpgRcUksy/QfvV778Ekg==
   dependencies:
     "@polkadot/util-crypto" "^8.4.1"
     "@sindresorhus/slugify" "^1.1.0"
@@ -1041,13 +1041,6 @@
   version "3.5.33"
   resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.33.tgz#d79c020f283bd50bd76101d7d300313c107325fc"
   integrity sha512-ndEo1xvnYeHxm7I/5sF6tBvnsA4Tdi3zj1keRKRs12SP+2ye2A27NDJ1B6PqkfMbGAcT+mqQVqbZRIrhfOp5PQ==
-
-"@types/bn.js@^4.11.5":
-  version "4.11.6"
-  resolved "https://registry.yarnpkg.com/@types/bn.js/-/bn.js-4.11.6.tgz#c306c70d9358aaea33cd4eda092a742b9505967c"
-  integrity sha512-pqr857jrp2kPuO9uRjZ3PwnJTjoQy+fcdxvBTvHm6dkmEL9q+hDD/2j/0ELOBPtPnS8LjCX0gI9nbl8lVkadpg==
-  dependencies:
-    "@types/node" "*"
 
 "@types/bn.js@^5.1.0":
   version "5.1.0"
@@ -1858,15 +1851,10 @@ bluebird@^3.5.0, bluebird@^3.7.2:
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
 
-bn.js@^4.0.0, bn.js@^4.11.9:
-  version "4.12.0"
-  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.12.0.tgz#775b3f278efbb9718eec7361f483fb36fbbfea88"
-  integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
-
-bn.js@^5.1.1, bn.js@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.2.0.tgz#358860674396c6997771a9d051fcc1b57d4ae002"
-  integrity sha512-D7iWRBvnZE8ecXiLj/9wbxH7Tk79fAh8IHaTNq1RWRixsS02W+5qS+iE9yq6RYl0asXx5tw0bLhmT5pIfbSquw==
+bn.js@5.1.0, bn.js@^4.0.0, bn.js@^4.11.9, bn.js@^5.1.1, bn.js@^5.2.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.1.0.tgz#7ef3e4af5d85a8d70d7077cb7d44bfc5cd6e6039"
+  integrity sha512-NiyuqJjtPhXcJDc8I+YeyZceSMViT39AvuFJCH3ieMcOsRvZsp2luMrGSnQaqN6HVJMvSgydLnkvw5N4xvuIoQ==
 
 body-parser@1.19.0, body-parser@^1.18.3:
   version "1.19.0"

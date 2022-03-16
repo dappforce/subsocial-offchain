@@ -7,6 +7,7 @@ import { reqTimeoutSecs, maxFileSizeBytes } from './config'
 import './email/jobs'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
 import { createV1Routes } from './routes'
+import { readTokenSaleSources } from './handlers/tokensaleHandlers/utils'
 
 require('dotenv').config()
 
@@ -49,8 +50,8 @@ app.use('/v1', createV1Routes())
 
 export const startHttpServer = async () => {
   // const ssl = await loadSSL()
-
   app.listen(port, async () => {
+    readTokenSaleSources()
     log.info(`HTTP server started on port ${port}`)
   })
 }

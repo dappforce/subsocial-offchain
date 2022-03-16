@@ -9,6 +9,7 @@ export type CommonDbState = {
 export type OffchainState = {
   postgres: CommonDbState
   elastic: CommonDbState
+  time?: Date
 }
 
 export type SubstrateEvent = {

@@ -4,7 +4,7 @@ import * as pgReqHandlers from '../../handlers/pgHandlers'
 import * as emailHandlers from '../../handlers/emailHandlers'
 import * as moderationHandlers from '../../handlers/getBlockListHandler'
 import * as votesHandlers from '../../handlers/votesHandlers'
-import * as crowdloanHandlers from '../../handlers/crowdloanHandlers/'
+import * as tokensaleHandlers from '../../handlers/tokensaleHandlers/'
 import { checkRegularSignature, checkSessionKeySignature } from '../../utils'
 
 export const createOffchainRoutes = () => {
@@ -118,10 +118,9 @@ export const createOffchainRoutes = () => {
 
   router.get('/moderation/list', moderationHandlers.getBlockListHandler)
 
-  router.get('/crowdloan/snapshot/:account', crowdloanHandlers.accountFromSnapshotHandler)
-
-  router.get('/crowdloan/email/:account', crowdloanHandlers.getLinkedEmailByAccountHandler)
-  router.post('/crowdloan/email/link', crowdloanHandlers.upsertEmailByAccountHandler)
+  router.get('/tokensale/snapshot/:account', tokensaleHandlers.isAccountFromSnapshotHandler)
+  router.get('/tokensale/email/:account', tokensaleHandlers.getLinkedEmailByAccountHandler)
+  router.post('/tokensale/email/link', checkRegularSignature, tokensaleHandlers.upsertEmailByAccountHandler)
 
   router.get('/polls/:pollId/:account/vote', votesHandlers.getVoteByAccountAndPollHandler)
   router.get('/polls/:pollId/votes', votesHandlers.getVoteByPollHandler)

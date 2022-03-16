@@ -7,24 +7,23 @@ const upsertVoteQuery = `
 		signature = :signature;
 `
 
-import { accountFromSnapshot } from '../../express-api/handlers/crowdloanHandlers/utils'
+import { isAccountFromSnapshot } from '../../express-api/handlers/tokensaleHandlers/utils'
 import { OkOrError } from '../../express-api/utils'
 import { UpsertVote } from '../../models'
-import { encodeStructId } from '../../substrate/utils'
+// import { encodeStructId } from '../../substrate/utils'
 import { newPgError, runQuery } from '../utils'
 
-export async function upsertVote (signMessage: UpsertVote): Promise<OkOrError> {
+export async function upsertVote (signedMessage: UpsertVote): Promise<OkOrError> {
 	try {
-		const { message: { vote, pollId }, signature } = signMessage
+		const { message: { vote, pollId }, signature, account } = signedMessage
 
-		const snapshotData = accountFromSnapshot(signMessage.account)
+		if (!isAccountFromSnapshot(signedMessage.account)) throw new Error('Account was not found in the snapshot')
 
-		if (!snapshotData) throw new Error('The account dont exist in snapshot')
+		// const { account } = snapshotData
 
-		const { account } = snapshotData
-
-		const amount = encodeStructId(snapshotData.amount)
-
+		// const amount = encodeStructId(snapshotData.amount)
+		const amount = 0
+		// TODO: make snapshot w/ amount { account: amount }
 		await runQuery(upsertVoteQuery, { account, vote, pollId, amount, signature })
 		return { ok: true }
 	} catch (err) {
