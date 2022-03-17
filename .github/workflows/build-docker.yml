@@ -1,22 +1,29 @@
-name: Build and push off-chain docker image
+name: Build and deploy off-chain 
 
 on:
   push:
+    branches:
+      - staging
+      - master
 
 jobs:
 
-
-  staging_build:
+  docker_build:
     name: Create & push Docker image
     runs-on: ubuntu-latest
     
     steps:
-
       - uses: actions/checkout@v2
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - name: Prepare
         id: prep
         run: |
-          TAG=$(echo $GITHUB_SHA | head -c7)
+          TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7)                
           IMAGE="oap75/subsocial-offchain"
           echo ::set-output name=tagged_image::${IMAGE}:${TAG}
           echo ::set-output name=tag::${TAG}          
@@ -39,13 +46,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-single-buildx
 
-
-      - name: Build staging image
+      - if: ${{ github.ref == 'refs/heads/staging' }}
+        name: Build staging image
         uses: docker/build-push-action@v2
         with:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
-          file: docker/Dockerfile
+          file: docker/Dockerfile.staging
+          push: true
+          tags: |
+                  ${{ steps.prep.outputs.tagged_image }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+
+      - if: ${{ github.ref == 'refs/heads/master' }}
+        name: Build staging image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          builder: ${{ steps.buildx.outputs.name }}
+          file: docker/Dockerfile.production
           push: true 
           tags: |
                   ${{ steps.prep.outputs.tagged_image }}
@@ -60,25 +80,32 @@ jobs:
 
 
   staging_deploy:
-    name: deploy to DO
-    needs: staging_build
+    name: deploy to staging DO
+    needs: docker_build
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/staging' }}    
 
     steps:
 
       - name: Checkout main
         uses: actions/checkout@v2
 
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN_STAGING }}
   
       - name: Update all file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/all.yaml
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/all.yaml
  
       - name: Update deployment file
-        run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/deploy.yaml
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/deploy.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 c7e84602-9029-40ed-9f95-6c113f6693ee
@@ -97,5 +124,50 @@ jobs:
       - name: Verify deployment
         run: kubectl -n sub-back rollout status deployment/sub-backend
 
-        
 
+
+  production_deploy:
+    name: deploy to production DO
+    needs: docker_build
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}    
+
+    steps:
+
+      - name: Checkout main
+        uses: actions/checkout@v2
+
+      - name: Extract branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN_PRODUCTION }}
+  
+      - name: Update all file
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/production/all.yaml
+ 
+      - name: Update deployment file
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/production/deploy.yaml
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 a4862333-a4d0-4e2c-b688-fcb90312d14e
+
+
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl delete -f $GITHUB_WORKSPACE/deployment/production/all.yaml
+ 
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f $GITHUB_WORKSPACE/deployment/production/all.yaml
+
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f $GITHUB_WORKSPACE/deployment/production/deploy.yaml
+ 
+
+      - name: Verify deployment
+        run: kubectl -n sub-back rollout status deployment/sub-backend
+        
