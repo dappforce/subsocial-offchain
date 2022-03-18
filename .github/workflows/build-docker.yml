@@ -24,7 +24,7 @@ jobs:
         id: prep
         run: |
           TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7)                
-          IMAGE="oap75/subsocial-offchain"
+          IMAGE="dappforce/subsocial-offchain"
           echo ::set-output name=tagged_image::${IMAGE}:${TAG}
           echo ::set-output name=tag::${TAG}          
 
@@ -80,7 +80,7 @@ jobs:
 
 
   staging_deploy:
-    name: deploy to staging DO
+    name: Deploy to staging infra
     needs: docker_build
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/staging' }}    
@@ -102,10 +102,10 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN_STAGING }}
   
       - name: Update all file
-        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/all.yaml
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/all.yaml
  
       - name: Update deployment file
-        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/deploy.yaml
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/deploy.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 c7e84602-9029-40ed-9f95-6c113f6693ee
@@ -127,7 +127,7 @@ jobs:
 
 
   production_deploy:
-    name: deploy to production DO
+    name: Deploy to production infra
     needs: docker_build
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/master' }}    
@@ -149,10 +149,10 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN_PRODUCTION }}
   
       - name: Update all file
-        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/production/all.yaml
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/production/all.yaml
  
       - name: Update deployment file
-        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|oap75/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/production/deploy.yaml
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/production/deploy.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 a4862333-a4d0-4e2c-b688-fcb90312d14e
