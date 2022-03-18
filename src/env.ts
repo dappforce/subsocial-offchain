@@ -1,3 +1,7 @@
+import { parseNumStr } from "@subsocial/utils"
+
+require('dotenv').config();
+
 export const TEST_MODE = process.env.TEST_MODE?.toLocaleLowerCase() === 'true'
 
 export const offchainTWSPort = process.env.OFFCHAIN_TELEGRAM_WS_PORT
@@ -31,3 +35,5 @@ export const isAllCorsAllowed = corsAllowedList[0] === '*'
 
 export const subsocialParaId = 2100
 export const kusamaNodeUrl = process.env.KUSAMA_NODE_URL
+
+export const postgresMaxPoolSize = parseNumStr(process.env.PG_MAX_POOL_SIZE)
