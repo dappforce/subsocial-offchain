@@ -3,6 +3,9 @@ import { AnyAccountId } from '@subsocial/types';
 import { readFile, writeFile, mkdir } from 'fs';
 import { join } from 'path';
 import { promisify } from 'util'
+import { typesBundle } from '@subsocial/types'
+import { ApiPromise, WsProvider } from '@polkadot/api'
+import { substrateNodeUrl } from './env';
 
 export const stateDirPath = join(__dirname, '../state')
 
@@ -39,4 +42,9 @@ export const loadSSL = async () => {
   } catch {
     return sslObj
   }
+}
+
+export const getApi = async () => {
+  const provider = new WsProvider(substrateNodeUrl)
+  return new ApiPromise({ provider, typesBundle }).isReady
 }
