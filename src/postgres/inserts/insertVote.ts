@@ -7,14 +7,12 @@ const upsertVoteQuery = `
 		signature = :signature;
 `
 
-// import { isAccountFromSnapshot } from '../../express-api/handlers/tokensaleHandlers/utils'
 import { OkOrError } from '../../express-api/utils'
 import { UpsertVote } from '../../models'
-// import { encodeStructId } from '../../substrate/utils'
 import { newPgError, runQuery } from '../utils'
 import {
   isAccountEligibleForVote,
-  getAmountByAccount
+  getAmountByAccountForVote
 } from '../../express-api/handlers/votesHandlers/utils'
 
 export async function upsertVote(signMessage: UpsertVote): Promise<OkOrError> {
@@ -28,7 +26,7 @@ export async function upsertVote(signMessage: UpsertVote): Promise<OkOrError> {
     if (!isAccountEligibleForVote(signMessage.account))
       throw new Error('The account don\'t exist in snapshot')
 
-    const amount = getAmountByAccount(account)
+    const amount = getAmountByAccountForVote(account)
 
     await runQuery(upsertVoteQuery, { account, vote, pollId, amount, signature })
     return { ok: true }

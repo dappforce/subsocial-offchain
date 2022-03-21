@@ -27,6 +27,6 @@ export const isAccountEligibleForVoteHandler: HandlerFn = (req, res) => {
 }
 
 export const upsertVoteHandler: HandlerFn = (req, res) => {
-  const params = parseParamsWithAccount(req.body.sessionCall) as UpsertVote
+  const params = parseParamsWithAccount(req.body) as UpsertVote
   return resolvePromiseAndReturnJson(res, upsertVote(params))
 }

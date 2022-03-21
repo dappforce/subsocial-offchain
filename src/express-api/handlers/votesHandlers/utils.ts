@@ -26,6 +26,6 @@ export const isAccountEligibleForVote = withSubsocialAddress<boolean>((key) =>
   eligibleAccountsMap.has(key)
 )
 
-export const getAmountByAccount = withSubsocialAddress<string>((key) =>
+export const getAmountByAccountForVote = withSubsocialAddress<string>((key) =>
   eligibleAccountsMap.get(key)
 )
