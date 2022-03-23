@@ -24,6 +24,26 @@ spec:
             - configMapRef:
                 name: sub-backend-env
 
+          readinessProbe:
+            httpGet:
+              path: /v1/subscriber/health/ready
+              port: 3001
+            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /v1/subscriber/health/live
+              port: 3001
+            failureThreshold: 3
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 15   
+
       restartPolicy: Always
   selector:
     matchLabels:
