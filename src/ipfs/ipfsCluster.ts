@@ -30,11 +30,12 @@ export class IpfsClusterApi {
   }
 
   /** Test IPFS cluster connection by requesting its version. */
-  private async testConnection () {
+  async testConnection () {
     try {
       const res = await this.ipfsClusterRequest('version')
       const { version } = JSON.parse(res) || {}
       log.info('Connected to IPFS Cluster with version: %s', version)
+      return version
     } catch (err) {
       log.error('Failed to connect to IPFS cluster: %o', err)
     }
