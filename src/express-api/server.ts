@@ -8,7 +8,6 @@ import './email/jobs'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
 import { createV1Routes } from './routes'
 import { readTokenSaleSources } from './handlers/tokensaleHandlers/utils'
-import { readPollsSources } from './handlers/votesHandlers/utils'
 
 require('dotenv').config()
 
@@ -53,7 +52,6 @@ export const startHttpServer = async () => {
   // const ssl = await loadSSL()
   app.listen(port, async () => {
     readTokenSaleSources()
-    readPollsSources()
     log.info(`HTTP server started on port ${port}`)
   })
 }
