@@ -19,7 +19,6 @@ USER offchain
 
 WORKDIR /home/offchain
 
-
 COPY --chown=offchain:users --from=builder package.json tsconfig.json yarn.lock ./
 COPY --chown=offchain:users --from=builder build/ ./build
 COPY --chown=offchain:users --from=builder node_modules/ ./node_modules
