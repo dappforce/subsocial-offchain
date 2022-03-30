@@ -57,19 +57,20 @@ const checkPostgres: CheckFn = async () => {
   }
 }
 
-const buildCheckOffchain = async (checkSubscriber: CheckFn) => {
+const buildCheckOffchain = async (_checkSubscriber: CheckFn) => {
   const responses = await Promise.all([
     checkIpfs(),
     checkElastic(),
     checkPostgres(),
-    checkSubscriber()
+    // TODO: enable when will fix it
+    // checkSubscriber()
   ])
 
   const isHealth = responses.every((res) => res.status === 'UP')
 
-  const [ipfs, elastic, postgres, subscriber] = responses
+  const [ipfs, elastic, postgres, /* subscriber */] = responses
 
-  return buildCheckResponse(isHealth, { ipfs, elastic, postgres, subscriber })
+  return buildCheckResponse(isHealth, { ipfs, elastic, postgres, /* subscriber */ })
 }
 
 const startTime = new Date()
