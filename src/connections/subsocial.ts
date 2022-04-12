@@ -1,7 +1,7 @@
 import { SubsocialApi } from '@subsocial/api'
 import { ipfsConfig } from './ipfs'
-import { getSubstrateApi } from '@subsocial/api'
-import { ApiPromise } from '@polkadot/api'
+// import { getSubstrateApi } from '@subsocial/api'
+import { ApiPromise, WsProvider } from '@polkadot/api'
 import { substrateNodeUrl } from '../env'
 let subsocial: SubsocialApi
 let api: ApiPromise
@@ -17,7 +17,7 @@ type Api = SubsocialApi & {
 export const resolveSubsocialApi = async (): Promise<Api> => {
   // Connect to Subsocial's Substrate node:
   if (!subsocial) {
-    api = await getSubstrateApi(substrateNodeUrl)
+    api = await new ApiPromise({ provider: new WsProvider(substrateNodeUrl) }).isReady
     
     subsocial = new SubsocialApi({
       substrateApi: api,
