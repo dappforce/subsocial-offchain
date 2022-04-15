@@ -41,7 +41,7 @@ data:
   RECAPTCHA_KEY: ""
   SUBSTRATE_EVENT_METHODS: SpaceCreated,SpaceUpdated,SpaceFollowed,SpaceUnfollowed,AccountFollowed,AccountUnfollowed,PostCreated,PostUpdated,PostShared,CommentCreated,CommentUpdated,PostReactionCreated,CommentReactionCreated,ProfileCreated
   SUBSTRATE_EVENT_SECTIONS: permissions,posts,profileFollows,profiles,reactions,scores,spaceFollows,spaceOwnership,spaces,utils
-  SUBSTRATE_URL: wss://pc-testnet.subsocial.network/stg-ws
+  SUBSTRATE_URL: wss://testnet.subsocial.network
   TEST_MODE: "false"
 
 ---
