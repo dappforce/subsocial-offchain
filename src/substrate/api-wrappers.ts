@@ -59,7 +59,6 @@ export async function findSocialAccount(id: AccountId | string): Promise<Normali
   else {
     const { profile, ...socialAccount } = await rpcApi.getSocialAccountById(id.toString()) || {}
 
-    console.log('account', socialAccount)
     return {
       ...socialAccount,
       ...profile
