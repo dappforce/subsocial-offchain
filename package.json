@@ -33,10 +33,6 @@
     "export-storages": "node ./build/src/substrate/exportSubstrateStoragesToFiles.js",
     "clean-start-subscribe": "yarn clear-postgres && yarn init-postgres && yarn init-search && yarn index-blocks && yarn reindex-content && yarn subscribe"
   },
-  "resolutions": {
-    "bn.js": "5.1.0",
-    "@types/bn.js": "^5.1.0"
-  },
   "devDependencies": {
     "@subsocial/config": "0.6.6-dev.34",
     "@types/connect-timeout": "^0.0.34",
