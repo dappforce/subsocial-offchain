@@ -877,45 +877,45 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@subsocial/api@^0.6.6":
-  version "0.6.6"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.6.6.tgz#02055316b7546f6069aa82ab9964c9d04864b12c"
-  integrity sha512-UW5EObYAlznuFuQO7XSRzdkH/k96vXEewgm1uWEVc88pCtxIBDOpbud55swu5V1ozgTk3pF2Kh6PJ3AjCEA8Cg==
+"@subsocial/api@^0.6.8":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.6.8.tgz#86e93bc68e46f40d7382e516730d7f9d367b0379"
+  integrity sha512-yMitFqTpx1wtZIYlSVDnQdruipuLxqtTETCU4k1UqSpbhK7cerYsapY3STVa4scAzYpkGpgXzV69RKWunkIt8Q==
   dependencies:
     "@polkadot/api" latest
-    "@subsocial/types" "0.6.6"
-    "@subsocial/utils" "0.6.6"
+    "@subsocial/types" "0.6.8"
+    "@subsocial/utils" "0.6.8"
     axios "^0.24.0"
 
-"@subsocial/config@0.6.6-dev.34":
-  version "0.6.6-dev.34"
-  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.6.6-dev.34.tgz#a82daefd7f5359bbb3f0e0f9374b09aab6a6da4b"
-  integrity sha512-IKhJNxU4wp2KC6TVRvRKgsmRXU8Vf1vvw6PgCQNWtdT1wSJ+/dvdiH6pFlXyhb5OCApUVTi5df5149XBIlL3rw==
+"@subsocial/config@0.6.8":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@subsocial/config/-/config-0.6.8.tgz#d8a821fea639d1f1593ec521cea617c41849234c"
+  integrity sha512-OP8nu6EAvDVlw0dXw6yj3LfSmGNkzdqEl1Q1KV3NofTcDEewnJdC2uHE7PCznTizsm8kEE9wtU9Of0/TDkLNlw==
 
-"@subsocial/definitions@0.6.6":
-  version "0.6.6"
-  resolved "https://registry.yarnpkg.com/@subsocial/definitions/-/definitions-0.6.6.tgz#bba83f83a18bcd13b70545a22dc40d263fc6842a"
-  integrity sha512-OJozWx8elZOP02kZ4QUhOMS79HBEkjMVd0S9v7LGb9TbkfdluuUBIy6YQyDxbPNQT5xkaXKY2VxSRiijYJ3V4A==
+"@subsocial/definitions@0.6.8":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@subsocial/definitions/-/definitions-0.6.8.tgz#ac6fbc94dd4aa713c51d31d1ca0031b8f253b68a"
+  integrity sha512-h4NFgKoASviYMoSaTRYcVConi2Re7Mb898mWw8jZ1Mz/RF2ZTlZcyD2S7RFq6d6I7owBuSXK8SeIFNKQ+O2/+Q==
   dependencies:
     "@polkadot/api" latest
     lodash.camelcase "^4.3.0"
 
-"@subsocial/types@0.6.6", "@subsocial/types@^0.6.6":
-  version "0.6.6"
-  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.6.6.tgz#51fcd4d64229dafb19856b8bc786d17d327c3ebe"
-  integrity sha512-Y3hc3hpvM5aLE6mCFQHKbvwurf1m//V/3xezkJuAPmP7PgQmb9RXkxvr0DsWZqdSje8SA1kpDUSuhD02qk9hdg==
+"@subsocial/types@0.6.8", "@subsocial/types@^0.6.8":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@subsocial/types/-/types-0.6.8.tgz#a3b46aa4b6b37c6a37e72cb4d0a20566a0c29777"
+  integrity sha512-fD3NNeecuX5XH9CsFqIN98KUGmGinvqN2KTwtn5DqP+d1F7CxULp+g3TndN2g8ZwX9Ezk1pR/ssChnid7LBpnA==
   dependencies:
     "@polkadot/types" latest
     "@polkadot/types-known" latest
     "@polkadot/types-support" latest
-    "@subsocial/definitions" "0.6.6"
-    "@subsocial/utils" "0.6.6"
+    "@subsocial/definitions" "0.6.8"
+    "@subsocial/utils" "0.6.8"
     cids "^0.7.1"
 
-"@subsocial/utils@0.6.6":
-  version "0.6.6"
-  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.6.6.tgz#1a12e8685aac7ab58711c4ee415381aa5150a57f"
-  integrity sha512-5cHhJORy8tygDw+2pnE/OEudlAAxfKvw0yG8sm9bpx3wW007oRjqSvKsQjsFJXAYdImHSdwGStH34dr3IPnzNw==
+"@subsocial/utils@0.6.8":
+  version "0.6.8"
+  resolved "https://registry.yarnpkg.com/@subsocial/utils/-/utils-0.6.8.tgz#cd6ca5f49bf1efc385d8cddcaf28ce4825226f17"
+  integrity sha512-dT74lglT3XkUzdztTO2bx0il4L/G8tbZACbpO03Qf/e6kLW91vPKMXRLdjoOEFunKx6uclZxL53AK9FEVphuow==
   dependencies:
     "@polkadot/util-crypto" "^8.4.1"
     "@sindresorhus/slugify" "^1.1.0"
@@ -1364,11 +1364,6 @@ ansi-escapes@^3.0.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-3.2.0.tgz#8780b98ff9dbf5638152d1f1fe5c1d7b4442976b"
   integrity sha512-cBhpre4ma+U0T1oM5fXg7Dy1Jw7zzwv7lt/GoCpr+hDQJoYnKVPLL4dCvSEFMmQurOQvSrwT7SL/DAlhBI97RQ==
-
-ansi-regex@*:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-6.0.1.tgz#3183e38fae9a65d7cb5e53945cd5897d0260a06a"
-  integrity sha512-n5M855fKb2SsfMIiFFoVrABHJC8QtHwVx+mHWP3QcEqBHYienj5dHSgjbxtC0WEZXYt4wcD6zrQElDPhFuZgfA==
 
 ansi-regex@^2.0.0:
   version "2.1.1"
@@ -3718,7 +3713,7 @@ import-local@^2.0.0:
     pkg-dir "^3.0.0"
     resolve-cwd "^2.0.0"
 
-imurmurhash@*, imurmurhash@^0.1.4:
+imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
   integrity sha1-khi5srkoojixPcT7a21XbyMUU+o=

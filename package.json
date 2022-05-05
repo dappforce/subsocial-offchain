@@ -34,7 +34,7 @@
     "clean-start-subscribe": "yarn clear-postgres && yarn init-postgres && yarn init-search && yarn index-blocks && yarn reindex-content && yarn subscribe"
   },
   "devDependencies": {
-    "@subsocial/config": "0.6.6-dev.34",
+    "@subsocial/config": "0.6.8",
     "@types/connect-timeout": "^0.0.34",
     "@types/cors": "^2.8.6",
     "@types/express": "^4.17.3",
@@ -55,8 +55,8 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
-    "@subsocial/api": "^0.6.6",
-    "@subsocial/types": "^0.6.6",
+    "@subsocial/api": "^0.6.8",
+    "@subsocial/types": "^0.6.8",
     "axios": "^0.26",
     "body-parser": "^1.18.3",
     "chalk": "^4.1.0",
