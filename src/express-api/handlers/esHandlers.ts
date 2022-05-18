@@ -1,5 +1,5 @@
 import * as express from 'express'
-import { getOffsetFromRequest, getLimitFromRequest, HandlerFn } from '../utils'
+import { getOffsetFromRequest, getLimitFromRequest, HandlerFn, OkOrError } from '../utils'
 import { nonEmptyStr, nonEmptyArr } from '@subsocial/utils'
 import { buildElasticSearchQuery } from '../../search/reader'
 import { ElasticQueryParams } from '@subsocial/types/offchain/search'
@@ -17,7 +17,7 @@ function toArray<T extends string>(maybeArr: T | Array<T>): Array<T> {
 }
 
 export type ElasticQueryParamsWithSpaceId = ElasticQueryParams & {
-  spaceId: string
+  spaceId?: string
 }
 
 function reqToElasticQueryParams(req: express.Request): ElasticQueryParamsWithSpaceId {
@@ -33,9 +33,8 @@ function reqToElasticQueryParams(req: express.Request): ElasticQueryParamsWithSp
   }
 }
 
-const queryElastic = async (req: express.Request, res: express.Response) => {
+export const queryElastic = async (esParams: ElasticQueryParamsWithSpaceId): Promise<OkOrError<any>> => {
   try {
-    const esParams = reqToElasticQueryParams(req)
     const esQuery = buildElasticSearchQuery(esParams)
 
     const result = await elasticReader.search(esQuery)
@@ -46,17 +45,25 @@ const queryElastic = async (req: express.Request, res: express.Response) => {
         }
       } = result
       
-      return hits
+      return { ok: true, data: hits }
     }
   } catch (err) {
 
     elasticLog.warn('Failed to query ElasticSearch:', err.message)
-    res.status(err.statusCode).send(err.meta)
+    return { ok: false, data: err }
+    // res.status(err.statusCode).send(err.meta)
   }
   return null
 }
 
 export const searchHandler: HandlerFn = async (req, res) => {
-  const searchResults = await queryElastic(req, res)
-  res.json(searchResults || [])
+  const esParams = reqToElasticQueryParams(req)
+
+  const { ok, data } = await queryElastic(esParams)
+
+  if (ok) {
+    res.json(data || [])
+  } else {
+    res.status(data.statusCode).send(data.meta)
+  }
 }

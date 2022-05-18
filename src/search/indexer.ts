@@ -1,15 +1,13 @@
 
-import { AccountId } from '@polkadot/types/interfaces'
 import { PostContent, ProfileContent, SpaceContent } from '@subsocial/types/offchain'
 import { ElasticIndex, ElasticIndexName, ElasticPostDoc, ElasticProfileDoc, ElasticSpaceDoc } from '@subsocial/types/offchain/search'
-import { Post, PostId, Profile, Space, SpaceId } from '@subsocial/types/substrate/interfaces'
 import { isEmptyObj } from '@subsocial/utils'
-import { resolveSubsocialApi } from '../connections'
 import { elasticIndexer } from '../connections/elastic'
 import { getContentFromIpfs } from '../ipfs'
-import { stringifyOption } from '../substrate/utils'
+import { findPost } from '../substrate/api-wrappers'
+import { asNormalizedComment, NormalizedPost, NormalizedProfile, NormalizedSpace } from '../substrate/normalizers'
 
-async function getProfileDoc(profile: Profile): Promise<ElasticProfileDoc | undefined> {
+async function getProfileDoc(profile: NormalizedProfile): Promise<ElasticProfileDoc | undefined> {
   const content = await getContentFromIpfs<ProfileContent>(profile)
   if (!content) return undefined
 
@@ -20,12 +18,12 @@ async function getProfileDoc(profile: Profile): Promise<ElasticProfileDoc | unde
   }
 }
 
-async function getSpaceDoc(space: Space): Promise<ElasticSpaceDoc | undefined> {
+async function getSpaceDoc(space: NormalizedSpace): Promise<ElasticSpaceDoc | undefined> {
   const content = await getContentFromIpfs<SpaceContent>(space)
   if (!content) return undefined
 
   const { name, about, tags } = content
-  const handle = stringifyOption(space.handle)
+  const handle = space.handle
 
   return {
     name,
@@ -35,22 +33,21 @@ async function getSpaceDoc(space: Space): Promise<ElasticSpaceDoc | undefined> {
   }
 }
 
-async function getPostDoc(post: Post): Promise<ElasticPostDoc | undefined> {
+async function getPostDoc(post: NormalizedPost): Promise<ElasticPostDoc | undefined> {
   const content = await getContentFromIpfs<PostContent>(post)
   if (!content) return undefined
 
-  const { substrate } = await resolveSubsocialApi()
-  const { spaceId: _spaceId, extension } = post
+  const { spaceId: _spaceId, isComment } = post
   const { title, body, tags } = content
 
   let spaceId: string
 
-  if (extension.isComment) {
-    const rootPostId = extension.asComment.rootPostId
-    const rootPost = await substrate.findPost({ id: rootPostId })
-    spaceId = stringifyOption(rootPost.spaceId)
+  if (isComment) {
+    const { rootPostId } = asNormalizedComment(post)
+    const rootPost = await findPost(rootPostId)
+    spaceId = rootPost.spaceId
   } else {
-    spaceId = stringifyOption(_spaceId)
+    spaceId = _spaceId
   }
 
   return {
@@ -68,7 +65,7 @@ type AnyElasticDoc =
 
 type IndexContentProps = {
   index: ElasticIndexName
-  id: AccountId | SpaceId | PostId
+  id: string
   doc: AnyElasticDoc
 }
 
@@ -82,15 +79,15 @@ async function indexContent({ index, id, doc }: IndexContentProps) {
   })
 }
 
-export async function indexProfileContent(profile: Profile) {
+export async function indexProfileContent(profile: NormalizedProfile) {
   return indexContent({
     index: ElasticIndex.profiles,
-    id: profile.created.account,
+    id: profile.id,
     doc: await getProfileDoc(profile)
   })
 }
 
-export async function indexSpaceContent(space: Space) {
+export async function indexSpaceContent(space: NormalizedSpace) {
   return indexContent({
     index: ElasticIndex.spaces,
     id: space.id,
@@ -98,7 +95,7 @@ export async function indexSpaceContent(space: Space) {
   })
 }
 
-export async function indexPostContent(post: Post) {
+export async function indexPostContent(post: NormalizedPost) {
   return indexContent({
     index: ElasticIndex.posts,
     id: post.id,

@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sub-backend
+  namespace: sub-back
+  labels:
+    app: sub-backend
+spec:
+  replicas: 3
+  template:
+    metadata:
+      name: sub-backend
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'sub-backend'
+        vault.hashicorp.com/agent-inject-secret-env: 'secrets/sub-backend/config'
+        vault.hashicorp.com/secret-volume-path: "/home/offchain/vault"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{ with secret "secrets/sub-backend/config" -}}
+          PGPASSWORD={{ .Data.data.PGPASSWORD }}
+          PGUSER={{ .Data.data.PGUSER }}
+          PGHOST={{ .Data.data.PGHOST }}
+          PGDATABASE={{ .Data.data.PGDATABASE }}
+          ES_NODE_URL={{ .Data.data.ES_NODE_URL }}
+          ES_OFFCHAIN_PASSWORD={{ .Data.data.ES_OFFCHAIN_PASSWORD }}
+          ES_OFFCHAIN_USER={{ .Data.data.ES_OFFCHAIN_USER }}
+          ES_READONLY_PASSWORD={{ .Data.data.ES_READONLY_PASSWORD }}
+          ES_READONLY_USER={{ .Data.data.ES_READONLY_USER }}
+          IPFS_CLUSTER_URL={{ .Data.data.IPFS_CLUSTER_URL }}
+          IPFS_GATEWAY_URL={{ .Data.data.IPFS_GATEWAY_URL }}
+          IPFS_NODE_URL={{ .Data.data.IPFS_NODE_URL }}
+          IPFS_READ_ONLY_NODE_URL={{ .Data.data.IPFS_READ_ONLY_NODE_URL }}          
+          EMAIL_HOST={{ .Data.data.EMAIL_HOST }}
+          EMAIL_PORT={{ .Data.data.EMAIL_PORT }}
+          EMAIL_USER={{ .Data.data.EMAIL_USER }}
+          EMAIL_PASSWORD={{ .Data.data.EMAIL_PASSWORD }}
+          EMAIL_FROM={{ .Data.data.EMAIL_FROM }}
+          RECAPTCHA_KEY={{ .Data.data.RECAPTCHA_KEY }}          
+          {{- end }}          
+
+      labels:
+        app: sub-backend
+    spec:
+      serviceAccountName: sub-backend
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - sub-backend
+            topologyKey: kubernetes.io/hostname
+      containers:
+        - name: sub-backend
+          image: <IMAGE>
+          args:
+            ['sh', '-c', 'cp /home/offchain/vault/env /home/offchain/.env && yarn start']
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: sub-backend-env
+
+          readinessProbe:
+            httpGet:
+              path: /v1/health/readiness 
+              port: 3001
+            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /v1/health/liveness
+              port: 3001
+            failureThreshold: 3
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 15   
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: sub-backend

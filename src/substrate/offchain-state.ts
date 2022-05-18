@@ -8,14 +8,14 @@ const stateFilePath = join(stateDirPath, 'state.json')
 const defaultOffchainState = (): OffchainState => ({
   postgres: { lastBlock: 0 },
   elastic: { lastBlock: 0 },
-  time: new Date()
+  // time: new Date()
 })
 
 export async function readOffchainState (): Promise<OffchainState> {
   try {
     const json = await asyncReadFile(stateFilePath, 'utf8')
     const state = JSON.parse(json) as OffchainState
-    state.time = new Date(state.time)
+    // state.time = new Date(state.time)
     log.debug('Read the offchain state from FS: %o', state)
     return state
   } catch (err) {
@@ -26,7 +26,7 @@ export async function readOffchainState (): Promise<OffchainState> {
 
 export async function writeOffchainState (state: OffchainState) {
   log.debug('Write the offchain state to FS: %o', state)
-  state.time = new Date()
+  // state.time = new Date()
   const json = JSON.stringify(state)
   await asyncMkdir(stateDirPath, { recursive: true })
   return asyncWriteFile(stateFilePath, json, 'utf8')

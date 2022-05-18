@@ -14,7 +14,7 @@ async function main (substrate: SubsocialSubstrateApi) {
 
   log.info(`Subscribe to Substrate events: ${Array.from(eventsFilterMethods)}`)
 
-  const api = await substrate.api
+  const api = await substrate.api as any
 
   blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
 
@@ -39,8 +39,11 @@ async function main (substrate: SubsocialSubstrateApi) {
   let lastBlock = 0
   let blockToProcess = 0
 
-  const getBestFinalizedBlock = async () =>
-    await api.derive.chain.bestNumberFinalized()
+  const getBestFinalizedBlock = async () => {
+    const finalizedHash = await api.rpc.chain.getFinalizedHead()
+    const block = await api.rpc.chain.getBlock(finalizedHash)
+    return block.block.header.number
+  }
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
 

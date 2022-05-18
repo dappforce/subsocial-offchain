@@ -8,7 +8,7 @@ export const createV1Routes = () => {
 
   router.use('/ipfs', createIpfsRoutes())
   router.use('/offchain', createOffchainRoutes())
-  router.use('/subscriber/health', createHealthRoutes())
+  router.use('/health', createHealthRoutes())
 
   return router
 }

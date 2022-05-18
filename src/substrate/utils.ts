@@ -79,7 +79,7 @@ export const blockNumberToApproxDate = async (eventBlock: BN) => {
   const api = await substrate.api
 
   const blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
-  const currentTimestamp = await api.query.timestamp.now()
+  const currentTimestamp = new BN(new Date().getTime())
   const block = await api.rpc.chain.getBlock()
 
   const lastBlockNumber = block.block.header.number.unwrap()
