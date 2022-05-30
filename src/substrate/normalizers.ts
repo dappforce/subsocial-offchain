@@ -19,7 +19,7 @@ type CanHaveContent = {
 }
 
 type HasOwner = {
-  owner: string
+  ownerId: string
 }
 
 type HasCreated = {
@@ -160,7 +160,7 @@ function normalizeSpaceOrPostStruct(struct: SpaceOrPostStruct): NormalizedSpaceO
   return {
     ...normalizeSuperCommonStruct(struct),
     id: struct.id.toString(),
-    owner: struct.owner.toString(),
+    ownerId: struct.owner.toString(),
     isHidden: struct.hidden.isTrue,
   }
 }

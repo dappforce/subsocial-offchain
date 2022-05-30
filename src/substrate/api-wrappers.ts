@@ -48,7 +48,13 @@ export async function findPost(id: PostId | string): Promise<NormalizedPost | un
   }
   else {
     const post = await rpcApi.getPostById(id.toString())
-    return post
+
+    if (!post) return undefined
+
+    return {
+      ...post,
+      ownerId: post.owner
+    }
   }
 }
 

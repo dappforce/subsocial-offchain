@@ -15,7 +15,7 @@ export const onRootPostShared = async (eventAction: SubstrateEvent, post: Normal
   const insertResult = await insertActivityForPost(eventAction, ids);
   if (insertResult === undefined) return;
 
-  const account = post.owner;
+  const account = post.ownerId;
   await insertNotificationForOwner({ account, ...insertResult });
   await fillNotificationsWithAccountFollowers({ account: author, ...insertResult });
 
