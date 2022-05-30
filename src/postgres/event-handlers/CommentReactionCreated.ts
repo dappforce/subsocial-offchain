@@ -12,7 +12,7 @@ export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post
   const {
     parentId,
     rootPostId,
-    createdBy,
+    owner,
     upvotesCount,
     downvotesCount
   } = asNormalizedComment(post)
@@ -22,12 +22,12 @@ export const onCommentReactionCreated = async (eventAction: SubstrateEvent, post
   const ids = [ parent, commentId ];
   const reactionCount = upvotesCount + downvotesCount - 1;
 
-  const insertResult = await insertActivityForCommentReaction(eventAction, reactionCount, ids, createdBy);
+  const insertResult = await insertActivityForCommentReaction(eventAction, reactionCount, ids, owner);
   if (insertResult === undefined) return;
 
-  if (voter === createdBy) return;
+  if (voter === owner) return;
   // insertAggStream(eventAction, commentId);
 
-  await insertNotificationForOwner({ ...insertResult, account: createdBy });
-  informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), createdBy, insertResult.blockNumber, insertResult.eventIndex, 'notification')
+  await insertNotificationForOwner({ ...insertResult, account: owner });
+  informTelegramClientAboutNotifOrFeed(eventAction.data[0].toString(), owner, insertResult.blockNumber, insertResult.eventIndex, 'notification')
 }
