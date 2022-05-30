@@ -14,7 +14,7 @@ export const onSpaceFollowed: EventHandlerFn = async (eventAction) => {
   if (!space) return;
 
   const count = space.followersCount - 1;
-  const account = space.owner;
+  const account = space.ownerId;
   const insertResult = await insertActivityForSpace(eventAction, count, account);
   if (insertResult === undefined) return;
 

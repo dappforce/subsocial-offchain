@@ -18,7 +18,7 @@ export const onCommentShared = async (eventAction: SubstrateEvent, comment: Norm
   eventAction.eventName = VirtualEvents.CommentShared
   const spaceId = rootPost.spaceId;
   const ids = [ spaceId, rootPostId, commentId ];
-  const account = comment.owner;
+  const account = comment.ownerId;
 
   const insertResult = await insertActivityForComment(eventAction, ids, account);
   if (insertResult === undefined) return;

@@ -22,7 +22,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Normal
 
   await insertCommentFollower(eventAction.data);
 
-  const postCreator = rootPost.owner;
+  const postCreator = rootPost.ownerId;
   const ids = [rootPostId, commentId];
 
   if (parentId) {
@@ -32,7 +32,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Normal
     const param = [...ids, parentId];
     const parentComment = await findPost(parentId);
 
-    const parentOwner = parentComment.owner.toString();
+    const parentOwner = parentComment.ownerId.toString();
     const insertResult = await insertActivityForComment(eventAction, param, author);
 
     if (author === parentOwner || insertResult === undefined) return;
