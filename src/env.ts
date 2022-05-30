@@ -9,7 +9,7 @@ export const offchainTWSPort = process.env.OFFCHAIN_TELEGRAM_WS_PORT
 export const appBaseUrl = process.env.APP_BASE_URL
 
 export const substrateNodeUrl = process.env.SUBSTRATE_URL
-export const substrateRpcUrl = process.env.SUBSTRATE_RPC_URL || 'https://rpc.subsocial.network/http'
+export const substrateRpcUrl = process.env.SUBSTRATE_RPC_URL
 
 export const ipfsReadOnlyNodeUrl = process.env.IPFS_READ_ONLY_NODE_URL || 'http://localhost:8080'
 export const ipfsNodeUrl = process.env.IPFS_NODE_URL || 'http://localhost:5001'

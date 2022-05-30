@@ -23,6 +23,7 @@ async function getSpaceDoc(space: NormalizedSpace): Promise<ElasticSpaceDoc | un
   if (!content) return undefined
 
   const { name, about, tags } = content
+  // TODO Need to replace it with getting space's domain name from the Domains pallet.
   const handle = space.handle
 
   return {
