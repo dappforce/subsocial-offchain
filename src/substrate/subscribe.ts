@@ -14,7 +14,7 @@ async function main (substrate: SubsocialSubstrateApi) {
 
   log.info(`Subscribe to Substrate events: ${Array.from(eventsFilterMethods)}`)
 
-  const api = await substrate.api as any
+  const api = await substrate.api
 
   blockTime = api.consts.timestamp?.minimumPeriod.muln(2).toNumber()
 
