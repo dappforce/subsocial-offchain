@@ -23,7 +23,7 @@ type HasOwner = {
 }
 
 type HasCreated = {
-  createdByAccount: string
+  createdBy: string
   createdAtBlock: number
   createdAtTime: number
 }
@@ -142,7 +142,7 @@ function normalizeSuperCommonStruct(struct: SuperCommonStruct): NormalizedSuperC
 
   return {
     // created:
-    createdByAccount: created.account.toString(),
+    createdBy: created.account.toString(),
     createdAtBlock: created.block.toNumber(),
     createdAtTime: created.time.toNumber(),
 

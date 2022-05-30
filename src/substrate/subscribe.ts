@@ -39,8 +39,11 @@ async function main (substrate: SubsocialSubstrateApi) {
   let lastBlock = 0
   let blockToProcess = 0
 
-  const getBestFinalizedBlock = async () =>
-    await api.derive.chain.bestNumberFinalized()
+  const getBestFinalizedBlock = async () => {
+    const finalizedHash = await api.rpc.chain.getFinalizedHead()
+    const block = await api.rpc.chain.getBlock(finalizedHash)
+    return block.block.header.number
+  }
 
   let bestFinalizedBlock = await getBestFinalizedBlock()
 

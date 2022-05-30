@@ -1,14 +1,14 @@
-import { resolveCidOfContent } from '@subsocial/api'
 import { CommonContent } from '@subsocial/types/offchain'
-import { Post, Profile, Space } from '@subsocial/types/substrate/interfaces'
 import { resolveSubsocialApi } from '../connections'
 import { ipfsLog as log } from '../connections/loggers'
 
-type Struct = Post | Space | Profile
+type HasContentId = {
+  contentId?: string
+}
 
-export async function getContentFromIpfs<T extends CommonContent>(struct: Struct): Promise<T | undefined> {
+export async function getContentFromIpfs<T extends CommonContent>(struct: HasContentId): Promise<T | undefined> {
   const { ipfs } = await resolveSubsocialApi()
-  const cid = resolveCidOfContent(struct.content)
+  const cid = struct.contentId
 
   return ipfs.getContent<T>(cid)
     .catch(err => {

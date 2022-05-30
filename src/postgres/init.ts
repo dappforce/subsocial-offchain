@@ -2,6 +2,7 @@ import { postgesLog as log } from '../connections/loggers'
 import { exit } from 'process'
 import { readFileSync, readdirSync } from 'fs'
 import { runQuery } from './utils'
+import { getActualSchemaVersion } from './selects/getActualSchemaVersion'
 
 const RELATION_NOT_FOUND_ERROR = '42P01'
 
@@ -34,13 +35,12 @@ const upgradeDbSchema = async (actualSchemaVersion: number) => {
 
 const init = async () => {
   try {
-    const { rows } = await runQuery('SELECT * FROM df.schema_version LIMIT 1')
+    const actualSchemaVersion = await getActualSchemaVersion()
     const maxAvailableSchemaVersion = schemaFiles
       .map(stripSchemaVersion)
       .sort((currentVersion, nextVersion) => currentVersion - nextVersion)
       .pop()
 
-    const actualSchemaVersion = rows[0]?.value as number || 0
 
     if (!actualSchemaVersion || actualSchemaVersion < maxAvailableSchemaVersion) {
       return upgradeDbSchema(actualSchemaVersion)

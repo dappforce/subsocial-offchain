@@ -1,7 +1,6 @@
 import { Pool, PoolConfig } from 'pg'
+import { postgresMaxPoolSize } from '../env';
 import { postgesLog as log } from './loggers';
-
-require('dotenv').config();
 
 const enableSsl = process.env.PG_SSL === 'true'
 
@@ -11,6 +10,7 @@ const pgConf: PoolConfig = {
   database: process.env.PGDATABASE,
   password: process.env.PGPASSWORD,
   port: parseInt(process.env.PGPORT),
+  max: postgresMaxPoolSize,
   ssl: enableSsl && {
     rejectUnauthorized: false
   }
