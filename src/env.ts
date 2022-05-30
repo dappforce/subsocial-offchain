@@ -17,6 +17,8 @@ export const ipfsClusterUrl = process.env.IPFS_CLUSTER_URL || 'http://localhost:
 export const ipfsGatewayUrl = process.env.IPFS_GATEWAY_URL
 export const port = process.env.OFFCHAIN_SERVER_PORT || 3001
 
+export const esNodeUrl = process.env.ES_NODE_URL || 'http://localhost:9200'
+
 export const emailHost = process.env.EMAIL_HOST
 export const emailPort = parseInt(process.env.EMAIL_PORT)
 export const emailUser = process.env.EMAIL_USER

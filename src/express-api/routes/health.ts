@@ -1,110 +1,116 @@
-import { Router, Handler } from 'express'
+import axios from 'axios'
+import { Handler, Router } from 'express'
 import { ipfsCluster } from '../../connections'
+import { esNodeUrl } from '../../env'
 import { getActualSchemaVersion } from '../../postgres/selects/getActualSchemaVersion'
 import { readOffchainState } from '../../substrate/offchain-state'
-import { queryElastic } from '../handlers/esHandlers'
 
 const FIVE_MIN = 5 * 60 * 1000
 
-const STATUS_READY = '/ready'
-const STATUS_LIVE = '/live'
+const STATUS_READY = '/readiness'
+const STATUS_LIVE = '/liveness'
 
 const buildSubscriberHealthRoute =
-  (timeCheck: (time: Date) => boolean, entity: 'ready' | 'live'): Handler =>
-  async (_, res) => {
+  (timeCheck: (time: Date) => boolean): CheckFn =>
+  async () => {
     const { time } = await readOffchainState()
-    if (time && timeCheck(time)) {
-      res.send(`Subscriber is ${entity}`)
-    } else {
-      res.status(500).send(`Subscriber isn't ${entity}`)
-    }
+    return buildCheckResponse(time && timeCheck(time))
   }
 
-const createIpfsHealthRoutes = () => {
-  const router = Router()
+type Status = 'UP' | 'DOWN'
 
-  router.get(
-    STATUS_LIVE,
-    async (_req, res) => {
-      const version = await ipfsCluster.testConnection()
-
-      if (version) {
-        res.send(`IPFS is ready. Version: ${version}`)
-      } else {
-        res.status(500).send(`IPFS isn't ready`)
-      }
-  })
-
-  return router
+type CheckResponse = {
+  status: Status
+  [key: string]: any
 }
 
-const createElasticHealthRoutes = () => {
-  const router = Router()
+type CheckFn = (...args: any[]) => Promise<CheckResponse>
 
-  router.get(
-    STATUS_LIVE,
-    async (_req, res) => {
-      try {
-        const searchResult = await queryElastic({ q: 'Subsocial', limit: 1, indexes: [ 'all' ]})
+const getStatus = (isUp: boolean) => (isUp ? 'UP' : 'DOWN')
+const buildCheckResponse = (isUp: boolean, details?: Record<string, any>): CheckResponse => ({
+  status: getStatus(isUp),
+  details
+})
 
-        if (searchResult) {
-          res.send(`Elastic is live.`)
-        } else {
-         throw new Error()
-        }
-      } catch {
-        res.status(500).send(`Elastic isn't ready`)
-      }
-  })
+const checkIpfs: CheckFn = async () => {
+  const version = await ipfsCluster.testConnection()
 
-  return router
+  return buildCheckResponse(!!version, { version })
 }
 
-export const createPsqlHealthRoutes = () => {
-  const router = Router()
+const checkElastic: CheckFn = async () => {
+  try {
+    const { data, status } = await axios.get(`${esNodeUrl}/_cluster/health`)
 
-  router.get(
-    STATUS_LIVE,
-    async (_req, res) => {
-      const actualSchemaVersion = await getActualSchemaVersion()
-
-      if (actualSchemaVersion !== undefined) {
-        res.send(`Postgres is live`)
-      } else {
-        res.status(500).send(`Postgres isn't live`)
-      }
-  })
-
-  return router
+    return buildCheckResponse(status === 200 && data?.status !== 'red')
+  } catch {
+    return buildCheckResponse(false)
+  }
 }
 
-const createSubscriberHealthRoutes = () => {
-  const router = Router()
+const checkPostgres: CheckFn = async () => {
+  try {
+    const actualSchemaVersion = await getActualSchemaVersion()
 
-  const startTime = new Date()
-
-  router.get(
-    STATUS_READY,
-    buildSubscriberHealthRoute((time) => time > startTime, 'ready')
-  )
-  router.get(
-    STATUS_LIVE,
-    buildSubscriberHealthRoute((time) => new Date().getTime() - time.getTime() < FIVE_MIN, 'live')
-  )
-
-  return router
+    return buildCheckResponse(!!actualSchemaVersion, { actualSchemaVersion })
+  } catch {
+    return buildCheckResponse(false)
+  }
 }
+
+const buildCheckOffchain = async (_checkSubscriber: CheckFn) => {
+  const responses = await Promise.all([
+    checkIpfs(),
+    checkElastic(),
+    checkPostgres(),
+    // TODO: enable when will fix it
+    // checkSubscriber()
+  ])
+
+  const isHealth = responses.every((res) => res.status === 'UP')
+
+  const [ipfs, elastic, postgres, /* subscriber */] = responses
+
+  return buildCheckResponse(isHealth, { ipfs, elastic, postgres, /* subscriber */ })
+}
+
+const startTime = new Date()
+const checkLiveForSubscriber: CheckFn = buildSubscriberHealthRoute((time) => time > startTime)
+const checkReadyForSubscriber: CheckFn = buildSubscriberHealthRoute(
+  (time) => new Date().getTime() - time.getTime() < FIVE_MIN)
+
+const liveCheck = () => buildCheckOffchain(checkLiveForSubscriber)
+const readyCheck = () => buildCheckOffchain(checkReadyForSubscriber)
+const checkHealth = async () => {
+  const responses = await Promise.all([readyCheck(), liveCheck()])
+
+  const isHealth = responses.every((res) => res.status === 'UP')
+
+  const [readiness, liveness] = responses
+
+  return buildCheckResponse(isHealth, { readiness, liveness })
+}
+
+const buildCheckHeader =
+  (check: CheckFn): Handler =>
+  async (_, res) => {
+    const response = await check()
+
+    if (response.status === 'UP') {
+      res.json(response)
+    } else {
+      res.status(500).json(response)
+    }
+  }
 
 export const createHealthRoutes = () => {
   const router = Router()
 
-  router.use('/subscriber', createSubscriberHealthRoutes())
-  router.use('/ipfs', createIpfsHealthRoutes())
-  router.use('/elastic', createElasticHealthRoutes())
-  router.use('/postgres', createPsqlHealthRoutes())
+  router.get('/', buildCheckHeader(checkHealth))
+  router.get(STATUS_READY, buildCheckHeader(readyCheck))
+  router.get(STATUS_LIVE, buildCheckHeader(liveCheck))
 
   return router
 }
 
 export default createHealthRoutes
-
