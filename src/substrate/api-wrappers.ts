@@ -1,11 +1,10 @@
 import { SpaceId, PostId } from '@subsocial/types/substrate/interfaces';
 import { readFileSync } from 'fs';
-import { resolveSubsocialApi } from '../connections/subsocial';
 
-import { Id, NormalizedPost, NormalizedProfile, NormalizedSpace, normalizeSpaceStruct, normalizePostStruct, normalizeProfileStruct } from './normalizers';
+import { Id, NormalizedPost, NormalizedProfile, NormalizedSpace } from './normalizers';
 import { AccountId } from '@polkadot/types/interfaces'
 import { TEST_MODE } from '../env';
-import BN from 'bn.js';
+import { rpcApi } from '../connections/rpc';
 
 type StorageName = 'posts' | 'spaces' | 'profiles'
 
@@ -38,9 +37,8 @@ export async function findSpace(id: SpaceId | string): Promise<NormalizedSpace |
     return storage.spaces[id.toString()]
   }
   else {
-    const { substrate } = await resolveSubsocialApi()
-    const space = await substrate.findSpace({ id: new BN(id) })
-    return normalizeSpaceStruct(space)
+    const space = await rpcApi.getSpaceById(id.toString())
+    return space
   }
 }
 
@@ -49,9 +47,8 @@ export async function findPost(id: PostId | string): Promise<NormalizedPost | un
     return storage.posts[id.toString()]
   }
   else {
-    const { substrate } = await resolveSubsocialApi()
-    const post = await substrate.findPost({ id: new BN(id) })
-    return normalizePostStruct(post)
+    const post = await rpcApi.getPostById(id.toString())
+    return post
   }
 }
 
@@ -60,8 +57,11 @@ export async function findSocialAccount(id: AccountId | string): Promise<Normali
     return storage.profiles[id.toString()]
   }
   else {
-    const { substrate } = await resolveSubsocialApi()
-    const profile = await substrate.findSocialAccount(id)
-    return normalizeProfileStruct(id, profile)
+    const { profile, ...socialAccount } = await rpcApi.getSocialAccountById(id.toString()) || {}
+
+    return {
+      ...socialAccount,
+      ...profile
+    }
   }
 }

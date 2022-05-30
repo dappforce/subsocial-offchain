@@ -22,7 +22,7 @@ export const onCommentCreated = async (eventAction: SubstrateEvent, post: Normal
 
   await insertCommentFollower(eventAction.data);
 
-  const postCreator = rootPost.createdByAccount;
+  const postCreator = rootPost.owner;
   const ids = [rootPostId, commentId];
 
   if (parentId) {

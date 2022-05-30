@@ -124,8 +124,6 @@ export const createOffchainRoutes = () => {
 
   router.get('/polls/:pollId/:account/vote', votesHandlers.getVoteByAccountAndPollHandler)
   router.get('/polls/:pollId/votes', votesHandlers.getVoteByPollHandler)
-  router.get('/polls/:pollId/data', votesHandlers.getVotesDataByPollIdAndVoteHandler)
-  router.get('/polls/eligibility/:account', votesHandlers.isAccountEligibleForVoteHandler)
   router.post('/polls/upsert', checkRegularSignature, votesHandlers.upsertVoteHandler)
 
   return router

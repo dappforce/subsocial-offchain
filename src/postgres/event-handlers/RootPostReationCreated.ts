@@ -10,7 +10,7 @@ export const onRootPostReactionCreated = async (eventAction: SubstrateEvent, pos
 
   const ids = [ postId ];
   const reactionCount = post.upvotesCount + post.downvotesCount - 1;
-  const postAuthor = post.createdByAccount;
+  const postAuthor = post.owner;
   const insertResult = await insertActivityForPostReaction(eventAction, reactionCount, ids, postAuthor);
   if (insertResult === undefined) return
 

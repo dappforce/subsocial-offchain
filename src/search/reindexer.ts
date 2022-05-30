@@ -7,6 +7,7 @@ import { argv, exit } from 'process'
 import { GenericAccountId } from '@polkadot/types'
 import { isEmptyArray } from '@subsocial/utils';
 import { getUniqueIds } from '@subsocial/api'
+import { findPost, findSocialAccount, findSpace } from '../substrate/api-wrappers';
 
 const one = new BN(1)
 
@@ -20,11 +21,10 @@ const reindexProfiles: ReindexerFn = async (substrate) => {
     const addressEncoded = '0x' + key.toHex().substr(-64)
     const account = new GenericAccountId(key.registry, addressEncoded)
 
-    const res = await substrate.findSocialAccount(account)
-    const { profile } = res
-    if (profile.isSome) {
+    const socialAccount = await findSocialAccount(account)
+    if (socialAccount.contentId) {
       log.info(`Index profile of account ${account.toString()}`)
-      await indexProfileContent(profile.unwrap())
+      await indexProfileContent(socialAccount)
     }
   })
 
@@ -40,7 +40,7 @@ const reindexSpaces: ReindexerFn = async (substrate) => {
 
   const spaceIndexators = spaceIds.map(async (spaceId) => {
     const id = new BN(spaceId)
-    const space = await substrate.findSpace({ id })
+    const space = await findSpace(id.toString())
     log.info(`Index space # ${spaceId} out of ${lastSpaceIdStr}`)
     await indexSpaceContent(space)
   })
@@ -57,7 +57,7 @@ const reindexPosts: ReindexerFn = async (substrate) => {
 
   const postIndexators = postIds.map(async (postId) => {
     const id = new BN(postId)
-    const post = await substrate.findPost({ id })
+    const post = await findPost(id.toString())
     log.info(`Index post # ${postId} out of ${lastPostIdStr}`)
     await indexPostContent(post)
   })
