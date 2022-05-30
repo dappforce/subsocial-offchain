@@ -8,7 +8,7 @@ export const onProfileUpdated: EventHandlerFn = async (eventAction) => {
   const accountId = data[0] as AccountId;
 
   const socialAccount = await findSocialAccount(accountId)
-  if (!socialAccount) return;
+  if (!socialAccount.contentId) return;
 
   await indexProfileContent(socialAccount);
 }
