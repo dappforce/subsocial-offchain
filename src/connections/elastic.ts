@@ -14,7 +14,6 @@ if (!greeted) {
 const esCert = process.env.ES_CERT
 
 const ssl = {
-  ca: esCert,
   rejectUnauthorized: !!esCert, // <-- this is important
 }
 

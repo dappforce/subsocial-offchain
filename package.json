@@ -1,6 +1,6 @@
 {
   "name": "dappforce-subsocial-offchain",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "description": "Off-chain services for Subsocial Network.",
   "author": "DappForce contributors",
   "license": "GPL-3.0-only",
