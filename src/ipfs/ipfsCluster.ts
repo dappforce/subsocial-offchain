@@ -99,8 +99,8 @@ export class IpfsClusterApi {
     try {
       const res = await ipfsRequest
       const body = JSON.parse(res)
-      const cidObj = body.Cid || body.cid
-      const cid = cidObj['/'] as IpfsCid
+
+      const cid = body.Cid || body.cid
       this.ipfsClusterRequest('pin', cid)
       log.debug('Content added and pinned under CID: %s', cid)
       return cid
