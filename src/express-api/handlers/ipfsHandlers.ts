@@ -44,7 +44,7 @@ export const addFile = async (req: express.Request, res: express.Response) => {
   } else {
     const cid = await ipfsCluster.addFile(req.file);
     log.debug('File added to IPFS with CID:', cid);
-    res.json(cid);
+    res.send(cid);
   }
 }
 
