@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sub-back-db-migrations
+spec:
+  template:
+    spec:
+      containers:
+      - name: sub-back-db-migrations
+        image: <IMAGE>
+        command: ["yarn", "init-postgres"]
+      restartPolicy: OnFailure

@@ -2,28 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sub-backend
-  namespace: sub-back
-  labels:
-    app: sub-backend
 spec:
-  replicas: 1
   template:
     metadata:
       name: sub-backend
-      labels:
-        app: sub-backend
     spec:
       serviceAccountName: sub-backend
       containers:
         - name: sub-backend
-          image: <IMAGE>          
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: sub-backend-env
-
           readinessProbe:
             httpGet:
               path: /v1/health/readiness
@@ -33,7 +22,6 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 10
-
           livenessProbe:
             httpGet:
               path: /v1/health/liveness
@@ -43,8 +31,3 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 15   
-
-      restartPolicy: Always
-  selector:
-    matchLabels:
-      app: sub-backend

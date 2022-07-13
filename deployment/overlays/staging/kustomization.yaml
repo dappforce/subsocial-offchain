@@ -1,0 +1,13 @@
+---
+bases:
+  - ../../base
+
+patchesStrategicMerge:
+  - deployment.yaml
+  - job.yaml
+
+configMapGenerator:
+  - name: sub-backend-env
+    namespace: sub-back
+    envs:
+    - stage.env

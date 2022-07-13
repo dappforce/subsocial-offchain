@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sub-back-db-migrations
+spec:
+  backoffLimit: 10
+  activeDeadlineSeconds: 240
+  template:
+    spec:
+      containers:
+      - name: sub-back-db-migrations
+        envFrom:
+        - configMapRef:
+            name: sub-backend-env
