@@ -99,25 +99,20 @@ jobs:
         with:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN_STAGING }}
 
-      - name: Update all file
-        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/all.yaml
+      - name: Update job file
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/base/job.yaml
 
       - name: Update deployment file
-        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/staging/deploy.yaml
+        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/base/deployment.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
         run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 c7e84602-9029-40ed-9f95-6c113f6693ee
 
       - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl delete -f $GITHUB_WORKSPACE/deployment/staging/all.yaml
+        run: kubectl delete -f $GITHUB_WORKSPACE/deployment/base/job.yaml -n sub-back
 
       - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl apply -f $GITHUB_WORKSPACE/deployment/staging/all.yaml
-
-      - name: Deploy to DigitalOcean Kubernetes
-        run: kubectl apply -f $GITHUB_WORKSPACE/deployment/staging/deploy.yaml
+        run: kubectl apply -k $GITHUB_WORKSPACE/deployment/overlays/staging/
 
       - name: Verify deployment
         run: kubectl -n sub-back rollout status deployment/sub-backend
-
-
