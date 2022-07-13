@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sub-backend
+spec:
+  template:
+    metadata:
+      name: sub-backend
+    spec:
+      serviceAccountName: sub-backend
+      containers:
+        - name: sub-backend
+          envFrom:
+            - configMapRef:
+                name: sub-backend-env
+          readinessProbe:
+            httpGet:
+              path: /v1/health/readiness
+              port: 3001
+            failureThreshold: 3
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /v1/health/liveness
+              port: 3001
+            failureThreshold: 3
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 15   
