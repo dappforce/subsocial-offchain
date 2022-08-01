@@ -23,7 +23,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: sub-backend-env
-
+            - secretRef:
+                name: sub-backend-secret 
           readinessProbe:
             httpGet:
               path: /v1/health/readiness
