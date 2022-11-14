@@ -7,7 +7,6 @@ import { asIpfsCid } from '@subsocial/api'
 const log = newLogger('IPFS req handler')
 
 export const addContent = async (req: express.Request, res: express.Response) => {
-  console.log('req.body', req.body)
   const content = JSON.stringify(req.body)
   if (content.length > maxFileSizeBytes) {
     res.statusCode = 400
@@ -37,7 +36,6 @@ export const getContentAsPostRequest = async (req: express.Request, res: express
   getContentResponse(res, req.body.cids)
 
 export const addFile = async (req: express.Request, res: express.Response) => {
-  console.log('req.file', req.file)
   if (req.file.size > maxFileSizeBytes) {
     res.statusCode = 400
     res.json({ status: 'error', message: `Uploaded file should be less than ${maxFileSizeMB} MB` })
