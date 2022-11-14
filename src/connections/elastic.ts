@@ -18,15 +18,6 @@ const ssl = {
   rejectUnauthorized: !!esCert, // <-- this is important
 }
 
-export const elasticIndexer = new Client({
-  node: esUrl,
-  auth: {
-    username: process.env.ES_OFFCHAIN_USER,
-    password: process.env.ES_OFFCHAIN_PASSWORD
-  },
-  ssl,
-})
-
 export const elasticReader = new Client({
   node: esUrl,
   auth: {

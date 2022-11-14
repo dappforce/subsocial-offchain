@@ -1,13 +1,13 @@
 import * as express from 'express'
 import { newLogger, nonEmptyStr } from '@subsocial/utils'
-import { ipfsCluster } from '../../connections/ipfs'
+import { ipfs, ipfsCluster } from '../../connections/ipfs'
 import { maxFileSizeBytes, maxFileSizeMB } from '../config'
-import { resolveSubsocialApi } from '../../connections'
 import { asIpfsCid } from '@subsocial/api'
 
 const log = newLogger('IPFS req handler')
 
 export const addContent = async (req: express.Request, res: express.Response) => {
+  console.log('req.body', req.body)
   const content = JSON.stringify(req.body)
   if (content.length > maxFileSizeBytes) {
     res.statusCode = 400
@@ -22,7 +22,6 @@ export const addContent = async (req: express.Request, res: express.Response) =>
 const getContentResponse = async (res: express.Response, cids: string[]) => {
   try {
     const ipfsCids = (Array.isArray(cids) ? cids : [ cids ]).map(asIpfsCid)
-    const { ipfs } = await resolveSubsocialApi()
     const contents = await ipfs.getContentArrayFromIpfs(ipfsCids)
     log.debug(`${contents.length} content items loaded from IPFS`)
     res.json(contents)
@@ -38,6 +37,7 @@ export const getContentAsPostRequest = async (req: express.Request, res: express
   getContentResponse(res, req.body.cids)
 
 export const addFile = async (req: express.Request, res: express.Response) => {
+  console.log('req.file', req.file)
   if (req.file.size > maxFileSizeBytes) {
     res.statusCode = 400
     res.json({ status: 'error', message: `Uploaded file should be less than ${maxFileSizeMB} MB` })

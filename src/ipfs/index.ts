@@ -1,5 +1,5 @@
-import { CommonContent } from '@subsocial/types/offchain'
-import { resolveSubsocialApi } from '../connections'
+import { CommonContent } from '@subsocial/api/types'
+import { ipfs } from '../connections'
 import { ipfsLog as log } from '../connections/loggers'
 
 type HasContentId = {
@@ -7,7 +7,6 @@ type HasContentId = {
 }
 
 export async function getContentFromIpfs<T extends CommonContent>(struct: HasContentId): Promise<T | undefined> {
-  const { ipfs } = await resolveSubsocialApi()
   const cid = struct.contentId
 
   return ipfs.getContent<T>(cid)
