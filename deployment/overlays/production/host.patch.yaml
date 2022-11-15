@@ -1,0 +1,8 @@
+---
+- op: replace
+  path: /spec/rules/0/host
+  value: "api.subsocial.network"
+
+- op: replace
+  path: /spec/tls/0/hosts
+  value: "api.subsocial.network"   

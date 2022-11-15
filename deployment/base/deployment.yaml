@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sub-backend
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: sub-backend
+    spec:
+      containers:
+        - name: sub-backend
+          image: <IMAGE>
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: sub-backend-env
+            - secretRef:
+                name: sub-backend-secret
+      restartPolicy: Always

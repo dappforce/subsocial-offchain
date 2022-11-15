@@ -1,0 +1,14 @@
+---
+bases:
+  - ../../base
+
+namespace: sub-back
+
+commonLabels:
+  app: sub-backend
+
+patchesStrategicMerge:
+  - deployment.yaml
+
+resources:
+  - configmap.yaml
