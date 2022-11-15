@@ -4,11 +4,6 @@ import * as ipfsReqHandlers from '../handlers/ipfsHandlers'
 import { maxFileSizeBytes } from '../config'
 
 const upload = multer({ limits: { fieldSize: maxFileSizeBytes } })
-// Uncomment the next line to add support for multi-file upload:
-// app.use(upload.array())
-
-// const getV1 = (url: string) => `/v1/${url}`
-// const getV1Offchain = (url: string) => `/offchain${url}`
 
 const createIpfsRoutes = () => {
   const router = Router()

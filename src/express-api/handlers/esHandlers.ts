@@ -2,9 +2,9 @@ import * as express from 'express'
 import { getOffsetFromRequest, getLimitFromRequest, HandlerFn, OkOrError } from '../utils'
 import { nonEmptyStr, nonEmptyArr } from '@subsocial/utils'
 import { buildElasticSearchQuery } from '../../search/reader'
-import { ElasticQueryParams } from '@subsocial/types/offchain/search'
 import { elasticReader } from '../../connections/elastic'
 import { elasticLog } from '../../connections/loggers'
+import { ElasticQueryParams } from '@subsocial/api/types'
 
 function toArray<T extends string>(maybeArr: T | Array<T>): Array<T> {
   if (nonEmptyArr(maybeArr)) {

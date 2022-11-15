@@ -1,1 +1,0 @@
-alter table df.token_drops add column date TIMESTAMP NOT NULL DEFAULT NOW()

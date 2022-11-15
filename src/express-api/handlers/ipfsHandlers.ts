@@ -1,8 +1,7 @@
 import * as express from 'express'
 import { newLogger, nonEmptyStr } from '@subsocial/utils'
-import { ipfsCluster } from '../../connections/ipfs'
+import { ipfs, ipfsCluster } from '../../connections/ipfs'
 import { maxFileSizeBytes, maxFileSizeMB } from '../config'
-import { resolveSubsocialApi } from '../../connections'
 import { asIpfsCid } from '@subsocial/api'
 
 const log = newLogger('IPFS req handler')
@@ -22,7 +21,6 @@ export const addContent = async (req: express.Request, res: express.Response) =>
 const getContentResponse = async (res: express.Response, cids: string[]) => {
   try {
     const ipfsCids = (Array.isArray(cids) ? cids : [ cids ]).map(asIpfsCid)
-    const { ipfs } = await resolveSubsocialApi()
     const contents = await ipfs.getContentArrayFromIpfs(ipfsCids)
     log.debug(`${contents.length} content items loaded from IPFS`)
     res.json(contents)

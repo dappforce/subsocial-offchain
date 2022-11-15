@@ -1,5 +1,6 @@
 import { ipfsReadOnlyNodeUrl, port, ipfsClusterUrl, ipfsNodeUrl } from '../env'
 import { IpfsClusterApi } from '../ipfs/ipfsCluster'
+import { SubsocialIpfsApi } from '@subsocial/api'
 
 require('dotenv').config()
 
@@ -14,3 +15,4 @@ export const ipfsCluster = new IpfsClusterApi({
   ipfsNodeUrl
 })
 
+export const ipfs = new SubsocialIpfsApi(ipfsConfig)

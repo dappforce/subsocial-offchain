@@ -1,5 +1,5 @@
 import { asAccountId } from '@subsocial/api';
-import { AnyAccountId } from '@subsocial/types';
+import { AnyAccountId } from '@subsocial/api/types';
 import { readFile, writeFile, mkdir } from 'fs';
 import { join } from 'path';
 import { promisify } from 'util'

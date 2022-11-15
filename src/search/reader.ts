@@ -1,12 +1,7 @@
 import { newLogger, isEmptyArray } from '@subsocial/utils'
 import { MAX_RESULTS_LIMIT } from '../express-api/utils'
 import { ElasticQueryParamsWithSpaceId } from '../express-api/handlers/esHandlers'
-import {
-  ElasticIndex,
-  ElasticIndexTypes,
-  AllElasticIndexes,
-  ElasticFields
-} from '@subsocial/types/offchain/search'
+import { ElasticIndexTypes, ElasticIndex, AllElasticIndexes, ElasticFields } from '@subsocial/api/types'
 
 const log = newLogger('Elastic Reader')
 
