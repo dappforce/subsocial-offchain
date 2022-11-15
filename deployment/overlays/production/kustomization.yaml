@@ -1,0 +1,26 @@
+---
+bases:
+  - ../../base
+
+namespace: sub-back
+
+commonLabels:
+  app: sub-backend
+
+patches:
+  - path: host.patch.yaml
+    target:
+      version: v1
+      kind: Ingress
+      name: sub-back
+  - path: host.patch.yaml
+    target:
+      version: v1
+      kind: Ingress
+      name: sub-backend-ws 
+
+patchesStrategicMerge:
+  - deployment.yaml
+
+resources:
+  - configmap.yaml    
