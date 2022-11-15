@@ -12,8 +12,8 @@ const createIpfsRoutes = () => {
   router.post('/addFile', upload.single('file'), ipfsReqHandlers.addFile)
 
   router.post('/add', ipfsReqHandlers.addContent)
-  router.get('/get', ipfsReqHandlers.getContentAsGetRequest)
-  router.post('/get', ipfsReqHandlers.getContentAsPostRequest)
+  // router.get('/get', ipfsReqHandlers.getContentAsGetRequest)
+  // router.post('/get', ipfsReqHandlers.getContentAsPostRequest)
   router.delete('/pins/:cid', ipfsReqHandlers.deleteContent)
 
   return router
