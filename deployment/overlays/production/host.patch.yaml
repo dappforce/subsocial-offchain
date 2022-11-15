@@ -4,5 +4,5 @@
   value: "api.subsocial.network"
 
 - op: replace
-  path: /spec/tls/0/hosts
+  path: /spec/tls/0/hosts/0
   value: "api.subsocial.network"   
