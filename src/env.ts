@@ -1,8 +1,4 @@
-import { parseNumStr } from "@subsocial/utils"
-
 require('dotenv').config();
-
-export const appBaseUrl = process.env.APP_BASE_URL
 
 export const substrateNodeUrl = process.env.SUBSTRATE_URL
 
@@ -13,5 +9,3 @@ export const port = process.env.OFFCHAIN_SERVER_PORT || 3001
 
 export const corsAllowedList = process.env.CORS_ALLOWED_ORIGIN.split(',')
 export const isAllCorsAllowed = corsAllowedList[0] === '*'
-
-export const postgresMaxPoolSize = parseNumStr(process.env.PG_MAX_POOL_SIZE)
