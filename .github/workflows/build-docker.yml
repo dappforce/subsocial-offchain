@@ -13,20 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "name=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         id: extract_branch
 
       - name: Prepare
         id: prep
         run: |
-          TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7)                
-          IMAGE="dappforce/subsocial-offchain"
-          echo ::set-output name=tagged_image::${IMAGE}:${TAG}
-          echo ::set-output name=tag::${TAG}          
+          echo "image=dappforce/subsocial-offchain:${{ env.name }}-$(echo $GITHUB_SHA | head -c7)" >> $GITHUB_ENV   
 
       - name: Set up Docker Buildx
         id: buildx
@@ -39,7 +36,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Cache Docker layers
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-single-buildx-${{ github.sha }}
@@ -47,14 +44,14 @@ jobs:
             ${{ runner.os }}-single-buildx
 
       - name: Build docker image
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
           file: docker/Dockerfile
           push: true
           tags: |
-            ${{ steps.prep.outputs.tagged_image }}
+            ${{ env.image }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -73,11 +70,11 @@ jobs:
     steps:
 
       - name: Checkout main
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "name=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         id: extract_branch
 
       - name: Install doctl
@@ -86,10 +83,10 @@ jobs:
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN_STAGING }}
 
       - name: Update deployment file
-        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/base/deployment.yaml
+        run: TAG=${{ env.name }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/base/deployment.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 c7e84602-9029-40ed-9f95-6c113f6693ee
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.K8S_STAGING }}
 
       - name: Deploy to DigitalOcean Kubernetes
         run: |-
@@ -105,23 +102,23 @@ jobs:
     steps:
 
       - name: Checkout main
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Extract branch name
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "name=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
         id: extract_branch
 
       - name: Install doctl
         uses: digitalocean/action-doctl@v2
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN_PRODUCTION }}
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN_PROD }}
 
       - name: Update deployment file
-        run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/base/deployment.yaml
+        run: TAG=${{ env.name }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/base/deployment.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 a4862333-a4d0-4e2c-b688-fcb90312d14e
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.K8S_PROD }}
 
       - name: Deploy to DigitalOcean Kubernetes
         run: |-
