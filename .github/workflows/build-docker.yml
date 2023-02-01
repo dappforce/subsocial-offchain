@@ -55,6 +55,8 @@ jobs:
           push: true
           tags: |
             ${{ steps.prep.outputs.tagged_image }}
+            dappforce/subsocial-offchain:master-latest
+
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
 
@@ -127,3 +129,26 @@ jobs:
         run: |-
           kubectl apply -k  $GITHUB_WORKSPACE/deployment/overlays/production/
           kubectl -n sub-back rollout status deployment/sub-backend
+
+  back-bk-prod-deploy:
+    name: bk-prod-deploy
+    needs: docker_build
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v3
+      - name: Extract branch name
+        shell: bash
+        run: echo "name=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+        id: extract_branch
+      - name: executing remote ssh commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.BACKUP_HOST }}
+          username: ${{ secrets.BACKUP_USERNAME }}
+          key: ${{ secrets.BACKUP_KEY }}
+          port: ${{ secrets.BACKUP_PORT }}
+          script: |
+            cd /root/offchain
+            ./update.sh          
