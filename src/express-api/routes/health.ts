@@ -1,5 +1,5 @@
 import { Handler, Router } from 'express'
-import { ipfsCluster } from '../../connections'
+import {ipfsApi} from "../../ipfs";
 
 const STATUS_READY = '/readiness'
 const STATUS_LIVE = '/liveness'
@@ -20,9 +20,9 @@ const buildCheckResponse = (isUp: boolean, details?: Record<string, any>): Check
 })
 
 const checkIpfs: CheckFn = async () => {
-  const version = await ipfsCluster.testConnection()
+  const upCID = await ipfsApi.saveAndPinJson({ ipfs: 'UP' })
 
-  return buildCheckResponse(!!version, { version })
+  return buildCheckResponse(!!upCID, { upCID })
 }
 
 const buildCheckOffchain = async () => {

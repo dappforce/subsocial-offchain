@@ -1,7 +1,7 @@
 import { newLogger, isEmptyArray } from '@subsocial/utils'
 import { MAX_RESULTS_LIMIT } from '../express-api/utils'
 import { ElasticQueryParamsWithSpaceId } from '../express-api/handlers/esHandlers'
-import { ElasticIndexTypes, ElasticIndex, AllElasticIndexes, ElasticFields } from '@subsocial/api/types'
+import { ElasticIndexTypes, ElasticIndex, AllElasticIndexes, ElasticFields } from '@subsocial/elasticsearch/types'
 
 const log = newLogger('Elastic Reader')
 
@@ -44,9 +44,6 @@ export const buildElasticSearchQuery = (params: ElasticQueryParamsWithSpaceId) =
     `${ElasticFields.post.tags}^2`,
 
     `${ElasticFields.comment.body}^2`,
-
-    `${ElasticFields.profile.name}^3`,
-    `${ElasticFields.profile.about}^1`
   ]
 
   const isEmptyQuery = q === '*' || q.trim() === ''

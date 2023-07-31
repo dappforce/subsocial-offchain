@@ -1,8 +1,9 @@
 import * as express from 'express'
 import { newLogger, nonEmptyStr } from '@subsocial/utils'
-import { ipfs, ipfsCluster } from '../../connections/ipfs'
+import { ipfs } from '../../connections/ipfs'
 import { maxFileSizeBytes, maxFileSizeMB } from '../config'
 import { asIpfsCid } from '@subsocial/api'
+import {ipfsApi} from "../../ipfs";
 
 const log = newLogger('IPFS req handler')
 
@@ -12,7 +13,7 @@ export const addContent = async (req: express.Request, res: express.Response) =>
     res.statusCode = 400
     res.json({ status: 'error', message: `Content should be less than ${maxFileSizeMB} MB` })
   } else {
-    const cid = await ipfsCluster.addContent(content)
+    const cid = await ipfsApi.saveAndPinJson(req.body);
     log.debug('Content added to IPFS with CID:', cid)
     res.json(cid)
   }
@@ -40,7 +41,7 @@ export const addFile = async (req: express.Request, res: express.Response) => {
     res.statusCode = 400
     res.json({ status: 'error', message: `Uploaded file should be less than ${maxFileSizeMB} MB` })
   } else {
-    const cid = await ipfsCluster.addFile(req.file);
+    const cid = await ipfsApi.saveAndPinImage(req.file);
     log.debug('File added to IPFS with CID:', cid);
     res.send(cid);
   }
@@ -51,9 +52,9 @@ export const deleteContent = async (req: express.Request, res: express.Response)
   const { cid } = req.params
   try {
     if (nonEmptyStr(cid)) {
-      const result = await ipfsCluster.unpinContent(cid)
+      // const result = await ipfsCluster.unpinContent(cid)
       log.debug('Content unpinned from IPFS by CID:', cid)
-      res.json(result)
+      res.json(true)
     } else {
       const msg = 'Cannot unpin content: No CID provided'
       log.warn(msg)

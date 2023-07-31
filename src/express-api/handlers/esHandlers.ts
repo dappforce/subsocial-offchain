@@ -4,7 +4,7 @@ import { nonEmptyStr, nonEmptyArr } from '@subsocial/utils'
 import { buildElasticSearchQuery } from '../../search/reader'
 import { elasticReader } from '../../connections/elastic'
 import { elasticLog } from '../../connections/loggers'
-import { ElasticQueryParams } from '@subsocial/api/types'
+import { ElasticQueryParams } from '@subsocial/elasticsearch/types'
 
 function toArray<T extends string>(maybeArr: T | Array<T>): Array<T> {
   if (nonEmptyArr(maybeArr)) {
