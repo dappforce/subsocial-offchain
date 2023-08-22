@@ -1,8 +1,7 @@
 import * as express from 'express'
 import { newLogger, nonEmptyStr } from '@subsocial/utils'
-import { ipfs, ipfsCluster } from '../../connections/ipfs'
+import { ipfsCluster } from '../../connections/ipfs'
 import { maxFileSizeBytes, maxFileSizeMB } from '../config'
-import { asIpfsCid } from '@subsocial/api'
 
 const log = newLogger('IPFS req handler')
 
@@ -18,22 +17,11 @@ export const addContent = async (req: express.Request, res: express.Response) =>
   }
 }
 
-const getContentResponse = async (res: express.Response, cids: string[]) => {
-  try {
-    const ipfsCids = (Array.isArray(cids) ? cids : [ cids ]).map(asIpfsCid)
-    const contents = await ipfs.getContentArrayFromIpfs(ipfsCids)
-    log.debug(`${contents.length} content items loaded from IPFS`)
-    res.json(contents)
-  } catch (err) {
-    res.json(err)
-  }
+export const saveData = async (req: express.Request, res: express.Response) => {
+  const cid = await ipfsCluster.saveData(req.body)
+  log.debug('Content added to IPFS with CID:', cid)
+  res.json(cid)
 }
-
-export const getContentAsGetRequest = async (req: express.Request, res: express.Response) =>
-  getContentResponse(res, req.query.cids as string[])
-
-export const getContentAsPostRequest = async (req: express.Request, res: express.Response) =>
-  getContentResponse(res, req.body.cids)
 
 export const addFile = async (req: express.Request, res: express.Response) => {
   if (req.file.size > maxFileSizeBytes) {
