@@ -19,6 +19,12 @@ export const addContent = async (req: express.Request, res: express.Response) =>
   }
 }
 
+export const saveData = async (req: express.Request, res: express.Response) => {
+  const cid = await ipfsApi.saveAndPinImage(req.body);
+  log.debug('Content added to IPFS with CID:', cid)
+  res.json(cid)
+}
+
 const getContentResponse = async (res: express.Response, cids: string[]) => {
   try {
     const ipfsCids = (Array.isArray(cids) ? cids : [ cids ]).map(asIpfsCid)
@@ -52,7 +58,7 @@ export const deleteContent = async (req: express.Request, res: express.Response)
   const { cid } = req.params
   try {
     if (nonEmptyStr(cid)) {
-      // const result = await ipfsCluster.unpinContent(cid)
+      await ipfsApi.ipfs.unpinContent(cid)
       log.debug('Content unpinned from IPFS by CID:', cid)
       res.json(true)
     } else {

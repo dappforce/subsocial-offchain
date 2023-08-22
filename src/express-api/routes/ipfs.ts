@@ -1,7 +1,7 @@
 import { Router } from 'express'
-import multer from 'multer'
 import * as ipfsReqHandlers from '../handlers/ipfsHandlers'
 import { maxFileSizeBytes } from '../config'
+import multer from "multer";
 
 const upload = multer({ limits: { fieldSize: maxFileSizeBytes } })
 
@@ -12,6 +12,7 @@ const createIpfsRoutes = () => {
   router.post('/addFile', upload.single('file'), ipfsReqHandlers.addFile)
 
   router.post('/add', ipfsReqHandlers.addContent)
+  router.post('/save', ipfsReqHandlers.saveData)
   // router.get('/get', ipfsReqHandlers.getContentAsGetRequest)
   // router.post('/get', ipfsReqHandlers.getContentAsPostRequest)
   router.delete('/pins/:cid', ipfsReqHandlers.deleteContent)
