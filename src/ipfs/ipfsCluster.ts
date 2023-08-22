@@ -126,6 +126,11 @@ export class IpfsClusterApi {
     return this.makeRequestAndPinCid(this.ipfsNodeRequest('dag/put', content))
   }
 
+  /** Add a JSON object to IPFS via `/add` and pin it via IPFS cluster. */
+  async saveData (content: string): Promise<IpfsCid | undefined> {
+    return this.makeRequestAndPinCid(this.ipfsClusterRequest('add', content))
+  }
+
   /** Delete a content from IPFS by unpinning it via IPFS cluster. */
   async unpinContent (cid: IpfsCid) {
     try {
