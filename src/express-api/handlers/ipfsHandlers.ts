@@ -20,7 +20,7 @@ export const addContent = async (req: express.Request, res: express.Response) =>
 }
 
 export const saveData = async (req: express.Request, res: express.Response) => {
-  const cid = await ipfsApi.saveAndPinImage(req.body);
+  const cid = await ipfsApi.saveAndPinFile(req.body);
   log.debug('Content added to IPFS with CID:', cid)
   res.json(cid)
 }
@@ -47,7 +47,7 @@ export const addFile = async (req: express.Request, res: express.Response) => {
     res.statusCode = 400
     res.json({ status: 'error', message: `Uploaded file should be less than ${maxFileSizeMB} MB` })
   } else {
-    const cid = await ipfsApi.saveAndPinImage(req.file);
+    const cid = await ipfsApi.saveAndPinFile(req.file);
     log.debug('File added to IPFS with CID:', cid);
     res.send(cid);
   }

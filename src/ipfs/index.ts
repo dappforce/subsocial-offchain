@@ -15,12 +15,12 @@ function getIpfsApi() {
     ipfs,
     saveAndPinJson: async (content: Record<any, any>) => {
       const cid = await ipfs.saveJson(content)
-      await ipfs.pinContent(cid, { 'meta.gatewayId': 1 })
+      await ipfs.pinContent(cid, { asLink: true, 'meta.gatewayId': 1 })
       return cid
     },
-    saveAndPinImage: async (content: any) => {
+    saveAndPinFile: async (content: any) => {
       const cid = await ipfs.saveFile(content)
-      await ipfs.pinContent(cid, { 'meta.gatewayId': 1 })
+      await ipfs.pinContent(cid, { asLink: true, 'meta.gatewayId': 1 })
       return cid
     },
   }

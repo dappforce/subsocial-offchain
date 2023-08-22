@@ -867,10 +867,10 @@
     escape-string-regexp "^2.0.0"
     lodash.deburr "^4.1.0"
 
-"@subsocial/api@0.8.13":
-  version "0.8.13"
-  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.8.13.tgz#94f69c8d870419d2becc346fd1202e36b8c066f6"
-  integrity sha512-jnbHm4bblYeYAYnriQDS9ehigGektPhwtxsHieXP+rYMKl3tu5ebbCOyCu/HXNavlEGFVGQmW1tYqw2VKhIC7w==
+"@subsocial/api@0.8.14":
+  version "0.8.14"
+  resolved "https://registry.yarnpkg.com/@subsocial/api/-/api-0.8.14.tgz#108d7827593c07090c1aca33b56113456b5428bb"
+  integrity sha512-xu91us11HwsJpsSULXuZLv8sH4cOw1xVN1vLKBQqJ1jaC7qsY5J0KGHA8hkT6STLWQ75tJjaxrXerPavhu/tQQ==
   dependencies:
     "@polkadot/api" latest
     "@polkadot/types" latest
@@ -895,10 +895,10 @@
     "@polkadot/api" latest
     lodash.camelcase "^4.3.0"
 
-"@subsocial/elasticsearch@^0.8.13":
-  version "0.8.13"
-  resolved "https://registry.yarnpkg.com/@subsocial/elasticsearch/-/elasticsearch-0.8.13.tgz#5f5e9e3eb6ab9fbff8fdbf8ab3b53db8f4f2b5a6"
-  integrity sha512-RUrizdzOOQQKDZMOWe6qDKX5y7blqjlZL9X1AR0ZQop7Qx/gFcWwAcvh5LfEPsYreK4UIjexowKm7mNrK1BzWA==
+"@subsocial/elasticsearch@^0.8.14":
+  version "0.8.14"
+  resolved "https://registry.yarnpkg.com/@subsocial/elasticsearch/-/elasticsearch-0.8.14.tgz#801dea9945096ddf3dd89b45a2b741e28b298481"
+  integrity sha512-61ndpTZflcmrmBsgyohprl1XnMOtCPysLldkrUqi80PZORQPEPIfjk8i0y2C/0TCRRripHXSz8WddpPA6lI54A==
   dependencies:
     "@elastic/elasticsearch" "7.4.0"
     "@subsocial/utils" latest

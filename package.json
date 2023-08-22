@@ -32,8 +32,8 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "7.4.0",
-    "@subsocial/api": "0.8.13",
-    "@subsocial/elasticsearch": "^0.8.13",
+    "@subsocial/api": "0.8.14",
+    "@subsocial/elasticsearch": "^0.8.14",
     "axios": "^0.26",
     "body-parser": "^1.18.3",
     "connect-timeout": "^1.9.0",
