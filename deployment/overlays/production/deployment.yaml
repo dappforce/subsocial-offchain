@@ -18,3 +18,12 @@ spec:
                 values:
                 - sub-backend
             topologyKey: kubernetes.io/hostname
+      containers:
+        - name: sub-backend
+          resources:
+            requests:
+              memory: "300Mi"
+              cpu: "200m"
+            limits:
+              memory: "750Mi"
+              cpu: "1"            
