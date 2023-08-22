@@ -91,7 +91,7 @@ jobs:
         run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/base/deployment.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 c7e84602-9029-40ed-9f95-6c113f6693ee
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.K8S_STAGING }}
 
       - name: Deploy to DigitalOcean Kubernetes
         run: |-
@@ -123,7 +123,7 @@ jobs:
         run: TAG=${{ steps.extract_branch.outputs.branch }}-$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|dappforce/subsocial-offchain:'${TAG}'|' $GITHUB_WORKSPACE/deployment/base/deployment.yaml
 
       - name: Save DigitalOcean kubeconfig with short-lived credentials
-        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 a4862333-a4d0-4e2c-b688-fcb90312d14e
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.K8S_PROD }}
 
       - name: Deploy to DigitalOcean Kubernetes
         run: |-
