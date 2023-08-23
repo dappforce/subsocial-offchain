@@ -1,5 +1,5 @@
 import { SubsocialIpfsApi } from '@subsocial/api'
-import {crustIpfsAuth, ipfsClusterUrl, ipfsNodeUrl} from "../env";
+import {crustIpfsAuth, ipfsClusterUrl, ipfsNodeUrl, ipfsReadOnlyNodeUrl} from "../env";
 function getIpfsApi() {
   const headers = crustIpfsAuth ? { authorization: `Bearer ${crustIpfsAuth}` } : {}
   const props = crustIpfsAuth ? { asLink: false, 'meta.gatewayId': 1 } : { asLink: true }
@@ -7,7 +7,8 @@ function getIpfsApi() {
   console.log(props)
 
   const ipfs = new SubsocialIpfsApi({
-    ipfsNodeUrl,
+    ipfsNodeUrl: ipfsReadOnlyNodeUrl,
+    ipfsAdminNodeUrl: ipfsNodeUrl,
     ipfsClusterUrl,
     headers,
   })
