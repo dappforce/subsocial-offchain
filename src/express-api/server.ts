@@ -1,9 +1,8 @@
 import express from 'express'
-import bodyParser from 'body-parser'
 import cors from 'cors'
 import { expressApiLog as log } from '../connections/loggers'
 import timeout from 'connect-timeout'
-import { maxFileSizeBytes, reqTimeoutSecs } from './config'
+import { reqTimeoutSecs } from './config'
 import { corsAllowedList, isAllCorsAllowed, port } from '../env'
 import { createV1Routes } from './routes'
 
@@ -32,10 +31,6 @@ function haltOnTimedout(req: express.Request, _res: express.Response, next) {
 }
 
 app.use(timeout(`${reqTimeoutSecs}s`))
-
-// for parsing application/json
-app.use(bodyParser.json({ limit: maxFileSizeBytes }))
-app.use(bodyParser.urlencoded({ extended: true, limit: maxFileSizeBytes }))
 app.use(haltOnTimedout)
 
 app.use('/v1', createV1Routes())

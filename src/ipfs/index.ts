@@ -4,6 +4,8 @@ function getIpfsApi() {
   const headers = crustIpfsAuth ? { authorization: `Bearer ${crustIpfsAuth}` } : {}
   const props = crustIpfsAuth ? { asLink: false, 'meta.gatewayId': 1 } : { asLink: true }
 
+  console.log(props)
+
   const ipfs = new SubsocialIpfsApi({
     ipfsNodeUrl,
     ipfsClusterUrl,
@@ -19,8 +21,8 @@ function getIpfsApi() {
       await ipfs.pinContent(cid, props)
       return cid
     },
-    saveAndPinFile: async (content: any) => {
-      const cid = await ipfs.saveFile(content)
+    saveAndPinFile: async (file: any) => {
+      const cid = await ipfs.saveFile(file)
       await ipfs.pinContent(cid, props)
       return cid
     },

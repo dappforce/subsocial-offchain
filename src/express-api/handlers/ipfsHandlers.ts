@@ -1,55 +1,34 @@
 import * as express from 'express'
 import { newLogger, nonEmptyStr } from '@subsocial/utils'
-import { ipfs } from '../../connections/ipfs'
-import { maxFileSizeBytes, maxFileSizeMB } from '../config'
-import { asIpfsCid } from '@subsocial/api'
-import {ipfsApi} from "../../ipfs";
+import { ipfsApi } from "../../ipfs";
 
 const log = newLogger('IPFS req handler')
 
 export const addContent = async (req: express.Request, res: express.Response) => {
-  const content = JSON.stringify(req.body)
-  if (content.length > maxFileSizeBytes) {
-    res.statusCode = 400
-    res.json({ status: 'error', message: `Content should be less than ${maxFileSizeMB} MB` })
-  } else {
-    const cid = await ipfsApi.saveAndPinJson(req.body);
-    log.debug('Content added to IPFS with CID:', cid)
-    res.json(cid)
-  }
-}
-
-export const saveData = async (req: express.Request, res: express.Response) => {
-  const cid = await ipfsApi.saveAndPinFile(req.body);
+  const cid = await ipfsApi.saveAndPinJson(req.body);
   log.debug('Content added to IPFS with CID:', cid)
   res.json(cid)
 }
 
-const getContentResponse = async (res: express.Response, cids: string[]) => {
-  try {
-    const ipfsCids = (Array.isArray(cids) ? cids : [ cids ]).map(asIpfsCid)
-    const contents = await ipfs.getContentArrayFromIpfs(ipfsCids)
-    log.debug(`${contents.length} content items loaded from IPFS`)
-    res.json(contents)
-  } catch (err) {
-    res.json(err)
-  }
+export const addRawData = async (req: express.Request, res: express.Response) => {
+  const cid = await ipfsApi.saveAndPinFile(req.body);
+  log.debug('Raw data added to IPFS with CID:', cid)
+  res.json(cid)
 }
 
-export const getContentAsGetRequest = async (req: express.Request, res: express.Response) =>
-  getContentResponse(res, req.query.cids as string[])
-
-export const getContentAsPostRequest = async (req: express.Request, res: express.Response) =>
-  getContentResponse(res, req.body.cids)
-
 export const addFile = async (req: express.Request, res: express.Response) => {
-  if (req.file.size > maxFileSizeBytes) {
-    res.statusCode = 400
-    res.json({ status: 'error', message: `Uploaded file should be less than ${maxFileSizeMB} MB` })
+  const cid = await ipfsApi.saveAndPinFile(req.file.buffer);
+  log.debug('File added to IPFS with CID:', cid);
+  res.json(cid);
+}
+
+export const getData = async (req: express.Request, res: express.Response) => {
+  const { cid } = req.params
+  const data = await ipfsApi.ipfs.getContent(cid);
+  if (data) {
+    res.json(data);
   } else {
-    const cid = await ipfsApi.saveAndPinFile(req.file);
-    log.debug('File added to IPFS with CID:', cid);
-    res.send(cid);
+    res.status(400).json(`Content with CID ${cid} not found or isnt JSON`);
   }
 }
 
