@@ -1,17 +1,34 @@
-import { CommonContent } from '@subsocial/api/types'
-import { ipfs } from '../connections'
-import { ipfsLog as log } from '../connections/loggers'
+import { SubsocialIpfsApi } from '@subsocial/api'
+import {crustIpfsAuth, ipfsClusterUrl, ipfsNodeUrl, ipfsReadOnlyNodeUrl} from "../env";
+function getIpfsApi() {
+  const headers = crustIpfsAuth ? { authorization: `Bearer ${crustIpfsAuth}` } : {}
+  const props = crustIpfsAuth ? { asLink: false, 'meta.gatewayId': 1 } : { asLink: true }
 
-type HasContentId = {
-  contentId?: string
+  console.log(props)
+
+  const ipfs = new SubsocialIpfsApi({
+    ipfsNodeUrl: ipfsReadOnlyNodeUrl,
+    ipfsAdminNodeUrl: ipfsNodeUrl,
+    ipfsClusterUrl,
+    headers,
+  })
+  ipfs.setWriteHeaders(headers)
+  ipfs.setPinHeaders(headers)
+
+  return {
+    ipfs,
+    saveAndPinJson: async (content: Record<any, any>) => {
+      const cid = await ipfs.saveJson(content)
+      await ipfs.pinContent(cid, props)
+      return cid
+    },
+    saveAndPinFile: async (file: any) => {
+      const cid = await ipfs.saveFile(file)
+      await ipfs.pinContent(cid, props)
+      return cid
+    },
+  }
 }
 
-export async function getContentFromIpfs<T extends CommonContent>(struct: HasContentId): Promise<T | undefined> {
-  const cid = struct.contentId
+export const ipfsApi = getIpfsApi()
 
-  return ipfs.getContent<T>(cid)
-    .catch(err => {
-      log.warn(`Failed to get content from IPFS by CID:`, cid?.toString(), err)
-      return undefined
-    })
-}

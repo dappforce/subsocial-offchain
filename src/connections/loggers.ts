@@ -3,4 +3,3 @@ require('dotenv').config();
 
 export const expressApiLog = newLogger('Express API')
 export const ipfsLog = newLogger('IPFS')
-export const elasticLog = newLogger('ElasticSearch')
