@@ -1,7 +1,8 @@
 import { SubsocialIpfsApi } from '@subsocial/api'
 import {crustIpfsAuth, ipfsClusterUrl, ipfsNodeUrl, ipfsReadOnlyNodeUrl} from "../env";
+
 function getIpfsApi() {
-  const headers = crustIpfsAuth ? { authorization: `Bearer ${crustIpfsAuth}` } : {}
+  const writeHeaders = crustIpfsAuth ? { authorization: crustIpfsAuth } : {}
   const props = crustIpfsAuth ? { asLink: false, 'meta.gatewayId': 1 } : { asLink: true }
 
   console.log(props)
@@ -10,21 +11,19 @@ function getIpfsApi() {
     ipfsNodeUrl: ipfsReadOnlyNodeUrl,
     ipfsAdminNodeUrl: ipfsNodeUrl,
     ipfsClusterUrl,
-    headers,
   })
-  ipfs.setWriteHeaders(headers)
-  ipfs.setPinHeaders(headers)
+  ipfs.setWriteHeaders(writeHeaders)
 
   return {
     ipfs,
     saveAndPinJson: async (content: Record<any, any>) => {
       const cid = await ipfs.saveJson(content)
-      await ipfs.pinContent(cid, props)
+      ipfs.pinContent(cid, props)
       return cid
     },
     saveAndPinFile: async (file: any) => {
       const cid = await ipfs.saveFile(file)
-      await ipfs.pinContent(cid, props)
+      ipfs.pinContent(cid, props)
       return cid
     },
   }
