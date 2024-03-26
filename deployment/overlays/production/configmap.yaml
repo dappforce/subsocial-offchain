@@ -19,9 +19,9 @@ data:
   IPFS_CLUSTER_URL: http://new-ipfs-cluster:9094
   IPFS_GATEWAY_URL: https://ipfs.subsocial.network
   IPFS_MAX_FILE_SIZE_BYTES: "2097152"
-  IPFS_NODE_URL: https://ipfs-gw.decloud.foundation
+  IPFS_NODE_URL: http://new-ipfs-cluster:5001
   IPFS_READ_ONLY_NODE_URL: http://new-ipfs-cluster:8080
-  IPFS_CRUST_AUTH: 'Basic c3ViLTVGQTluUURWZzI2N0RFZDhtMVp5cFhMQm52TjdTRnhZd1Y3bmRxU1lHaU45VFRwdToweDEwMmQ3ZmJhYWQwZGUwNzFjNDFmM2NjYzQzYmQ0NzIxNzFkZGFiYWM0MzEzZTc5YTY3ZWExOWM0OWFlNjgyZjY0YWUxMmRlY2YyNzhjNTEwZGY4YzZjZTZhYzdlZTEwNzY2N2YzYTBjZjM5OGUxN2VhMzAyMmRkNmEyYjc1OTBi='
+  IPFS_CRUST_AUTH: ''
   KUSAMA_NODE_URL: wss://kusama-rpc.polkadot.io
   LOG_LEVEL: info
   MAX_RESULTS_LIMIT: "20"
