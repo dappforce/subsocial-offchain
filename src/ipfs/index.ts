@@ -18,12 +18,12 @@ function getIpfsApi() {
     ipfs,
     saveAndPinJson: async (content: Record<any, any>) => {
       const cid = await ipfs.saveJson(content)
-      // ipfs.pinContent(cid, props)
+      ipfs.pinContent(cid, props)
       return cid
     },
     saveAndPinFile: async (file: any) => {
       const cid = await ipfs.saveFile(file)
-      // ipfs.pinContent(cid, props)
+      ipfs.pinContent(cid, props)
       return cid
     },
   }
