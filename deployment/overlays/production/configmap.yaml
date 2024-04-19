@@ -19,7 +19,7 @@ data:
   IPFS_CLUSTER_URL: http://new-ipfs-cluster:9094
   IPFS_GATEWAY_URL: https://ipfs.subsocial.network
   IPFS_MAX_FILE_SIZE_BYTES: "2097152"
-  IPFS_NODE_URL: http://89.58.19.3:5001
+  IPFS_NODE_URL: http://new-ipfs-cluster:5001
   IPFS_READ_ONLY_NODE_URL: http://new-ipfs-cluster:8080
   IPFS_CRUST_AUTH: ''
   KUSAMA_NODE_URL: wss://kusama-rpc.polkadot.io
