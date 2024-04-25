@@ -13,9 +13,6 @@ data:
   ES_NODE_URL: https://104.248.94.114:9200
   ES_OFFCHAIN_USER: elastic
   ES_READONLY_USER: elastic
-  FAUCET_DRIP_AMOUNT: "0.05"
-  FAUCET_MAX_AMOUNT_TOP_UP: "0.025"
-  FAUCET_MNEMONIC: ""
   IPFS_GATEWAY_URL: https://ipfs.subsocial.network
   IPFS_MAX_FILE_SIZE_BYTES: "2097152"
   IPFS_CLUSTER_URL: http://new-ipfs-cluster:9094
