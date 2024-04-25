@@ -1,11 +1,10 @@
 import { SubsocialIpfsApi } from '@subsocial/api'
-import {crustIpfsAuth, ipfsClusterUrl, ipfsNodeUrl, ipfsReadOnlyNodeUrl} from "../env";
+import {ipfsAuthHeader, ipfsClusterUrl, ipfsNodeUrl, ipfsReadOnlyNodeUrl} from "../env";
 
 function getIpfsApi() {
-  const writeHeaders = crustIpfsAuth ? { authorization: crustIpfsAuth } : {}
-  const props = crustIpfsAuth ? { asLink: false, 'meta.gatewayId': 1 } : { asLink: true }
-
-  console.log(props)
+  const writeHeaders = { authorization: ipfsAuthHeader }
+  const isCrust = false
+  const props = isCrust ? { asLink: false, 'meta.gatewayId': 1 } : { asLink: true }
 
   const ipfs = new SubsocialIpfsApi({
     ipfsNodeUrl: ipfsReadOnlyNodeUrl,
