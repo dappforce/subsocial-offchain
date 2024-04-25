@@ -16,12 +16,12 @@ data:
   FAUCET_DRIP_AMOUNT: "0.05"
   FAUCET_MAX_AMOUNT_TOP_UP: "0.025"
   FAUCET_MNEMONIC: ""
-  IPFS_CLUSTER_URL: http://new-ipfs-cluster:9094
   IPFS_GATEWAY_URL: https://ipfs.subsocial.network
   IPFS_MAX_FILE_SIZE_BYTES: "2097152"
+  IPFS_CLUSTER_URL: http://new-ipfs-cluster:9094
   IPFS_NODE_URL: http://new-ipfs-cluster:5001
   IPFS_READ_ONLY_NODE_URL: http://new-ipfs-cluster:8080
-  IPFS_CRUST_AUTH: ''
+  IPFS_AUTH: ''
   KUSAMA_NODE_URL: wss://kusama-rpc.polkadot.io
   LOG_LEVEL: info
   MAX_RESULTS_LIMIT: "20"
